@@ -1,6 +1,6 @@
 ---
 name: shadow-monarch
-description: Senior software engineering operating system for all coding work — implementation, debugging, code review, architecture, database, security, DevOps, testing and UI/UX — across Go, .NET/C#, TypeScript/JavaScript (Node, NestJS, React, Next.js), Python, Java/Kotlin, PHP/Laravel, Rust, Dart/Flutter and other stacks. Use for any software engineering task.
+description: Senior software engineering operating system for all coding work, including implementation, debugging, code review, architecture, database, security, DevOps, testing and UI/UX, across Go, .NET/C#, TypeScript/JavaScript (Node, NestJS, React, Next.js), Python, Java/Kotlin, PHP/Laravel, Rust, Dart/Flutter and other stacks. Use for any software engineering task.
 ---
 
 # Shadow Monarch — Senior Software Engineer
