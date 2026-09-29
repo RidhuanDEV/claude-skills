@@ -1,8 +1,8 @@
 # Shadow Monarch — Claude Skills
 
 A senior software engineering skill for Claude. It makes Claude work like an experienced engineer across
-architecture, backend, frontend, UI/UX design, database, security, DevOps, testing, debugging and code review,
-with language guides for **Go, .NET/C#, TypeScript/JavaScript (Node, NestJS, React, Next.js), Python,
+architecture, backend, frontend, UI/UX design, database, security, DevOps, testing, debugging, code review and
+AI/LLM features, with language guides for **Go, .NET/C#, TypeScript/JavaScript (Node, NestJS, React, Next.js, Vue, Angular), Python,
 Java/Kotlin, PHP/Laravel, Rust and Dart/Flutter**.
 
 > Control complexity instead of being controlled by it.
@@ -17,9 +17,10 @@ shadow-monarch/
 ├─ GLOBAL.md         short version for account-wide instructions
 └─ reference/        loaded only when the task needs them
    ├─ CORE.md  ARCHITECTURE.md  BACKEND.md  DATABASE.md  FRONTEND.md  DESIGN.md
-   ├─ SECURITY.md  DEVOPS.md  TESTING.md  DEBUGGING.md  CODE-REVIEW.md
+   ├─ SECURITY.md  DEVOPS.md  TESTING.md  DEBUGGING.md  CODE-REVIEW.md  AI-LLM.md
    └─ lang-GO.md  lang-DOTNET.md  lang-TYPESCRIPT-NODE.md  lang-PYTHON.md
       lang-JAVA-KOTLIN.md  lang-PHP-LARAVEL.md  lang-RUST.md  lang-DART-FLUTTER.md
+evals/               test prompts to check the skill works (not part of the upload)
 ```
 
 `SKILL.md` tells Claude which reference files to read for each task. For example, a NestJS bug that only happens in Docker
@@ -53,11 +54,22 @@ Manual alternative: copy the folder yourself and paste `GLOBAL.md` into `~/.clau
 ### Claude apps (claude.ai / desktop / mobile)
 
 1. Zip the `shadow-monarch` folder so that the zip contains the folder with `SKILL.md` inside it:
-   - Windows: `Compress-Archive -Path shadow-monarch -DestinationPath shadow-monarch.zip`
+   - Windows: `Compress-Archive -Path shadow-monarch -DestinationPath shadow-monarch.zip -Force`
    - macOS/Linux: `zip -r shadow-monarch.zip shadow-monarch`
-2. Upload the zip as a custom skill in Claude's settings (Skills section; the exact location may change over time).
+2. Make sure **Settings → Capabilities → Code execution and file creation** is on, then go to **Customize → Skills →
+   + → Create skill → Upload a skill** and pick the zip (menu names may change over time).
 3. Optional: paste the contents of `shadow-monarch/GLOBAL.md` into your profile's personal preferences so the core rules
    apply to every chat. It is about 3k characters, well under the preferences limit.
+
+## Test it
+
+See [`evals/README.md`](evals/README.md): 8 realistic prompts with the points a good answer must hit,
+plus how to compare with the skill turned off.
+
+## Updating
+
+After pulling a new version: re-run the install script (Claude Code) and re-upload the zip (Claude apps; the uploaded
+copy does not update itself). If `GLOBAL.md` changed, paste it into your profile preferences again.
 
 ## Customize
 

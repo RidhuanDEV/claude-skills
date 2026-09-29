@@ -1,0 +1,118 @@
+{
+  "skill_name": "shadow-monarch",
+  "evals": [
+    {
+      "id": 1,
+      "name": "review-payment-endpoint",
+      "prompt": "review this before I merge:\n\n```ts\napp.post('/pay', async (req, res) => {\n  const total = req.body.price * req.body.qty;\n  await db.query(`UPDATE wallets SET balance = balance - ${total} WHERE user_id = ${req.body.userId}`);\n  res.json({ ok: true });\n});\n```",
+      "expected_output": "A structured code review using the CRITICAL/HIGH/MEDIUM/LOW/NIT scale with location, impact and fix for each finding.",
+      "files": [],
+      "assertions": [
+        "Uses CRITICAL / HIGH / MEDIUM / LOW / NIT severity labels",
+        "Flags SQL injection from string-interpolated query as CRITICAL",
+        "Flags trusting userId from the request body (missing authentication/authorization)",
+        "Flags price/total coming from the client and float arithmetic for money",
+        "Flags missing idempotency or double-submit protection for a payment",
+        "Flags missing balance check / race condition (balance can go negative)",
+        "Flags missing error handling / always returning ok",
+        "Provides a corrected implementation or concrete fix per finding"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "nestjs-500-in-docker",
+      "prompt": "my nestjs api works fine with npm run start:dev on my laptop but when i run it with docker compose every request to /auth/login returns 500. postgres is also in the compose file. what should i check?",
+      "expected_output": "Evidence-first debugging: ranked hypotheses by layer and exact commands to collect evidence before proposing fixes.",
+      "files": [],
+      "assertions": [
+        "Asks for or tells the user how to get the container logs / stack trace before guessing a fix",
+        "Mentions localhost inside a container vs the compose service name for the database host",
+        "Mentions missing or different environment variables (e.g. JWT secret, DATABASE_URL) in the container",
+        "Ranks hypotheses rather than giving a single guess",
+        "Gives concrete commands (docker compose logs, exec, env) and does not suggest deleting volumes as a first step"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "efcore-add-column-production",
+      "prompt": "I need to add a non-nullable PhoneNumber column to our Users table (about 8 million rows, SQL Server, EF Core 8, app runs on 3 instances behind a load balancer). How do I do this safely?",
+      "expected_output": "An expand-migrate-contract plan compatible with rolling deploys, with EF Core specifics.",
+      "files": [],
+      "assertions": [
+        "Recommends adding the column as nullable first (expand), then backfill, then enforce NOT NULL later",
+        "Recommends batched backfill rather than one giant UPDATE",
+        "Mentions old and new app versions running side by side during rollout",
+        "Advises against auto-migrating on startup with multiple instances or recommends applying migrations in the pipeline",
+        "Mentions reviewing the generated SQL / migration script and a rollback plan"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "go-external-api-client",
+      "prompt": "Write a Go function that fetches a user's profile from https://api.example.com/users/{id} and returns a typed struct. It'll be called from our HTTP handlers.",
+      "expected_output": "Idiomatic, production-ready Go code.",
+      "files": [],
+      "assertions": [
+        "Accepts context.Context as the first parameter and uses http.NewRequestWithContext",
+        "Uses a configured http.Client with a Timeout, not http.DefaultClient",
+        "Closes the response body and checks the status code",
+        "Wraps errors with context using %w",
+        "Limits or safely decodes the response body",
+        "Includes a test or a test plan (e.g. httptest.Server)"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "bahasa-laravel-upload",
+      "prompt": "tolong bikinin endpoint upload foto KTP di laravel 11, max 2MB, nanti disimpan buat verifikasi user",
+      "expected_output": "Reply in Bahasa Indonesia with English code; secure upload handling appropriate for sensitive identity documents.",
+      "files": [],
+      "assertions": [
+        "Responds in Bahasa Indonesia while keeping code and technical terms in English",
+        "Uses a Form Request with mimes/max validation",
+        "Stores the file on a private (non-public) disk with a generated filename",
+        "Treats the KTP as sensitive personal data (access control, signed/temporary URLs, or encryption/retention mentioned)",
+        "Includes authorization so users can only access their own document"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "rag-fastapi-design",
+      "prompt": "We want a 'chat with our regulations' feature: ~5,000 PDF regulations, FastAPI backend, PostgreSQL already in use, users from different agencies should only see documents their agency is allowed to see. How would you design it?",
+      "expected_output": "A right-sized RAG design with permission filtering in retrieval, citations and evaluation.",
+      "files": [],
+      "assertions": [
+        "Considers pgvector in the existing PostgreSQL before adding a new database",
+        "Filters by agency/permissions inside the retrieval query, not after generation",
+        "Requires citations and a 'not found' answer instead of guessing",
+        "Mentions prompt injection from document content",
+        "Proposes an evaluation set / measuring retrieval quality",
+        "Covers PDF extraction/OCR and structure-aware chunking"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "simple-question-stays-short",
+      "prompt": "what's the difference between 401 and 403?",
+      "expected_output": "A short, direct answer with no design-document structure.",
+      "files": [],
+      "assertions": [
+        "Answers in a few sentences or a very short list",
+        "Does not produce a multi-section template (no 'Security considerations', 'Testing' sections)"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "push-back-on-overengineering",
+      "prompt": "I'm building an internal leave-request app for about 150 employees. I want to split it into 6 microservices with Kafka and deploy on Kubernetes so it's scalable. Can you set up the architecture?",
+      "expected_output": "Respectful pushback recommending a modular monolith, with reasons and a path to scale later.",
+      "files": [],
+      "assertions": [
+        "Challenges the microservices/Kafka/Kubernetes choice with concrete operational costs",
+        "Recommends a modular monolith (or equivalent simple architecture) with clear module boundaries",
+        "Explains when splitting later would be justified",
+        "Still helps: proposes a concrete structure rather than only refusing"
+      ]
+    }
+  ]
+}

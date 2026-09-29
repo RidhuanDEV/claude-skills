@@ -34,6 +34,11 @@ Types are design tools: domain models, discriminated unions for states and API r
 `unknown` + validation for external data (never trust `as SomeType` on API responses — parse with a schema).
 Avoid `any`, non-null assertions as a habit, and type gymnastics nobody can maintain.
 
+Vue and Angular equivalents: Vue — Composition API + `<script setup>`, Pinia for shared state, `computed` for
+derived values, `watch` cleanup via `onWatcherCleanup`/`onUnmounted`, TanStack Query for Vue for server state.
+Angular — standalone components, signals for local state, `OnPush` change detection, RxJS subscriptions ended with
+`takeUntilDestroyed`/`async` pipe, typed reactive forms, `HttpClient` interceptors for auth/errors.
+
 ## 4. Rendering and effects (React-family, adapt for others)
 
 - Effects are for synchronizing with external systems, not for deriving data. Every subscription, timer, listener,

@@ -1,6 +1,7 @@
 # CORE — Engineering Mindset & Code Quality
 
-Always loaded for non-trivial work. Other files add domain detail; this file sets behavior.
+Loaded for non-trivial work. It expands the non-negotiables in SKILL.md (not repeated here);
+domain and language files add detail.
 
 ## 1. Before touching code
 
@@ -108,12 +109,8 @@ primitive obsession for important values (money, IDs, emails), premature optimiz
 ## 9. Communication
 
 - Concise, structured, precise, honest about uncertainty. Never hide important risks.
-- Adjust depth: simple questions get simple answers; do not bury an implementation under theory.
 - Explaining code: what it does, why it works, key decisions, failure cases, how to test — not a line-by-line translation.
 - Uncertain? "The most likely cause is…", "Based on this stack trace…", "Two plausible scenarios…", then how to verify.
-- Teaching: intuition → basic concept → example → production considerations → advanced details. Do not oversimplify.
-- Treat me as an engineer working with you: point out flawed assumptions, missed risks, better options —
-  without replacing my requirements with your preferences.
 
 Documentation answers: what is this, why does it exist, how does it work, how do I run, configure, test and deploy it,
 what commonly breaks. Useful over exhaustive; keep it in sync with the code. Respect semantic versioning
@@ -124,10 +121,4 @@ what commonly breaks. Useful over exhaustive; keep it in sync with the code. Res
 Is it correct? Secure? Can it fail partially? Can it run twice? Can two users run it at once?
 What if a dependency is down? Can it corrupt or leak data? Does it scale for expected demand?
 Can another engineer understand, test and roll it back?
-
-Never: blindly agree with incorrect assumptions, invent APIs/packages, hide uncertainty, suggest destructive
-commands casually, expose secrets, trust client input, ignore authorization, swallow errors, add needless
-dependencies, overengineer, rewrite working systems without justification, confuse "it compiles" with "it is correct".
-
-Always: understand before changing, fix root causes, preserve working behavior, consider edge cases, security and
-failure modes, validate input, protect data integrity, communicate trade-offs, use evidence, define tests, change incrementally.
+"It compiles" and "the tests I wrote pass" are not the same as "it is correct".
