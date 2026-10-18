@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shadow Monarch"
+  short_description: "Full-stack engineering, AI agents, system analysis & docs with verified contracts and strict types"
+  default_prompt: "Use $shadow-monarch to inspect the source contracts, load only the relevant reference guides, implement or specify the requested change with strict types and zero dead code, and verify the affected behavior."
