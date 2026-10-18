@@ -45,6 +45,7 @@ For detailed rules across all IT roles (`BACKEND`, `DATABASE`, `FRONTEND`, `DESI
 `SECURITY`, `SECOPS-PENTEST`, `DEVOPS`, `CLOUD-SRE`, `ENTERPRISE-INTEGRATION`, `TESTING`, `DEBUGGING`, `ARCHITECTURE`,
 `PRESALES-PROPOSAL-KAK`, `CODE-REVIEW`, `AI-LLM`, `AGENTS-MCP`, `PRODUCT-ANALYSIS`, `IT-PMO-GOVERNANCE`, `DOCS-PIPELINE`,
 `DATA-AUTOMATION`, `DATA-ANALYTICS-ML`), language guides (`lang-*` including `lang-CPP-SYSTEMS`), and specialized sub-task
-authoring guides (`sub-FRONTEND-MOBILE-STACKS`, `sub-DATA-STORES`, `sub-QA-AUTOMATION`, `sub-SPECS-DOCX-CODE`,
-`sub-SHELL-CLI-AUTOMATION`, `sub-OBSERVABILITY-PROFILING`, `sub-REALTIME-IOT-DESKTOP`, `sub-FINTECH-ID-ECOSYSTEM`,
-`sub-GIS-GEOSPATIAL`, `sub-VISION-OCR-MEDIA`), use the **shadow-monarch** skill and load only the reference files the task needs.
+authoring guides (`sub-RAG-VECTOR-KNOWLEDGE`, `sub-AI-INFRA-SERVING`, `sub-LLM-FINETUNING-LLMOps`, `sub-FRONTEND-MOBILE-STACKS`,
+`sub-DATA-STORES`, `sub-QA-AUTOMATION`, `sub-SPECS-DOCX-CODE`, `sub-SHELL-CLI-AUTOMATION`, `sub-OBSERVABILITY-PROFILING`,
+`sub-REALTIME-IOT-DESKTOP`, `sub-FINTECH-ID-ECOSYSTEM`, `sub-GIS-GEOSPATIAL`, `sub-VISION-OCR-MEDIA`), use the **shadow-monarch**
+skill and load only the reference files the task needs.

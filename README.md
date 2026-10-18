@@ -1,10 +1,10 @@
 # Shadow Monarch — Antigravity, Codex, and Claude Skill
 
-A full-spectrum senior engineering and IT peer skill for Antigravity, Codex, and Claude, with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, and specialized sub-tasks** through a 3-Tier Foreign Key routing index (44 reference modules loaded strictly on demand):
+A full-spectrum senior engineering and IT peer skill for Antigravity, Codex, and Claude, with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, AI/RAG/GPU infrastructure, and specialized sub-tasks** through a 3-Tier Foreign Key routing index (47 reference modules loaded strictly on demand):
 
-- **25 Role & Domain Guides**: Core Mindset, Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design, Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
+- **25 Role & Domain Guides**: Core Mindset, Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design, Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM Core, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
 - **9 Language Guides (`lang-*`)**: TypeScript/JavaScript (Node, NestJS, Express, React, Next.js), Go, .NET/C#, Python (FastAPI, Django, Flask), Java/Kotlin (Spring Boot), PHP/Laravel, Rust (`tokio`, `axum`), Dart/Flutter, and Modern C/C++20/Embedded (ESP32/STM32/CMake/Wasm).
-- **10 Specialized Sub-Task & Tooling Guides (`sub-*`)**: Vue 3/Nuxt/Angular Signals/Tailwind/React Native/Jetpack Compose/SwiftUI, PostgreSQL/Redis/Elasticsearch/MongoDB, Playwright/Cypress/`k6`/Bruno/TCM/UAT, OpenAPI 3.1/DBML/Strict Mermaid/`python-docx` & Node `docx` Generators, PowerShell/Bash/Taskfiles, OpenTelemetry/PromQL/LogQL/Grafana/Profiling, WebSockets/SSE/WebRTC/MQTT IoT/Electron/Tauri/Chrome MV3, Indonesian Fintech & Gov (SNAP BI, TTE BSrE/e-Meterai, SatuSehat FHIR/BPJS, Tax PPN/PPh), GIS/PostGIS/MapLibre/Vector Tiles, and Computer Vision/OCR/Whisper/FFmpeg.
+- **13 Specialized Sub-Task & Tooling Guides (`sub-*`)**: Advanced RAG/Hybrid Search/Reranking/Vector DBs/GraphRAG, AI & GPU Infrastructure (`vLLM`/`SGLang`/`TGI`/`Ollama`, VRAM Sizing, K8s GPU, `LiteLLM` Gateways), LLM Fine-Tuning (`LoRA`/`QLoRA`/`DPO`/Unsloth, Guardrails, LLMOps Tracing), Vue 3/Nuxt/Angular Signals/Tailwind/React Native/Jetpack Compose/SwiftUI, PostgreSQL/Redis/Elasticsearch/MongoDB, Playwright/Cypress/`k6`/Bruno/TCM/UAT, OpenAPI 3.1/DBML/Strict Mermaid/`python-docx` & Node `docx` Generators, PowerShell/Bash/Taskfiles, OpenTelemetry/PromQL/LogQL/Grafana/Profiling, WebSockets/SSE/WebRTC/MQTT IoT/Electron/Tauri/Chrome MV3, Indonesian Fintech & Gov (SNAP BI, TTE BSrE/e-Meterai, SatuSehat FHIR/BPJS, Tax PPN/PPh), GIS/PostGIS/MapLibre/Vector Tiles, and Computer Vision/OCR/Whisper/FFmpeg.
 
 > Control complexity instead of being controlled by it.
 
@@ -17,7 +17,7 @@ shadow-monarch/
 ├─ SKILL.md          core rules + 3-tier Foreign Key router (always loaded when the skill is used)
 ├─ GLOBAL.md         account-wide summary for Claude / global agent instructions
 ├─ agents/openai.yaml Codex display name and invocation prompt
-└─ reference/        44 focused modules loaded only when the active task needs them
+└─ reference/        47 focused modules loaded only when the active task needs them
    ├─ Role & Domain (25):
    │  CORE.md  ARCHITECTURE.md  PRESALES-PROPOSAL-KAK.md  BACKEND.md  DATABASE.md
    │  FRONTEND.md  DESIGN.md  MOBILE-DESIGN.md  MOBILE.md  REFACTORING.md
@@ -29,7 +29,8 @@ shadow-monarch/
    │  lang-TYPESCRIPT-NODE.md  lang-GO.md  lang-DOTNET.md  lang-PYTHON.md
    │  lang-JAVA-KOTLIN.md  lang-PHP-LARAVEL.md  lang-RUST.md  lang-DART-FLUTTER.md
    │  lang-CPP-SYSTEMS.md
-   └─ Sub-Task & Tooling Authoring Rules (10):
+   └─ Sub-Task & Tooling Authoring Rules (13):
+      sub-RAG-VECTOR-KNOWLEDGE.md  sub-AI-INFRA-SERVING.md  sub-LLM-FINETUNING-LLMOps.md
       sub-FRONTEND-MOBILE-STACKS.md  sub-DATA-STORES.md  sub-QA-AUTOMATION.md
       sub-SPECS-DOCX-CODE.md  sub-SHELL-CLI-AUTOMATION.md  sub-OBSERVABILITY-PROFILING.md
       sub-REALTIME-IOT-DESKTOP.md  sub-FINTECH-ID-ECOSYSTEM.md  sub-GIS-GEOSPATIAL.md

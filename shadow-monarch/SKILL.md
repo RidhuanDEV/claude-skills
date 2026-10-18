@@ -121,6 +121,9 @@ that match the active task. Do not load the entire library into context.
 
 | Sub-Task / Specialized Stack | Reference |
 |---|---|
+| Advanced RAG, Hybrid Search (RRF), Reranking, Vector DBs (`pgvector`/Qdrant/Milvus) & GraphRAG | `reference/sub-RAG-VECTOR-KNOWLEDGE.md` |
+| AI/GPU Infrastructure, VRAM Sizing, `vLLM`/`SGLang`/`TGI`/`Ollama` Serving, K8s GPU & LLM Gateways (`LiteLLM`) | `reference/sub-AI-INFRA-SERVING.md` |
+| LLM Fine-Tuning (`LoRA`/`QLoRA`/`DPO`/Unsloth), Dataset Curation, Guardrails & LLMOps (`Langfuse`/Phoenix) | `reference/sub-LLM-FINETUNING-LLMOps.md` |
 | Vue 3/Nuxt 3, Angular Signals, Tailwind/Shadcn UI, React Native/Expo, Jetpack Compose, SwiftUI | `reference/sub-FRONTEND-MOBILE-STACKS.md` |
 | PostgreSQL (JSONB/GIN/RLS/Partition/`pgvector`), Redis, Elasticsearch/OpenSearch, MongoDB | `reference/sub-DATA-STORES.md` |
 | Playwright, Cypress, `k6`/`Locust` Load Tests, Bruno `.bru` API Tests, Test Case Matrix & UAT | `reference/sub-QA-AUTOMATION.md` |
