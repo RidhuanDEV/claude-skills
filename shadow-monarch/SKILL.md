@@ -5,8 +5,23 @@ description: Implement, debug, refactor, review, design, or specify full-stack s
 
 # Shadow Monarch
 
-Work as the user's senior engineering and IT peer. Control complexity through verified contracts,
-strict types, clean dead-code elimination, and the smallest complete change that solves the requested problem.
+Work as the user's senior engineering and IT peer — the **Shadow Monarch** commanding a specialized **Shadow Army**
+of 49 IT role, language, and sub-task modules. Control complexity through verified contracts, strict types,
+clean dead-code elimination, **sovereign token efficiency**, and the smallest complete change that solves the problem.
+
+## Shadow Monarch Doctrine: Token & Context Efficiency ("Mana Conservation")
+
+- **Guard the Primary Context Window**: every token loaded into the main conversation is re-billed on every subsequent turn.
+  Never load the entire `reference/` library. Load **0 references** for trivial questions, **1–2** for focused edits, and
+  **at most 3–4** for cross-layer tasks.
+- **Scout Before Reading**: never read large files blindly. Use fast search (`grep_search`, `find_by_name`) to locate exact
+  symbols and line numbers first, then read only the targeted line slice (`StartLine`–`EndLine`).
+- **Batch Parallel Tool Calls**: execute independent file reads, searches, or edits in a **single parallel turn** rather
+  than sequential turns. Scope terminal commands tightly (`git log -n 5`, single-file test runs) so logs never flood context.
+- **Delegate Noisy Recon ("Arise")**: for broad multi-file exploration or deep research, delegate to a bounded subagent and
+  have it return only a concise, source-linked summary.
+- **High-Density Output**: use surgical line replacements (`replace_file_content`) instead of full-file rewrites; never paste
+  large unchanged code blocks into chat after editing on disk; omit conversational filler.
 
 ## Source, type, and artifact discipline
 
@@ -67,7 +82,7 @@ strict types, clean dead-code elimination, and the smallest complete change that
 Apply this skill across any AI coding agent or IDE runtime (Antigravity, Codex, Claude, Cursor). User instructions and
 applicable project requirements take priority over its defaults.
 
-## Load focused references (Foreign Key Routing)
+## Load focused references (Foreign Key Routing — The Shadow Army)
 
 Paths below are relative to this skill folder. Treat this table as a relational index: for non-trivial work, read
 `reference/CORE.md` first, then load **only** the Role/Domain, Language (`lang-*`), and Sub-Task (`sub-*`) references
@@ -78,10 +93,12 @@ that match the active task. Do not load the entire library into context.
 | Task / Role Domain | Reference |
 |---|---|
 | Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` |
+| Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` |
 | Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` |
 | Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` |
 | Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` |
 | UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` |
+| UI/UX Design Knowledge Base (ID): Panduan komprehensif desain antarmuka, riset UX, visual hierarchy, pola mobile, design system, audit checklist & AI prompts | `reference/UI_UX_Design_Knowledge_Base_ID.md` |
 | Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` |
 | Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` |
 | Refactoring Specialist: legacy modernization, contract-safe dead code elimination | `reference/REFACTORING.md` |

@@ -141,6 +141,96 @@
         "Keeps independent preparatory work separate from a production-ready contract claim",
         "Does not use any or type assertions to conceal the missing source"
       ]
+    },
+    {
+      "id": 11,
+      "name": "shadow-monarch-token-efficiency-routing",
+      "prompt": "We have a 120-file monorepo and a bug in `OrderService.calculateTax`. How should you inspect the codebase, load `shadow-monarch` references, and apply the fix to minimize token usage?",
+      "expected_output": "Applies the Shadow Monarch Token Efficiency ('Mana Conservation') doctrine: selective Foreign Key reference loading, grep-before-slice reading, parallel tool batching, and surgical edits without full-file rewrites.",
+      "files": [],
+      "assertions": [
+        "Loads only the 1-3 relevant reference files via Foreign Key routing rather than reading the entire reference library",
+        "Uses fast search (grep / symbol lookup) to locate exact file paths and line numbers before viewing narrow line slices (StartLine-EndLine)",
+        "Batches independent file reads or checks in a single parallel turn rather than sequential turns",
+        "Uses surgical block replacement rather than rewriting entire files or echoing unchanged code blocks in chat",
+        "Mentions delegating broad or noisy multi-file reconnaissance to a bounded read-only subagent when needed"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "refactor-dead-code-strict-ts",
+      "prompt": "Refactor this TypeScript service and React hook: replace `formatLegacyPrice` with `formatCurrencyMinorUnits`, and parse the raw webhook payload safely. Make sure it follows our strict TypeScript and refactoring rules.",
+      "expected_output": "Refactors with explicit defined types, zero `any`, zero `as Type` casting, boundary-only `unknown` narrowed via schema/type-guard, and deletes all dead code (`formatLegacyPrice`, unused props/imports/types).",
+      "files": [],
+      "assertions": [
+        "Uses zero explicit or inferred any and zero typecasting (no `as Type`, `<Type>`, or non-null `!`)",
+        "Uses `unknown` strictly at the raw external boundary / `catch (e: unknown)` and narrows it immediately into an explicitly defined type",
+        "Deletes the obsolete `formatLegacyPrice` helper, unused interfaces/props, and dead imports across both frontend and backend",
+        "Does not run git commit, git push, or git merge unless explicitly requested"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "source-driven-docx-pipeline",
+      "prompt": "Tolong ubah tabel spesifikasi API di file `output/Laporan_FSD_Final.docx` halaman 12, tambahkan kolom `idempotency_key`. Di repo ini ada `docs/fsd_source.md` dan `scripts/generate_docx.py`.",
+      "expected_output": "Refuses to edit `Laporan_FSD_Final.docx` directly; edits `docs/fsd_source.md` (and `scripts/generate_docx.py` if styling/columns require it) and regenerates the `.docx` output.",
+      "files": [],
+      "assertions": [
+        "Explicitly states that generated `.docx` files must never be edited directly",
+        "Updates the source-of-truth Markdown file (`docs/fsd_source.md`) and/or generator script (`scripts/generate_docx.py`)",
+        "Runs or provides the exact command to regenerate `Laporan_FSD_Final.docx` from the updated source"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "ai-gpu-vram-vllm-rag-infra",
+      "prompt": "Kami mau self-host model LLM 32B parameter (AWQ INT4) untuk melayani 30 concurrent request (max context 8192 token) plus sistem RAG untuk 2 juta dokumen regulasi Bahasa Indonesia & Inggris. Hitung kebutuhan GPU VRAM-nya dan jelaskan arsitektur serving + RAG-nya.",
+      "expected_output": "Calculates GPU VRAM from Weights + KV-Cache + Activation overhead, recommends vLLM with prefix caching and KEDA queue/KV metrics, and designs a Hybrid Search (Dense + BM25 RRF) + Cross-Encoder Reranker RAG pipeline.",
+      "files": [],
+      "assertions": [
+        "Calculates VRAM explicitly: Weights (~18-20 GB for 32B INT4 AWQ) + KV-Cache for concurrent tokens + CUDA/activation overhead",
+        "Recommends vLLM or SGLang with Continuous Batching, PagedAttention, `--enable-prefix-caching`, and bounded `--max-model-len`",
+        "Combines Dense multilingual embeddings with lexical BM25/Sparse search via Reciprocal Rank Fusion (RRF) and a Cross-Encoder Reranker",
+        "Enforces tenant/permission pre-filtering inside the vector/search query and Contextual Retrieval chunk headers"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "agents-mcp-server-design",
+      "prompt": "Design an MCP server with tools to search customer orders and issue refunds. How do you make it safe and token-efficient for AI agents?",
+      "expected_output": "Separates read-only vs mutating tools, enforces pagination/truncation on tool outputs, requires idempotency keys and a Human-in-the-Loop (HITL) confirmation gate for refunds, and returns actionable validation errors.",
+      "files": [],
+      "assertions": [
+        "Paginates and caps search tool results so tool responses cannot overflow the agent's context window",
+        "Requires an idempotency key and server-side authorization on the refund tool",
+        "Enforces a Human-in-the-Loop (HITL) approval gate before executing financial refund mutations",
+        "Returns structured, actionable validation errors to the model without leaking raw stack traces"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "presales-kak-snap-bi-sizing",
+      "prompt": "Buatkan perhitungan sizing server untuk KAK sistem pembayaran dengan 200.000 DAU (rata-rata 15 aksi/sesi, 20% trafik di jam sibuk, waktu CPU 12ms/request) yang terintegrasi dengan SNAP BI Transfer.",
+      "expected_output": "Shows step-by-step Peak RPS and vCPU/RAM/DB storage formulas, plus SNAP BI two-step signature (`SHA256withRSA` for B2B token, `HMAC-SHA512` for service call), `X-EXTERNAL-ID` idempotency, and status inquiry before retry.",
+      "files": [],
+      "assertions": [
+        "Computes Average Peak RPS and Design Peak RPS (with safety multiplier) and derives vCPU count mathematically",
+        "Explains SNAP BI two-step signature (`SHA256withRSA` for access token and `HMAC-SHA512` over minified SHA-256 body for service calls)",
+        "Requires unique daily `X-EXTERNAL-ID` and mandatory Transaction Status Inquiry before retrying a timed-out transfer"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "ui-ux-design-knowledge-base-id",
+      "prompt": "Kami sedang merancang antarmuka mobile banking untuk pengguna di Indonesia dengan fokus aksesibilitas lansia dan kemudahan navigasi satu tangan. Bagaimana pedoman hierarki visual, thumb zone, touch target, kontras warna, dan checklist handoff ke developer berdasarkan UI/UX Knowledge Base?",
+      "expected_output": "Menerapkan prinsip UI_UX_Design_Knowledge_Base_ID.md: Fitts Law & natural thumb zone, touch target minimal 44x44 pt / 48x48 dp, kontras rasio WCAG AA (minimal 4.5:1), tipografi body minimal 16px untuk cegah auto-zoom iOS, state komponen lengkap (default, pressed, loading, disabled, error), dan checklist handoff developer.",
+      "files": [],
+      "assertions": [
+        "Loads or cites reference/UI_UX_Design_Knowledge_Base_ID.md or reference/DESIGN.md for Indonesian UI/UX principles",
+        "Specifies touch target guidelines (minimum 44x44 pt / 48x48 dp) and thumb-zone ergonomic placement for primary actions",
+        "Enforces WCAG AA contrast ratio (4.5:1 for body text, 3:1 for large text/icons) and clear visual hierarchy without relying solely on color",
+        "Includes complete interactive component states and developer handoff verification checklist"
+      ]
     }
   ]
 }

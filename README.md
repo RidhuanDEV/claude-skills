@@ -1,12 +1,12 @@
 # Shadow Monarch — Antigravity, Codex, and Claude Skill
 
-A full-spectrum senior engineering and IT peer skill for Antigravity, Codex, and Claude, with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, AI/RAG/GPU infrastructure, and specialized sub-tasks** through a 3-Tier Foreign Key routing index (47 reference modules loaded strictly on demand):
+A full-spectrum **Shadow Monarch + IT** skill for Antigravity, Codex, and Claude: combining **sovereign AI token & context efficiency ("Mana Conservation")** with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, AI/RAG/GPU infrastructure, and specialized sub-tasks** through a 3-Tier Foreign Key routing index (49 reference modules loaded strictly on demand):
 
-- **25 Role & Domain Guides**: Core Mindset, Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design, Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM Core, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
+- **27 Role & Domain Guides**: Core Mindset, Shadow Monarch Token & Context Efficiency (`TOKEN-EFFICIENCY`), Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design (`DESIGN`), UI/UX Design Knowledge Base ID (`UI_UX_Design_Knowledge_Base_ID`), Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM Core, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
 - **9 Language Guides (`lang-*`)**: TypeScript/JavaScript (Node, NestJS, Express, React, Next.js), Go, .NET/C#, Python (FastAPI, Django, Flask), Java/Kotlin (Spring Boot), PHP/Laravel, Rust (`tokio`, `axum`), Dart/Flutter, and Modern C/C++20/Embedded (ESP32/STM32/CMake/Wasm).
 - **13 Specialized Sub-Task & Tooling Guides (`sub-*`)**: Advanced RAG/Hybrid Search/Reranking/Vector DBs/GraphRAG, AI & GPU Infrastructure (`vLLM`/`SGLang`/`TGI`/`Ollama`, VRAM Sizing, K8s GPU, `LiteLLM` Gateways), LLM Fine-Tuning (`LoRA`/`QLoRA`/`DPO`/Unsloth, Guardrails, LLMOps Tracing), Vue 3/Nuxt/Angular Signals/Tailwind/React Native/Jetpack Compose/SwiftUI, PostgreSQL/Redis/Elasticsearch/MongoDB, Playwright/Cypress/`k6`/Bruno/TCM/UAT, OpenAPI 3.1/DBML/Strict Mermaid/`python-docx` & Node `docx` Generators, PowerShell/Bash/Taskfiles, OpenTelemetry/PromQL/LogQL/Grafana/Profiling, WebSockets/SSE/WebRTC/MQTT IoT/Electron/Tauri/Chrome MV3, Indonesian Fintech & Gov (SNAP BI, TTE BSrE/e-Meterai, SatuSehat FHIR/BPJS, Tax PPN/PPh), GIS/PostGIS/MapLibre/Vector Tiles, and Computer Vision/OCR/Whisper/FFmpeg.
 
-> Control complexity instead of being controlled by it.
+> Control complexity instead of being controlled by it. Conserve Mana (tokens); summon only the exact Shadow Generals the battle requires.
 
 ## How it works
 
@@ -14,17 +14,17 @@ The skill uses progressive Foreign Key loading so it stays small in context:
 
 ```text
 shadow-monarch/
-├─ SKILL.md          core rules + 3-tier Foreign Key router (always loaded when the skill is used)
+├─ SKILL.md          core rules + Shadow Monarch token doctrine + 3-tier Foreign Key router
 ├─ GLOBAL.md         account-wide summary for Claude / global agent instructions
 ├─ agents/openai.yaml Codex display name and invocation prompt
-└─ reference/        47 focused modules loaded only when the active task needs them
-   ├─ Role & Domain (25):
-   │  CORE.md  ARCHITECTURE.md  PRESALES-PROPOSAL-KAK.md  BACKEND.md  DATABASE.md
-   │  FRONTEND.md  DESIGN.md  MOBILE-DESIGN.md  MOBILE.md  REFACTORING.md
-   │  SECURITY.md  SECOPS-PENTEST.md  DEVOPS.md  CLOUD-SRE.md
-   │  ENTERPRISE-INTEGRATION.md  TESTING.md  DEBUGGING.md  CODE-REVIEW.md
-   │  AI-LLM.md  AGENTS-MCP.md  PRODUCT-ANALYSIS.md  IT-PMO-GOVERNANCE.md
-   │  DOCS-PIPELINE.md  DATA-AUTOMATION.md  DATA-ANALYTICS-ML.md
+└─ reference/        49 focused modules loaded only when the active task needs them
+   ├─ Role & Domain (27):
+   │  CORE.md  TOKEN-EFFICIENCY.md  ARCHITECTURE.md  PRESALES-PROPOSAL-KAK.md
+   │  BACKEND.md  DATABASE.md  FRONTEND.md  DESIGN.md  UI_UX_Design_Knowledge_Base_ID.md
+   │  MOBILE-DESIGN.md  MOBILE.md  REFACTORING.md  SECURITY.md  SECOPS-PENTEST.md
+   │  DEVOPS.md  CLOUD-SRE.md  ENTERPRISE-INTEGRATION.md  TESTING.md  DEBUGGING.md
+   │  CODE-REVIEW.md  AI-LLM.md  AGENTS-MCP.md  PRODUCT-ANALYSIS.md
+   │  IT-PMO-GOVERNANCE.md  DOCS-PIPELINE.md  DATA-AUTOMATION.md  DATA-ANALYTICS-ML.md
    ├─ Languages (9):
    │  lang-TYPESCRIPT-NODE.md  lang-GO.md  lang-DOTNET.md  lang-PYTHON.md
    │  lang-JAVA-KOTLIN.md  lang-PHP-LARAVEL.md  lang-RUST.md  lang-DART-FLUTTER.md

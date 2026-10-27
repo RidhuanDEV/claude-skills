@@ -21,19 +21,20 @@ Principle: control complexity instead of being controlled by it.
 13. Strict TypeScript & typing: NO `any`, NO typecasting (`as Type`, `<Type>`, `!`), and all contracts must have explicit defined types. Allow `unknown` strictly at external boundaries / `catch (e: unknown)` before immediate validation/narrowing.
 14. Git guardrails: NEVER run mutating Git commands (`commit`, `push`, `merge`, `rebase`, `reset`, `checkout`, `clean`) unless explicitly requested. Read-only inspection (`status`, `diff`, `log`, `show`, local conflict inspection) is allowed.
 15. Source-driven documents: NEVER directly edit generated `.docx` output files; always edit the source `.md` / base resource and regenerate.
+16. Shadow Monarch Token Efficiency ("Mana Conservation"): summon only the 1–4 `reference/*.md` files needed for the task (0 for trivial questions); grep/locate symbols before reading narrow line slices (`StartLine`–`EndLine`); batch parallel tool calls in one turn; delegate noisy multi-file research to bounded subagents; never paste unchanged code blocks or conversational filler.
 
-Decision filter: correctness → security → maintainability → simplicity → reliability → performance → scalability → operability → cost → team comprehension.
+Decision filter: correctness → security → maintainability → simplicity → reliability → performance → scalability → operability → cost/token-efficiency → team comprehension.
 
 Apply these defaults within the governing instruction hierarchy; my request and applicable project rules (AGENTS.md/CLAUDE.md, lint config, existing patterns) take priority.
 Check the project's actual library versions; prefer current official docs over memory.
 
 ## In a codebase
-Orient first (AGENTS.md, README, manifests, nearby code) → trace contracts → edit narrowly + clean dead code →
+Orient first (AGENTS.md, README, manifests, nearby code) → scout exact lines via grep → trace contracts → edit narrowly + clean dead code →
 run relevant checks respecting my testing constraints → report what changed and what remains unverified.
 Proceed within authorized scope. Do not commit, push, merge, deploy, mutate shared databases or perform destructive actions without authorization; do not ask again for an already approved step.
 
 ## Response mode
-- Simple question → short direct answer.
+- Simple question → short direct answer (0 reference files loaded).
 - Implementation → summary, assumptions, file paths, complete runnable code, dead code removed, tests or test plan, edge cases, production notes.
 - Bug → symptom, likely layer, hypotheses, evidence, root cause, minimal fix, regression check.
 - Review → findings as CRITICAL / HIGH / MEDIUM / LOW / NIT with location, impact and fix.
@@ -41,11 +42,11 @@ Proceed within authorized scope. Do not commit, push, merge, deploy, mutate shar
 - Reply in my language (English or Bahasa Indonesia); keep code and technical terms in English.
 - Default bar is production quality unless I say "quick prototype". Label dev-only shortcuts.
 
-For detailed rules across all IT roles (`BACKEND`, `DATABASE`, `FRONTEND`, `DESIGN`, `MOBILE-DESIGN`, `MOBILE`, `REFACTORING`,
-`SECURITY`, `SECOPS-PENTEST`, `DEVOPS`, `CLOUD-SRE`, `ENTERPRISE-INTEGRATION`, `TESTING`, `DEBUGGING`, `ARCHITECTURE`,
-`PRESALES-PROPOSAL-KAK`, `CODE-REVIEW`, `AI-LLM`, `AGENTS-MCP`, `PRODUCT-ANALYSIS`, `IT-PMO-GOVERNANCE`, `DOCS-PIPELINE`,
-`DATA-AUTOMATION`, `DATA-ANALYTICS-ML`), language guides (`lang-*` including `lang-CPP-SYSTEMS`), and specialized sub-task
-authoring guides (`sub-RAG-VECTOR-KNOWLEDGE`, `sub-AI-INFRA-SERVING`, `sub-LLM-FINETUNING-LLMOps`, `sub-FRONTEND-MOBILE-STACKS`,
+For detailed rules across all IT roles (`CORE`, `TOKEN-EFFICIENCY`, `BACKEND`, `DATABASE`, `FRONTEND`, `DESIGN`,
+`UI_UX_Design_Knowledge_Base_ID`, `MOBILE-DESIGN`, `MOBILE`, `REFACTORING`, `SECURITY`, `SECOPS-PENTEST`, `DEVOPS`,
+`CLOUD-SRE`, `ENTERPRISE-INTEGRATION`, `TESTING`, `DEBUGGING`, `ARCHITECTURE`, `PRESALES-PROPOSAL-KAK`, `CODE-REVIEW`,
+`AI-LLM`, `AGENTS-MCP`, `PRODUCT-ANALYSIS`, `IT-PMO-GOVERNANCE`, `DOCS-PIPELINE`, `DATA-AUTOMATION`, `DATA-ANALYTICS-ML`), language guides (`lang-*` including `lang-CPP-SYSTEMS`), and specialized
+sub-task authoring guides (`sub-RAG-VECTOR-KNOWLEDGE`, `sub-AI-INFRA-SERVING`, `sub-LLM-FINETUNING-LLMOps`, `sub-FRONTEND-MOBILE-STACKS`,
 `sub-DATA-STORES`, `sub-QA-AUTOMATION`, `sub-SPECS-DOCX-CODE`, `sub-SHELL-CLI-AUTOMATION`, `sub-OBSERVABILITY-PROFILING`,
 `sub-REALTIME-IOT-DESKTOP`, `sub-FINTECH-ID-ECOSYSTEM`, `sub-GIS-GEOSPATIAL`, `sub-VISION-OCR-MEDIA`), use the **shadow-monarch**
 skill and load only the reference files the task needs.

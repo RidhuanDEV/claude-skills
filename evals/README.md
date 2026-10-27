@@ -24,6 +24,13 @@
 | 8 push-back-on-overengineering | peer, not yes-man |
 | 9 verified-nullable-contract | backend authority, nullability, no any or guessed fallbacks |
 | 10 missing-contract-no-fabrication | source request rather than invented response fields |
+| 11 shadow-monarch-token-efficiency-routing | Foreign Key budget, grep-before-slice, parallel tool batching, subagent delegation |
+| 12 refactor-dead-code-strict-ts | zero `any`, zero `as Type` casting, boundary-only `unknown`, dead code elimination |
+| 13 source-driven-docx-pipeline | never edit `.docx` directly; edit `.md` source and regenerate |
+| 14 ai-gpu-vram-vllm-rag-infra | GPU VRAM math, `vLLM` prefix caching, Hybrid RRF + Cross-Encoder Reranker RAG |
+| 15 agents-mcp-server-design | token-safe paginated MCP tools, idempotency, HITL gate for financial actions |
+| 16 presales-kak-snap-bi-sizing | KAK server sizing formula + SNAP BI signature & transfer inquiry rules |
+| 17 ui-ux-design-knowledge-base-id | UI/UX foundations, thumb zone/touch targets, WCAG AA, handoff checklist |
 
 ## If something fails
 

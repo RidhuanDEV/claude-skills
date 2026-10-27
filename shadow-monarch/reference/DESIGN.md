@@ -5,6 +5,11 @@ AI products, dashboards and mobile apps. Design is problem solving, not decorati
 Priority: clarity → usability → consistency → accessibility → scalability → performance → business impact.
 If it looks beautiful but is confusing, slow, hard to learn, inaccessible or unscalable, it failed.
 
+> **Indonesian UI/UX Deep Reference**: For an exhaustive 25-section knowledge base in Bahasa Indonesia (user research,
+> Gestalt & visual hierarchy, grid/spacing, mobile patterns & thumb zones, typography, WCAG AA accessibility,
+> component states, usability testing, developer handoff checklist, and AI prompt library), see
+> [`reference/UI_UX_Design_Knowledge_Base_ID.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-monarch/reference/UI_UX_Design_Knowledge_Base_ID.md).
+
 ## 1. Before designing screens
 
 Understand the user's objective, the business goal, the main flow, edge cases and failure states.
