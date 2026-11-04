@@ -98,7 +98,7 @@ that match the active task. Do not load the entire library into context.
 | Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` |
 | Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` |
 | UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` |
-| UI/UX Design Knowledge Base (ID): Panduan komprehensif desain antarmuka, riset UX, visual hierarchy, pola mobile, design system, audit checklist & AI prompts | `reference/UI_UX_Design_Knowledge_Base_ID.md` |
+| UI/UX, Visual Art Direction & Product Interface Knowledge Base v2 (ID): 43 bab panduan desain antarmuka, art direction, visual choreography, pola mobile/web, design system, audit rubrics & AI prompts | `reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md` |
 | Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` |
 | Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` |
 | Refactoring Specialist: legacy modernization, contract-safe dead code elimination | `reference/REFACTORING.md` |

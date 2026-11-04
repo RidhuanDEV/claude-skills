@@ -30,7 +30,7 @@
 | 14 ai-gpu-vram-vllm-rag-infra | GPU VRAM math, `vLLM` prefix caching, Hybrid RRF + Cross-Encoder Reranker RAG |
 | 15 agents-mcp-server-design | token-safe paginated MCP tools, idempotency, HITL gate for financial actions |
 | 16 presales-kak-snap-bi-sizing | KAK server sizing formula + SNAP BI signature & transfer inquiry rules |
-| 17 ui-ux-design-knowledge-base-id | UI/UX foundations, thumb zone/touch targets, WCAG AA, handoff checklist |
+| 17 ui-ux-design-knowledge-base-id | UI/UX v2 foundations & art direction, thumb zone/touch targets, WCAG AA, handoff checklist |
 
 ## If something fails
 

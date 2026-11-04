@@ -1,4 +1,37 @@
-# UI/UX Design Knowledge Base
+# UI/UX, Visual Art Direction & Product Interface Knowledge Base
+
+**Versi:** 2.0 — Extended Art Direction, Web & Mobile  
+**Bahasa:** Indonesia  
+**Cakupan:** UI/UX + graphic art + editorial composition + visual choreography + web/mobile engineering.  
+**Basis:** Seluruh knowledge base v1.0 dipertahankan; bab 26–43 ditambahkan sebagai pendalaman.  
+**Status:** Dokumen referensi dan panduan kerja, bukan pengganti pengujian pengguna, dokumentasi platform, atau creative direction manusia.
+
+**Cara pakai untuk AI agent:** Baca bagian 26 (aturan keputusan), 27–34 (art direction), 35–39 (web/mobile), 40 (prompt), 41 (audit), lalu gunakan bab 1–25 sebagai fondasi UX. Jangan menerapkan semua efek desain sekaligus.
+
+## Navigasi materi tambahan
+
+- [26. Decision framework dan anti-generic AI](#26-decision-framework-dan-anti-generic-ai)
+- [27. Kosakata seni desain digital](#27-kosakata-seni-desain-digital)
+- [28. Komposisi dan visual choreography](#28-komposisi-dan-visual-choreography)
+- [29. Art direction editorial dan modernisme](#29-art-direction-editorial-dan-modernisme)
+- [30. Ornamentasi, edge art, dan section continuity](#30-ornamentasi-edge-art-dan-section-continuity)
+- [31. Ilustrasi, visual metaphors dan icon family](#31-ilustrasi-visual-metaphors-dan-icon-family)
+- [32. Advanced typography dan layout expression](#32-advanced-typography-dan-layout-expression)
+- [33. Color dramaturgy, material, dan texture](#33-color-dramaturgy-material-dan-texture)
+- [34. Motion choreography dan prototyping](#34-motion-choreography-dan-prototyping)
+- [35. Website composition and implementation patterns](#35-website-composition-and-implementation-patterns)
+- [36. Mobile app art direction and native UX](#36-mobile-app-art-direction-and-native-ux)
+- [37. Accessibility and inclusive creative UI](#37-accessibility-and-inclusive-creative-ui)
+- [38. Performance, assets, and delivery](#38-performance-assets-and-delivery)
+- [39. Practical design recipes](#39-practical-design-recipes)
+- [40. AI prompt and agent playbook](#40-ai-prompt-and-agent-playbook)
+- [41. Design critique and validation rubrics](#41-design-critique-and-validation-rubrics)
+- [42. Case study: Program Riset Nasional](#42-case-study-program-riset-nasional)
+- [43. External source hierarchy and update policy](#43-external-source-hierarchy-and-update-policy)
+
+---
+
+# Bagian A — Fondasi UI/UX Design Knowledge Base v1.0
 
 **Versi:** 1.0  
 **Bahasa:** Indonesia  
@@ -949,3 +982,618 @@ Nilai tiap dimensi dari 1 sampai 5 dan sertakan bukti. Skor tinggi harus berasal
 Desain yang berkualitas lahir dari kombinasi empati, pemahaman konteks, prinsip visual, pengetahuan platform, keterampilan teknis, dan evaluasi berulang. Referensi visual membantu memperluas kemungkinan, tetapi tidak menggantikan pertimbangan tentang kebutuhan pengguna. AI dapat membantu menghasilkan alternatif dan kode awal; keputusan final tetap perlu ditinjau manusia, diverifikasi, dan diuji.
 
 **Aturan praktis:** jangan bertanya hanya “Apakah ini terlihat bagus?”. Tanyakan juga: “Apakah orang memahami apa yang terjadi? Bisakah mereka menyelesaikan tugasnya? Apa yang terjadi ketika gagal? Siapa yang tertinggal? Bukti apa yang menunjukkan bahwa desain ini bekerja?”
+
+
+---
+
+# Bagian B — Advanced Art Direction, Web & Mobile
+
+# 26. Decision framework dan anti-generic AI
+
+## 26.1 Empat lapisan keputusan
+
+1. **Functional truth:** tugas pengguna, urutan informasi, CTA, status, navigasi, kepercayaan, dan aksesibilitas. Tidak boleh berubah demi estetika.
+2. **Visual grammar:** grid, type scale, warna semantik, spacing, bentuk dan iconography. Konsisten pada seluruh produk.
+3. **Art direction:** visual motif, metaphor, treatment gambar, crop, kesan, visual tension, karakter unik. Boleh bervariasi antar halaman asal satu sistem.
+4. **Micro-polish:** shadows, easing, detail geometris, noise, highlights, feedback interaksi. Diterapkan setelah struktur benar.
+
+**Prioritas:** Jika art direction mengganggu konten, adaptasi art direction; bukan mengorbankan fungsi. Jangan menyamakan *high-polish* dengan *high-complexity*.
+
+## 26.2 Generic AI design failure modes
+
+| Gejala | Penyebab tipikal | Koreksi desain |
+|---|---|---|
+| Tiga kartu identik, seragam dan datar | Mengulang template tanpa tujuan | Gunakan hierarki dan komposisi yang punya narasi; variasikan artwork, pertahankan konsistensi kontrol |
+| Semua objek memiliki shadow + gradient | Efek tanpa sistem | Tetapkan satu material/lighting language; hilangkan efek yang tidak memberi peran |
+| Hero seperti slide presentasi | Background diperlakukan sebagai satu poster terisolasi | Gunakan section continuity: dekorasi di tepi, transisi atas/bawah netral |
+| Ikon selalu bohlam, roket, gear | Metafora generik | Audit konteks, temukan objek-domain nyata, lalu sederhanakan atau abstraksikan |
+| Terlalu banyak hal bergerak | Animasi menjadi tujuan | Petakan motion ke focus/feedback/navigation; hanya satu pola ambient motion per area |
+| Terlalu steril | Semua konten diletakkan di dalam kartu | Pertimbangkan unboxed layout, rhythm, material difference, negative space |
+| Terlalu “AI” | Objek literal bertumpuk, perspektif tidak stabil, visual tropes | Batasi elemen per ilustrasi, gunakan seni grafis editorial dan detail yang disengaja |
+| Terlalu banyak dekorasi | Tidak ada visual budget | Batasi 1 hero motif + 1 supporting motif + 1 micro accent per section |
+
+**Aturan orisinalitas:** Bedakan belajar dari komposisi referensi vs menduplikasi karya. Ambil prinsip (mis. negative space), bukan susunan elemen identik. Jangan menyebut AI-generated visual sebagai foto riset atau dokumentasi kegiatan nyata.
+
+## 26.3 Brief kreatif sebelum mendesain
+
+Jawab: (1) siapa pengguna; (2) apa tugas primer; (3) konteks halaman dan section sebelahnya; (4) karakter brand; (5) satu metafora visual; (6) apa yang sengaja tidak ditampilkan; (7) apa yang berubah di mobile; (8) apa yang mengukur keberhasilan. Lalu buat moodboard berisi tiga arah berbeda dan tulis kriteria pemilihan. Tidak perlu menghasilkan moodboard jika tugas hanya perbaikan minor.
+
+## 26.4 Visual budget
+
+Terapkan batas kualitatif: satu pusat perhatian per viewport; satu warna aksen primer, satu motif dominan, satu transisi utama; gunakan detail dekoratif hanya ketika menguatkan alur pandang. Angka seperti 20px radius, 120px artwork, 24px stagger merupakan **contoh**, bukan standar universal.
+
+# 27. Kosakata seni desain digital
+
+## 27.1 Genre visual dan kapan dipakai
+
+| Arah | Ciri visual | Cocok | Risiko |
+|---|---|---|---|
+| Swiss International Style | alignment presisi, type besar, grid rasional, kontras | universitas, editorial data | terlihat dingin jika tanpa karakter |
+| Bauhaus / modernist | bentuk dasar, warna terukur, fungsi sebagai komposisi | ikon modular, hero kreatif | dekorasi abstrak terlalu dominan |
+| Editorial / magazine | asymmetric spread, crop, whitespace, type as object | artikel, landing kreatif | editorial bisa menghambat scanning form |
+| Contemporary collage | cutout, layering, gestural shapes, cut-paper | program, budaya, pendidikan | tumpukan detail menyebabkan noise |
+| Organic modernism | blob, kurva, garis kontinuitas, imbangan geometri | portal riset modern | template blob generik |
+| Neo-brutalism | strokes tegas, warna berani, offset shadow | brand muda | kontras dan density terlalu agresif |
+| Art deco inspired | ritme simetris, garis ornamental, geometri elegan | kampanye tertentu | tampilan terlalu formal atau dekoratif |
+| Minimalist utility | navigasi tajam, density tepat, warna hemat | aplikasi bisnis dan dashboard | kehilangan identitas brand jika terlalu netral |
+| Data-driven generative art | bentuk dari data/proses nyata | storytelling ilmiah | berisiko menyesatkan tanpa label data |
+| Illustration-led identity | ilustrasi unik, style guide ketat | modul, onboarding | gaya menjadi childish/stock |
+
+Gunakan genre sebagai **referensi prinsip**, bukan paket efek yang harus disalin. Campuran dua gaya memerlukan aturan: misalnya grid Swiss + organic side ornament; bukan semua gaya digabung.
+
+## 27.2 Terminologi penting
+
+- **Visual grammar:** bahasa bentuk yang berulang: stroke, sudut, proporsi, tone, kesan ruang.
+- **Art direction:** keputusan konseptual tentang bagaimana isi ditampilkan, bukan sekadar pilihan warna.
+- **Choreography:** urutan, arah, tempo, serta relasi antar elemen saat mata menjelajah halaman atau pengguna berinteraksi.
+- **Compositional anchor:** elemen yang menstabilkan komposisi (judul, ilustrasi, garis tepi).
+- **Visual tension:** ketidakseimbangan terukur yang menghasilkan ketertarikan.
+- **Counterweight:** elemen untuk menyeimbangkan focal point pada sisi lawan, tanpa harus berukuran sama.
+- **Bleed:** bentuk keluar melewati tepi canvas/section secara sengaja.
+- **Negative space:** ruang tanpa elemen bermakna untuk alur baca dan fokus.
+- **Editorial cropping:** memotong visual secara terencana untuk menonjolkan konteks.
+- **Art direction responsive:** mengubah komposisi, bukan hanya menskalakan aset.
+- **Staggered rhythm:** pola posisi tidak persis satu garis lurus yang tetap mempertahankan keteraturan.
+- **Section continuity:** transisi yang terasa menyatu antara section atas, sekarang, dan bawah.
+- **Visual metaphor:** objek atau bentuk yang menjelaskan gagasan abstrak tanpa teks panjang.
+- **Morphology:** aturan bentuk suatu keluarga objek, mis. lingkaran iris dan stroke sama.
+
+# 28. Komposisi dan visual choreography
+
+## 28.1 Hirarki komposisi tingkat lanjut
+
+Urutan baca dibentuk oleh kontras ukuran, posisi, jarak, bobot warna, ilustrasi, tipografi, dan arah vektor. Mulai dari wireframe grayscale; tunjukkan satu item utama, kelompok sekunder, detail tersier. Pastikan pengguna bisa menjelaskan tujuan section sebelum memperhatikan ornamen.
+
+Teknik: **rule of thirds**, golden-ratio exploration (bukan kewajiban), diagonal composition, asymmetry, axial symmetry, modular grid, baseline grid, clustering, repetition with variation, figure-ground reversals. Uji ketajaman dengan screenshot blur dan zoom out; fokus seharusnya masih jelas.
+
+## 28.2 Ritme antarelement
+
+Definisikan rhythm dengan pola ukuran dan posisi: `small → medium → large`, `high → low → high`, `quiet → emphasis → quiet`. Hindari tiga item tengah-tengah identik jika kontennya perlu narasi; tetapi pada daftar pilihan setara, pertahankan kesetaraan fungsional, alignment CTA, dan akses yang adil.
+
+**Stagger implementation:** Geser hanya artwork atau wrapper visual di desktop (mis. `translateY(24px)`), *bukan* CTA atau konten esensial bila menciptakan perbedaan akses. Pertahankan document order dan DOM order. Pada mobile, hilangkan stagger jika mengganggu scan linear. Jangan mengandalkan visual reorder untuk urutan fokus.
+
+## 28.3 Visual flow antar konten
+
+- Gunakan implied lines dari alignment title → artwork → program name → CTA.
+- Garis lengkung di latar boleh menghubungkan seri, namun tidak boleh melintasi label, form, atau tombol.
+- Satu kurva yang melintas antar item memberi rasa relasi; terlalu banyak kurva menjadi ilustrasi poster.
+- Jangan menjadikan dekorasi sebagai konektor jika item sebenarnya berdiri sendiri dan tidak memiliki urutan.
+- Untuk tiga link portal yang setara: ritme bisa berasal dari komposisi artwork, bukan ranking atau perbedaan prominence CTA.
+
+## 28.4 Asymmetry with control
+
+Asimetri butuh sistem penyeimbang: bentuk organik besar di kiri bisa ditimbang oleh titik-titik kecil yang lebih jenuh di kanan. Perhatikan **perceived mass**: warna navy jenuh terasa lebih berat dari blob biru pucat. Jangan sekadar membuat semua sisi identik.
+
+## 28.5 Typography choreography
+
+Sebuah headline mengawali narasi; subhead mengurangi skala; artwork memberi jeda visual; body memberikan konteks; CTA menyelesaikan alur. Gunakan ritme vertikal yang konsisten. Hindari semua subjudul, gambar, badge, dan tombol berlomba menarik perhatian.
+
+# 29. Art direction editorial dan modernisme
+
+## 29.1 Sistem editorial untuk produk
+
+Tetapkan (a) 1–2 font families dengan lisensi; (b) skala type display, heading, body; (c) modular columns; (d) image treatment; (e) color roles; (f) illustration stroke and palette; (g) signature motif; (h) mobile equivalent. Identitas lahir dari **pengulangan keputusan**, bukan banyak dekorasi.
+
+## 29.2 Typography as image
+
+Bentuk seni boleh berasal dari angka besar, huruf inisial, label vertikal pendek, split heading, atau running text; tetap simpan teks penting sebagai HTML/SwiftUI/Compose text. Batasi teks dekoratif, hindari teks utama tertanam dalam JPG/WebP. Jika letterform dijadikan SVG dekoratif, pastikan konten aslinya ada dalam struktur aksesibel.
+
+## 29.3 Modernist abstract illustration
+
+Mulai dengan makna: “proposal” dapat diwakili dokumen + diagram; “perubahan” oleh transformasi bentuk; “riset” oleh hubungan data; “inovasi” oleh pola modul yang berkembang. Kurangi realisme: bentuk datar 2–4 lapis, geometri bermakna, detail terpilih, palet terkendali. Jangan otomatis menambahkan gear atau bohlam untuk setiap fitur.
+
+## 29.4 Art direction artefact
+
+Untuk setiap section, tulis specification sheet:
+
+```
+Intent: memberi akses ke tiga portal pendanaan riset nasional
+Visual thesis: tiga disiplin berbeda, satu ekosistem riset
+Visual language: Swiss modular grid + flat editorial collage
+Palette roles: navy typography, blue identity, orange accents, pale-blue decorative field
+Primary shape: research motif (books, plantation crop, orbital geometry)
+Ornament: cropped edge-only organic blobs; no central frame
+Motion: optional 3–5px transform on hover, 160–240ms, reduced-motion fallback
+Constraints: no misleading official logos; button external link; mobile stack; no full-section poster
+```
+
+Angka-angka di atas hanyalah titik awal untuk dievaluasi sesuai perangkat dan brand.
+
+# 30. Ornamentasi, edge art, dan section continuity
+
+## 30.1 Edge-only art
+
+Dekorasi di kiri dan kanan section memberi karakter tanpa mengorbankan ruang baca. Letakkan dekorasi pada layer *non-interactive*, sementara konten pada layer yang lebih tinggi. **Jangan** memaksakan ornamen mengisi seluruh bidang atau menyentuh setiap elemen. Organic shapes yang terpotong oleh edge sering lebih natural dari blob sempurna di tengah.
+
+**Anti-PPT rule:** section bukan slide mandiri. Jangan membuat full-bleed backdrop bergambar ramai, frame dekoratif mengelilingi seluruh konten, atau shadow panggung. Saat pengguna scroll, batas section harus terasa menyambung dengan artikel/berita di atas dan konten di bawah. Dekorasi tidak boleh bocor keluar section atau memaksa scroll horizontal.
+
+## 30.2 Katalog ornamentasi
+
+| Motif | Fungsi | Penempatan | Hindari |
+|---|---|---|---|
+| Cropped circles | counterweight dan brand accent | tepi dengan bleed 20–70% | lingkaran di semua sudut |
+| Organic blob | organic framing | kiri/kanan di belakang whitespace | blob menabrak teks |
+| Dotted matrix | memberi tekstur ilmiah | potongan kecil dekat edge | penuh seperti noise |
+| Thin arcs / orbit | implied direction, connective rhythm | dari edge, tidak melewati aksi | garis banyak dan saling silang |
+| Paper-cut layer | material contrast | dekat artwork non-kritis | bayangan berat di semua lapisan |
+| Scallop / folded geometry | batas editorial | hanya satu transisi section khusus | memecah konten di halaman panjang |
+| Soft gradient field | depth lembut | edge backgrounds | menurunkan kontras |
+| Repeated glyph motif | identitas brand | 1 sudut atau separator | menggantikan icon bermakna |
+
+## 30.3 Arsitektur DOM untuk ornament
+
+```html
+<section class="research-programs" aria-labelledby="research-title">
+  <div class="ornament ornament--left" aria-hidden="true"></div>
+  <div class="ornament ornament--right" aria-hidden="true"></div>
+  <div class="research-programs__content">
+    <h2 id="research-title">Program Riset Nasional</h2>
+    <!-- program links -->
+  </div>
+</section>
+```
+
+```css
+.research-programs { position: relative; isolation: isolate; overflow: clip; background: #fff; }
+.research-programs__content { position: relative; z-index: 1; max-width: 1200px; margin-inline: auto; padding: clamp(40px, 6vw, 88px) 24px; }
+.ornament { position: absolute; z-index: 0; pointer-events: none; width: clamp(100px, 14vw, 200px); aspect-ratio: 1; opacity: .65; }
+.ornament--left { top: 20%; left: -90px; border-radius: 42% 58% 68% 32%; background: #dceaf9; }
+.ornament--right { right: -95px; bottom: 8%; border-radius: 58% 42% 35% 65%; background: #dceaf9; }
+@media (max-width: 680px) { .ornament { width: 110px; opacity: .3; } .ornament--left { left: -75px; } .ornament--right { right: -78px; } }
+```
+
+Use SVG for sophisticated paths; CSS for simple geometry. Do not use thousands of DOM nodes for dots. Verify clipped focus indicators are not hidden by `overflow: clip`; place important focusable content away from clipped edge or adjust architecture.
+
+## 30.4 Section continuity checklist
+
+[ ] screenshot tiga section sekaligus, bukan satu section saja.  
+[ ] Dekorasi tidak membuat abrupt full-screen background band.  
+[ ] Header dan footer section memiliki breathing room.  
+[ ] Ornament tidak menabrak next/previous section.  
+[ ] Kontras terpenuhi pada seluruh posisi.  
+[ ] Saat mobile, konten terbaca tanpa harus memahami dekorasi.  
+[ ] Tidak muncul horizontal scroll.  
+[ ] Ketika text scaling 200%, dekorasi tetap tidak menghalangi tugas.
+
+# 31. Ilustrasi, visual metaphors dan icon family
+
+## 31.1 Semantic icon design pipeline
+
+1. Tentukan action/object: “arsip hibah” berarti dokumen lama yang disimpan, bukan sekadar laci cantik.
+2. Kumpulkan 3 metafora, uji pada orang yang memahami domain.
+3. Pilih yang paling jelas pada ukuran kecil dan tanpa caption.
+4. Definisikan grammar: canvas square, safe inset, stroke, corner radius, flat fill, accent proportion, light-blue blob consistency.
+5. Bentuk icon sebagai SVG bila perlu ketajaman dan editability; WebP transparan jika kompleksitas ilustrasi membutuhkannya.
+6. Uji alpha transparency, ukuran file, pixel artifact, konsistensi visual mass, cropping, dan theme background.
+
+## 31.2 Icon families vs illustration families
+
+Icon utilitas 16–24px perlu detail minimum; ilustrasi modul 128–512px boleh punya 2–4 elemen konsep. Jangan memakai ilustrasi modul untuk tombol mungil. Tetapkan skala yang konsisten dan kepadatan visual setara. Jadikan ornament/blue blob satu language; hindari memakai blob identik jika terasa tempelan mesin.
+
+## 31.3 Anti-symbol clichés
+
+- Gear: gunakan untuk benar-benar *settings*; bukan untuk semua `kelola`.
+- Shield/lock: hak akses dan keamanan; jangan untuk semua halaman admin.
+- Bulb: boleh untuk ide/inovasi, tetapi orbit/data modules sering lebih distinctive.
+- Trophy: capaian/penghargaan; tidak selalu tepat untuk luaran akademik.
+- Folder: arsip/dokumen; kombinasikan dengan ciri semantik jika beberapa fitur dokumen berdekatan.
+
+## 31.4 Visual asset specification
+
+```
+Name: icon_pengabdian.webp
+Role: module-launcher illustration (informative when paired with title)
+Canvas: 512×512 pixels, transparent outside artwork
+Palette: navy + PRPM-blue + orange + pale-blue blob
+Style: flat editorial, no 3D or gear, no embedded text
+Visual: hands/community; recognizability at 112px CSS
+Optimization: WebP with alpha; compare quality at target display size
+Accessibility: if title adjacent, icon can have empty alt to avoid duplicate reading
+Fallback: semantic labeled link remains functional if image fails
+```
+
+**Check:** Make transparent export truly alpha, not checkerboard pixels; never remove white areas within the illustration that are deliberate design. Prefer local assets with versioning to avoid external hotlink issues.
+
+# 32. Advanced typography dan layout expression
+
+## 32.1 Type hierarchy as art
+
+Differentiate editorial display from utilitarian body copy. Use typographic contrast through weight, width, spacing and line breaks; avoid relying only on font size. Align headline baseline with visual anchor. For long Indonesian words, test wrapping (e.g. Kemdiktisaintek, Pengabdian kepada Masyarakat), abbreviation policy, and text scaling.
+
+## 32.2 Baseline and modular layout
+
+Adopt an 8px spatial rhythm as starting heuristic, not rigid law. Use coherent column widths and vertical anchors: image-top, badge, title, description, action. On three equal portal links, content columns may use `display:flex` and CTA `margin-top:auto`. Card outlines can be absent while the internal grid remains strict.
+
+## 32.3 Unboxed layout
+
+A grid does not require filled cards. Use image + heading + description + CTA with whitespace separating groups. Provide focus/hover treatment for actual links. If entire tile is clickable, avoid nested interactive elements; a single `<a>` element can include content and an explicit visible CTA style. For external links, distinguish external navigation and open-new-tab behavior consistently; do not force new tabs without a product reason.
+
+## 32.4 Responsive editorial typesetting
+
+Use `clamp()` for display, but test minimum size on narrow screens. Avoid fixed-height headings. Line length for body depends on script, font, and device; optimize readability rather than one universal character count. Localize all date and number formats.
+
+# 33. Color dramaturgy, material, dan texture
+
+## 33.1 Color roles
+
+Primary brand blue does not need to fill every card. Preserve navy for titles/actions and reserve orange for a small number of high-information accents. Background can be pure white/off-white with edge-only pale blue. Semantically dangerous states must not borrow brand orange without a distinct meaning.
+
+## 33.2 Color distribution
+
+The familiar 60/30/10 color ratio is a **heuristic**, not a standard. A research portal might use 80% neutral, 15% blue, 5% orange if that makes content clearest. Test color-blind differentiability and contrast with actual typography.
+
+## 33.3 Material language
+
+Choose either flat print-like, cut paper, soft clay, or photorealism for a surface. Avoid mixing glossy gradient 3D icons with hard flat graphics unless deliberate and justified. Consistent edge treatment, stroke and grain matter more than adding texture everywhere.
+
+## 33.4 Texture and grain
+
+Use subtle grain to reduce artificial sterility in editorial artwork; not over body text and interactive controls. JPEG/WebP noise can increase asset weight; measure before deployment. For small UI components, clean vector often wins. Ensure gradients do not band noticeably on target screens.
+
+# 34. Motion choreography dan prototyping
+
+## 34.1 Motion hierarchy
+
+1. **State motion**: hover, pressed, loading, expand/collapse.
+2. **Navigation motion**: page/stack transitions; show spatial relationships.
+3. **Spatial feedback**: parallax/float tied to cursor or scroll when useful.
+4. **Ambient art motion**: extremely limited; optional, never blocking.
+
+## 34.2 Choreography principles
+
+Use coordinated motion rather than random movement: if the image elevates, shadow softens and accent moves a little, but text remains readable. Animate `transform` and `opacity` when feasible instead of layout properties. Motion should have a beginning and settling point; avoid continuous bouncing on reading-heavy pages.
+
+Suggested microinteraction ranges such as 120–240ms are design starting points, not mandatory platform specs. Test with keyboard and touch. Never communicate state only through motion.
+
+```css
+.portal-art { transition: transform 200ms ease; will-change: auto; }
+.portal-link:hover .portal-art, .portal-link:focus-visible .portal-art { transform: translateY(-4px); }
+@media (prefers-reduced-motion: reduce) { .portal-art { transition: none; transform: none !important; } }
+```
+
+Avoid persistent `will-change` for dozens of elements because it may increase memory use. Use only when profiling demonstrates a benefit.
+
+## 34.3 Mobile motion
+
+Touch screens have no stable hover: provide pressed state, spring/scale only when relevant, and preserve screen-reader focus. Avoid motion sickness from scroll-linked parallax. App transitions should match platform navigational model. Respect system reduce motion preferences on iOS and Android.
+
+## 34.4 Motion spec handoff
+
+Specify trigger, duration, easing, property, delay, interrupt behavior, reverse behavior, reduced-motion fallback, and end state. Example: `portal illustration: hover/keyboard focus -> transform translateY(-4px), 200ms ease-out; touch -> pressed opacity transition; reduced motion -> no transform`.
+
+# 35. Website composition and implementation patterns
+
+## 35.1 Section taxonomy
+
+- **Informational hero:** mission, proposition, primary CTA.
+- **Editorial feature strip:** insight, program summaries, visual narrative.
+- **Portal launcher:** choices with equal action importance.
+- **Content feed:** news/cards/list; density and scan order first.
+- **Data dashboard:** insight/action with filters; fewer decorative distractions.
+- **Conversion panel:** decision and action; keep distractions minimal.
+
+Do not use the same bento, gradient and blob treatment for all section types. A long page needs cadence: dense news → breathable program links → denser detail → footer.
+
+## 35.2 Responsive and container strategy
+
+Use fluid layout with content-based breakpoints and CSS grid. Example:
+
+```css
+.portal-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(20px,3vw,36px); }
+.portal-item { min-width:0; display:flex; flex-direction:column; }
+.portal-item__art { width:min(100%, 180px); aspect-ratio:1; object-fit:contain; }
+.portal-item__action { margin-top:auto; width:100%; min-height:44px; }
+@media (max-width:900px) { .portal-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:620px) { .portal-grid { grid-template-columns:1fr; } }
+```
+
+Breakpoints are examples; test narrow devices, long titles and zoom. Avoid fixed card heights that clip localized text. Make sure art is not the only indication of what clicking does.
+
+## 35.3 External link UX
+
+Use `<a href>` for navigation, not click handlers on `div`; ensure destination URLs are configured and verified. Label CTA “Kunjungi situs” or site-specific destination. For `target="_blank"`, apply `rel="noopener noreferrer"` as appropriate and signal new-tab behavior if UX expects it; opening in same tab can be preferable for predictability. Track clicks only with privacy-aware analytics.
+
+## 35.4 State and data handling
+
+Skeletons should preserve dimensions and reduce layout shift. Fetch only when needed based on data semantics; caching/revalidation is separate from styling. Use progressive enhancement: content and links should remain usable without motion or complex JavaScript. No unnecessary service/Redis dependency for purely decorative UI.
+
+## 35.5 Web visual QA matrix
+
+Test at 320, 375, 390, 768, 1024, 1280, 1440, and ultrawide as *sample viewports*, not target-device absolutes. Test 200% zoom, reduced-motion, dark mode if supported, slow network, image failure, and keyboard. Verify Firefox, Chromium, and Safari where supported. Inspect appearance beside adjacent sections, not only isolated component screenshots.
+
+# 36. Mobile app art direction and native UX
+
+## 36.1 Platform-native foundation
+
+Choose whether the app is native iOS (SwiftUI/UIKit), Android (Compose/Views), or cross-platform (Flutter/React Native). Respect back gestures, system bars, keyboard, safe area, navigation architecture, dynamic type, accessibility, and platform interactions. Never blindly copy desktop sidebar cards onto narrow mobile screens.
+
+## 36.2 Navigation and information architecture
+
+- App home should prioritize top user tasks, not mirror org chart.
+- Bottom navigation for few peer destinations; drill-down for detail; search for large catalogs.
+- Use modal/sheet for contextual decisions, not primary navigation sprawl.
+- Mobile launcher may use 2-column illustrated modules with labels, but only when feature count and scanability justify it.
+- Keep navigation state when returning; don't reset forms/filters unexpectedly.
+
+## 36.3 Native design systems
+
+Material Design 3 and Apple Human Interface Guidelines provide current platform-specific patterns; consult latest vendor docs for sizes, component behavior, and system APIs. Typical guidance often uses comfortable touch areas around **48dp on Android** and **44pt on iOS**, but these are platform-specific design rules of thumb, not interchangeable CSS pixels or exact WCAG requirements.
+
+## 36.4 Responsive vs adaptive mobile
+
+Phone portrait, landscape, tablet and foldable may require *different composition*. Example: phone uses single column, tablet combines navigation rail plus content, large screen offers split detail. For illustration, use safe crop and alternate framing rather than merely reducing entire artwork.
+
+## 36.5 Mobile art-direction patterns
+
+| Pattern | Art treatment | Interaction |
+|---|---|---|
+| Onboarding value | bold editorial composition, one focus, restrained caption | swipe plus explicit next/skip |
+| Empty state | one meaningful illustration, unobtrusive color | primary recovery/action |
+| Home launcher | unified icon family, negative space, predictable grid | full accessible tap targets |
+| Detail screen | hero crop, progressive disclosure | back navigation predictable |
+| Profile/admin | utility-first, sparse art | stable forms, validation, permission cues |
+| Progress/task flow | visual steps, accurate states | progress + save/draft recovery |
+
+## 36.6 Gestures and haptics
+
+Use gestures only when discoverable or backed by visible controls. Haptic feedback should communicate meaningful results and honor system settings. Don't attach vibration to every hover/tap. Avoid animations that obscure permission/privacy consequences.
+
+## 36.7 System integrations and edge cases
+
+Design offline/error/timeout, push permission timing, deep links, biometric auth fallback, keyboard overlap, soft navigation bar, screen rotation, dark mode, large text, OS-level screen readers (VoiceOver/TalkBack), multi-window, foldables when relevant. Never fake a permission screen that looks identical to an OS dialog.
+
+# 37. Accessibility and inclusive creative UI
+
+## 37.1 Accessibility tiers
+
+Treat WCAG 2.2 as a web conformance reference where relevant; mobile accessibility also requires platform testing. For WCAG 2.2 AA, success criterion 2.5.8 has a **24×24 CSS px target-size minimum with exceptions**, not a blanket 44px rule. Design for more comfortable targets beyond the bare minimum where possible. WCAG AAA has additional criteria; do not misstate AAA as AA.
+
+## 37.2 Creative art accessibility
+
+Decorative side ornaments: `aria-hidden="true"` and non-interactive; decorative images `alt=""`. Informative charts need text equivalents. Embedded illustrations cannot contain the only copy of title or CTA. Verify contrast against dynamic backgrounds and focus indicators when using clipping. `prefers-reduced-motion` must be honored for nonessential motion.
+
+## 37.3 Test protocol
+
+Keyboard-only traverse; screen reader spot-check; zoom to 200%; 320px reflow; high text scale on native; high contrast where supported; simulate reduced motion; test RTL/localization if product supports it. Automated audits supplement human tests; they cannot prove semantic clarity or good choreography.
+
+# 38. Performance, assets, and delivery
+
+## 38.1 Performance targets (web)
+
+As of verified Google guidance: good Core Web Vitals thresholds **LCP ≤2.5s**, **INP ≤200ms**, **CLS ≤0.1**, evaluated with real-user data at p75. These are quality targets, not guaranteed by asset dimensions alone. Verify any changed threshold against current official documentation.
+
+## 38.2 Asset format matrix
+
+| Media | Default candidate | Why | Caution |
+|---|---|---|---|
+| Simple icons and geometry | SVG | scalable and editable | sanitize embedded SVG and avoid huge paths |
+| Small illustration with alpha | WebP / AVIF | efficient raster | alpha artifacts, browser/platform support |
+| Photo | AVIF/WebP + fallback if needed | high compression | verify quality and decoding |
+| Small UI animation | CSS / SVG / native animation | interactive, lightweight | reduced-motion / CPU |
+| Rich animation | Lottie/Rive after evaluation | controlled playback | bundle size, accessibility, licenses |
+| Large photographic background | optimized responsive image | art direction variants | avoid costly LCP |
+
+Do not insist everything must be 512×512; 512 is appropriate for downloadable module illustrations, while displayed CSS dimension and DPR determine served variants. Provide `width` and `height` to prevent layout shifts, `srcset` where useful, lazy-load below-the-fold assets, and consider preload for critical hero only when measured.
+
+## 38.3 Asset QA
+
+Inspect image at actual displayed size, not just zoomed 1000px. Test dark/light surrounding backgrounds, high DPR, alpha boundaries, compressed halos, semantic consistency, and image absence. Provide deterministic file names, versioning, and source metadata. Confirm WebP alpha channel with actual pixel inspection.
+
+## 38.4 Performance monitoring
+
+Use browser performance tools, Lighthouse for diagnosis, real user monitoring when available, and mobile profiler for actual-device jank/energy. Avoid adding heavy shader, filter, backdrop blur or continuous JS animation solely for ornamentation. Audit memory, battery and scroll performance on mid/low-end devices.
+
+# 39. Practical design recipes
+
+## 39.1 News → Programs → Next content
+
+**Problem:** Program section between news and other content feels too clean or isolated.  
+**Recipe:** Neutral background, edge-only shapes, content 3-column unboxed grid, artwork as focus, small colored badge, heading, one-line contextual description, full-width per-column CTA.  
+**Don't:** huge decorative banner, dark full-background card, ornaments crossing texts, fake wave as information when not meaningful.
+
+## 39.2 Module dashboard with many submodules
+
+Use role grouping, search/filter when large, consistent 512px-derived WebP illustrations shown at ~96–140 CSS px as needed, full semantic labels, tile radius 20px as one design token if brand uses it. Distinguish primary module from submodules; icon only for level requested, never duplicate icon language unnecessarily. Validate semantics without relying only on icon.
+
+## 39.3 Admin dashboard
+
+Use restrained brand accent; prioritize data, filter and action status. Reserve large artwork for empty states/onboarding. Art-heavy cards can undermine dense operational workflows.
+
+## 39.4 Academic mobile home
+
+Use top task shortcuts, contextual updates, badges for meaningful statuses only, easy bottom navigation if appropriate, two-column icon modules at mobile sizes with text that wraps. Avoid fixed button widths and unsafe bottom overlaps.
+
+## 39.5 Long-form editorial article
+
+Combine measured reading width, varied headings, pull quotes or images with captions, stable contents navigation, and restrained side art. Side decorations should vanish or simplify on narrow viewports.
+
+# 40. AI prompt and agent playbook
+
+## 40.1 The non-generic master prompt
+
+```text
+ROLE: Senior product designer + editorial art director + front-end/mobile engineer.
+SOURCE OF TRUTH: existing UI/UX knowledge base; existing codebase, brand assets and user content.
+
+TASK: Redesign [specific section or screen], not an unrelated rebrand.
+FIRST AUDIT: inspect existing DOM/route/components/design tokens/adjacent sections/platform.
+GOAL: solve user task with distinctive, human-led art direction, not stock UI or AI clichés.
+ART DIRECTION: [Swiss editorial + modernist abstract, or other justified direction].
+COMPOSITION: define one focal point, visual rhythm, alignment, whitespace and visual counterweights.
+SECTION CONTINUITY: inspect above and below; artwork edge-only if section is part of a long page.
+AVOID: gear-on-every-feature, glossy 3D, random gradients, all-blue card blocks, full-slide hero,
+      unnecessary shadow, glow, parallax, fake brand logo, invented content, image-embedded CTA.
+ASSETS: reuse or create semantically meaningful coherent icon family; WebP/SVG lightweight.
+WEB: semantic links, responsive grid, keyboard focus, reduced motion, real URLs, performance.
+MOBILE: use native interaction, safe area, large text, appropriate touch target, system behavior.
+PROCESS: propose 2–3 clearly different directions if major redesign; choose one with reasons.
+IMPLEMENTATION: preserve business logic/API/routing/auth; no new dependency without need.
+VALIDATION: screenshot in context at desktop/mobile; test content overflow, keyboard, motion,
+            image failure, contrast, external navigation, and actual route behavior.
+REPORT: before/after, files changed, evidence from testing, known limitations, rollback.
+```
+
+## 40.2 Art director critique prompt
+
+```text
+Act as a senior editorial art director, not an illustration generator.
+Critique this UI in layers: functional hierarchy → compositional rhythm → semantic artwork →
+brand identity → implementation quality. Mark precisely where it feels templated/AI-generated.
+Identify the visual center, counterweights, negative space, and visual flow.
+Give 3 targeted high-impact changes and 3 elements to deliberately remove.
+For each change specify intended user effect, responsive behavior, and verification method.
+Do not add decorative artifacts just to fill blank space.
+```
+
+## 40.3 Edge-only ornament prompt
+
+```text
+Enhance only the side edges of the existing [section].
+Use cropped organic pale-blue shapes, a restrained navy/orange ring, and tiny dotted grids.
+Keep central content background neutral, no central image, no full-section frame.
+Observe the content directly above and below; make transition seamless.
+Use aria-hidden decorative SVG/CSS with pointer-events:none, no overflow and no extra packages.
+Retain existing headline, texts, links and assets; make CTA width 100% per column.
+Desktop edge ornaments can be ~80-160px as starting point; mobile simplify and fade.
+Validate at 320px, 390px, 768px, 1440px, 200% zoom, focus and reduced-motion.
+```
+
+## 40.4 Mobile screen prompt
+
+```text
+Analyze native platform first: [iOS/Android/Flutter/React Native].
+Specify user task, navigation/back expectations, safe area, keyboard and dynamic text.
+Use [art direction] without sacrificing tap targets or readability.
+Deliver flow, screens, states, token system, icon family, responsive/adaptive design,
+permissions, offline/errors and QA on real device. Avoid desktop-port aesthetics.
+```
+
+## 40.5 Code-agent guardrails
+
+- Read project files and available dependencies before editing.
+- Preserve route, state management, tracking, authorization and accessible naming.
+- Do not implement UI screenshot as a single image; use real semantic structure.
+- Do not modify external URLs without verification.
+- Do not install animation libraries for one CSS hover.
+- Do not report “production ready” without test evidence.
+- Don't claim improved performance without measurement.
+- Use feature-scoped changes, screenshot/regression tests, and list changed files.
+
+# 41. Design critique and validation rubrics
+
+## 41.1 100-point rubric (evaluation aid, not universal objective truth)
+
+| Criterion | Weight | Evidence |
+|---|---:|---|
+| Functional clarity and task success | 20 | task test, CTA visibility, information architecture |
+| Visual hierarchy and typography | 15 | first glance, legibility, real content |
+| Art direction identity and originality | 15 | coherent visual grammar, differentiates from generic templates |
+| Composition and choreography | 15 | spatial rhythm, counterweight, section continuity |
+| Responsiveness and platform respect | 10 | multiple viewport/device screenshots |
+| Accessibility and inclusive UX | 10 | focus, labels, contrast, motion, touch |
+| Performance and asset engineering | 10 | CWV/device profile, optimized media |
+| Maintainability and handoff | 5 | tokens, components, tests, documentation |
+
+Score only with evidence. Don't declare “less AI-generated” as fact; treat it as subjective perception to test with design reviewers or users.
+
+## 41.2 Severity mapping
+
+- **P0 blocker:** can't complete primary task, inaccessible critical path, broken navigation.
+- **P1 high:** misleading controls, unreadable UI, broken mobile layout, severe performance.
+- **P2 medium:** inconsistent icon language, weak hierarchy, excessive ornaments.
+- **P3 polish:** micro-spacing, tonal nuance, minor animation feel.
+
+## 41.3 Visual audit in context
+
+Capture complete scroll progression: previous section tail → target section → next section head. Review at real browser zoom, no cropped demo-only previews. Ask: Is this a page section or a detached poster? Is the brand identifiable without header? Is one CTA consistently apparent? Are all three portal options equal in importance? Is the experience still coherent with imagery disabled?
+
+# 42. Case study: Program Riset Nasional
+
+## 42.1 Problem context
+
+Three external links: Hibah BIMA, Hibah Riset BPDP, Program RIIM. The section sits below news and before other homepage content. Old presentation used dark solid blue boxes; initial redesign felt generic and AI-generated; user preferred unboxed white/pale-blue composition with restrained edge art.
+
+## 42.2 Approved direction
+
+- Section surface: white/light ice blue, visually connected to surrounding sections.
+- Unboxed 3-column layout (not three giant colored cards).
+- Illustration family: flat educational editorial, distinct semantic icon per program, blue+orange.
+- Desktop: equal column widths; optional stagger limited to artwork, not essential CTA alignment.
+- Accent: cropped organic art shapes **only at left/right edges**; tiny dotted motif, orbit ring; no central full-screen poster.
+- Text: program badge, readable title, short factual description; no text embedded in raster artwork.
+- CTA: full width of **each** column container, not full section; semantic external link.
+- Mobile: stack, simplify ornaments, consistent actions, no horizontal scroll.
+- Motion: optional subtle hover illustration lift and reduced-motion fallback.
+
+## 42.3 Rejected patterns
+
+- Large blue solid rectangles enclosing every element.
+- Generative photorealistic labs/tropical scenery for simple navigation.
+- Too many gradients, floating particles, glow, or dramatic 3D shadows.
+- Using ornamental art as slide background covering whole section.
+- Irregular CTA width, cards with inconsistent bottoms, text misalignment.
+
+## 42.4 Acceptance tests
+
+1. Three links open intended official destinations, without inventing URLs.
+2. Button widths match corresponding columns and align visually.
+3. Decor remains behind content, no pointer interception.
+4. At mobile width, art does not collide with text and layout stacks.
+5. At full-page scroll, transition to/from news is natural.
+6. When image blocked, text/links still usable.
+7. Keyboard focus visible and reduced-motion honored.
+8. Assets load efficiently and do not induce CLS.
+
+# 43. External source hierarchy and update policy
+
+## 43.1 Source priority
+
+1. **Accessibility standards:** https://www.w3.org/TR/WCAG22/ (normative, check amendments/version).
+2. **Web performance:** https://web.dev/articles/vitals and https://developers.google.com/search/docs/appearance/core-web-vitals (current thresholds and measurement).
+3. **Apple platform:** https://developer.apple.com/design/human-interface-guidelines/ (native iOS patterns and controls).
+4. **Android/Material:** https://m3.material.io/ and https://developer.android.com/design (Android patterns, Compose, accessibility).
+5. **MDN:** https://developer.mozilla.org/ (CSS, HTML, responsive image, semantic API).
+6. **WAI patterns:** https://www.w3.org/WAI/ARIA/apg/ (when complex custom widgets need ARIA guidance; prefer native controls).
+7. **Research/human factors:** https://www.nngroup.com/ (heuristics and UX methods; cite specific article when relying on a claim).
+8. **Design resources:** https://www.figma.com/ ; https://storybook.js.org/ (workflow tooling, not authority over UX).
+9. **Art and design history:** museum archives or primary institutional collections for Bauhaus, Swiss typography and modernist poster research. Distinguish descriptive historical facts from contemporary stylistic recommendations.
+
+## 43.2 Freshness rule
+
+Verify version-specific guidance and active links when used. UI trends and platform components change; do not invent "latest" features. For normative standards, quote exact criterion or reference link rather than simplifying requirements into universal numbers. Use real device or browser testing for performance. Keep dated notes on which documents were verified.
+
+## 43.3 Documentation versus taste
+
+- **Standard:** explicit normative accessibility criterion, browser/API contract.
+- **Platform guideline:** recommended component/gesture and native convention.
+- **Heuristic:** 8px spacing, 60/30/10 color, ~200ms hover, 24px stagger.
+- **Creative preference:** Swiss editorial, edge-only blob, no gear, unboxed layout.
+- **Empirical evidence:** usability observation, analytics, performance field data.
+
+Never present a creative taste as a technical requirement, and never claim a visual was user-tested if it was not.
+
+---
+
+# Penutup v2.0 — Design identity without losing utility
+
+Desain yang unik bukan hasil dari menambah objek atau efek sebanyak mungkin. Keunikan yang tahan lama berasal dari keputusan yang selaras: konten, tipografi, komposisi, metafora domain, palet, posisi ruang kosong, gerak dan perilaku platform. Untuk website panjang, periksa hubungan antar-section; untuk mobile, mulailah dari interaksi dan keterbatasan perangkat; untuk AI agent, gunakan referensi sebagai *direction*, bukan template visual yang disalin. 

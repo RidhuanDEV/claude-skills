@@ -43,7 +43,7 @@ Proceed within authorized scope. Do not commit, push, merge, deploy, mutate shar
 - Default bar is production quality unless I say "quick prototype". Label dev-only shortcuts.
 
 For detailed rules across all IT roles (`CORE`, `TOKEN-EFFICIENCY`, `BACKEND`, `DATABASE`, `FRONTEND`, `DESIGN`,
-`UI_UX_Design_Knowledge_Base_ID`, `MOBILE-DESIGN`, `MOBILE`, `REFACTORING`, `SECURITY`, `SECOPS-PENTEST`, `DEVOPS`,
+`UI_UX_Design_Knowledge_Base_v2`, `MOBILE-DESIGN`, `MOBILE`, `REFACTORING`, `SECURITY`, `SECOPS-PENTEST`, `DEVOPS`,
 `CLOUD-SRE`, `ENTERPRISE-INTEGRATION`, `TESTING`, `DEBUGGING`, `ARCHITECTURE`, `PRESALES-PROPOSAL-KAK`, `CODE-REVIEW`,
 `AI-LLM`, `AGENTS-MCP`, `PRODUCT-ANALYSIS`, `IT-PMO-GOVERNANCE`, `DOCS-PIPELINE`, `DATA-AUTOMATION`, `DATA-ANALYTICS-ML`), language guides (`lang-*` including `lang-CPP-SYSTEMS`), and specialized
 sub-task authoring guides (`sub-RAG-VECTOR-KNOWLEDGE`, `sub-AI-INFRA-SERVING`, `sub-LLM-FINETUNING-LLMOps`, `sub-FRONTEND-MOBILE-STACKS`,
