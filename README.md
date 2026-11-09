@@ -36,6 +36,17 @@ shadow-monarch/
       sub-SPECS-DOCX-CODE.md  sub-SHELL-CLI-AUTOMATION.md  sub-OBSERVABILITY-PROFILING.md
       sub-REALTIME-IOT-DESKTOP.md  sub-FINTECH-ID-ECOSYSTEM.md  sub-GIS-GEOSPATIAL.md
       sub-VISION-OCR-MEDIA.md
+shadow-api/          /shadow-api (OpenAPI 3.1 Compact/Modular, Postman v2.1 sync & HTTP testing)
+shadow-db/           /shadow-db (Multi-DB introspect, ERD/DBML, Star Schema DW, Pentaho .ktr/.kjb & Cron)
+shadow-doc/          /shadow-doc (Hybrid .json Canonical AST + .md Importer -> .docx / .xlsx / .pdf)
+shadow-ops/          /shadow-ops (Full-Spectrum DevOps/SRE + local OWASP & H5BP vendor knowledge base)
+shadow-perf/         /shadow-perf (Pre-UAT Gate ONLY: OpenAPI-to-k6 load testing & SQL EXPLAIN profiling)
+shadow-test/         /shadow-test (Polyglot Unit & Integration Testing across 8+ languages/frameworks)
+shadow-browser/      /shadow-browser (Playwright E2E UI & 375px mobile viewport verification)
+shadow-sec/          /shadow-sec (OWASP Top 10, secret leak & dependency audit)
+handoff/             /handoff (Cross-agent session handoff & context compaction)
+context7/            /context7 (Live official library documentation lookup)
+mcp-servers/         Custom MCP servers (shadow-api-mcp, shadow-db-mcp, shadow-handoff-mcp)
 evals/               test prompts to check the skill works (not part of the upload)
 ```
 
