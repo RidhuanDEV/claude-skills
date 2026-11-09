@@ -78,20 +78,28 @@ use `.gitattributes`), case sensitivity, permissions, shell syntax and process m
 give PowerShell commands (or both), e.g. `Get-Content -Tail 50 -Wait app.log` vs `tail -f app.log`,
 `$env:NODE_ENV="production"` vs `export NODE_ENV=production`.
 
-## 10. Git (Read-Only Diagnostics by Default)
+## 10. Git & Collaborative Multi-Branch Workflow (Safe Sync & Conflict Resolution)
 
-- **Default rule**: do NOT execute mutating Git commands (`git commit`, `git push`, `git merge`, `git rebase`, `git reset`,
-  `git checkout`, `git clean`, `git stash`, or branch/tag creation/deletion) unless the user explicitly instructs you to run
-  that specific Git action.
-- **Allowed read-only inspection**: you may run non-mutating diagnostic commands (`git status`, `git diff`, `git diff --stat`,
-  `git log -n <N>`, `git show`, `git blame`) to inspect local changes, verify diff scope, or analyze merge conflict markers
-  in files during testing and debugging.
-- **When resolving merge conflicts locally in source files**: understand both sides (`HEAD` vs incoming); never blindly take
-  ours/theirs; preserve business contracts and types from both sides, remove conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`),
-  and run type checks/tests to verify — without running `git commit` or `git merge --continue` unless asked.
-- **If the user explicitly requests Git mutations**: distinguish working tree, staging area, local commits, and remote commits
-  first; never run destructive commands (`reset --hard`, `clean -fd`, `push --force`) without explicit confirmation; use
-  focused Conventional Commits (`fix(auth): rotate refresh token after renewal`).
+- **Default publishing/destructive guardrail**: do NOT execute unrequested `git commit`, `git push`, `git reset --hard`,
+  `git clean -fd`, or `git push --force` unless the Monarch explicitly instructs you to run that action.
+- **Proactive collaborative branch inspection (Allowed Anytime)**: because the Monarch collaborates across team branches,
+  freely run safe diagnostic and remote-tracking commands:
+  - `git status -sb` & `git branch -vv` (check active branch, ahead/behind counts, and uncommitted local work).
+  - `git fetch --all --prune` (safely update remote-tracking refs `origin/*` without modifying the working tree).
+  - `git log HEAD..origin/<branch> --oneline --stat` (see what teammates pushed before pulling).
+  - `git diff --name-status HEAD...origin/<branch>` (list files modified on remote vs local).
+  - `git merge-tree --write-tree HEAD origin/<branch>` (Git 2.38+ zero-touch dry-run merge in memory to detect exact conflicting files BEFORE running `git pull` or `git merge`!).
+- **Safe Pull Protocol (When the Monarch asks to pull / sync from `origin/<branch>` or `main`/`develop`)**:
+  1. **Check local working tree**: run `git status --porcelain`. If local modified files overlap with incoming changes from `origin/<branch>`, warn the Monarch or create a named stash backup (`git stash push -u -m "shadow-backup-before-pull"`).
+  2. **Dry-run conflict check**: run `git fetch origin` and `git merge-tree --write-tree HEAD origin/<branch>`.
+  3. **Execute safe pull**:
+     - If no local divergence (`ahead 0`), run `git pull --ff-only origin <branch>`.
+     - If diverged and dry-run is clean, run `git pull --no-rebase origin <branch>` (or `--rebase` if the repo enforces linear history) and re-apply stashed changes (`git stash pop`).
+- **Collaborative Conflict Resolution Rules (`<<<<<<<`, `=======`, `>>>>>>>`)**:
+  - **Inspect both intents first**: run `git log -p -n 3 HEAD -- <file>` (Monarch's changes) and `git log -p -n 3 origin/<branch> -- <file>` (teammate's changes).
+  - **Never blindly pick `--ours` or `--theirs`** on shared code — integrate both the Monarch's and teammate's routes, DTOs, imports, and business rules cleanly.
+  - **Verify after resolving**: ensure zero conflict markers (`git diff --check`), strict typing (`0 any`, `0 as Type`), and passing typecheck/tests before reporting completion.
+- **If the Monarch explicitly requests Git commits/pushes**: distinguish working tree, staging area, local commits, and remote commits first; use focused Conventional Commits (`feat(scope): ...`, `fix(scope): ...`).
 
 ## 11. Incidents
 

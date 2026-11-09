@@ -74,6 +74,10 @@ complete change that solves the problem.
 - **Cross-Agent Context Compaction & Session Handoff (`shadow_handoff` MCP)**:
   - When the Monarch says `"handoff"` (or asks to compact/save session state before context fills up or before switching agents), immediately call `save_handoff` on the `shadow_handoff` MCP with the active `projectPath`, goal, completed work, prioritized next steps, active contracts/decisions, and key files.
   - When the Monarch starts a session with `"lanjut handoff"` (or `"load handoff"`), immediately call `load_handoff` on the `shadow_handoff` MCP and resume execution from step 1 of the saved next steps.
+- **Safe Collaborative Git Branch Sync & Conflict Resolution (`/shadow-git`)**:
+  - Do not run unrequested `git commit`, `git push`, `git reset --hard`, `git clean -fd`, or `git push --force`.
+  - Because the Monarch works across branches in collaborative teams, proactively run safe branch & conflict checks (`git status -sb`, `git branch -vv`, `git fetch --all --prune`, `git log HEAD..origin/<branch> --oneline`, and `git merge-tree --write-tree HEAD origin/<branch>` in-memory conflict dry-run).
+  - When pulling or resolving conflicts, protect uncommitted local changes first (`git stash push -u -m "..."` if needed), inspect both the Monarch's and teammate's commit history (`git log -p`), never blindly take `--ours` or `--theirs`, merge both contracts cleanly, and run `git diff --check` + typecheck/tests.
 
 ## Execution
 
@@ -186,6 +190,7 @@ that match the active task. Do not load the entire library into context.
 | `/shadow-test` | Polyglot Unit, Integration & Contract Testing across TypeScript/JS, Python, Go, PHP/Laravel, Java/Kotlin, .NET, Rust & Flutter |
 | `/shadow-browser` | Real Chromium E2E UI verification & 375px mobile overflow testing (`playwright` MCP) |
 | `/shadow-sec` | Pre-push OWASP Top 10, secret leak & dependency vulnerability audit |
+| `/shadow-git` | Safe team branch inspection (`git fetch`, `git merge-tree` dry-run conflict detection), safe pull with stash protection & smart conflict resolution |
 | `/handoff` | Cross-agent session handoff & context compaction with Git-root detection (`shadow_handoff` MCP) |
 
 For other stacks use `reference/CORE.md` plus applicable domain references and verified ecosystem documentation.
