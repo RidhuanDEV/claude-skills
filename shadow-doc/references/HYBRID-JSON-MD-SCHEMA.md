@@ -1,6 +1,6 @@
-# HYBRID-JSON-MD-SCHEMA — Canonical JSON AST & `.md` Importer Specification
+# HYBRID-JSON-MD-SCHEMA — Canonical JSON AST v2.0 & Legacy v1.0 Reference
 
-Adapted directly from the battle-tested architecture of `D:\Pekerjaan-Sistem-Analis\Laporan\Laporan-Generator`.
+Adapted from `D:\Pekerjaan-Sistem-Analis\Laporan\Laporan-Generator` and upgraded to **Shadow-Doc v2.0** (`schemas/canonical-document.schema.json`).
 
 ---
 
@@ -8,28 +8,105 @@ Adapted directly from the battle-tested architecture of `D:\Pekerjaan-Sistem-Ana
 
 | Layer | File Format | Responsibility |
 | :--- | :--- | :--- |
-| **Blueprint & Style Rules** | `.md` (`POLA-*.md`, `RULES-*.md`) | Defines chapter structure, tone of voice (formal Indonesian PUEBI/EYD), forbidden words, and formatting standards. |
-| **Fast Narrative Authoring** | `.md` (`draft.md`) | Optional quick authoring format for prose, Mermaid diagrams, and simple Markdown tables; converted into `.json` via `doc_scaffold.py md-to-json`. |
-| **Canonical Source of Truth** | `.json` (`naskah.json`, `dokteknis/*.json`, `uat.json`) | Strictly validated AST with explicit table column widths (`lebar`), cell alignments (`rata`), numbered evidence files (`bukti`), and metric source attribution (`sumber`). |
-| **Compiled Output** | `.docx`, `.xlsx`, `.pdf` | Regenerable binary output. **NEVER edited directly.** |
+| **Blueprint & Templates** | `.md` (`templates/01..20.md`, `POLA-*.md`) | Defines chapter structure, tone of voice (`id-ID` / `en-US`), placeholders (`[ISI ...]`), and formatting standards. |
+| **Fast Narrative Authoring** | `.md` (`draft.md`) | Quick authoring format for prose, Mermaid diagrams, and Markdown tables; imported into Canonical AST v2.0 via `doc_scaffold.py import` (or legacy v1 via `md-to-json`). |
+| **Canonical Source of Truth (v2.0)** | `.json` (`schemas/canonical-document.schema.json`) | Strictly validated AST with block-level IDs (`FR-001`, `TBL-001`), `trace_ids`, `source_refs`, `history[]`, `signoff_record[]`, and SHA-256 `semantic_hash`. |
+| **Compiled Output** | `.docx`, `.pdf`, `.xlsx`, `.csv`, `.zip` | Regenerable binary output. **NEVER edited directly.** |
 
 ---
 
-## 2. Canonical Document JSON Schema (`naskah.json` / `dokteknis/*.json`)
+## 2. Canonical Document JSON AST v2.0 (`schema_version: "2.0"`)
+
+```json
+{
+  "schema_version": "2.0",
+  "document_id": "PRJ-SRS-001",
+  "project_id": "PRJ-2026",
+  "document_type": "SRS",
+  "title": "Software Requirements Specification",
+  "revision": "0.1-DRAFT",
+  "app_version": "1.0.0",
+  "status": "DRAFT",
+  "language": "id-ID",
+  "classification": "INTERNAL",
+  "style_profile": "corporate",
+  "owner": "Lead System Analyst",
+  "reviewers": ["Security Architect"],
+  "approvers": ["VP Engineering"],
+  "created_at": "2026-11-10T05:00:00Z",
+  "updated_at": "2026-11-10T05:00:00Z",
+  "supersedes": null,
+  "forbidden_terms": ["OtherClientName"],
+  "sources": [
+    {
+      "source_id": "KAK-2026",
+      "reference": "docs/KAK-Bab-II.pdf",
+      "verified_at": "2026-11-10T05:00:00Z",
+      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "SEC-1",
+      "kind": "heading",
+      "level": 2,
+      "title": "1. Kebutuhan Fungsional",
+      "body": null,
+      "source_refs": ["KAK-2026"],
+      "trace_ids": []
+    },
+    {
+      "id": "FR-001",
+      "kind": "paragraph",
+      "title": "Autentikasi OAuth2 & Passkey",
+      "body": "Sistem wajib menyediakan autentikasi OAuth2/OIDC dengan dukungan passkey FIDO2.",
+      "source_refs": ["KAK-2026"],
+      "trace_ids": ["SDD-001", "TC-001", "UAT-001"],
+      "status": "APPROVED"
+    }
+  ],
+  "history": [
+    {
+      "revision": "0.1-DRAFT",
+      "reason": "Initial draft",
+      "changed_by": "Lead System Analyst",
+      "changed_at": "2026-11-10T05:00:00Z",
+      "approval_ref": null
+    }
+  ],
+  "signoff_record": [
+    {
+      "role": "Approver",
+      "identity": null,
+      "decision": "PENDING",
+      "timestamp": null,
+      "evidence_ref": null
+    }
+  ],
+  "unmapped_blocks": []
+}
+```
+
+---
+
+## 3. Legacy v1.0 JSON Schema (`bagian -> subbagian -> blok`) — Preserved for Backward Compatibility
+
+Legacy v1.0 files (`jenis`, `judul`, `bagian`) remain 100% supported by `doc_scaffold.py check-readiness` and can be migrated to v2.0 at any time using:
+
+```powershell
+python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" migrate-v1 --in legacy.json --project-id PRJ-2026 --doc-id DOC-001 --out migrated_v2.json
+```
+
+(Automatically creates `legacy.v1.bak.json` and preserves the original `bagian` array under `legacy_v1_bagian`).
 
 ```json
 {
   "jenis": "srs | prd | dokteknis | bulanan | akhir | uat | manual",
   "judul": "Dokumen Spesifikasi Teknis & Arsitektur Sistem",
   "metadata": {
-    "instansi": ["KEMENTERIAN PEKERJAAN UMUM", "SEKRETARIAT JENDERAL", "PUSAT DATA DAN TEKNOLOGI INFORMASI"],
+    "instansi": ["KEMENTERIAN PEKERJAAN UMUM"],
     "proyek": "Pengembangan Sistem Informasi Terpadu",
-    "periode": "2026-11",
-    "tempat": "Jakarta",
-    "istilah_terlarang": ["nama_produk_internal_rahasia", "klien_lain"],
-    "pejabat": {
-      "pengawas": { "jabatan": "Pejabat Pembuat Komitmen", "nama": "Nama Pejabat", "nip": "198001012005011001" }
-    }
+    "istilah_terlarang": ["nama_produk_internal_rahasia"]
   },
   "bagian": [
     {
@@ -40,54 +117,7 @@ Adapted directly from the battle-tested architecture of `D:\Pekerjaan-Sistem-Ana
           "sumber": "KAK Bab II Ruang Lingkup Pekerjaan"
         }
       ],
-      "subbagian": [
-        {
-          "judul": "Spesifikasi Komponen Layanan",
-          "blok": [
-            {
-              "daftar": [
-                { "judul": "Layanan Autentikasi", "uraian": "Menggunakan protokol OAuth2 dan JWT RS256." },
-                { "judul": "Basis Data Utama", "uraian": "PostgreSQL 16 dengan replikasi baca-saja." }
-              ]
-            },
-            {
-              "tabel": {
-                "keterangan": "Spesifikasi Modul Sistem",
-                "kolom": [
-                  { "judul": "Kode", "lebar": 8, "rata": "tengah" },
-                  { "judul": "Nama Modul", "lebar": 25, "rata": "kiri" },
-                  { "judul": "Target SLA", "lebar": 12, "rata": "tengah" }
-                ],
-                "baris": [
-                  ["MOD-01", "Modul Integrasi API Gateway", "99,9%"],
-                  ["MOD-02", "Modul Pelaporan Eksekutif", "99,5%"]
-                ]
-              },
-              "sumber": "Dokumen Kontrak Lampiran A"
-            },
-            {
-              "diagram": {
-                "mermaid": "flowchart LR\n  Client[\"Aplikasi Web\"] --> GW[\"API Gateway\"]\n  GW --> DB[(\"PostgreSQL 16\")]",
-                "keterangan": "Diagram Alur Arsitektur Sistem"
-              }
-            },
-            {
-              "kode": {
-                "bahasa": "sql",
-                "isi": "SELECT id, status FROM orders WHERE created_at >= CURRENT_DATE;"
-              }
-            },
-            {
-              "bukti": [
-                {
-                  "berkas": "bukti/01-dashboard-utama.png",
-                  "keterangan": "Tampilan antarmuka halaman pemantauan utama."
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "subbagian": []
     }
   ]
 }
@@ -95,49 +125,13 @@ Adapted directly from the battle-tested architecture of `D:\Pekerjaan-Sistem-Ana
 
 ---
 
-## 3. UAT & Test Case Matrix Schema (`uat-matrix.json` -> `.xlsx` & `.docx`)
-
-```json
-{
-  "jenis": "uat",
-  "judul": "Dokumen User Acceptance Testing (UAT)",
-  "metadata": {
-    "proyek": "Sistem Manajemen Terpadu",
-    "versi": "1.0.0",
-    "tanggal_uji": "2026-11-09"
-  },
-  "kasus_uji": [
-    {
-      "id": "TC-AUTH-001",
-      "modul": "Autentikasi & Otorisasi",
-      "prioritas": "P0",
-      "tipe": "Positive",
-      "prasyarat": "Pengguna memiliki akun aktif dengan peran Admin.",
-      "langkah": [
-        "Buka halaman login aplikasi.",
-        "Masukkan email dan kata sandi yang valid, lalu tekan tombol Masuk."
-      ],
-      "data_uji": "email: admin@instansi.go.id",
-      "hasil_diharapkan": "Sistem mengarahkan pengguna ke halaman Dashboard Utama dan mencatat log sesi.",
-      "hasil_aktual": "Sesuai harapan.",
-      "status": "PASS",
-      "bukti_berkas": "bukti/uat-auth-001.png"
-    }
-  ]
-}
-```
-
----
-
-## 4. Word (`.docx`) & Excel (`.xlsx`) Styling Standards
+## 4. Multi-Format Rendering & Visual QA Standards (`.docx`, `.pdf`, `.xlsx`, `.csv`, `.md`)
 
 1. **Explicit UTF-8 Everywhere on Windows**:
-   - Every file read/write in Python MUST specify `encoding="utf-8"` so Indonesian characters, em-dashes, and symbols are never corrupted by Windows `cp1252`.
-2. **Table Formatting Discipline**:
-   - Repeat table header rows across page breaks (`w:tblHeader`).
-   - Prevent rows from splitting mid-line across pages (`w:cantSplit`).
-   - Keep headings attached to the following paragraph (`keep_with_next = True`).
-3. **Validation Gate (`check-readiness`) Before Rendering**:
-   - Check that every `paragraf` ends with valid terminal punctuation (`.`, `:`, `)`, `"`).
-   - Check that every numeric claim with units (`%`, `ms`, `GB`, `request`, `baris`, `rupiah`) has a `"sumber"` field or is flagged as a warning (`PERINGATAN`).
-   - Check that every referenced image in `bukti` exists on disk before building `.docx`.
+   - Every file read/write in Python specifies `encoding="utf-8"`.
+2. **Word (`.docx`) Pagination & Typography**:
+   - Supports `corporate` (`Calibri` 11pt) and `institutional` (`Times New Roman` 12pt) profiles, A4 portrait or landscape (`RTM`), running headers/footers, native Word TOC field (`TOC \o "1-3"`), repeating table headers (`w:tblHeader`), non-splitting rows (`w:cantSplit`), and heading attachment (`keep_with_next = True`).
+3. **Excel (`.xlsx`) Register Standards**:
+   - Generates 4 standardized worksheets: `README_Metadata`, `Register_Data` (frozen header row `A2`, auto-filter, status dropdown validation), `Traceability_Links`, and `Data_Dictionary`.
+4. **PDF (`.pdf`) Standards**:
+   - Native offline rendering via `fpdf2` with running headers, page `X/{nb}` footers, PDF section bookmarks/outlines, and wrapped tables.

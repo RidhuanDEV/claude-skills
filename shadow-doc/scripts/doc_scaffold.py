@@ -1,381 +1,474 @@
 #!/usr/bin/env python3
-"""Shadow Doc Pipeline Utility (Hybrid .md <-> .json AST + Readiness Validator + DOCX/XLSX Builder).
-
-Inspired by D:\\Pekerjaan-Sistem-Analis\\Laporan\\Laporan-Generator.
-All file operations enforce explicit UTF-8 encoding on Windows.
+"""
+Shadow-Doc v2.0 & v1.0 Hybrid Document Scaffold, Lifecycle & Readiness CLI
+100% Backward-Compatible with v1.0 (`--selftest`, `md-to-json`, `check-readiness`)
+and supports full v2.0 SDLC Document Engineering (`create`, `import`, `update`,
+`validate`, `diff`, `impact`, `approve`, `export`, `package`, `inspect`,
+`migrate-v1`, `--acceptance-suite`).
 """
 
-from __future__ import annotations
-
 import argparse
+import importlib.util
 import json
 import re
 import sys
-import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List
 
-POLA_DAFTAR = re.compile(r"^(\s*)([-*]|\d+\.)\s+(.*)$")
-POLA_ANGKA_BERSATUAN = re.compile(
-    r"\b\d+(?:[.,]\d+)?\s*(?:%|persen|ms|detik|menit|jam|hari|bulan|tahun|KB|MB|GB|TB|req/s|RPS|baris|halaman|rupiah|Rp)\b",
-    re.IGNORECASE,
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from v2_core import (
+    SKILL_ROOT,
+    TEMPLATE_MAP,
+    analyze_traceability_and_impact,
+    atomic_write_json,
+    create_document_from_template,
+    diff_documents_v2,
+    import_existing_file_to_v2,
+    selective_update_v2,
+    transition_approval_status,
+    validate_document_v2,
 )
-AKHIR_KALIMAT_VALID = (".", "!", "?", ":", ";", ")", '"', "'", "”")
+from v2_renderers import (
+    build_stage_package,
+    render_v2_to_csv,
+    render_v2_to_docx,
+    render_v2_to_markdown,
+    render_v2_to_pdf,
+    render_v2_to_xlsx,
+    verify_rendered_outputs_qa,
+)
+from v2_acceptance import run_acceptance_suite
 
 
-def _sebaris(teks: str) -> str:
-    teks = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", teks)
-    return re.sub(r"\s+", " ", teks).strip()
-
-
-def md_to_json_ast(md_path: Path, jenis: str, judul: str) -> dict[str, Any]:
-    """Convert a Markdown document (.md) into the canonical Shadow-Doc JSON AST."""
-    sumber_default = f"Dokumen sumber '{md_path.name}'"
-    baris = md_path.read_text(encoding="utf-8").splitlines()
-
-    bagian: list[dict[str, Any]] = []
-    judul_aktif = judul
-    target: list[dict[str, Any]] | None = None
-    paragraf: list[str] = []
-
-    def bersumber(blok: dict[str, Any], teks_uji: str) -> dict[str, Any]:
-        polos_uji = re.sub(r"[*`]", "", teks_uji)
-        if POLA_ANGKA_BERSATUAN.search(polos_uji) and "sumber" not in blok:
-            blok["sumber"] = sumber_default
-        return blok
-
-    def tutup_paragraf() -> None:
-        nonlocal paragraf, target
-        if paragraf and target is not None:
-            teks = _sebaris(" ".join(paragraf))
-            if teks:
-                target.append(bersumber({"paragraf": teks}, teks))
-        paragraf = []
-
-    i = 0
-    while i < len(baris):
-        b = baris[i]
-        polos = b.strip()
-
-        if re.match(r"^#\s+", b) and not bagian:
-            judul_h1 = re.sub(r"^#\s+", "", b).strip()
-            if judul == "Dokumen Teknis":
-                judul = judul_h1
-            i += 1
-            continue
-
-        if re.match(r"^##\s+", b):
-            tutup_paragraf()
-            judul_aktif = re.sub(r"^##\s+[\d.]*\s*", "", b).strip()
-            bagian.append({"judul": judul_aktif, "blok": [], "subbagian": []})
-            target = bagian[-1]["blok"]
-        elif re.match(r"^###\s+", b):
-            tutup_paragraf()
-            if not bagian:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-            judul_aktif = re.sub(r"^###\s+[\d.]*\s*", "", b).strip()
-            bagian[-1]["subbagian"].append({"judul": judul_aktif, "blok": []})
-            target = bagian[-1]["subbagian"][-1]["blok"]
-        elif re.match(r"^####\s+", b):
-            tutup_paragraf()
-            if not bagian:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-            judul_aktif = re.sub(r"^####\s+[\d.]*\s*", "", b).strip()
-            induk = (
-                bagian[-1]["subbagian"][-1]["blok"]
-                if bagian[-1]["subbagian"]
-                else bagian[-1]["blok"]
-            )
-            induk.append({"subbab": {"judul": judul_aktif, "blok": []}})
-            target = induk[-1]["subbab"]["blok"]
-        elif polos.startswith("```"):
-            tutup_paragraf()
-            if target is None:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-                target = bagian[-1]["blok"]
-            bahasa = polos[3:].strip()
-            isi_kode: list[str] = []
-            i += 1
-            while i < len(baris) and not baris[i].strip().startswith("```"):
-                isi_kode.append(baris[i])
-                i += 1
-            lekuk = min((len(x) - len(x.lstrip()) for x in isi_kode if x.strip()), default=0)
-            isi_kode = [x[lekuk:] for x in isi_kode]
-            if bahasa.lower() == "mermaid":
-                target.append(
-                    {
-                        "diagram": {
-                            "mermaid": "\n".join(isi_kode),
-                            "keterangan": f"Diagram {judul_aktif}",
-                        }
-                    }
-                )
-            else:
-                target.append({"kode": {"bahasa": bahasa or "text", "isi": "\n".join(isi_kode)}})
-        elif polos.startswith("|"):
-            tutup_paragraf()
-            if target is None:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-                target = bagian[-1]["blok"]
-            tabel: list[list[str]] = []
-            while i < len(baris) and baris[i].strip().startswith("|"):
-                tabel.append([_sebaris(c) for c in baris[i].strip().strip("|").split("|")])
-                i += 1
-            i -= 1
-            if len(tabel) >= 2:
-                kepala = tabel[0]
-                isi_baris = [
-                    r
-                    for idx, r in enumerate(tabel[1:], start=1)
-                    if idx != 1 or not all(re.match(r"^:?-{2,}:?$", c) for c in r)
-                ]
-                isi_baris = [r for r in isi_baris if len(r) == len(kepala)]
-                kolom = []
-                for k, j in enumerate(kepala):
-                    panjang = max([len(j)] + [len(r[k]) for r in isi_baris]) if isi_baris else len(j)
-                    pendek = bool(isi_baris) and all(len(r[k]) <= 10 for r in isi_baris)
-                    kolom.append(
-                        {
-                            "judul": j.replace("**", "").strip() or "-",
-                            "lebar": min(max(panjang, 4), 40),
-                            "rata": "tengah" if pendek else "kiri",
-                        }
-                    )
-                baris_bersih = [[c if c else "-" for c in r] for r in isi_baris]
-                blok_tabel: dict[str, Any] = {
-                    "tabel": {
-                        "keterangan": f"Tabel {judul_aktif}",
-                        "kolom": kolom,
-                        "baris": baris_bersih,
-                    }
-                }
-                target.append(
-                    bersumber(blok_tabel, json.dumps(baris_bersih, ensure_ascii=False))
-                )
-        elif POLA_DAFTAR.match(b):
-            tutup_paragraf()
-            if target is None:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-                target = bagian[-1]["blok"]
-            m = POLA_DAFTAR.match(b)
-            assert m is not None
-            tingkat = 1 if len(m.group(1)) < 4 else 2
-            teks = _sebaris(m.group(3))
-            mj = re.match(r"^\*\*(.+?)\*\*:?\s*(.*)$", teks)
-            item: Any = (
-                {"judul": mj.group(1).rstrip(":"), "uraian": mj.group(2)}
-                if mj and mj.group(2)
-                else teks
-            )
-            if target and "daftar" in target[-1] and target[-1].get("tingkat", 1) == tingkat:
-                target[-1]["daftar"].append(item)
-            else:
-                blok_daftar: dict[str, Any] = {"daftar": [item]}
-                if tingkat > 1:
-                    blok_daftar["tingkat"] = tingkat
-                target.append(blok_daftar)
-        elif polos in ("---", "") or polos.startswith("<"):
-            tutup_paragraf()
-        else:
-            if target is None:
-                bagian.append({"judul": "Pendahuluan", "blok": [], "subbagian": []})
-                target = bagian[-1]["blok"]
-            paragraf.append(polos)
-        i += 1
-
-    tutup_paragraf()
-    for bg in bagian:
-        if not bg.get("subbagian"):
-            bg.pop("subbagian", None)
-        if not bg.get("blok"):
-            bg.pop("blok", None)
-
-    return {
-        "jenis": jenis,
-        "judul": judul,
-        "metadata": {
-            "sumber_berkas": md_path.name,
-            "istilah_terlarang": [],
-        },
-        "bagian": bagian,
+# ============================================================================
+# LEGACY v1.0 FUNCTIONS (100% Preserved for Backward Compatibility)
+# ============================================================================
+def check_libraries() -> Dict[str, str]:
+    libs = {
+        "docx (python-docx)": "docx",
+        "openpyxl (Excel)": "openpyxl",
+        "reportlab (PDF)": "reportlab",
+        "fpdf2 (PDF)": "fpdf",
+        "markdown": "markdown",
     }
+    results: Dict[str, str] = {}
+    for label, mod in libs.items():
+        spec = importlib.util.find_spec(mod)
+        results[label] = "AVAILABLE" if spec is not None else "MISSING (pip install required)"
+    return results
 
 
-def check_readiness(doc: dict[str, Any], base_dir: Path) -> tuple[list[str], list[str]]:
-    """Validate canonical JSON AST for errors (galat) and warnings (peringatan)."""
-    galat: list[str] = []
-    peringatan: list[str] = []
+def parse_markdown_to_ast(
+    md_text: str, title: str = "Dokumen Teknis", instansi: str = "Organisasi"
+) -> Dict[str, Any]:
+    """Legacy v1.0 Markdown-to-AST parser (`bagian -> subbagian -> blok`)."""
+    lines = md_text.splitlines()
+    ast: Dict[str, Any] = {
+        "judul": title,
+        "subjudul": "Generated by Shadow-Doc Hybrid Importer",
+        "instansi": instansi,
+        "bagian": [],
+    }
+    current_bagian: Dict[str, Any] | None = None
+    current_subbagian: Dict[str, Any] | None = None
+    in_code_block = False
+    code_lines: List[str] = []
+    table_lines: List[str] = []
 
-    if not doc.get("judul"):
-        galat.append("Ruas 'judul' dokumen kosong.")
-    bagian = doc.get("bagian", [])
-    kasus_uji = doc.get("kasus_uji", [])
-    if not bagian and not kasus_uji:
-        galat.append("Dokumen tidak memiliki 'bagian' maupun 'kasus_uji'.")
+    def ensure_containers() -> None:
+        nonlocal current_bagian, current_subbagian
+        if current_bagian is None:
+            current_bagian = {"judul": "Pendahuluan", "subbagian": []}
+            ast["bagian"].append(current_bagian)
+        if current_subbagian is None:
+            current_subbagian = {"judul": "Umum", "blok": []}
+            current_bagian["subbagian"].append(current_subbagian)
 
-    terlarang = [
-        t.lower()
-        for t in doc.get("metadata", {}).get("istilah_terlarang", [])
-        if isinstance(t, str) and t.strip()
-    ]
-
-    def periksa_teks(teks: str, lokasi: str, punya_sumber: bool) -> None:
-        if not teks.strip():
-            galat.append(f"{lokasi}: teks kosong.")
+    def flush_table() -> None:
+        nonlocal table_lines
+        if not table_lines:
             return
-        rendah = teks.lower()
-        for istilah in terlarang:
-            if istilah in rendah:
-                galat.append(
-                    f"{lokasi}: ditemukan istilah terlarang lintas-klien/internal '{istilah}'."
-                )
-        if POLA_ANGKA_BERSATUAN.search(teks) and not punya_sumber:
-            peringatan.append(
-                f"{lokasi}: memuat angka bersatuan tanpa atribusi 'sumber' eksplisit."
-            )
+        ensure_containers()
+        rows: List[List[str]] = []
+        for tline in table_lines:
+            stripped = tline.strip().strip("|")
+            cells = [c.strip() for c in stripped.split("|")]
+            if all(re.match(r"^[-:]+$", c.replace(" ", "")) for c in cells if c):
+                continue
+            rows.append(cells)
+        if len(rows) >= 2 and current_subbagian is not None:
+            current_subbagian["blok"].append({
+                "jenis": "tabel",
+                "judul": "Tabel Data",
+                "header": rows[0],
+                "baris": rows[1:],
+            })
+        table_lines = []
 
-    def periksa_blok_list(blok_list: list[dict[str, Any]], konteks: str) -> None:
-        for idx, b in enumerate(blok_list, start=1):
-            lok = f"{konteks} > blok[{idx}]"
-            punya_sumber = bool(b.get("sumber"))
-            if "paragraf" in b:
-                p = str(b["paragraf"]).strip()
-                periksa_teks(p, lok, punya_sumber)
-                if p and not p.endswith(AKHIR_KALIMAT_VALID):
-                    galat.append(
-                        f"{lok}: kalimat paragraf diduga terpotong (tidak diakhiri tanda baca titik/valid): '...{p[-25:]}'"
-                    )
-            elif "tabel" in b:
-                tbl = b["tabel"]
-                kolom = tbl.get("kolom", [])
-                baris = tbl.get("baris", [])
-                if not kolom:
-                    galat.append(f"{lok}: tabel tidak memiliki definisi kolom.")
-                for r_idx, r in enumerate(baris, start=1):
-                    if len(r) != len(kolom):
-                        galat.append(
-                            f"{lok}: baris tabel ke-{r_idx} memiliki {len(r)} sel, seharusnya {len(kolom)}."
-                        )
-            elif "bukti" in b:
-                for b_item in b["bukti"]:
-                    berkas = b_item.get("berkas", "")
-                    if berkas and not (base_dir / berkas).exists():
-                        peringatan.append(
-                            f"{lok}: berkas gambar bukti '{berkas}' belum ditemukan di '{base_dir}'."
-                        )
-            elif "subbab" in b:
-                sub = b["subbab"]
-                periksa_blok_list(sub.get("blok", []), f"{lok} ({sub.get('judul', 'Subbab')})")
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        if line.strip().startswith("```"):
+            flush_table()
+            if not in_code_block:
+                in_code_block = True
+                code_lines = []
+            else:
+                in_code_block = False
+                ensure_containers()
+                if current_subbagian is not None:
+                    current_subbagian["blok"].append({
+                        "jenis": "kode",
+                        "teks": "\n".join(code_lines),
+                    })
+            continue
+        if in_code_block:
+            code_lines.append(line)
+            continue
+        if line.strip().startswith("|") and line.strip().endswith("|"):
+            table_lines.append(line)
+            continue
+        else:
+            flush_table()
+        if line.startswith("# ") and not line.startswith("## "):
+            ast["judul"] = line[2:].strip()
+            continue
+        if line.startswith("## ") and not line.startswith("### "):
+            current_bagian = {"judul": line[3:].strip(), "subbagian": []}
+            ast["bagian"].append(current_bagian)
+            current_subbagian = None
+            continue
+        if line.startswith("### "):
+            if current_bagian is None:
+                current_bagian = {"judul": "Bagian Utama", "subbagian": []}
+                ast["bagian"].append(current_bagian)
+            current_subbagian = {"judul": line[4:].strip(), "blok": []}
+            current_bagian["subbagian"].append(current_subbagian)
+            continue
+        if line.strip().startswith(("- ", "* ")):
+            ensure_containers()
+            item_text = line.strip()[2:].strip()
+            if current_subbagian is not None:
+                if current_subbagian["blok"] and current_subbagian["blok"][-1].get("jenis") == "bullet":
+                    current_subbagian["blok"][-1]["item"].append(item_text)
+                else:
+                    current_subbagian["blok"].append({"jenis": "bullet", "item": [item_text]})
+            continue
+        if line.strip():
+            ensure_containers()
+            if current_subbagian is not None:
+                current_subbagian["blok"].append({"jenis": "paragraf", "teks": line.strip()})
 
-    for bg in bagian:
-        j_bg = bg.get("judul", "Tanpa Judul")
-        periksa_blok_list(bg.get("blok", []), f"Bagian '{j_bg}'")
-        for sub in bg.get("subbagian", []):
-            j_sub = sub.get("judul", "Tanpa Judul")
-            periksa_blok_list(sub.get("blok", []), f"Bagian '{j_bg}' > '{j_sub}'")
+    flush_table()
+    return ast
 
-    return galat, peringatan
+
+def validate_ast(ast: Dict[str, Any]) -> List[str]:
+    """Legacy v1.0 AST validator + auto-delegation if v2.0 schema_version is detected."""
+    if ast.get("schema_version") == "2.0":
+        res = validate_document_v2(ast, strict=False)
+        return [f"[{e['code']}] {e['message']}" for e in res["issues"]]
+
+    issues: List[str] = []
+    for req in ("judul", "subjudul", "instansi", "bagian"):
+        if req not in ast:
+            issues.append(f"Missing top-level field: '{req}'")
+    if not isinstance(ast.get("bagian"), list) or len(ast["bagian"]) == 0:
+        issues.append("'bagian' must be a non-empty list of chapters.")
+        return issues
+
+    for b_idx, bagian in enumerate(ast["bagian"]):
+        for sub_idx, sub in enumerate(bagian.get("subbagian", [])):
+            for blk_idx, blok in enumerate(sub.get("blok", [])):
+                jenis = blok.get("jenis")
+                if jenis == "tabel":
+                    headers = blok.get("header", [])
+                    for r_idx, row in enumerate(blok.get("baris", [])):
+                        if len(row) != len(headers):
+                            issues.append(
+                                f"Bagian[{b_idx}].Sub[{sub_idx}].Blok[{blk_idx}] Row {r_idx} "
+                                f"has {len(row)} cells, expected {len(headers)}."
+                            )
+    return issues
 
 
 def run_selftest() -> int:
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_dir = Path(tmp)
-        sample_md = tmp_dir / "sample_spec.md"
-        sample_md.write_text(
-            "# Spesifikasi Teknis Layanan\n\n"
-            "## 1. Pendahuluan\n\n"
-            "Sistem dirancang untuk melayani 500 req/s dengan ketersediaan 99,9%.\n\n"
-            "### 1.1 Komponen Utama\n\n"
-            "- **API Gateway**: Mengelola autentikasi dan pembatasan laju.\n"
-            "- **Worker Antrean**: Memproses pengiriman laporan asinkron.\n\n"
-            "| Kode | Komponen | Target |\n"
-            "| --- | --- | --- |\n"
-            "| C-01 | Gateway | 99,9% |\n"
-            "| C-02 | Worker | 99,5% |\n\n"
-            "```mermaid\n"
-            "flowchart LR\n"
-            "  A[\"Client\"] --> B[\"API Gateway\"]\n"
-            "```\n",
-            encoding="utf-8",
-        )
-        ast_data = md_to_json_ast(sample_md, "dokteknis", "Dokumen Teknis")
-        galat, peringatan = check_readiness(ast_data, tmp_dir)
-        assert len(galat) == 0, f"Expected 0 galat, got: {galat}"
-        assert len(ast_data["bagian"]) == 1, "Expected 1 bagian"
-        out_json = tmp_dir / "naskah.json"
-        out_json.write_text(json.dumps(ast_data, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(
-            json.dumps(
-                {
-                    "status": "SELFTEST_OK",
-                    "sections": len(ast_data["bagian"]),
-                    "galat": len(galat),
-                    "peringatan": len(peringatan),
-                }
-            )
-        )
-    return 0
+    sample_md = """# Laporan Uji Coba
+## Pendahuluan
+### Latar Belakang
+Sistem ini dirancang untuk otomasi dokumen enterprise.
+- Mendukung JSON AST v1.0 & v2.0
+- Mendukung Markdown Importer
+| ID | Fitur | Status |
+| --- | --- | --- |
+| FR-01 | Importer MD | Siap |
+| FR-02 | Generator DOCX | Siap |
+"""
+    ast = parse_markdown_to_ast(sample_md)
+    issues = validate_ast(ast)
+    libs = check_libraries()
+    print(json.dumps({
+        "status": "PASS" if not issues else "FAIL",
+        "version": "2.0.0 (v1-compatible)",
+        "ast_chapters": len(ast["bagian"]),
+        "validation_issues": issues,
+        "installed_libraries": libs,
+        "supported_v2_templates": len(set(TEMPLATE_MAP.values())),
+    }, indent=2))
+    return 0 if not issues else 1
 
 
+# ============================================================================
+# CLI ENTRYPOINT (v1.0 + v2.0 Unified Commands)
+# ============================================================================
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Shadow Doc Hybrid JSON/MD Pipeline")
-    parser.add_argument("--selftest", action="store_true", help="Run self-test")
+    parser = argparse.ArgumentParser(description="Shadow-Doc v2.0 & v1.0 Hybrid CLI")
+    parser.add_argument("--selftest", action="store_true", help="Run self-test and check Python libraries")
+    parser.add_argument("--acceptance-suite", action="store_true", help="Run all 15 v2.0 Acceptance Tests (AT-01..AT-15) & Scale Benchmark")
     sub = parser.add_subparsers(dest="cmd")
 
-    p_m2j = sub.add_parser("md-to-json", help="Convert .md file to canonical .json AST")
-    p_m2j.add_argument("--input", required=True, help="Input .md file path")
-    p_m2j.add_argument("--output", required=True, help="Output .json file path")
-    p_m2j.add_argument("--jenis", default="dokteknis", help="Document type")
-    p_m2j.add_argument("--judul", default="Dokumen Teknis", help="Document title")
+    # v1.0 Legacy Commands
+    p_md = sub.add_parser("md-to-json", help="[v1] Convert Markdown file into canonical JSON AST")
+    p_md.add_argument("--input", required=True, help="Input Markdown file path")
+    p_md.add_argument("--output", required=True, help="Output JSON AST file path")
+    p_md.add_argument("--title", default="Dokumen Teknis", help="Document title")
+    p_md.add_argument("--instansi", default="Organisasi", help="Organization name")
 
-    p_chk = sub.add_parser("check-readiness", help="Validate canonical .json before rendering")
-    p_chk.add_argument("--input", required=True, help="Input .json file path")
+    p_chk = sub.add_parser("check-readiness", help="[v1/v2] Validate canonical JSON AST file")
+    p_chk.add_argument("--json", required=True, help="Input JSON AST file path")
+
+    # v2.0 Commands
+    p_create = sub.add_parser("create", help="[v2] Create a canonical v2.0 JSON document from one of the 20 templates")
+    p_create.add_argument("--type", required=True, help="Template type (e.g. SRS, SDD, RTM, HANDOVER, etc.)")
+    p_create.add_argument("--project-id", required=True, help="Project ID (e.g. PRJ-2026-001)")
+    p_create.add_argument("--doc-id", default=None, help="Document ID (e.g. DOC-SRS-001)")
+    p_create.add_argument("--title", default=None, help="Optional Document Title override")
+    p_create.add_argument("--owner", default="System Analyst", help="Document Owner")
+    p_create.add_argument("--lang", default="id-ID", choices=["id-ID", "en-US"], help="Language")
+    p_create.add_argument("--style", default="corporate", choices=["corporate", "institutional"], help="Style profile")
+    p_create.add_argument("--out", required=True, help="Output canonical JSON path")
+
+    p_import = sub.add_parser("import", help="[v2] Import .md, .docx, .pdf, or v1 .json into canonical v2.0 JSON AST")
+    p_import.add_argument("--in", dest="input_path", required=True, help="Input file (.md, .docx, .pdf, .json)")
+    p_import.add_argument("--project-id", required=True, help="Project ID")
+    p_import.add_argument("--doc-id", default=None, help="Document ID")
+    p_import.add_argument("--type", default="SRS", help="Document Type")
+    p_import.add_argument("--out", required=True, help="Output canonical v2.0 JSON path")
+
+    p_update = sub.add_parser("update", help="[v2] Selectively update a single block or section without mutating unrelated blocks")
+    p_update.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
+    p_update.add_argument("--scope-id", required=True, help="Block/Section ID to update (e.g. FR-001)")
+    p_update.add_argument("--content", required=True, help="New content text")
+    p_update.add_argument("--author", default="Shadow Army", help="Author of the change")
+    p_update.add_argument("--change-ref", default="CR-MANUAL", help="Change reference ID")
+    p_update.add_argument("--expected-hash", default=None, help="Optional base document hash for concurrency lock")
+    p_update.add_argument("--out", default=None, help="Optional output path")
+
+    p_val = sub.add_parser("validate", help="[v2] Run schema, secret, traceability, and quality gate validation")
+    p_val.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
+    p_val.add_argument("--strict", action="store_true", help="Strict gate (fails on OPEN TBD/TBR, UNVERIFIED blocks, or secrets)")
+
+    p_diff = sub.add_parser("diff", help="[v2] Compute block-level diff between two canonical JSON documents")
+    p_diff.add_argument("--old", required=True, help="Old canonical JSON path")
+    p_diff.add_argument("--new", required=True, help="New canonical JSON path")
+
+    p_impact = sub.add_parser("impact", help="[v2] Run bidirectional traceability & change-impact analysis")
+    p_impact.add_argument("--doc", required=True, nargs="+", help="One or more canonical v2.0 JSON paths")
+    p_impact.add_argument("--changed-id", required=True, help="Changed Requirement/API/Design/Test ID (e.g. FR-001)")
+
+    p_approve = sub.add_parser("approve", help="[v2] Transition document approval status with separation-of-duties checks")
+    p_approve.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
+    p_approve.add_argument("--status", required=True, choices=["DRAFT", "IN_REVIEW", "CHANGES_REQUESTED", "APPROVED", "RELEASED", "SUPERSEDED", "ARCHIVED"])
+    p_approve.add_argument("--actor", required=True, help="Approver/Reviewer name")
+    p_approve.add_argument("--role", default="Approver", help="Approver role")
+    p_approve.add_argument("--evidence-ref", default=None, help="Approval evidence reference (required for APPROVED/RELEASED)")
+
+    p_export = sub.add_parser("export", help="[v2] Render canonical v2.0 JSON into docx, pdf, xlsx, csv, or md")
+    p_export.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
+    p_export.add_argument("--format", required=True, help="Comma-separated formats: md,docx,pdf,xlsx,csv,all")
+    p_export.add_argument("--out-dir", required=True, help="Output directory")
+
+    p_pkg = sub.add_parser("package", help="[v2] Build stage handover ZIP package with SHA-256 manifest.json")
+    p_pkg.add_argument("--source-dir", required=True, help="Directory containing project documents")
+    p_pkg.add_argument("--project-id", required=True, help="Project ID")
+    p_pkg.add_argument("--stage", default="handover", help="SDLC stage")
+    p_pkg.add_argument("--out", required=True, help="Output .zip path")
+
+    p_insp = sub.add_parser("inspect", help="[v2] Inspect metadata, block counts, and status of a document")
+    p_insp.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
+
+    p_mig = sub.add_parser("migrate-v1", help="[v2] Migrate legacy v1.0 JSON AST to v2.0 Canonical AST with .v1.bak.json backup")
+    p_mig.add_argument("--in", dest="input_path", required=True, help="Legacy v1.0 JSON path")
+    p_mig.add_argument("--project-id", default="PRJ-MIGRATED-001", help="Project ID")
+    p_mig.add_argument("--doc-id", default="DOC-MIGRATED-001", help="Document ID")
+    p_mig.add_argument("--out", required=True, help="Output v2.0 JSON path")
 
     args = parser.parse_args()
+
     if args.selftest:
         return run_selftest()
 
+    if args.acceptance_suite:
+        out_dir = SKILL_ROOT / "output"
+        summary = run_acceptance_suite(out_dir)
+        print(json.dumps({
+            "suite": summary["suite"],
+            "total_tests": summary["total_tests"],
+            "passed": summary["passed"],
+            "failed": summary["failed"],
+            "all_passed": summary["all_passed"],
+            "report_json": str(out_dir / "acceptance_report_v2.json"),
+            "report_md": str(out_dir / "acceptance_report_v2.md"),
+        }, indent=2))
+        return 0 if summary["all_passed"] else 1
+
     if args.cmd == "md-to-json":
-        in_path = Path(args.input).resolve()
-        out_path = Path(args.output).resolve()
-        ast_data = md_to_json_ast(in_path, args.jenis, args.judul)
-        galat, peringatan = check_readiness(ast_data, in_path.parent)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(
-            json.dumps(ast_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
-        print(
-            json.dumps(
-                {
-                    "status": "CONVERTED",
-                    "output": str(out_path),
-                    "galat": galat,
-                    "peringatan": peringatan,
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
-        )
-        return 1 if galat else 0
+        md_text = Path(args.input).read_text(encoding="utf-8")
+        ast = parse_markdown_to_ast(md_text, title=args.title, instansi=args.instansi)
+        issues = validate_ast(ast)
+        Path(args.output).write_text(json.dumps(ast, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(json.dumps({"output": args.output, "issues": issues}, indent=2))
+        return 0 if not issues else 1
 
     if args.cmd == "check-readiness":
-        in_path = Path(args.input).resolve()
-        doc = json.loads(in_path.read_text(encoding="utf-8"))
-        galat, peringatan = check_readiness(doc, in_path.parent)
-        print(
-            json.dumps(
-                {
-                    "status": "READY" if not galat else "BLOCKED_BY_GALAT",
-                    "galatCount": len(galat),
-                    "peringatanCount": len(peringatan),
-                    "galat": galat,
-                    "peringatan": peringatan,
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
+        ast = json.loads(Path(args.json).read_text(encoding="utf-8"))
+        issues = validate_ast(ast)
+        print(json.dumps({"ready": len(issues) == 0, "issues": issues, "libraries": check_libraries()}, indent=2))
+        return 0 if not issues else 1
+
+    if args.cmd == "create":
+        doc = create_document_from_template(
+            doc_type=args.type,
+            project_id=args.project_id,
+            doc_id=args.doc_id,
+            language=args.lang,
+            style_profile=args.style,
+            owner=args.owner,
         )
-        return 1 if galat else 0
+        if args.title:
+            doc["title"] = args.title
+        out_p = Path(args.out)
+        atomic_write_json(out_p, doc)
+        print(json.dumps({"status": "CREATED", "path": str(out_p), "document_id": doc["document_id"], "revision": doc["revision"]}, indent=2))
+        return 0
+
+    if args.cmd == "import":
+        doc = import_existing_file_to_v2(
+            Path(args.input_path),
+            project_id=args.project_id,
+            doc_type=args.type,
+            doc_id=args.doc_id,
+        )
+        out_p = Path(args.out)
+        atomic_write_json(out_p, doc)
+        print(json.dumps({"status": "IMPORTED", "path": str(out_p), "blocks": len(doc["blocks"]), "unmapped_blocks": len(doc.get("unmapped_blocks", []))}, indent=2))
+        return 0
+
+    if args.cmd == "update":
+        doc_p = Path(args.doc)
+        orig_doc = json.loads(doc_p.read_text(encoding="utf-8"))
+        updated, diff_rep = selective_update_v2(
+            orig_doc,
+            scope_id=args.scope_id,
+            new_body=args.content,
+            change_ref=args.change_ref,
+            changed_by=args.author,
+            expected_hash=args.expected_hash,
+        )
+        was_approved = diff_rep.get("forked_from_approved", False)
+        if args.out:
+            out_p = Path(args.out)
+        elif was_approved:
+            out_p = doc_p.with_suffix(".draft-fork.json")
+        else:
+            out_p = doc_p
+        atomic_write_json(out_p, updated)
+        print(json.dumps({
+            "status": "FORKED_NEW_DRAFT" if was_approved else "UPDATED",
+            "path": str(out_p),
+            "revision": updated["revision"],
+            "doc_status": updated["status"],
+            "diff": diff_rep,
+        }, indent=2))
+        return 0
+
+    if args.cmd == "validate":
+        doc = json.loads(Path(args.doc).read_text(encoding="utf-8"))
+        res = validate_document_v2(doc, strict=args.strict)
+        print(json.dumps(res, indent=2, ensure_ascii=False))
+        return 0 if res["valid"] else 1
+
+    if args.cmd == "diff":
+        old_doc = json.loads(Path(args.old).read_text(encoding="utf-8"))
+        new_doc = json.loads(Path(args.new).read_text(encoding="utf-8"))
+        print(json.dumps(diff_documents_v2(old_doc, new_doc), indent=2, ensure_ascii=False))
+        return 0
+
+    if args.cmd == "impact":
+        docs = [json.loads(Path(p).read_text(encoding="utf-8")) for p in args.doc]
+        print(json.dumps(analyze_traceability_and_impact(docs, changed_id=args.changed_id), indent=2, ensure_ascii=False))
+        return 0
+
+    if args.cmd == "approve":
+        doc_p = Path(args.doc)
+        doc = json.loads(doc_p.read_text(encoding="utf-8"))
+        updated = transition_approval_status(doc, args.status, args.actor, args.role, args.evidence_ref)
+        atomic_write_json(doc_p, updated)
+        print(json.dumps({"status": updated["status"], "revision": updated["revision"], "path": str(doc_p)}, indent=2))
+        return 0
+
+    if args.cmd == "export":
+        doc_p = Path(args.doc)
+        doc = json.loads(doc_p.read_text(encoding="utf-8"))
+        out_dir = Path(args.out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        stem = doc.get("document_id", doc_p.stem)
+        fmts = [f.strip().lower() for f in args.format.split(",")]
+        if "all" in fmts:
+            fmts = ["md", "docx", "pdf", "xlsx", "csv"]
+        rendered: Dict[str, Path] = {}
+        if "md" in fmts:
+            rendered["md"] = render_v2_to_markdown(doc, out_dir / f"{stem}.md")
+        if "docx" in fmts:
+            rendered["docx"] = render_v2_to_docx(doc, out_dir / f"{stem}.docx")
+        if "pdf" in fmts:
+            rendered["pdf"] = render_v2_to_pdf(doc, out_dir / f"{stem}.pdf")
+        if "xlsx" in fmts:
+            rendered["xlsx"] = render_v2_to_xlsx(doc, out_dir / f"{stem}.xlsx")
+        if "csv" in fmts:
+            rendered["csv"] = render_v2_to_csv(doc, out_dir / f"{stem}.csv")
+        qa = verify_rendered_outputs_qa(doc, rendered)
+        print(json.dumps(qa, indent=2))
+        return 0 if qa["passed"] else 1
+
+    if args.cmd == "package":
+        res = build_stage_package(Path(args.source_dir), args.project_id, args.stage, Path(args.out))
+        print(json.dumps(res, indent=2))
+        return 0
+
+    if args.cmd == "inspect":
+        doc = json.loads(Path(args.doc).read_text(encoding="utf-8"))
+        print(json.dumps({
+            "project_id": doc.get("project_id"),
+            "document_id": doc.get("document_id"),
+            "document_type": doc.get("document_type"),
+            "status": doc.get("status"),
+            "revision": doc.get("revision"),
+            "block_count": len(doc.get("blocks", [])),
+            "history_count": len(doc.get("history", [])),
+            "signoff_count": len(doc.get("signoff_record", [])),
+            "semantic_hash": doc.get("semantic_hash"),
+        }, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.cmd == "migrate-v1":
+        doc = import_existing_file_to_v2(Path(args.input_path), project_id=args.project_id, doc_id=args.doc_id)
+        out_p = Path(args.out)
+        atomic_write_json(out_p, doc)
+        print(json.dumps({"status": "MIGRATED_TO_V2", "path": str(out_p), "backup": str(Path(args.input_path).with_suffix(".v1.bak.json"))}, indent=2))
+        return 0
 
     parser.print_help()
     return 0

@@ -1,2 +1,7 @@
 ﻿mcp-servers/node_modules/
 *.bak.*
+
+__pycache__/
+*.pyc
+shadow-doc/output/
+shadow-git/output/

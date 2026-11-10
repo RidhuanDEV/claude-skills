@@ -1,0 +1,49 @@
+{
+  "schema_version": "2.0",
+  "document_id": "DEMO-SRS-001",
+  "project_id": "DEMO",
+  "document_type": "SRS",
+  "title": "Software Requirements Specification",
+  "revision": "0.1-DRAFT",
+  "app_version": null,
+  "status": "DRAFT",
+  "language": "id-ID",
+  "classification": "INTERNAL",
+  "owner": null,
+  "reviewers": [],
+  "approvers": [],
+  "created_at": null,
+  "updated_at": null,
+  "sources": [],
+  "blocks": [
+    {
+      "id": "SEC-1",
+      "kind": "heading",
+      "title": "Pendahuluan",
+      "body": null,
+      "source_refs": [],
+      "trace_ids": []
+    },
+    {
+      "id": "FR-001",
+      "kind": "paragraph",
+      "title": "Contoh requirement, belum diverifikasi",
+      "body": "[ISI DARI SUMBER PROYEK]",
+      "source_refs": [],
+      "trace_ids": [
+        "TC-001"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "revision": "0.1-DRAFT",
+      "reason": "Template initialization",
+      "changed_by": null,
+      "changed_at": null,
+      "approval_ref": null
+    }
+  ],
+  "signoff_record": [],
+  "unmapped_blocks": []
+}

@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shadow Doc Canonical AST V2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_id",
+    "project_id",
+    "document_type",
+    "title",
+    "revision",
+    "status",
+    "language",
+    "blocks",
+    "sources",
+    "history"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "document_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "string"
+    },
+    "app_version": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "IN_REVIEW",
+        "CHANGES_REQUESTED",
+        "APPROVED",
+        "RELEASED",
+        "SUPERSEDED",
+        "ARCHIVED"
+      ]
+    },
+    "language": {
+      "enum": ["id-ID", "en-US"]
+    },
+    "classification": {
+      "enum": ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"]
+    },
+    "style_profile": {
+      "enum": ["corporate", "institutional"]
+    },
+    "audience": {
+      "type": ["string", "null"]
+    },
+    "owner": {
+      "type": ["string", "null"]
+    },
+    "reviewers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "approvers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "created_at": {
+      "type": ["string", "null"]
+    },
+    "updated_at": {
+      "type": ["string", "null"]
+    },
+    "effective_date": {
+      "type": ["string", "null"]
+    },
+    "template_version": {
+      "type": ["string", "null"]
+    },
+    "change_reason": {
+      "type": ["string", "null"]
+    },
+    "supersedes": {
+      "type": ["string", "null"]
+    },
+    "hash": {
+      "type": ["string", "null"]
+    },
+    "semantic_hash": {
+      "type": ["string", "null"]
+    },
+    "forbidden_terms": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "reference"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "reference": { "type": "string" },
+          "verified_at": { "type": ["string", "null"] },
+          "checksum": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": {
+            "enum": [
+              "heading",
+              "paragraph",
+              "table",
+              "figure",
+              "list",
+              "code",
+              "opaque"
+            ]
+          },
+          "level": { "type": ["integer", "null"] },
+          "title": { "type": ["string", "null"] },
+          "body": { "type": ["string", "null"] },
+          "status": { "type": ["string", "null"] },
+          "owner": { "type": ["string", "null"] },
+          "table_data": {
+            "type": ["object", "null"],
+            "properties": {
+              "caption": { "type": ["string", "null"] },
+              "columns": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          },
+          "figure_data": {
+            "type": ["object", "null"],
+            "properties": {
+              "path": { "type": ["string", "null"] },
+              "caption": { "type": ["string", "null"] },
+              "alt_text": { "type": ["string", "null"] },
+              "mermaid": { "type": ["string", "null"] }
+            }
+          },
+          "list_items": {
+            "type": ["array", "null"],
+            "items": { "type": "string" }
+          },
+          "code_language": { "type": ["string", "null"] },
+          "source_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "trace_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "last_reviewed_at": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["revision", "reason"],
+        "properties": {
+          "revision": { "type": "string" },
+          "reason": { "type": "string" },
+          "changed_by": { "type": ["string", "null"] },
+          "changed_at": { "type": ["string", "null"] },
+          "approval_ref": { "type": ["string", "null"] },
+          "before_hash": { "type": ["string", "null"] },
+          "after_hash": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "signoff_record": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string" },
+          "identity": { "type": ["string", "null"] },
+          "decision": {
+            "enum": ["PENDING", "APPROVED", "CHANGES_REQUESTED", "REJECTED"]
+          },
+          "timestamp": { "type": ["string", "null"] },
+          "evidence_ref": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "review_comments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "comment_id": { "type": "string" },
+          "block_id": { "type": "string" },
+          "author": { "type": "string" },
+          "comment": { "type": "string" },
+          "status": { "enum": ["OPEN", "RESOLVED"] },
+          "created_at": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "unmapped_blocks": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "legacy_v1_bagian": {
+      "type": ["array", "null"]
+    }
+  }
+}

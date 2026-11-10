@@ -1,25 +1,72 @@
-# Installs the shadow-monarch skill for Claude Code (Windows PowerShell 5.1+ / PowerShell 7+).
-# - Copies .\shadow-monarch to %USERPROFILE%\.claude\skills\shadow-monarch (replacing an older copy)
-# - Inserts GLOBAL.md into %USERPROFILE%\.claude\CLAUDE.md between markers (backs up the old file first)
-# If script execution is blocked, run:  powershell -ExecutionPolicy Bypass -File .\install.ps1
+# Installs the full 36-skill Shadow Army suite (shadow-monarch + companion /shadow-* skills)
+# and updates %USERPROFILE%\.claude\CLAUDE.md between markers.
+# Run with: powershell -ExecutionPolicy Bypass -File .\install.ps1
 $ErrorActionPreference = 'Stop'
 
-$Source   = Join-Path $PSScriptRoot 'shadow-monarch'
+$Source    = Join-Path $PSScriptRoot 'shadow-monarch'
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
-$Target   = Join-Path $ClaudeDir 'skills\shadow-monarch'
-$ClaudeMd = Join-Path $ClaudeDir 'CLAUDE.md'
-$Begin    = '<!-- BEGIN shadow-monarch -->'
-$End      = '<!-- END shadow-monarch -->'
+$ClaudeMd  = Join-Path $ClaudeDir 'CLAUDE.md'
+$Begin     = '<!-- BEGIN shadow-monarch -->'
+$End       = '<!-- END shadow-monarch -->'
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 if (-not (Test-Path (Join-Path $Source 'SKILL.md'))) {
     throw "SKILL.md not found in $Source. Run this script from the repo root."
 }
 
-New-Item -ItemType Directory -Force -Path (Join-Path $ClaudeDir 'skills') | Out-Null
-if (Test-Path $Target) { Remove-Item -Recurse -Force $Target }
-Copy-Item -Recurse -Path $Source -Destination $Target
-Write-Host "Skill installed: $Target"
+$SkillFolders = @(
+    'shadow-monarch',
+    'shadow-discovery',
+    'shadow-architect',
+    'shadow-plan',
+    'shadow-bootstrap',
+    'shadow-design',
+    'shadow-auth',
+    'shadow-data',
+    'shadow-db',
+    'shadow-api',
+    'shadow-cache',
+    'shadow-integrate',
+    'shadow-accessibility',
+    'shadow-quality',
+    'shadow-test',
+    'shadow-sec',
+    'shadow-perf',
+    'shadow-uat',
+    'shadow-release',
+    'shadow-compat',
+    'shadow-browser',
+    'shadow-ops',
+    'shadow-observe',
+    'shadow-resilience',
+    'shadow-maintain',
+    'shadow-handover',
+    'shadow-doc',
+    'shadow-git',
+    'handoff',
+    'context7'
+)
+
+$TargetRoots = @(
+    (Join-Path $HOME '.gemini\config\skills'),
+    (Join-Path $HOME '.gemini\skills'),
+    (Join-Path $ClaudeDir 'skills'),
+    (Join-Path $HOME '.agents\skills'),
+    (Join-Path $HOME '.codex\skills')
+)
+
+foreach ($Root in $TargetRoots) {
+    New-Item -ItemType Directory -Force -Path $Root | Out-Null
+    foreach ($Folder in $SkillFolders) {
+        $SrcPath = Join-Path $PSScriptRoot $Folder
+        if (Test-Path (Join-Path $SrcPath 'SKILL.md')) {
+            $DstPath = Join-Path $Root $Folder
+            if (Test-Path $DstPath) { Remove-Item -Recurse -Force $DstPath }
+            Copy-Item -Recurse -Force -Path $SrcPath -Destination $DstPath
+        }
+    }
+    Write-Host "Synced $($SkillFolders.Count) Shadow Army skills to: $Root"
+}
 
 $global = [System.IO.File]::ReadAllText((Join-Path $Source 'GLOBAL.md'), $Utf8NoBom).TrimEnd()
 $block  = "$Begin`n$global`n$End"
@@ -42,4 +89,4 @@ if (Test-Path $ClaudeMd) {
     Write-Host "Created $ClaudeMd"
 }
 
-Write-Host 'Done. Restart Claude Code to pick up the changes.'
+Write-Host 'Done. All 36 Shadow Army skills are active across Antigravity, Gemini CLI, Claude Code, and Codex.'

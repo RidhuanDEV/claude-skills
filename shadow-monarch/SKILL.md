@@ -71,13 +71,18 @@ complete change that solves the problem.
   - Whenever a local or staging server is running, test the real HTTP endpoint via `test_api_endpoint` / `run_api_collection`
     and record actual status codes and response payloads into the OpenAPI & Postman collection.
   - Use the `context7` MCP (`resolve-library-id`, `query-docs`) to fetch up-to-date official framework/library docs.
+- **Task-Based Research & Standards Source Routing (`reference/RESEARCH-SOURCE-POLICY.md`)**:
+  - Do NOT default to `arXiv` (unreviewed preprints) for software engineering, SDLC documentation, architecture, testing, or security.
+  - Route sources by task: **Requirements/SRS** -> `ISO/IEC/IEEE 29148`; **Architecture/SDD/ADR** -> `ISO/IEC/IEEE 42010` & `ISO/IEC 25010`; **Testing/RTM/UAT** -> `ISO/IEC/IEEE 29119`; **AppSec & DevSecOps** -> `NIST SSDF (SP 800-218)` & `OWASP ASVS 5.0`; **Ops/Maintenance/Handover** -> `ISO/IEC 20000-1`, `NIST SP 800-61`, `ISO/IEC/IEEE 14764`, & `IEEE 1063`; **Framework Implementation** -> official version-matched docs via `/context7`; **Empirical CS/SE Research** -> peer-reviewed venues (`IEEE Xplore`, `ACM Digital Library`, `SpringerLink`, `ScienceDirect`, indexed via `Semantic Scholar` / `OpenAlex` / `Google Scholar`); **AI/ML Research** -> `IEEE Xplore`, `ACM`, `Springer`, top conferences, and `arXiv` (explicitly marked `PREPRINT` unless a peer-reviewed DOI is verified). Always verify year/version, DOI, peer-review status, and publisher credibility.
 - **Cross-Agent Context Compaction & Session Handoff (`shadow_handoff` MCP)**:
   - When the Monarch says `"handoff"` (or asks to compact/save session state before context fills up or before switching agents), immediately call `save_handoff` on the `shadow_handoff` MCP with the active `projectPath`, goal, completed work, prioritized next steps, active contracts/decisions, and key files.
   - When the Monarch starts a session with `"lanjut handoff"` (or `"load handoff"`), immediately call `load_handoff` on the `shadow_handoff` MCP and resume execution from step 1 of the saved next steps.
-- **Safe Collaborative Git Branch Sync & Conflict Resolution (`/shadow-git`)**:
-  - Do not run unrequested `git commit`, `git push`, `git reset --hard`, `git clean -fd`, or `git push --force`.
-  - Because the Monarch works across branches in collaborative teams, proactively run safe branch & conflict checks (`git status -sb`, `git branch -vv`, `git fetch --all --prune`, `git log HEAD..origin/<branch> --oneline`, and `git merge-tree --write-tree HEAD origin/<branch>` in-memory conflict dry-run).
-  - When pulling or resolving conflicts, protect uncommitted local changes first (`git stash push -u -m "..."` if needed), inspect both the Monarch's and teammate's commit history (`git log -p`), never blindly take `--ours` or `--theirs`, merge both contracts cleanly, and run `git diff --check` + typecheck/tests.
+- **Safe Collaborative Git, Worktree & Parallel Multi-Agent Orchestration (`/shadow-git` v2.0)**:
+  - Read-only by default. Do not run unrequested `git commit`, `git push`, `git merge`, `git rebase`, `git reset --hard`, `git clean -fd`, `git worktree remove --force`, or `git push --force`.
+  - Detect the repository's actual branching strategy (`detect-strategy`) rather than assuming Git Flow.
+  - When multiple agents or features run in parallel, isolate each feature in its own Git worktree (`worktree-create`) with an explicit agent ownership & path scope manifest (`.git/shadow-worktrees/agents_registry.json`).
+  - Support independent integration of completed feature branches into `main` (`integrate-feature`) without waiting for unrelated in-progress branches, and forward-sync updated `main` into active feature branches (`sync-from-main`, defaulting to `merge` and blocking automatic `rebase` on shared/published branches).
+  - Use `predict-conflicts` (`git merge-tree --write-tree` + diff analysis) to separate hard Git conflicts from semantic risks (parallel DB migrations, OpenAPI changes, shared config, lockfiles). Enforce the 6-point `safe-cleanup` gate before removing any worktree or branch.
 
 ## Execution
 
@@ -119,6 +124,7 @@ that match the active task. Do not load the entire library into context.
 | Task / Role Domain | Reference |
 |---|---|
 | Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` |
+| Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` |
 | Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` |
 | Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` |
 | Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` |
@@ -178,20 +184,50 @@ that match the active task. Do not load the entire library into context.
 | GIS & Geospatial (PostGIS SRID 4326, `GIST`, `ST_DWithin`, GeoJSON `[lng,lat]`, MapLibre/Leaflet, Vector Tiles, H3) | `reference/sub-GIS-GEOSPATIAL.md` |
 | Computer Vision, Document OCR (e-KTP/Invoice), Biometrics/Liveness, Whisper Audio & Safe `ffmpeg` | `reference/sub-VISION-OCR-MEDIA.md` |
 
-### 4. Companion Shadow Army Slash Skills (`/shadow-*`)
+### 4. Full-Stack SDLC Orchestration & 36-Skill Shadow Army Matrix
 
-| Slash Skill | Purpose & Execution Gate |
-|---|---|
-| `/shadow-api` | OpenAPI 3.1 (`compact` or `modular` by tag), Postman v2.1 sync & real HTTP endpoint testing (`shadow_api` MCP) |
-| `/shadow-db` | Multi-DB introspection (Postgres, MySQL, MSSQL, MongoDB, SQLite), ERD/DBML, Schema Diff, Star Schema DW, Pentaho (`.ktr`/`.kjb`) & Cron/Airflow (`shadow_db` MCP) |
-| `/shadow-doc` | Hybrid `.json` Canonical AST + `.md` Importer -> `.docx` / `.xlsx` / `.pdf` generator (inspired by `Laporan-Generator`) |
-| `/shadow-ops` | Full-Spectrum DevOps, Docker/Compose, Nginx/Caddy, Linux `systemd`/PM2, K8s, CI/CD, Observability & 3-2-1 Backups (with local OWASP & H5BP vendor knowledge base) |
-| `/shadow-perf` | **Pre-UAT / Staging Gate ONLY** (never auto-run during feature coding): OpenAPI-to-`k6` load/stress testing & SQL `EXPLAIN ANALYZE` profiling |
-| `/shadow-test` | Polyglot Unit, Integration & Contract Testing across TypeScript/JS, Python, Go, PHP/Laravel, Java/Kotlin, .NET, Rust & Flutter |
-| `/shadow-browser` | Real Chromium E2E UI verification & 375px mobile overflow testing (`playwright` MCP) |
-| `/shadow-sec` | Pre-push OWASP Top 10, secret leak & dependency vulnerability audit |
-| `/shadow-git` | Safe team branch inspection (`git fetch`, `git merge-tree` dry-run conflict detection), safe pull with stash protection & smart conflict resolution |
-| `/handoff` | Cross-agent session handoff & context compaction with Git-root detection (`shadow_handoff` MCP) |
+`shadow-monarch` acts as the **SDLC Orchestrator** across 8 quality-gated lifecycle stages (returning work to the appropriate stage whenever a gate fails rather than forcing deployment):
+`1. Discovery (/shadow-discovery)` -> `2. Architecture (/shadow-architect, /shadow-plan, /shadow-bootstrap)` -> `3. Implementation (/shadow-design, /shadow-auth, /shadow-data, /shadow-cache, /shadow-integrate, /shadow-api)` -> `4. Verification (/shadow-quality, /shadow-test, /shadow-sec, /shadow-browser, /shadow-compat, /shadow-accessibility)` -> `5. Pre-UAT (/shadow-perf)` -> `6. Staging UAT (/shadow-uat)` -> `7. Production Release & Smoke Test (/shadow-release, /shadow-ops)` -> `8. Handover & Maintenance (/shadow-handover, /shadow-observe, /shadow-resilience, /shadow-maintain)`.
+
+#### 3-Tier Skill Activation Policy
+1. **Tier 1 — Always-On (Lightweight Guardrails)**: `shadow-monarch`, `antislop` (`during` mode), strict typing (`0 any`, `0 as Type`), token efficiency, read-only by default for server/DB mutations, and ambiguity stop gate when requirements conflict.
+2. **Tier 2 — Conditional (Task-Triggered)**:
+   - `/shadow-api` when API contracts change · `/shadow-auth` when identity/RBAC/tenant logic changes · `/shadow-data` & `/shadow-db` when schemas or migrations change · `/shadow-cache` when client/Redis caching changes · `/shadow-integrate` when webhooks/3rd-party APIs change · `/shadow-test` when behavior changes · `/shadow-browser` when UI screens change · `/shadow-git` when syncing branches or resolving conflicts · `/context7` when checking library docs.
+3. **Tier 3 — Gate-Based (High-Risk Stage Transitions)**:
+   - `/shadow-discovery` & `/shadow-architect` before new systems · `/shadow-bootstrap` when scaffolding from zero · `/shadow-quality` & `/shadow-sec` (NIST SSDF + OWASP ASVS 5.0) before release · `/shadow-perf` strictly at the **Pre-UAT Gate** · `/shadow-uat` at **Staging UAT & Client Acceptance** · `/shadow-release` at **Production Deployment** · `/shadow-handover` at **BAST & Client Delivery** · `/handoff` for AI session memory transfer.
+
+| Group | Slash Skill | Priority | Core Responsibility & Deliverable |
+|---|---|---|---|
+| **A. Discovery & Architecture** | `/shadow-discovery` | P0 | Requirement elicitation, FR/NFR, scope boundaries, Given/When/Then criteria & gap analysis |
+| | `/shadow-architect` | P0 | System Design, C4 diagrams, ADRs, Modular Monolith vs Microservices & capacity sizing |
+| | `/shadow-plan` | P0 | Epic -> User Story -> Task breakdown, dependency graph, DoR/DoD & effort estimation |
+| | `/shadow-bootstrap` | P0 | Zero-to-runnable project scaffold (strict TS/lint, env validation, DB/ORM, Docker dev, CI, seed) |
+| | `/shadow-design` | P1 | Design system tokens, user flows, wireframe specs & 5-state component contracts |
+| **B. App & Data Lifecycle** | `/shadow-auth` | P0 | AuthN/AuthZ, RBAC/ABAC, OAuth2/OIDC, SSO, refresh rotation, audit trail & tenant isolation |
+| | `/shadow-data` | P0 | Zero-downtime Expand-Contract migrations, deterministic seeds, safe backfills & ACID integrity |
+| | `/shadow-db` | P0 | Multi-DB introspection, DBML/Mermaid ERD, schema diff, Star Schema DW, Pentaho & Cron (`shadow_db` MCP) |
+| | `/shadow-api` | P0 | OpenAPI 3.1 (`compact`/`modular`), Postman v2.1 sync & live HTTP testing (`shadow_api` MCP) |
+| | `/shadow-cache` | P1 | `TanStack Query` key factories, Redis caching, stampede protection, optimistic UI & `Idempotency-Key` |
+| | `/shadow-integrate` | P1 | Payment gateways, HMAC webhooks, SMTP, partner APIs, timeouts, backoff retries & Outbox pattern |
+| | `/shadow-accessibility` | P2 | Deep WCAG 2.2 AA/AAA audit, keyboard focus traps, ARIA live regions & screen reader QA |
+| **C. Quality, UAT & Release** | `/shadow-quality` | P0 | Static analysis, strict typecheck/lint, complexity reduction, dead code cleanup & layer conformance |
+| | `/shadow-test` | P0 | Polyglot unit, integration & contract tests (8+ languages) with risk-based pyramid & 8-point matrix |
+| | `/shadow-sec` | P0 | STRIDE threat modeling, SBOM/supply-chain, secret scan & NIST SSDF / OWASP ASVS 5.0 verification |
+| | `/shadow-perf` | P0 | **Pre-UAT Gate ONLY**: OpenAPI-to-`k6` load/stress/spike tests & SQL `EXPLAIN ANALYZE` profiling |
+| | `/shadow-uat` | P0 | Requirement Traceability Matrix (RTM), Staging UAT scenarios, defect triage, evidence & sign-off |
+| | `/shadow-release` | P0 | SemVer changelog, pre-flight checklist, backward-compatible migration gate & verified rollback |
+| | `/shadow-compat` | P1 | API backward compatibility, safe dependency upgrades & cross-browser/iOS/Android compatibility |
+| | `/shadow-browser` | P0 | Real Chromium E2E UI verification & 375px mobile viewport overflow checks (`playwright` MCP) |
+| **D. Ops & Maintenance** | `/shadow-ops` | P0 | Immutable Docker/K8s, Nginx/Caddy, Linux `systemd`/PM2, CI/CD & backups (local OWASP/H5BP KB) |
+| | `/shadow-observe` | P1 | SLI/SLO error budgets, multi-window burn alerts, OpenTelemetry trace/log correlation & triage |
+| | `/shadow-resilience` | P1 | Automated DB backup restore drills (RPO/RTO proof), graceful degradation & fault isolation |
+| | `/shadow-maintain` | P1 | Post-production Harwat/OMKT, SLA bug triage, hotfix + regression test workflow & blameless RCA |
+| **E. Delivery & Collaboration** | `/shadow-handover` | P0 | Client BAST, source/SBOM inventory, secure credential transfer, Admin/User Manuals & ToT |
+| | `/shadow-doc` | P0 | Canonical JSON AST v2.0 + 20 SDLC templates + selective block updates + bidirectional traceability + approval governance -> `.docx` / `.pdf` / `.xlsx` / `.csv` / `.md` / `.zip` |
+| | `/shadow-git` | P0 | Branching strategy detection, Git worktrees, parallel multi-agent isolation, independent feature integration, forward sync from `main`, `git merge-tree` conflict/semantic risk prediction & 6-point safe cleanup |
+| | `/handoff` | P0 | Cross-agent AI session context compaction & resumption (`shadow_handoff` MCP) |
+| | `/context7` | P0 | Real-time official library/framework documentation lookup (`context7` MCP) |
+| | `/antislop` (+5 sub) | P0 | Always-on (`during` mode) UI, mobile layout, human accessibility, copywriting & code comment filter |
 
 For other stacks use `reference/CORE.md` plus applicable domain references and verified ecosystem documentation.
 Framework-specific examples do not transfer unchanged to another framework. Resolve conflicting
