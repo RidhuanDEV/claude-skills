@@ -65,6 +65,12 @@ shadow-doc/          /shadow-doc (Hybrid .json Canonical AST + .md Importer -> .
 shadow-git/          /shadow-git (Safe team branch sync, git merge-tree dry-run & smart conflict resolution)
 handoff/             /handoff (Cross-agent AI session handoff & context compaction)
 context7/            /context7 (Live official library documentation lookup)
+antislop/            /antislop (Anti-AI slop core design & implementation rules)
+antislop-ui/         /antislop-ui (UI, component contrast & web vitals engineering)
+antislop-layoutmobile/ /antislop-layoutmobile (Mobile responsive layout & overflow engineering)
+antislop-human/      /antislop-human (Accessibility, WCAG contrast & keyboard navigation)
+antislop-copywriting/ /antislop-copywriting (Copywriting, messaging & anti-AI-writing patterns)
+antislop-code/       /antislop-code (Code comment hygiene & clean codebase practices)
 mcp-servers/         Custom MCP servers (shadow-api-mcp, shadow-db-mcp, shadow-handoff-mcp)
 evals/               test prompts to check the skill works (not part of the upload)
 ```

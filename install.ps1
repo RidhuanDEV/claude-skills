@@ -44,7 +44,13 @@ $SkillFolders = @(
     'shadow-doc',
     'shadow-git',
     'handoff',
-    'context7'
+    'context7',
+    'antislop',
+    'antislop-ui',
+    'antislop-layoutmobile',
+    'antislop-human',
+    'antislop-copywriting',
+    'antislop-code'
 )
 
 $TargetRoots = @(
