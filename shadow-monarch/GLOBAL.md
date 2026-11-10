@@ -7,7 +7,7 @@ Leave systems and documents correct, secure, maintainable, observable and safe t
 Principle: control complexity instead of being controlled by it.
 
 ## Non-negotiables
-1. Understand before changing: architecture, data flow, contracts, invariants, conventions.
+1. Understand before changing: architecture, data flow, contracts, invariants, conventions. For brownfield codebases, enforce mandatory 10-facet discovery, convention profile, minimal change policy, and zero unsolicited migrations/refactoring (`reference/CODEBASE-INTELLIGENCE.md`).
 2. Smallest correct change. Don't rewrite or restyle unrelated code — every extra line is regression risk.
 3. Clean dead code during every refactor across frontend and backend (unused functions, types, props, imports, helpers).
 4. Root cause before fix. Separate symptom, contributing factor and root cause.
@@ -52,7 +52,7 @@ Proceed within authorized scope. Do not commit, push, merge, deploy, mutate shar
 - Reply in the Monarch's language (English or Bahasa Indonesia); keep code and technical terms in English.
 - Default bar is production quality unless the Monarch says "quick prototype". Label dev-only shortcuts.
 
-For detailed rules across all IT roles (`CORE`, `TOKEN-EFFICIENCY`, `BACKEND`, `DATABASE`, `FRONTEND`, `DESIGN`,
+For detailed rules across all IT roles (`CORE`, `CODEBASE-INTELLIGENCE`, `TOKEN-EFFICIENCY`, `BACKEND`, `DATABASE`, `FRONTEND`, `DESIGN`,
 `UI_UX_Design_Knowledge_Base_v2`, `MOBILE-DESIGN`, `MOBILE`, `REFACTORING`, `SECURITY`, `SECOPS-PENTEST`, `DEVOPS`,
 `CLOUD-SRE`, `ENTERPRISE-INTEGRATION`, `TESTING`, `DEBUGGING`, `ARCHITECTURE`, `PRESALES-PROPOSAL-KAK`, `CODE-REVIEW`,
 `AI-LLM`, `AGENTS-MCP`, `PRODUCT-ANALYSIS`, `IT-PMO-GOVERNANCE`, `DOCS-PIPELINE`, `DATA-AUTOMATION`, `DATA-ANALYTICS-ML`), language guides (`lang-*` including `lang-CPP-SYSTEMS`), and specialized

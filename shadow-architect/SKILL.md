@@ -43,8 +43,51 @@ For every consequential choice (Database engine, Monolith vs Microservices, Auth
 
 ---
 
-## 3. Stage 2 Exit Gate Checklist (To Unlock `/shadow-plan` & `/shadow-bootstrap`)
+## 3. Brownfield Architecture & Convention Preservation
+
+When designing or extending an existing application (**Brownfield Project**):
+
+### A. Brownfield vs Greenfield Project Routing
+- **Greenfield**: Zero/empty repository. Proceed with standard Shadow Army scaffolding (`/shadow-bootstrap`) and right-sized Modular Monolith baseline.
+- **Brownfield**: Existing codebase present. **Preserve existing architectural patterns** (Layered MVC, Feature-based, Hexagonal, Clean, Minimalist). Do **NOT** impose unsolicited architectural migrations (e.g. converting a working MVC into Clean Architecture/DDD) solely because it is perceived as "cleaner" or "more modern".
+
+### B. Mandatory Existing-Codebase Discovery & Convention Profile
+Before proposing architectural modifications, inspect the codebase across the **10 Discovery Facets** and maintain the Project Convention Profile at `docs/engineering/CODEBASE_CONVENTIONS.md`:
+1. **Framework, Language & Runtime**: Exact version, module system (CommonJS vs ESM).
+2. **Project Structure & Module Boundaries**: Directory organization, monorepo workspaces.
+3. **Architectural Patterns**: Prevailing architectural style and layer boundaries.
+4. **Naming Conventions**: File, folder, class, function, and variable casings.
+5. **Code Formatting & Lint Rules**: Linter configs, indentation, quotes, trailing commas.
+6. **API & Database Access Patterns**: Established ORM, query builders, repository patterns.
+7. **Error Handling & Validation**: Centralized error middleware, validation libraries (Zod, Joi, FormRequest).
+8. **Authentication & Authorization**: Session/JWT mechanisms, RBAC/ABAC guards.
+9. **State Management & Caching**: Frontend stores (Zustand, Redux, Pinia), Redis caching keys.
+10. **Testing & Dependency Conventions**: Test runners, mock styles, fixture conventions.
+
+Run deterministic discovery and profiling:
+```powershell
+python "shadow-quality/scripts/codebase_intelligence.py" discover --repo-dir . --write-profile
+```
+If patterns conflict across legacy modules, **document the ambiguity** rather than inventing a global standard.
+
+### C. Convention Precedence Hierarchy
+Always resolve architectural decisions using this hierarchy:
+1. **Level 1**: Explicit user requirements & safety/security constraints (SQL injection prevention, data isolation).
+2. **Level 2**: Applicable project-level instructions (`AGENTS.md`, `CLAUDE.md`, documented architecture).
+3. **Level 3**: Established patterns in relevant existing modules.
+4. **Level 4**: Shadow Army global conventions.
+5. **Level 5**: AI default preferences (**never** allowed to override established project conventions).
+
+### D. Existing Code First Principle
+- Always search for the closest existing implementation before architecting new components.
+- Reuse existing services, utilities, middleware, and repositories.
+- Match equivalent module structure and naming patterns across feature boundaries.
+
+---
+
+## 4. Stage 2 Exit Gate Checklist (To Unlock `/shadow-plan` & `/shadow-bootstrap`)
 - [ ] C4 Context and Container diagrams validated in strict Mermaid syntax.
 - [ ] Core database ERD (`/shadow-db`) and API contract strategy (`/shadow-api`) aligned with functional requirements.
 - [ ] ADRs written for all critical stack and infrastructure choices.
 - [ ] Capacity sizing confirms infrastructure fits client budget and SLA targets.
+- [ ] For Brownfield projects: Project Convention Profile (`docs/engineering/CODEBASE_CONVENTIONS.md`) inspected and architectural preservation confirmed.

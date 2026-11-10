@@ -83,6 +83,12 @@ complete change that solves the problem.
   - When multiple agents or features run in parallel, isolate each feature in its own Git worktree (`worktree-create`) with an explicit agent ownership & path scope manifest (`.git/shadow-worktrees/agents_registry.json`).
   - Support independent integration of completed feature branches into `main` (`integrate-feature`) without waiting for unrelated in-progress branches, and forward-sync updated `main` into active feature branches (`sync-from-main`, defaulting to `merge` and blocking automatic `rebase` on shared/published branches).
   - Use `predict-conflicts` (`git merge-tree --write-tree` + diff analysis) to separate hard Git conflicts from semantic risks (parallel DB migrations, OpenAPI changes, shared config, lockfiles). Enforce the 6-point `safe-cleanup` gate before removing any worktree or branch.
+- **Codebase Intelligence & Convention Preservation (Brownfield Projects — `reference/CODEBASE-INTELLIGENCE.md`)**:
+  - Classify project state before designing or coding: **Greenfield** (scaffold from zero via `/shadow-bootstrap`) vs **Brownfield** (existing application).
+  - For Brownfield projects, perform **Mandatory 10-Facet Discovery** before editing (runtime, structure, architecture pattern, naming conventions, formatting/lint, DB/ORM access, error handling/validation, auth, state/caching, testing).
+  - Enforce the **Convention Precedence Hierarchy**: Level 1 (User Reqs & Safety) > Level 2 (Project Instructions / `AGENTS.md`) > Level 3 (Relevant Existing Module Patterns) > Level 4 (Shadow Army Global Conventions) > Level 5 (AI Default Preferences). Never impose unsolicited tech preferences or new architectural layers onto established codebases.
+  - Enforce **Existing Code First & Minimal Change Policy**: reuse existing services, utilities, hooks, and repositories; follow closest existing module structures; never perform unrelated refactoring, unsolicited architecture/library migrations (e.g. CJS to ESM, plain JS to TS, Redux to Zustand), unrequested dependency additions, or unrelated file formatting.
+  - Validate against the Architecture & Convention Drift Gate via `/shadow-quality` (`scripts/codebase_intelligence.py audit-drift`).
 
 ## Execution
 
@@ -124,6 +130,7 @@ that match the active task. Do not load the entire library into context.
 | Task / Role Domain | Reference |
 |---|---|
 | Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` |
+| Codebase Intelligence & Convention Preservation: 10-facet discovery, convention profile, minimal change policy & drift prevention | `reference/CODEBASE-INTELLIGENCE.md` |
 | Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` |
 | Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` |
 | Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` |

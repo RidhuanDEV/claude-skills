@@ -9,7 +9,7 @@ Use this skill during development or at **SDLC Stage 4 (Verification Gate)** to 
 
 ---
 
-## 1. The 6 Mandatory Quality Checks
+## 1. The 7 Mandatory Quality Checks
 
 ### 1. Strict Compiler & Type Safety Gate (`0 Errors`, `0 Warnings`)
 - **TypeScript**: Verify `tsc --noEmit` passes with zero errors, zero `any`, zero `as Type` / `<Type>` / `!` typecasting, and zero `@ts-ignore` / `@ts-expect-error`.
@@ -35,10 +35,30 @@ Verify strict directional dependencies:
 ### 5. Contract Synchronization Check
 - Verify that every backend route parameter, request DTO, and response shape matches `openapi.yaml`, `postman_collection.json` (`/shadow-api`), and frontend consumer types (`100%` parity).
 
-### 6. Structured Code Review Output Format
+### 6. Architecture & Convention Drift Gate (Brownfield Codebase Intelligence)
+For brownfield codebases, run the deterministic drift audit before completing the task:
+```powershell
+python "shadow-quality/scripts/codebase_intelligence.py" audit-drift --repo-dir . [--changed-files ...]
+```
+Verify zero unapproved drift across the following violation categories:
+- `UNEXPECTED_ARCHITECTURAL_LAYER`: Unsolicited new folder/layer (e.g. `domain/` or `usecases/` in simple MVC apps).
+- `MODULE_SYSTEM_DRIFT`: CommonJS `require` vs ESM `import` mismatch with package convention.
+- `TYPESCRIPT_IN_JS_PROJECT`: TypeScript syntax/extensions introduced into a plain JavaScript project.
+- `DIRECT_DB_ACCESS_IN_CONTROLLER`: Bypassing established repository or service layers with direct DB calls.
+- `INCONSISTENT_NAMING`: Deviating from dominant file/function naming conventions without justification.
+- `UNSOLICITED_STATE_STORE`: Introducing a competing client state library (e.g. Redux when Zustand exists).
+- `UNSOLICITED_ORM_HTTP_CLIENT`: Introducing competing database access or HTTP libraries.
+- `SECURITY_EXCEPTION_SQL_INJECTION`: **Level 1 Safety Override** — Flags legacy raw SQL string interpolation. Security always overrides legacy habits; convert to parameterized queries while preserving naming and structure.
+
+**Enforce the Minimal Change Policy**:
+- Zero unrelated refactoring or code cleanup in files outside the task scope.
+- Zero unsolicited architectural or dependency migrations.
+- Zero reformatting or whitespace tampering on untouched lines/files.
+
+### 7. Structured Code Review Output Format
 When asked to review code or a PR, report findings ordered by severity:
 - `[CRITICAL]` Security vulnerability, data loss/corruption risk, broken auth/tenant isolation, or crash in production.
 - `[HIGH]` Broken business requirement, race condition, N+1 query on large table, or missing transaction rollback.
-- `[MEDIUM]` Missing edge-case handling, missing validation, or architectural boundary violation.
+- `[MEDIUM]` Missing edge-case handling, missing validation, architectural boundary violation, or convention drift.
 - `[LOW / NIT]` Naming clarity, dead code removal, or minor readability improvement.
 *(Every finding must include exact `file:line`, impact explanation, and concrete replacement code).*
