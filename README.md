@@ -148,6 +148,13 @@ copy does not update itself). If `GLOBAL.md` changed, paste it into your profile
 - Add a stack: create `reference/lang-<NAME>.md` following the same sections as the others
   (layout, errors, concurrency, data access, security, testing, tooling, common mistakes) and add a row to the
   language table in `SKILL.md`.
+
+## Credits & Attribution
+
+The Shadow Army suite integrates and respects the work of open-source authors:
+- **Anti-Slop Suite** (`antislop`, `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `antislop-copywriting`, `antislop-code`): Created by [Miqdad Badjuber (`anti-slop`)](https://github.com/miqdadbadjuber/anti-slop) and Web Quality/Accessibility components by [Addy Osmani](https://github.com/addyosmani) (MIT License).
+- **H5BP & OWASP Web Guidelines**: Integrated into `/shadow-ops` knowledge base from HTML5 Boilerplate and OWASP projects.
+
 - Keep each reference file focused and under about 10k characters so loading stays cheap.
 
 ## License
