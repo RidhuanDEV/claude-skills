@@ -45,6 +45,13 @@ Principle: control complexity instead of being controlled by it.
     Docker DB/test container or image (`*-test-*`, `*-migration-verification*`, `*-restore-drill*`) must use
     `--rm --label shadow.ephemeral=true` and `try/finally` (`docker rm -f -v` / `docker compose down -v --rmi local --remove-orphans`)
     so zero leftover containers, volumes, or temporary images remain after tests pass or fail.
+24. Research Source Policy, Local Download & 7-Point File Safety Gate (`reference/RESEARCH-SOURCE-POLICY.md` &
+    `shadow-doc/scripts/reference_verifier.py`): verify DOI/URL, publisher/venue, year/version, and peer-review
+    status on every cited source, tagging unreviewed arXiv papers as `[PREPRINT]`. Download publicly accessible
+    references locally into `docs/references/` (`references_manifest.json`) and re-check every file with
+    `python shadow-doc/scripts/reference_verifier.py scan docs/references --quarantine-delete` (blocks executable/macro
+    extensions, double-extension spoofing, `MZ`/`ELF` binaries disguised as `.pdf`, PDF `/JavaScript` or `/Launch`
+    exploits, and `<script>` injection, automatically deleting unsafe files from the local PC).
 
 Decision filter: correctness → security → maintainability → simplicity → reliability → performance → scalability → operability → cost/token-efficiency → team comprehension.
 
