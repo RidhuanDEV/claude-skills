@@ -16,13 +16,13 @@ A backup that has never been restored is **not** a backup. Use **`/shadow-resili
 
 ### The 5-Step Restore Drill Verification
 1. **Fetch Latest Production Backup Artifact**: Pull the latest `.dump` / `.sql.gz` from backup storage and verify its `.sha256` checksum.
-2. **Spin Up Ephemeral Restore Container**: Launch an isolated Postgres/MySQL container (`postgres:16-alpine` on a temporary local port).
+2. **Spin Up Ephemeral Restore Container**: Launch an isolated Postgres/MySQL/MariaDB container (`--rm --label shadow.ephemeral=true` on a temporary local port) inside a `try / finally` (`trap EXIT`) block.
 3. **Execute Restore & Measure Duration (`Actual RTO`)**:
    - Run `pg_restore` or `gunzip < backup.sql.gz | mysql` and record elapsed wall-clock seconds.
 4. **Verify Data Integrity & Recency (`Actual RPO`)**:
    - Query row counts on core transaction tables (`users`, `orders`, `audit_logs`) and check `MAX(created_at)` to verify the data lag is within the target RPO.
 5. **Tear Down & Log Drill Evidence**:
-   - Destroy the temporary container and write an auditable drill report (`docs/ops/restore-drill-YYYY-MM.md` — compatible with `/shadow-doc` monthly maintenance reports!).
+   - Always execute `docker rm -f -v <container>` (and `docker image rm -f <temp-image>` if a custom image was built) in the `finally` block so zero stopped containers or orphan volumes remain, then write an auditable drill report (`docs/ops/restore-drill-YYYY-MM.md` — compatible with `/shadow-doc` monthly maintenance reports!).
 
 ---
 

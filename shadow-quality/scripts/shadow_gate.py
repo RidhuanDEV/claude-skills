@@ -41,6 +41,14 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 
 HEURISTIC_REGEX_RE = re.compile(r"\b(re\.compile|re\.search|re\.match|new\s+RegExp)\s*\(")
 TEST_FILE_RE = re.compile(r"((?:^|[/\\])test_|_test\.|\.test\.|\.spec\.|tests?[/\\]|evals\.json)", re.IGNORECASE)
+DOCKER_SCRIPT_PATH_RE = re.compile(r"(test|spec|migration|drill|verify)", re.IGNORECASE)
+EPHEMERAL_CONTAINER_RE = re.compile(
+    r"(?:^|[-_])(?:test-\d{6,}|migration-verification|restore-drill|db-restore-drill|test-db-\d+)(?:$|[-_])",
+    re.IGNORECASE,
+)
+DOCKER_RUN_CMD_RE = re.compile(r"^\s*(?:sudo\s+)?docker\s+run\b(?P<args>[^\n;]*)", re.MULTILINE)
+DOCKER_COMPOSE_UP_RE = re.compile(r"^\s*(?:sudo\s+)?docker(?:\s+compose|-compose)\b[^\n;]*\bup\b", re.MULTILINE)
+DOCKER_BUILD_TAG_RE = re.compile(r"^\s*(?:sudo\s+)?docker\s+build\b[^\n;]*\s+-t\s+(?P<tag>\S+)", re.MULTILINE)
 
 
 def get_git_modified_files(repo_root: Path) -> list[Path]:
@@ -142,6 +150,105 @@ def check_secrets(file_path: Path, rel_path: str) -> list[dict[str, Any]]:
     return violations
 
 
+def check_docker_test_cleanup(file_path: Path, rel_path: str) -> list[dict[str, Any]]:
+    """Verify test/migration/drill scripts tear down ephemeral Docker containers, volumes, and temp images."""
+    violations: list[dict[str, Any]] = []
+    if file_path.name == "shadow_gate.py":
+        return violations
+    if file_path.suffix not in (".sh", ".ps1", ".py", ".ts", ".js", ".mjs"):
+        return violations
+    if not DOCKER_SCRIPT_PATH_RE.search(rel_path):
+        return violations
+
+    try:
+        content = file_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return violations
+
+    has_docker_rm = bool(re.search(r"\bdocker\s+(?:container\s+)?rm\b", content))
+    has_compose_down = bool(re.search(r"\bdocker(?:\s+compose|-compose)\b[\s\S]*?\bdown\b", content))
+    has_image_rm = bool(re.search(r"\bdocker\s+(?:image\s+rm|rmi)\b|--rmi\s+(?:local|all)", content))
+
+    for match in DOCKER_RUN_CMD_RE.finditer(content):
+        args_str = match.group("args")
+        if "--rm" not in args_str and not has_docker_rm:
+            violations.append({
+                "severity": "HIGH",
+                "code": "DOCKER_TEST_MISSING_CLEANUP",
+                "file": rel_path,
+                "message": "Test/migration script runs `docker run` without `--rm` and without `docker rm -f -v` teardown.",
+                "corrective_action": "Add `--rm --label shadow.ephemeral=true` and wrap in `try/finally` (`trap EXIT`) calling `docker rm -f -v <container>`.",
+            })
+            break
+
+    if DOCKER_COMPOSE_UP_RE.search(content) and not has_compose_down:
+        violations.append({
+            "severity": "HIGH",
+            "code": "DOCKER_TEST_MISSING_CLEANUP",
+            "file": rel_path,
+            "message": "Test/migration script runs `docker compose up` without a matching `docker compose down -v --rmi local --remove-orphans` teardown.",
+            "corrective_action": "Add `docker compose -p <project>-test down -v --rmi local --remove-orphans` in a `finally` / `trap EXIT` block.",
+        })
+
+    if DOCKER_BUILD_TAG_RE.search(content) and not has_image_rm:
+        violations.append({
+            "severity": "HIGH",
+            "code": "DOCKER_TEST_IMAGE_MISSING_CLEANUP",
+            "file": rel_path,
+            "message": "Test/migration script builds a Docker image (`docker build -t ...`) without removing it after test completion.",
+            "corrective_action": "Remove temporary test images in `finally` / `trap EXIT` via `docker image rm -f <tag>` or `docker compose down --rmi local`.",
+        })
+
+    return violations
+
+
+def inspect_or_cleanup_docker_leaks(cleanup: bool = False) -> dict[str, Any]:
+    """Detect (and optionally remove) leftover stopped ephemeral test/migration/drill containers."""
+    try:
+        proc = subprocess.run(
+            ["docker", "ps", "-a", "--format", "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Label \"shadow.ephemeral\"}}"],
+            capture_output=True,
+            text=True,
+            timeout=8,
+            check=False,
+        )
+        if proc.returncode != 0:
+            return {"docker_available": False, "leaked_containers": [], "cleaned_containers": []}
+    except Exception:
+        return {"docker_available": False, "leaked_containers": [], "cleaned_containers": []}
+
+    leaked: list[dict[str, str]] = []
+    cleaned: list[str] = []
+
+    for line in proc.stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 4:
+            continue
+        cid, cname, cimage, cstatus = parts[0].strip(), parts[1].strip(), parts[2].strip(), parts[3].strip()
+        ephemeral_label = parts[4].strip() if len(parts) >= 5 else ""
+
+        if EPHEMERAL_CONTAINER_RE.search(cname) or ephemeral_label.lower() == "true":
+            leaked.append({"id": cid, "name": cname, "image": cimage, "status": cstatus})
+            if cleanup and cstatus.lower().startswith(("exited", "created", "dead")):
+                rm_proc = subprocess.run(
+                    ["docker", "rm", "-v", cid],
+                    capture_output=True,
+                    text=True,
+                    timeout=8,
+                    check=False,
+                )
+                if rm_proc.returncode == 0:
+                    cleaned.append(cname)
+
+    return {
+        "docker_available": True,
+        "leaked_count": len(leaked),
+        "leaked_containers": leaked,
+        "cleaned_count": len(cleaned),
+        "cleaned_containers": cleaned,
+    }
+
+
 def run_shadow_gate(
     repo_root: Path,
     changed_files: list[Path] | None = None,
@@ -165,6 +272,7 @@ def run_shadow_gate(
         rel = str(f.relative_to(root)) if f.is_relative_to(root) else str(f)
         violations.extend(check_strict_typescript(f, rel))
         violations.extend(check_secrets(f, rel))
+        violations.extend(check_docker_test_cleanup(f, rel))
 
         if f.suffix in (".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rs", ".php") and not TEST_FILE_RE.search(rel):
             try:
@@ -307,6 +415,52 @@ def run_self_test() -> dict[str, Any]:
         codes5 = {v["code"] for v in rr5["violations"]}
         record("RECALL-5: Flags unsolicited Redux store in a Zustand repository", not rr5["passed"] and "UNSOLICITED_STATE_STORE" in codes5, json.dumps(list(codes5)))
 
+        # --- DOCKER TEST CLEANUP PRECISION & RECALL PROBES ---
+        p6 = src / "test_db_clean.sh"
+        p6.write_text(
+            "#!/usr/bin/env bash\n"
+            "trap 'docker rm -f -v app-test-db' EXIT\n"
+            "docker run -d --rm --label shadow.ephemeral=true --name app-test-db mariadb:10\n",
+            encoding="utf-8",
+        )
+        r6 = run_shadow_gate(root, [p6], probes_verified=True)
+        record("PRECISION-6: Test script with `--rm` and `trap docker rm -f -v` is clean", r6["passed"], json.dumps(r6["violations"]))
+
+        non_ephemeral_names = [
+            "tejas-v2-app",
+            "emanifest-mysql",
+            "notulen-api",
+            "postgres-latest",
+            "contest-service",
+            "attestation-worker",
+        ]
+        false_pos = [n for n in non_ephemeral_names if EPHEMERAL_CONTAINER_RE.search(n)]
+        record("PRECISION-7: `EPHEMERAL_CONTAINER_RE` never matches production/dev containers or words containing 'test'", len(false_pos) == 0, json.dumps(false_pos))
+
+        rc6 = src / "verify_migration.sh"
+        rc6.write_text(
+            "#!/usr/bin/env bash\n"
+            "docker run -d --name prpm-prod6nov-test-1793940631107 mariadb:10\n"
+            "docker build -t prpm-test:temp .\n",
+            encoding="utf-8",
+        )
+        rr6 = run_shadow_gate(root, [rc6], probes_verified=True)
+        codes6 = {v["code"] for v in rr6["violations"]}
+        record(
+            "RECALL-6: Flags `docker run` without `--rm`/`docker rm` and `docker build -t` without image cleanup in test script",
+            not rr6["passed"] and "DOCKER_TEST_MISSING_CLEANUP" in codes6 and "DOCKER_TEST_IMAGE_MISSING_CLEANUP" in codes6,
+            json.dumps(list(codes6)),
+        )
+
+        ephemeral_names = [
+            "prpm-prod6nov-test-1793940631107",
+            "prpm-prod6nov-migration-verification",
+            "billing-restore-drill-2026",
+            "api_test-db-9912",
+        ]
+        missed = [n for n in ephemeral_names if not EPHEMERAL_CONTAINER_RE.search(n)]
+        record("RECALL-7: `EPHEMERAL_CONTAINER_RE` matches leftover test/migration/drill container names", len(missed) == 0, json.dumps(missed))
+
     all_passed = all(r["passed"] for r in results)
     return {
         "suite": "shadow_gate.py Precision & Recall Self-Test",
@@ -323,6 +477,8 @@ def main() -> int:
     parser.add_argument("--repo", "--repo-dir", dest="repo", default=".", help="Repository root directory")
     parser.add_argument("--files", "--changed-files", dest="files", nargs="*", default=None, help="Explicit changed files to check")
     parser.add_argument("--probes-verified", action="store_true", help="Confirm Rigor Protocol precision/recall probes were executed")
+    parser.add_argument("--check-docker-leaks", action="store_true", help="Check running/stopped Docker containers for leftover test/migration/drill containers")
+    parser.add_argument("--cleanup-docker-leaks", action="store_true", help="Remove stopped/exited ephemeral test/migration/drill Docker containers and their anonymous volumes")
     parser.add_argument("--install-hook", action="store_true", help="Install git pre-commit hook in target repository")
     parser.add_argument("--self-test", action="store_true", help="Run precision & recall probe suite on shadow_gate.py")
     args = parser.parse_args()
@@ -340,6 +496,24 @@ def main() -> int:
 
     changed = [Path(f).resolve() for f in args.files] if args.files is not None else None
     report = run_shadow_gate(repo_root, changed, probes_verified=args.probes_verified)
+
+    if args.check_docker_leaks or args.cleanup_docker_leaks:
+        docker_report = inspect_or_cleanup_docker_leaks(cleanup=args.cleanup_docker_leaks)
+        report["docker_leaks"] = docker_report
+        remaining = docker_report["leaked_count"] - docker_report["cleaned_count"]
+        if remaining > 0:
+            report["passed"] = False
+            report["recommended_max_readiness"] = "BLOCKED"
+            report["blocking_violations_count"] += 1
+            report["total_violations_count"] += 1
+            report["violations"].append({
+                "severity": "HIGH",
+                "code": "DOCKER_EPHEMERAL_CONTAINER_LEAK",
+                "file": "docker-daemon",
+                "message": f"{remaining} leftover ephemeral test/migration/drill Docker container(s) detected: {[c['name'] for c in docker_report['leaked_containers']]}",
+                "corrective_action": "Run `python shadow-quality/scripts/shadow_gate.py --cleanup-docker-leaks` or remove with `docker rm -f -v <container>`.",
+            })
+
     print(json.dumps(report, indent=2, ensure_ascii=False))
     return 0 if report["passed"] else 1
 

@@ -38,14 +38,15 @@ Model judgment varies across providers; a deterministic script returns the exact
 Before claiming `VERIFIED-LOCAL` or `READY-TO-MERGE`, run:
 
 ```powershell
-python "shadow-quality/scripts/shadow_gate.py" --repo .
+python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks
 ```
 
-`shadow_gate.py` enforces four model-independent checks:
+`shadow_gate.py` enforces five model-independent checks:
 1. **`STRICT_TYPING_VIOLATION`**: scans modified `.ts`/`.tsx` files for forbidden `any`, `as Type` casts, `@ts-ignore`, and `@ts-expect-error`.
 2. **`SECRET_LEAK_DETECTED`**: scans modified files for hardcoded private keys, AWS/GCP/API tokens, and credentials.
 3. **`UNPROBED_HEURISTIC_CHANGE`**: detects added/modified regexes (`re.compile`, `RegExp`, `/.../`) or heuristic predicates and checks whether test files were updated or probes were executed.
 4. **`CONVENTION_AND_ARCH_DRIFT`**: runs `codebase_intelligence.py audit-drift` on modified files (`UNEXPECTED_ARCHITECTURAL_LAYER`, `MODULE_SYSTEM_DRIFT`, `TYPESCRIPT_IN_JS_PROJECT`, `DIRECT_DB_ACCESS_IN_CONTROLLER`, `INCONSISTENT_NAMING`, `UNSOLICITED_STATE_STORE`, `UNSOLICITED_ORM_HTTP_CLIENT`, `SECURITY_EXCEPTION_SQL_INJECTION`).
+5. **`DOCKER_TEST_MISSING_CLEANUP` & `DOCKER_EPHEMERAL_CONTAINER_LEAK`**: flags test/migration/drill scripts that run `docker run` without `--rm` + `docker rm -f -v`, `docker compose up` without `down -v --rmi local --remove-orphans`, or `docker build -t` without image removal, and inspects the local Docker daemon (`--check-docker-leaks` / `--cleanup-docker-leaks`) so zero `*-test-*` or `*-migration-verification*` containers or temporary images are left behind.
 
 Optional Git pre-commit hook installation for any repository:
 ```powershell

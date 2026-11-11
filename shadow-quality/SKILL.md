@@ -36,13 +36,16 @@ Verify strict directional dependencies:
 - Verify that every backend route parameter, request DTO, and response shape matches `openapi.yaml`, `postman_collection.json` (`/shadow-api`), and frontend consumer types (`100%` parity).
 
 ### 6. Architecture & Convention Drift Gate (Brownfield Codebase Intelligence)
-For brownfield codebases, run the unified deterministic quality & drift gate before completing the task:
+For brownfield codebases, run the unified deterministic quality, drift & Docker leak gate before completing the task:
 ```powershell
-python "shadow-quality/scripts/shadow_gate.py" --repo .
+python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks
+# To automatically clean stopped/exited test/migration/drill containers:
+python "shadow-quality/scripts/shadow_gate.py" --repo . --cleanup-docker-leaks
 # Or run convention drift standalone:
 python "shadow-quality/scripts/codebase_intelligence.py" audit-drift --repo-dir . [--changed-files ...]
 ```
-Verify zero unapproved drift across the following violation categories:
+Verify zero unapproved drift or test-container leaks across the following violation categories:
+- `DOCKER_TEST_MISSING_CLEANUP` / `DOCKER_TEST_IMAGE_MISSING_CLEANUP` / `DOCKER_EPHEMERAL_CONTAINER_LEAK`: Test, migration-verification, or restore-drill scripts running `docker run` without `--rm` + `docker rm -f -v`, running `docker compose up` without `down -v --rmi local --remove-orphans`, building temporary test images without removing them, or leaving exited `*-test-*` / `*-migration-verification*` containers in Docker.
 - `UNEXPECTED_ARCHITECTURAL_LAYER`: Unsolicited new folder/layer (e.g. `domain/` or `usecases/` in simple MVC apps).
 - `MODULE_SYSTEM_DRIFT`: CommonJS `require` vs ESM `import` mismatch with package convention.
 - `TYPESCRIPT_IN_JS_PROJECT`: TypeScript syntax/extensions introduced into a plain JavaScript project.

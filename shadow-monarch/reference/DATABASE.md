@@ -52,6 +52,7 @@ Rules:
 - Large tables: create indexes concurrently (`CREATE INDEX CONCURRENTLY` in PostgreSQL; online DDL in MySQL 8 /
   SQL Server Enterprise); avoid table rewrites (volatile defaults, type changes) during peak hours.
 - Migrations are versioned, reviewed, reversible where feasible, and never edited after being applied to shared environments.
+- When testing migrations or schema changes in Docker (`*-migration-verification`, `*-test-*`), reuse a single ephemeral DB container per run, pass `--rm --label shadow.ephemeral=true`, and guarantee teardown (`docker rm -f -v` / `docker compose down -v --rmi local --remove-orphans`) inside `try/finally` (`trap EXIT`) so stopped DB containers and temporary images never accumulate.
 - Changing a field's meaning requires a migration and communication, not a silent reinterpretation.
 - Schema evolution for APIs/messages follows the same rule: additive first, old and new consumers coexist.
 

@@ -147,10 +147,13 @@ Every change must survive an attempt to break it before it is reported as done o
    `IMPLEMENTED` (code written) → `VERIFIED-LOCAL` (probes + tests executed) →
    `REVIEWED` (independent adversarial pass done, findings resolved) → `READY-TO-MERGE`.
    Never say "siap", "aman", or "selesai" without the level name.
-6. **Deterministic Cross-Model Quality Gate (`shadow_gate.py`).** Before claiming `VERIFIED-LOCAL` or
-   `READY-TO-MERGE`, run `python "shadow-quality/scripts/shadow_gate.py" --repo .` so every agent model
-   (Claude, Codex, Gemini, Antigravity) passes the exact same strict-typing, secret-scan, heuristic-probe,
-   and brownfield-drift checks (`reference/CROSS-MODEL-PARITY.md`).
+6. **Deterministic Cross-Model Quality Gate & Zero Docker Test Leaks (`shadow_gate.py`).** Before claiming
+   `VERIFIED-LOCAL` or `READY-TO-MERGE`, run `python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks`
+   so every agent model (Claude, Codex, Gemini, Antigravity) passes the exact same strict-typing, secret-scan,
+   heuristic-probe, brownfield-drift, and Docker test-teardown checks (`reference/CROSS-MODEL-PARITY.md`).
+   Every ephemeral Docker test/migration/drill container or image (`*-test-*`, `*-migration-verification*`, `*-restore-drill*`)
+   must reuse a single container per suite and clean up in `try/finally` (`docker run --rm --label shadow.ephemeral=true` +
+   `docker rm -f -v`, or `docker compose down -v --rmi local --remove-orphans`).
 
 ## Load focused references (Foreign Key Routing — The Shadow Army)
 

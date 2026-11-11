@@ -20,6 +20,8 @@ Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, addi
 | **3. Switch & Validate** | Enforce `NOT NULL` (using `CHECK (...) NOT VALID` then `VALIDATE CONSTRAINT`), switch reads to the new column. | Verified 100% data completeness before switching. |
 | **4. Contract** | Remove dual-write code and drop the obsolete column in a subsequent release. | Clean schema with zero downtime. |
 
+- **Ephemeral Migration Verification Container Cleanup**: Whenever verifying migrations against an ephemeral Docker database (`*-migration-verification` / `*-test-*`), always launch with `docker run --rm --label shadow.ephemeral=true` and wrap the run in `try / finally` (`trap EXIT`) executing `docker rm -f -v <container>` (or `docker compose -p <project>-migtest down -v --rmi local --remove-orphans`) so zero stopped containers, volumes, or temporary images remain after verification passes.
+
 ---
 
 ## 2. Transaction Integrity & Concurrency Control

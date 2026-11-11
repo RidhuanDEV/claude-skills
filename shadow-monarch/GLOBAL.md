@@ -40,9 +40,11 @@ Principle: control complexity instead of being controlled by it.
 23. Cross-Model Parity & Deterministic Quality Gate (`reference/CROSS-MODEL-PARITY.md` & `shadow_gate.py`):
     before non-trivial edits, write the 4-line Pre-Code Checkpoint (Blast Radius, Closest Existing Pattern,
     Falsification Plan, Target Readiness Level). Before claiming `VERIFIED-LOCAL` or `READY-TO-MERGE`, run
-    `python shadow-quality/scripts/shadow_gate.py --repo .` (strict TS check, secret scan, heuristic probe
-    check, and brownfield drift audit). For shared hot paths, run the adversarial review pass in a fresh
-    session or different model family and combine via `/handoff merge`.
+    `python shadow-quality/scripts/shadow_gate.py --repo . --check-docker-leaks` (strict TS check, secret scan,
+    heuristic probe check, brownfield drift audit, and Docker test-container/image leak check). Any ephemeral
+    Docker DB/test container or image (`*-test-*`, `*-migration-verification*`, `*-restore-drill*`) must use
+    `--rm --label shadow.ephemeral=true` and `try/finally` (`docker rm -f -v` / `docker compose down -v --rmi local --remove-orphans`)
+    so zero leftover containers, volumes, or temporary images remain after tests pass or fail.
 
 Decision filter: correctness → security → maintainability → simplicity → reliability → performance → scalability → operability → cost/token-efficiency → team comprehension.
 

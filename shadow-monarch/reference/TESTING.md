@@ -4,7 +4,10 @@
 
 - **Unit** — pure logic, fast, many. Domain rules, calculations, validators, state machines.
 - **Integration** — real interactions with DB, queue, cache, filesystem, framework wiring. Prefer real dependencies in
-  containers (Testcontainers or Docker Compose) over mocking the database.
+  containers (Testcontainers or Docker Compose) over mocking the database. Reuse a single container per test suite run
+  (isolating individual tests via DB transactions or schemas) rather than spawning a new container per test, and always
+  guarantee container/volume/temp-image teardown in `try/finally` (`docker run --rm --label shadow.ephemeral=true` +
+  `docker rm -f -v`, or `docker compose down -v --rmi local --remove-orphans`).
 - **API/contract** — endpoint status codes, shapes, errors, auth; consumer-driven contracts between services where useful.
 - **End-to-end** — a few critical user journeys (login, checkout, submit/approve). Do not try to prove everything with E2E.
 
@@ -45,6 +48,8 @@ Any rule that decides from text (regex, keyword list, stemmer, intent router, gu
 
 - Deterministic: no dependence on execution order, real time (inject a clock), randomness (seed it), or external network.
 - Isolated: each test sets up and cleans its own data (transactions rolled back, unique IDs, or fresh containers).
+  Any ephemeral Docker container, volume, or test-built image created for integration or migration tests must be removed
+  automatically on both pass and fail (`try/finally` or `trap EXIT`), verified via `shadow_gate.py --check-docker-leaks`.
 - Names describe behavior: `should_reject_order_when_total_is_negative`, `returns 403 when user edits another user's post`.
 - Arrange–Act–Assert structure; one behavior per test; meaningful assertions (no `expect(result).toBeTruthy()` on complex objects).
 - Avoid snapshot abuse, testing private internals, sleeping to wait (poll with timeout or use fakes), and coverage-chasing tests.
