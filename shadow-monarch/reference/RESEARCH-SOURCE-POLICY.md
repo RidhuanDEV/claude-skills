@@ -42,13 +42,24 @@ Whenever the Shadow Army researches, designs, implements, audits, or documents a
 
 ---
 
-## 4. Mandatory 6-Point Source Verification Protocol
+## 4. Mandatory 8-Point Source Verification, Local Download & File Safety Protocol
 
-Before citing any external standard, documentation, or research paper in code comments, ADRs, or `/shadow-doc` artifacts, verify and record:
+Before citing any external standard, documentation, or research paper in code comments, ADRs, or `/shadow-doc` artifacts, verify, download locally, and safety-check:
 
 1. **Source Category (`source_type`)**: Classify as `STANDARD`, `OFFICIAL_DOCS`, `PEER_REVIEWED`, `REGULATION`, `PROJECT_ARTIFACT`, or `PREPRINT`.
 2. **Publication Year & Version (`version_or_year`)**: Verify the exact standard edition (e.g., `ISO/IEC/IEEE 29148:2018`, `OWASP ASVS 5.0.0`) or library version (`Next.js 15.x`). Reject obsolete editions when a current standard applies.
 3. **Persistent Identifier (`doi_or_url`)**: Record the official DOI (`10.1109/...`, `10.1145/...`), ISO/NIST standard number, or canonical documentation URL.
-4. **Peer-Review & Normative Status (`peer_reviewed`)**: Explicitly distinguish peer-reviewed journal/conference papers and ratified standards (`peer_reviewed: true`) from unreviewed preprints (`peer_reviewed: false`).
+4. **Peer-Review & Normative Status (`peer_reviewed`)**: Explicitly distinguish peer-reviewed journal/conference papers and ratified standards (`peer_reviewed: true`) from unreviewed preprints (`peer_reviewed: false`). Every `arXiv` preprint without a verified journal/conference DOI must carry the `[PREPRINT]` badge.
 5. **Publisher & Venue Credibility (`standard_or_venue`)**: Verify the publisher (`ISO`, `IEEE`, `ACM`, `NIST`, `OWASP`, `Springer`, `Elsevier`). Do not treat anonymous blogs or unverified preprints as normative standards.
 6. **Traceable Citation in AST (`sources[]` & `source_refs[]`)**: Every normative rule or empirical claim in `/shadow-doc` must link its block `source_refs` to an entry in `root.sources[]`.
+7. **Mandatory Local Download & Offline Archival (`docs/references/`)**:
+   - Whenever a cited reference (open-access paper, public standard PDF/spec from NIST/OWASP/IETF/W3C, or technical bulletin) is publicly downloadable, download a local copy into `<project>/docs/references/` using `shadow-doc/scripts/reference_verifier.py fetch` and record its `sha256`, `doi_or_url`, `venue`, `peer_reviewed`, and `citation_badge` in `docs/references/references_manifest.json`.
+8. **Mandatory 7-Point File Safety Re-Check (`reference_verifier.py` — Zero Dangerous Files on Local PC)**:
+   - Every downloaded or imported reference file MUST pass `python "shadow-doc/scripts/reference_verifier.py" scan <path> --quarantine-delete` before being kept or opened:
+     1. **Blocked Executable/Macro Extensions**: Rejects `.exe`, `.dll`, `.bat`, `.cmd`, `.ps1`, `.vbs`, `.js`, `.scr`, `.msi`, `.jar`, `.docm`, `.xlsm`, `.pptm`, `.lnk`, `.iso`.
+     2. **Double-Extension Spoof Detection**: Blocks disguised filenames such as `paper.pdf.exe` or `standard.pdf.ps1`.
+     3. **Magic-Byte Header Verification**: Verifies `%PDF-` header on `.pdf` files and blocks Windows PE (`MZ`), Linux `ELF`, Mach-O, or ZIP/Archive (`PK`) binaries masquerading as PDFs or text files.
+     4. **PDF Active-Content / Exploit Scan**: Rejects PDFs containing `/JavaScript`, `/JS`, `/Launch`, `/EmbeddedFiles`, `/RichMedia`, `/XFA`, or `/SubmitForm` dictionary actions.
+     5. **Text/HTML Script Injection Scan**: Rejects `.html`/`.md`/`.txt` references containing active `<script>`, `<iframe>`, `<object>`, `<embed>`, inline `onload=`/`onerror=`, or `javascript:` URIs.
+     6. **File Size Sanity Check**: Rejects 0-byte files or >100 MB archive bombs.
+     7. **Automatic Quarantine Deletion**: Any file failing safety verification is immediately deleted from disk (`DELETED_UNSAFE_FILE`) so dangerous files never remain on the Monarch's PC.

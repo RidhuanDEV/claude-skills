@@ -28,6 +28,7 @@ Use this skill whenever the **Monarch** asks to create, import, selectively upda
 7. **Research & Normative Standards Source Policy (`NORMATIVE_STANDARDS_MAP`)**:
    - **Industry Standards First**: Every SDLC document (`SRS`, `SDD`, `RTM`, `TEST_PLAN`, `UAT`, `SECURITY_RISK`, `INCIDENT`, `MANUAL`, `MAINTENANCE`) anchors to authoritative standards (`ISO/IEC/IEEE 29148:2018`, `ISO/IEC/IEEE 42010:2022`, `ISO/IEC/IEEE 29119`, `ISO/IEC 25010`, `NIST SSDF SP 800-218`, `OWASP ASVS 5.0.0`, `ISO/IEC/IEEE 12207`, `NIST SP 800-61`, `ISO/IEC/IEEE 14764`, `ISO/IEC/IEEE 26514`) and official version-matched framework documentation (`/context7` MCP).
    - **Academic Literature & `arXiv` Preprint Rules**: Use peer-reviewed databases (`IEEE Xplore`, `ACM Digital Library`, `SpringerLink`, `ScienceDirect`, indexed via `Semantic Scholar` / `OpenAlex` / `Google Scholar`) as supporting evidence when architectural or algorithmic decisions require empirical backing. Never default to `arXiv` for software engineering standards; `arXiv` preprints must be tagged `source_type: "PREPRINT"` (`peer_reviewed: false`) unless a peer-reviewed journal/conference DOI is verified.
+   - **Mandatory Local Download & 7-Point File Safety Gate (`scripts/reference_verifier.py`)**: Download publicly accessible reference files into `docs/references/` and verify every downloaded or imported file with `scripts/reference_verifier.py` (checks extension allowlist, double-extension spoofing, `%PDF-` vs `MZ`/`ELF` magic bytes, PDF `/JavaScript` & `/Launch` exploit tokens, HTML `<script>` injection, and SHA-256 manifest; unsafe files are immediately deleted from the local PC).
 
 ---
 
@@ -115,6 +116,15 @@ python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" pack
 # 9. Run v1.0 backward-compatibility self-test & v2.0 15-test acceptance suite
 python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" --selftest
 python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" --acceptance-suite
+
+# 10. Download a reference to local PC, verify 7-Point File Safety, and update references_manifest.json
+python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" fetch `
+  --url "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf" `
+  --dest-dir docs/references --title "NIST SSDF SP 800-218" --venue "NIST" --year "2022" --doi "10.6028/NIST.SP.800-218"
+
+# 11. Scan local reference folder and auto-delete any disguised/dangerous file
+python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" scan docs/references --quarantine-delete
+python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" --self-test
 ```
 
 - **Word TOC Field Note**: When opening generated `.docx` files in Microsoft Word, press `Ctrl+A` then `F9` to populate dynamic page numbers in the native Word Table of Contents (`TOC`) field.
