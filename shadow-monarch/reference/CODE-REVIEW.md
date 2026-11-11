@@ -86,6 +86,14 @@ Objective, technical, specific, actionable, respectful, evidence-based. Every cr
 No vague "bad code", no emotional tone, no approval without analysis, no style-only reviews.
 Separate facts from opinions ("must" for defects, "consider" for preferences). Respect existing conventions unless they cause harm.
 
+- **Execute, don't just read.** For every new predicate/regex/guard in the diff, run at least one
+  precision probe and one recall probe before writing the verdict. A review that only read the code
+  must say so in the Summary.
+- **Map every new global side effect.** Document-level listeners (scroll, focusout, resize, keydown),
+  module-level state and shared-path hooks: list which existing flows also trigger them.
+- **Challenge the author's evidence.** For each readiness claim in the PR/handoff, check whether the
+  evidence measures it; report mismatches as findings (category `evidence-gap`).
+
 ## 6. Reject on sight
 
 God objects and massive functions · hidden side effects · callback hell · global mutable state · hardcoded credentials/config ·
@@ -97,4 +105,6 @@ premature optimization or abstraction.
 
 Correctness: logic, edge cases, error handling, races · Security: authN/authZ, validation, injection, secrets ·
 Scalability: queries, caching, retries, bounded queues · Maintainability: naming, architecture, abstraction level ·
-Operability: logging, monitoring, alerting, safe deploy/rollback · Testing: meaningful, regression, edge and failure cases.
+Operability: logging, monitoring, alerting, safe deploy/rollback · Testing: meaningful, regression, edge and failure cases ·
+Evidence: each claim backed by evidence that measures it; precision/recall probes executed for heuristics;
+untested surfaces listed explicitly.

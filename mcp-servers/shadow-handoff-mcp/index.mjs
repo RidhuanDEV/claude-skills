@@ -13,6 +13,11 @@
  * 2. load_handoff: Loads the latest (or specific) handoff snapshot for a project so a fresh session
  *    resumes immediately with minimal token usage.
  * 3. list_handoffs: Lists all projects with saved handoffs or the handoff history for a specific project.
+ * 4. merge_handoffs: Combines parallel sessions saved under different sessionLabels (e.g. "plan" + "review")
+ *    into one handoff, keeping the lowest readiness level and the union of untested surfaces.
+ *
+ * Every save also records verification state (readinessLevel, untestedSurfaces, claimEvidenceMap) so
+ * gaps in verification travel with the handoff instead of only the completed work.
  */
 
 import fs from 'node:fs'
@@ -24,11 +29,15 @@ import { execFileSync } from 'node:child_process'
 const PROTOCOL_VERSION = '2024-11-05'
 const SERVER_INFO = {
   name: 'shadow-handoff-mcp',
-  version: '1.0.0',
+  version: '1.1.0',
 }
 
 const HANDOFF_ROOT = path.join(os.homedir(), '.shadow-handoff')
 const MAX_HISTORY_PER_PROJECT = 15
+// PLANNED covers sessions that produced only a plan; the remaining levels follow the Rigor Protocol.
+const READINESS_LEVELS = ['PLANNED', 'IMPLEMENTED', 'VERIFIED-LOCAL', 'REVIEWED', 'READY-TO-MERGE']
+const DEFAULT_SESSION_LABEL = 'default'
+const STALE_SESSION_GAP_MS = 24 * 60 * 60 * 1000
 
 const TOOLS = [
   {
@@ -87,8 +96,35 @@ const TOOLS = [
           type: 'boolean',
           description: 'If true, also writes a copy to <projectPath>/.handoff/HANDOFF.md (default: false to keep repo clean unless requested)',
         },
+        sessionLabel: {
+          type: 'string',
+          description: 'Label for this session when several run in parallel on the same project (e.g. "plan", "review"). Each label keeps its own snapshot so merge_handoffs can combine them. Default: "default".',
+        },
+        readinessLevel: {
+          type: 'string',
+          enum: READINESS_LEVELS,
+          description: 'Verified state of the work: PLANNED (plan only) -> IMPLEMENTED (code written) -> VERIFIED-LOCAL (probes + tests executed) -> REVIEWED (independent adversarial pass, findings resolved) -> READY-TO-MERGE.',
+        },
+        untestedSurfaces: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Surfaces NOT yet tested (e.g. "real multi-turn conversation", "topic switch", "ALL-CAPS input", "UI during streaming"). The next session must read these before concluding. Use [] only if every surface was tested.',
+        },
+        claimEvidenceMap: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              claim: { type: 'string', description: 'Readiness claim, e.g. "follow-up resolution is safe"' },
+              evidence: { type: 'string', description: 'Evidence that measures this specific claim' },
+              notMeasured: { type: 'string', description: 'What this evidence does not measure' },
+            },
+            required: ['claim', 'evidence'],
+          },
+          description: 'Claim -> evidence -> what is not measured, for every readiness claim made.',
+        },
       },
-      required: ['projectPath', 'title', 'currentGoal', 'completedWork', 'nextSteps'],
+      required: ['projectPath', 'title', 'currentGoal', 'completedWork', 'nextSteps', 'readinessLevel', 'untestedSurfaces'],
     },
   },
   {
@@ -121,6 +157,46 @@ const TOOLS = [
           description: 'Optional project path to list its history snapshots',
         },
       },
+    },
+  },
+  {
+    name: 'merge_handoffs',
+    description:
+      'Combine parallel sessions on the same project (each saved with save_handoff and a distinct sessionLabel, e.g. "plan" and "review") into one handoff that a single agent can load. Keeps the LOWEST readiness level, the union of untested surfaces, label-tagged work/steps/decisions, and warns when sessions saw different branches or commits. The merged result becomes the project latest handoff.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectPath: {
+          type: 'string',
+          description: 'Absolute path to the project directory',
+        },
+        sessionLabels: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Labels to merge, in the order their nextSteps should run (e.g. ["plan", "review"]). Default: all saved sessions, oldest first.',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional title for the merged handoff',
+        },
+        currentGoal: {
+          type: 'string',
+          description: 'Optional combined goal. Default: each session goal tagged with its label.',
+        },
+        sourceAgent: {
+          type: 'string',
+          description: 'Agent performing the merge',
+        },
+        archiveSessionsAfterMerge: {
+          type: 'boolean',
+          description: 'Move merged session snapshots to sessions/archive/ so a later merge does not pick them up again (default: true). Nothing is deleted.',
+        },
+        alsoWriteToProjectFolder: {
+          type: 'boolean',
+          description: 'If true, also writes the merged handoff to <projectPath>/.handoff/HANDOFF.md',
+        },
+      },
+      required: ['projectPath'],
     },
   },
 ]
@@ -159,6 +235,108 @@ function projectSlugFromPath(projectPath) {
   return `${combined || 'workspace'}-${hash.toString(16).slice(0, 6)}`
 }
 
+function requireString(value, field) {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`${field} is required and must be a non-empty string`)
+  }
+  return value.trim()
+}
+
+function sanitizeSessionLabel(label) {
+  if (label === undefined || label === null || label === '') return DEFAULT_SESSION_LABEL
+  if (typeof label !== 'string') throw new Error('sessionLabel must be a string')
+  const clean = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+  if (!clean) {
+    throw new Error(`sessionLabel "${label}" has no usable characters (use letters or digits, e.g. "plan", "review")`)
+  }
+  return clean
+}
+
+function toStringArray(value, field) {
+  if (value === undefined || value === null) return []
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array of strings`)
+  return value
+    .map((item, idx) => {
+      if (typeof item !== 'string') throw new Error(`${field}[${idx}] must be a string`)
+      return item.trim()
+    })
+    .filter((item) => item.length > 0)
+}
+
+function parseReadinessLevel(value) {
+  if (typeof value !== 'string' || !READINESS_LEVELS.includes(value)) {
+    throw new Error(`readinessLevel is required and must be one of: ${READINESS_LEVELS.join(' | ')}`)
+  }
+  return value
+}
+
+function parseClaimEvidenceMap(value) {
+  if (value === undefined || value === null) return []
+  if (!Array.isArray(value)) {
+    throw new Error('claimEvidenceMap must be an array of { claim, evidence, notMeasured }')
+  }
+  return value.map((entry, idx) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new Error(`claimEvidenceMap[${idx}] must be an object { claim, evidence, notMeasured }`)
+    }
+    const claim = requireString(entry.claim, `claimEvidenceMap[${idx}].claim`)
+    const evidence = requireString(entry.evidence, `claimEvidenceMap[${idx}].evidence`)
+    if (entry.notMeasured !== undefined && typeof entry.notMeasured !== 'string') {
+      throw new Error(`claimEvidenceMap[${idx}].notMeasured must be a string`)
+    }
+    return { claim, evidence, notMeasured: (entry.notMeasured || '').trim() }
+  })
+}
+
+function lowestReadiness(levels) {
+  return levels.reduce((low, level) =>
+    READINESS_LEVELS.indexOf(level) < READINESS_LEVELS.indexOf(low) ? level : low,
+  )
+}
+
+function buildHandoffId(iso, label) {
+  return `handoff-${iso.replace(/[:.]/g, '-').slice(0, 19)}-${label}`
+}
+
+function listSessionLabels(projectDir) {
+  const sessionsDir = path.join(projectDir, 'sessions')
+  if (!fs.existsSync(sessionsDir)) return []
+  return fs
+    .readdirSync(sessionsDir)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => f.replace(/\.json$/, ''))
+    .sort()
+}
+
+// Verification state stored next to a latest.md, so loaders see readiness and gaps without parsing markdown.
+function readVerificationState(latestMdPath) {
+  const jsonPath = path.join(path.dirname(latestMdPath), 'latest.json')
+  if (!fs.existsSync(jsonPath)) return {}
+  try {
+    const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'))
+    if (!meta.readinessLevel) return {}
+    const pending = listSessionLabels(path.dirname(latestMdPath))
+    return {
+      readinessLevel: meta.readinessLevel,
+      untestedSurfaces: Array.isArray(meta.untestedSurfaces) ? meta.untestedSurfaces : [],
+      reviewGate:
+        'Read untestedSurfaces before writing any review conclusion or readiness claim. Surfaces listed there are unverified.',
+      ...(pending.length >= 2
+        ? {
+            unmergedSessions: pending,
+            mergeHint: `Parallel sessions are saved but not merged (${pending.join(', ')}). This snapshot shows only one of them; call merge_handoffs to combine.`,
+          }
+        : {}),
+    }
+  } catch {
+    return {}
+  }
+}
+
 function captureGitSnapshot(projectPath) {
   try {
     if (!fs.existsSync(projectPath)) return null
@@ -188,6 +366,34 @@ function captureGitSnapshot(projectPath) {
   }
 }
 
+function formatVerificationSection(meta) {
+  if (!meta.readinessLevel) return []
+  const lines = [
+    `## 0. Verification State (Read Before Concluding)`,
+    `- **Readiness Level**: \`${meta.readinessLevel}\``,
+    `- **Untested Surfaces** (unverified; do not claim these as safe):`,
+    ...(meta.untestedSurfaces.length > 0
+      ? meta.untestedSurfaces.map((item) => `  - [ ] ${item}`)
+      : ['  - (None declared: the saving agent states every surface was tested)']),
+  ]
+  if (meta.claimEvidenceMap.length > 0) {
+    lines.push(
+      ``,
+      `| Claim | Evidence | Not measured |`,
+      `|---|---|---|`,
+      ...meta.claimEvidenceMap.map(
+        (row) =>
+          `| ${row.claim.replace(/\|/g, '\\|')} | ${row.evidence.replace(/\|/g, '\\|')} | ${(row.notMeasured || '(not stated)').replace(/\|/g, '\\|')} |`,
+      ),
+    )
+  }
+  if (meta.mergeWarnings && meta.mergeWarnings.length > 0) {
+    lines.push(``, `**Merge warnings:**`, ...meta.mergeWarnings.map((w) => `- ${w}`))
+  }
+  lines.push(``)
+  return lines
+}
+
 function formatMarkdownHandoff(meta, gitInfo) {
   const lines = [
     `# SHADOW HANDOFF: ${meta.title}`,
@@ -195,12 +401,17 @@ function formatMarkdownHandoff(meta, gitInfo) {
     `- **Project Path**: \`${meta.projectPath}\``,
     `- **Timestamp**: ${meta.createdAt}`,
     `- **Source Agent**: ${meta.sourceAgent || 'Shadow Army'}`,
+    ...(meta.sessionLabel ? [`- **Session**: \`${meta.sessionLabel}\``] : []),
+    ...(meta.mergedFrom && meta.mergedFrom.length > 0
+      ? [`- **Merged From Sessions**: ${meta.mergedFrom.map((l) => `\`${l}\``).join(', ')}`]
+      : []),
     ...(gitInfo
       ? [
           `- **Git Branch**: \`${gitInfo.branch}\` (Last commit: \`${gitInfo.lastCommit}\`)`,
         ]
       : []),
     ``,
+    ...formatVerificationSection(meta),
     `## 1. Current Goal (Titah Monarch)`,
     meta.currentGoal,
     ``,
@@ -259,34 +470,80 @@ function formatMarkdownHandoff(meta, gitInfo) {
 }
 
 function handleSaveHandoff(args) {
-  const resolvedProjectPath = resolveCanonicalProjectRoot(args.projectPath)
+  const projectPathArg = requireString(args.projectPath, 'projectPath')
+  const resolvedProjectPath = resolveCanonicalProjectRoot(projectPathArg)
   const slug = projectSlugFromPath(resolvedProjectPath)
   const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
-  const historyDir = path.join(projectDir, 'history')
-  fs.mkdirSync(historyDir, { recursive: true })
-
-  const now = new Date()
-  const iso = now.toISOString()
-  const stamp = iso.replace(/[:.]/g, '-').slice(0, 19)
-  const handoffId = `handoff-${stamp}`
+  const sessionLabel = sanitizeSessionLabel(args.sessionLabel)
+  const iso = new Date().toISOString()
 
   const gitInfo = captureGitSnapshot(resolvedProjectPath)
   const meta = {
-    handoffId,
+    handoffId: buildHandoffId(iso, sessionLabel),
     projectSlug: slug,
     projectPath: resolvedProjectPath,
     sourceAgent: args.sourceAgent || 'Shadow Army',
-    title: args.title,
-    currentGoal: args.currentGoal,
-    completedWork: args.completedWork || [],
-    nextSteps: args.nextSteps || [],
-    keyDecisionsAndContracts: args.keyDecisionsAndContracts || [],
-    blockersOrBugs: args.blockersOrBugs || [],
-    importantFiles: args.importantFiles || [],
-    resumeCommandOrHint: args.resumeCommandOrHint || '',
+    sessionLabel,
+    title: requireString(args.title, 'title'),
+    currentGoal: requireString(args.currentGoal, 'currentGoal'),
+    completedWork: toStringArray(args.completedWork, 'completedWork'),
+    nextSteps: toStringArray(args.nextSteps, 'nextSteps'),
+    keyDecisionsAndContracts: toStringArray(args.keyDecisionsAndContracts, 'keyDecisionsAndContracts'),
+    blockersOrBugs: toStringArray(args.blockersOrBugs, 'blockersOrBugs'),
+    importantFiles: toStringArray(args.importantFiles, 'importantFiles'),
+    resumeCommandOrHint: typeof args.resumeCommandOrHint === 'string' ? args.resumeCommandOrHint : '',
+    readinessLevel: parseReadinessLevel(args.readinessLevel),
+    untestedSurfaces: (() => {
+      if (!Array.isArray(args.untestedSurfaces)) {
+        throw new Error('untestedSurfaces is required: list surfaces not yet tested, or [] if every surface was tested')
+      }
+      return toStringArray(args.untestedSurfaces, 'untestedSurfaces')
+    })(),
+    claimEvidenceMap: parseClaimEvidenceMap(args.claimEvidenceMap),
     createdAt: iso,
     git: gitInfo,
   }
+
+  const written = writeHandoffFiles(meta, gitInfo, args.alsoWriteToProjectFolder === true)
+
+  // Per-session snapshot: a parallel session saving under another label no longer erases this one.
+  const sessionsDir = path.join(projectDir, 'sessions')
+  fs.mkdirSync(sessionsDir, { recursive: true })
+  fs.writeFileSync(path.join(sessionsDir, `${sessionLabel}.json`), JSON.stringify(meta, null, 2) + '\n', 'utf8')
+
+  const otherSessions = listSessionLabels(projectDir).filter((label) => label !== sessionLabel)
+
+  return {
+    status: 'saved',
+    handoffId: meta.handoffId,
+    projectSlug: slug,
+    projectPath: resolvedProjectPath,
+    sessionLabel,
+    readinessLevel: meta.readinessLevel,
+    untestedSurfacesCount: meta.untestedSurfaces.length,
+    latestMdPath: written.latestMdPath,
+    ...(written.projectCopyPath ? { projectCopyPath: written.projectCopyPath } : {}),
+    nextStepsCount: meta.nextSteps.length,
+    gitCaptured: Boolean(gitInfo),
+    ...(otherSessions.length > 0
+      ? {
+          parallelSessions: otherSessions,
+          mergeHint: `Other sessions are saved for this project (${otherSessions.join(', ')}). latest.md now shows only "${sessionLabel}". Call merge_handoffs to combine them before switching to one agent.`,
+        }
+      : {}),
+    resumeInstruction:
+      'In any new session (Antigravity, Claude Code, Codex, or Gemini CLI), say "lanjut handoff" to load this snapshot immediately.',
+  }
+}
+
+function writeHandoffFiles(meta, gitInfo, alsoWriteToProjectFolder) {
+  const projectDir = path.join(HANDOFF_ROOT, 'projects', meta.projectSlug)
+  const historyDir = path.join(projectDir, 'history')
+  fs.mkdirSync(historyDir, { recursive: true })
+  const handoffId = meta.handoffId
+  const slug = meta.projectSlug
+  const resolvedProjectPath = meta.projectPath
+  const iso = meta.createdAt
 
   const markdown = formatMarkdownHandoff(meta, gitInfo)
   const latestMdPath = path.join(projectDir, 'latest.md')
@@ -325,31 +582,156 @@ function handleSaveHandoff(args) {
     projectSlug: slug,
     projectPath: resolvedProjectPath,
     latestHandoffId: handoffId,
-    title: args.title,
+    title: meta.title,
     sourceAgent: meta.sourceAgent,
+    readinessLevel: meta.readinessLevel,
     updatedAt: iso,
     latestMdPath,
   }
   fs.writeFileSync(indexPath, JSON.stringify(indexData, null, 2) + '\n', 'utf8')
 
   let projectCopyPath = null
-  if (args.alsoWriteToProjectFolder && fs.existsSync(resolvedProjectPath)) {
+  if (alsoWriteToProjectFolder && fs.existsSync(resolvedProjectPath)) {
     projectCopyPath = path.join(resolvedProjectPath, '.handoff', 'HANDOFF.md')
     fs.mkdirSync(path.dirname(projectCopyPath), { recursive: true })
     fs.writeFileSync(projectCopyPath, markdown, 'utf8')
   }
 
-  return {
-    status: 'saved',
-    handoffId,
+  return { latestMdPath, projectCopyPath }
+}
+
+// Same text from several sessions collapses into one entry tagged with every label that reported it.
+function unionTagged(sessions, field) {
+  const order = []
+  const labelsByText = new Map()
+  for (const session of sessions) {
+    const items = Array.isArray(session[field]) ? session[field] : []
+    for (const item of items) {
+      if (!labelsByText.has(item)) {
+        labelsByText.set(item, [])
+        order.push(item)
+      }
+      const labels = labelsByText.get(item)
+      if (!labels.includes(session.sessionLabel)) labels.push(session.sessionLabel)
+    }
+  }
+  return order.map((item) => `[${labelsByText.get(item).join('+')}] ${item}`)
+}
+
+function handleMergeHandoffs(args = {}) {
+  const resolvedProjectPath = resolveCanonicalProjectRoot(requireString(args.projectPath, 'projectPath'))
+  const slug = projectSlugFromPath(resolvedProjectPath)
+  const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+  const sessionsDir = path.join(projectDir, 'sessions')
+  const available = listSessionLabels(projectDir)
+
+  const requested =
+    args.sessionLabels === undefined || args.sessionLabels === null
+      ? null
+      : toStringArray(args.sessionLabels, 'sessionLabels').map(sanitizeSessionLabel)
+  if (requested) {
+    const missing = requested.filter((label) => !available.includes(label))
+    if (missing.length > 0) {
+      throw new Error(
+        `Session(s) not found: ${missing.join(', ')}. Saved sessions for this project: ${available.join(', ') || '(none)'}`,
+      )
+    }
+  }
+
+  const sessions = (requested || available).map((label) =>
+    JSON.parse(fs.readFileSync(path.join(sessionsDir, `${label}.json`), 'utf8')),
+  )
+  if (!requested) {
+    sessions.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)))
+  }
+  if (sessions.length < 2) {
+    throw new Error(
+      `merge_handoffs needs at least 2 saved sessions; found ${sessions.length} (${available.join(', ') || 'none'}). Save each parallel session with its own sessionLabel first, or use load_handoff for a single session.`,
+    )
+  }
+
+  const warnings = []
+  const branches = [...new Set(sessions.map((s) => (s.git ? s.git.branch : '(no git)')))]
+  if (branches.length > 1) {
+    warnings.push(`Sessions were on different branches (${branches.join(', ')}). Confirm which branch the merged work targets before continuing.`)
+  }
+  const commits = [...new Set(sessions.map((s) => (s.git ? s.git.lastCommit : '(no git)')))]
+  if (branches.length === 1 && commits.length > 1) {
+    warnings.push(`Sessions saw different commits (${commits.join(' | ')}). A review may describe code that has since changed.`)
+  }
+  const times = sessions.map((s) => Date.parse(s.createdAt)).filter((t) => !Number.isNaN(t))
+  if (times.length > 1 && Math.max(...times) - Math.min(...times) > STALE_SESSION_GAP_MS) {
+    warnings.push('Sessions were saved more than 24 hours apart. Check that the older one is still current.')
+  }
+  const levels = sessions.map((s) => {
+    if (READINESS_LEVELS.includes(s.readinessLevel)) return s.readinessLevel
+    warnings.push(`Session "${s.sessionLabel}" has no readinessLevel; treated as PLANNED.`)
+    return 'PLANNED'
+  })
+  warnings.push('Decisions and steps from different sessions are listed side by side, not reconciled. Check them for contradictions before acting.')
+
+  const labels = sessions.map((s) => s.sessionLabel)
+  const iso = new Date().toISOString()
+  const gitInfo = captureGitSnapshot(resolvedProjectPath)
+  const meta = {
+    handoffId: buildHandoffId(iso, 'merged'),
     projectSlug: slug,
     projectPath: resolvedProjectPath,
-    latestMdPath,
-    ...(projectCopyPath ? { projectCopyPath } : {}),
-    nextStepsCount: meta.nextSteps.length,
-    gitCaptured: Boolean(gitInfo),
-    resumeInstruction:
-      'In any new session (Antigravity, Claude Code, Codex, or Gemini CLI), say "lanjut handoff" to load this snapshot immediately.',
+    sourceAgent: args.sourceAgent || 'Shadow Army',
+    mergedFrom: labels,
+    title: typeof args.title === 'string' && args.title.trim() ? args.title.trim() : `Merged: ${sessions.map((s) => s.title).join(' + ')}`,
+    currentGoal:
+      typeof args.currentGoal === 'string' && args.currentGoal.trim()
+        ? args.currentGoal.trim()
+        : sessions.map((s) => `[${s.sessionLabel}] ${s.currentGoal}`).join('\n'),
+    completedWork: sessions.flatMap((s) => s.completedWork.map((item) => `[${s.sessionLabel}] ${item}`)),
+    nextSteps: sessions.flatMap((s) => s.nextSteps.map((item) => `[${s.sessionLabel}] ${item}`)),
+    keyDecisionsAndContracts: unionTagged(sessions, 'keyDecisionsAndContracts'),
+    blockersOrBugs: unionTagged(sessions, 'blockersOrBugs'),
+    importantFiles: [...new Set(sessions.flatMap((s) => s.importantFiles))],
+    resumeCommandOrHint: sessions
+      .filter((s) => s.resumeCommandOrHint)
+      .map((s) => `[${s.sessionLabel}] ${s.resumeCommandOrHint}`)
+      .join(' ; '),
+    readinessLevel: lowestReadiness(levels),
+    untestedSurfaces: unionTagged(sessions, 'untestedSurfaces'),
+    claimEvidenceMap: sessions.flatMap((s) =>
+      (Array.isArray(s.claimEvidenceMap) ? s.claimEvidenceMap : []).map((row) => ({
+        ...row,
+        claim: `[${s.sessionLabel}] ${row.claim}`,
+      })),
+    ),
+    mergeWarnings: warnings,
+    createdAt: iso,
+    git: gitInfo,
+  }
+
+  const written = writeHandoffFiles(meta, gitInfo, args.alsoWriteToProjectFolder === true)
+
+  const archived = []
+  if (args.archiveSessionsAfterMerge !== false) {
+    const archiveDir = path.join(sessionsDir, 'archive')
+    fs.mkdirSync(archiveDir, { recursive: true })
+    const stamp = iso.replace(/[:.]/g, '-').slice(0, 19)
+    for (const label of labels) {
+      const target = path.join(archiveDir, `${label}-${stamp}.json`)
+      fs.renameSync(path.join(sessionsDir, `${label}.json`), target)
+      archived.push(target)
+    }
+  }
+
+  return {
+    status: 'merged',
+    handoffId: meta.handoffId,
+    projectPath: resolvedProjectPath,
+    mergedFrom: labels,
+    readinessLevel: meta.readinessLevel,
+    untestedSurfacesCount: meta.untestedSurfaces.length,
+    warnings,
+    latestMdPath: written.latestMdPath,
+    ...(written.projectCopyPath ? { projectCopyPath: written.projectCopyPath } : {}),
+    archivedSessions: archived,
+    resumeInstruction: 'Say "lanjut handoff" in the target agent to load the merged handoff.',
   }
 }
 
@@ -382,6 +764,7 @@ function handleLoadHandoff(args = {}) {
         matchedBy: 'exact_git_root_or_path',
         projectPath: resolvedProjectPath,
         latestMdPath,
+        ...readVerificationState(latestMdPath),
         markdown: fs.readFileSync(latestMdPath, 'utf8'),
       }
     }
@@ -408,6 +791,7 @@ function handleLoadHandoff(args = {}) {
             requestedPath: resolvedProjectPath,
             projectPath: parentOrChildMatch.projectPath,
             latestMdPath: parentOrChildMatch.latestMdPath,
+            ...readVerificationState(parentOrChildMatch.latestMdPath),
             markdown: fs.readFileSync(parentOrChildMatch.latestMdPath, 'utf8'),
           }
         }
@@ -446,17 +830,20 @@ function handleLoadHandoff(args = {}) {
     projectPath: latestEntry.projectPath,
     updatedAt: latestEntry.updatedAt,
     latestMdPath: latestEntry.latestMdPath,
+    ...readVerificationState(latestEntry.latestMdPath),
     markdown: fs.readFileSync(latestEntry.latestMdPath, 'utf8'),
   }
 }
 
 function handleListHandoffs(args = {}) {
   if (args.projectPath) {
-    const resolvedProjectPath = path.resolve(args.projectPath)
+    const resolvedProjectPath = resolveCanonicalProjectRoot(args.projectPath)
     const slug = projectSlugFromPath(resolvedProjectPath)
-    const historyDir = path.join(HANDOFF_ROOT, 'projects', slug, 'history')
+    const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+    const historyDir = path.join(projectDir, 'history')
+    const sessions = listSessionLabels(projectDir)
     if (!fs.existsSync(historyDir)) {
-      return { projectPath: resolvedProjectPath, history: [] }
+      return { projectPath: resolvedProjectPath, history: [], sessions }
     }
     const files = fs
       .readdirSync(historyDir)
@@ -467,6 +854,7 @@ function handleListHandoffs(args = {}) {
       projectPath: resolvedProjectPath,
       projectSlug: slug,
       history: files.map((f) => f.replace(/\.md$/, '')),
+      sessions,
     }
   }
 
@@ -554,6 +942,9 @@ rl.on('line', async (line) => {
         sendToolText(id, out)
       } else if (toolName === 'list_handoffs') {
         const out = handleListHandoffs(toolArgs)
+        sendToolText(id, out)
+      } else if (toolName === 'merge_handoffs') {
+        const out = handleMergeHandoffs(toolArgs)
         sendToolText(id, out)
       } else {
         sendToolText(id, `Unknown tool: ${toolName}`, true)
