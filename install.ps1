@@ -76,23 +76,37 @@ foreach ($Root in $TargetRoots) {
 
 $global = [System.IO.File]::ReadAllText((Join-Path $Source 'GLOBAL.md'), $Utf8NoBom).TrimEnd()
 $block  = "$Begin`n$global`n$End"
+$CodexDir = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME '.codex' }
+$GeminiDir = Join-Path $HOME '.gemini'
 
-if (Test-Path $ClaudeMd) {
-    $stamp = Get-Date -Format 'yyyyMMddHHmmss'
-    Copy-Item $ClaudeMd "$ClaudeMd.bak.$stamp"
-    $current = [System.IO.File]::ReadAllText($ClaudeMd, $Utf8NoBom)
-    $pattern = [regex]::Escape($Begin) + '[\s\S]*?' + [regex]::Escape($End)
-    if ($current -match $pattern) {
-        $updated = [regex]::Replace($current, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $block })
-        Write-Host "Updated shadow-monarch block in $ClaudeMd (backup saved)"
-    } else {
-        $updated = $current.TrimEnd() + "`n`n" + $block + "`n"
-        Write-Host "Appended shadow-monarch block to $ClaudeMd (backup saved)"
+$GlobalInstructionFiles = @(
+    $ClaudeMd,
+    (Join-Path $CodexDir 'AGENTS.md'),
+    (Join-Path $GeminiDir 'GEMINI.md')
+)
+
+foreach ($InstructionFile in $GlobalInstructionFiles) {
+    $ParentDir = Split-Path -Parent $InstructionFile
+    if (-not (Test-Path $ParentDir)) {
+        New-Item -ItemType Directory -Force -Path $ParentDir | Out-Null
     }
-    [System.IO.File]::WriteAllText($ClaudeMd, $updated, $Utf8NoBom)
-} else {
-    [System.IO.File]::WriteAllText($ClaudeMd, $block + "`n", $Utf8NoBom)
-    Write-Host "Created $ClaudeMd"
+    if (Test-Path $InstructionFile) {
+        $stamp = Get-Date -Format 'yyyyMMddHHmmss'
+        Copy-Item $InstructionFile "$InstructionFile.bak.$stamp"
+        $current = [System.IO.File]::ReadAllText($InstructionFile, $Utf8NoBom)
+        $pattern = [regex]::Escape($Begin) + '[\s\S]*?' + [regex]::Escape($End)
+        if ($current -match $pattern) {
+            $updated = [regex]::Replace($current, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $block })
+            Write-Host "Updated shadow-monarch block in $InstructionFile (backup saved)"
+        } else {
+            $updated = $current.TrimEnd() + "`n`n" + $block + "`n"
+            Write-Host "Appended shadow-monarch block to $InstructionFile (backup saved)"
+        }
+        [System.IO.File]::WriteAllText($InstructionFile, $updated, $Utf8NoBom)
+    } else {
+        [System.IO.File]::WriteAllText($InstructionFile, $block + "`n", $Utf8NoBom)
+        Write-Host "Created $InstructionFile"
+    }
 }
 
-Write-Host 'Done. All 36 Shadow Army skills are active across Antigravity, Gemini CLI, Claude Code, and Codex.'
+Write-Host 'Done. All 36 Shadow Army skills and global instruction files (CLAUDE.md, AGENTS.md, GEMINI.md) are synced across Antigravity, Gemini CLI, Claude Code, and Codex.'

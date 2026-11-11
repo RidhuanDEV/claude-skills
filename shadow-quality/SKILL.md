@@ -36,8 +36,10 @@ Verify strict directional dependencies:
 - Verify that every backend route parameter, request DTO, and response shape matches `openapi.yaml`, `postman_collection.json` (`/shadow-api`), and frontend consumer types (`100%` parity).
 
 ### 6. Architecture & Convention Drift Gate (Brownfield Codebase Intelligence)
-For brownfield codebases, run the deterministic drift audit before completing the task:
+For brownfield codebases, run the unified deterministic quality & drift gate before completing the task:
 ```powershell
+python "shadow-quality/scripts/shadow_gate.py" --repo .
+# Or run convention drift standalone:
 python "shadow-quality/scripts/codebase_intelligence.py" audit-drift --repo-dir . [--changed-files ...]
 ```
 Verify zero unapproved drift across the following violation categories:

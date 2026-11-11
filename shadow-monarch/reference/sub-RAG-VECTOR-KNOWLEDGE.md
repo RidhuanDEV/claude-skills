@@ -58,6 +58,13 @@ User Query → Query Analysis / Rewrite → Parallel [Dense Vector Top-50 + BM25
 2. **Query Transformation**:
    - Conversational history condensation: rewrite follow-up questions (*"berapa dendanya?"*) into standalone search queries
      (*"berapa denda keterlambatan pembayaran pajak PBB di Perda X?"*).
+   - **Follow-up detection pitfalls (Indonesian)**: `-nya` is not always anaphora ("hanya", "punya",
+     "bertanya" are not clitics; "biasanya", "sebenarnya" are adverbs). Any history carry-over must have
+     topic-switch tests; prefer letting the rewrite LLM resolve references and *validate* its output,
+     over deterministic concatenation of old questions.
+   - **Guards on rewrite output** must be measured on a conversation set (multi-turn, including topic
+     switches and references to assistant answers), not only on single-turn retrieval metrics.
+     Retrieval-only probes that bypass rewrite are not evidence about rewrite safety.
    - Extract structured metadata filters (dates, document types, department codes) from the query when applicable.
    - Use **Multi-Query** or **HyDE (Hypothetical Document Embeddings)** when user queries are very short or abstract.
 3. **Hybrid Search (Dense + Lexical BM25/Sparse)**:

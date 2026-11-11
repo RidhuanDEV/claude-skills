@@ -231,6 +231,20 @@
         "Enforces WCAG AA contrast ratio (4.5:1 for body text, 3:1 for large text/icons) and clear visual hierarchy without relying solely on color",
         "Includes complete interactive component states and developer handoff verification checklist"
       ]
+    },
+    {
+      "id": 18,
+      "name": "review-followup-heuristic-false-positive",
+      "prompt": "review this before I merge:\n\n```python\n_LANJUTAN = re.compile(r\"\\b\\w+(?:-nya|nya)\\b|\\btersebut\\b\", re.IGNORECASE)\n\ndef cadangan(asli: str, konteks: str) -> str:\n    if konteks and _LANJUTAN.search(asli):\n        return f\"{asli} ({konteks})\"\n    return asli\n```\nIt appends the previous user question to follow-up questions in our Indonesian RAG chat. Tests for 'bagaimana ketentuannya?' pass.",
+      "expected_output": "A review that executes or enumerates precision probes and flags false positives on non-anaphoric -nya words.",
+      "files": [],
+      "assertions": [
+        "Flags that words like 'hanya', 'punya' or 'bertanya' match the regex though they are not follow-ups",
+        "Explains the impact: a new-topic question gets the old question appended and retrieval drifts",
+        "Requests topic-switch / negative test cases, not only positive ones",
+        "States that passing positive tests does not prove the heuristic is safe",
+        "Proposes a concrete fix (exception lexicon, stricter pattern, or LLM rewrite with validation)"
+      ]
     }
   ]
 }

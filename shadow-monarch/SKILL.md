@@ -147,6 +147,10 @@ Every change must survive an attempt to break it before it is reported as done o
    `IMPLEMENTED` (code written) → `VERIFIED-LOCAL` (probes + tests executed) →
    `REVIEWED` (independent adversarial pass done, findings resolved) → `READY-TO-MERGE`.
    Never say "siap", "aman", or "selesai" without the level name.
+6. **Deterministic Cross-Model Quality Gate (`shadow_gate.py`).** Before claiming `VERIFIED-LOCAL` or
+   `READY-TO-MERGE`, run `python "shadow-quality/scripts/shadow_gate.py" --repo .` so every agent model
+   (Claude, Codex, Gemini, Antigravity) passes the exact same strict-typing, secret-scan, heuristic-probe,
+   and brownfield-drift checks (`reference/CROSS-MODEL-PARITY.md`).
 
 ## Load focused references (Foreign Key Routing — The Shadow Army)
 
@@ -160,6 +164,7 @@ that match the active task. Do not load the entire library into context.
 |---|---|
 | Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` |
 | Codebase Intelligence & Convention Preservation: 10-facet discovery, convention profile, minimal change policy & drift prevention | `reference/CODEBASE-INTELLIGENCE.md` |
+| Cross-Model Frontier Parity: unified instruction sync, pre-code checkpoints, deterministic `shadow_gate.py`, cross-model review & model routing | `reference/CROSS-MODEL-PARITY.md` |
 | Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` |
 | Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` |
 | Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` |

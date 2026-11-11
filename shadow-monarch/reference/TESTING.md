@@ -24,7 +24,22 @@ concurrency/race for shared resources · meaningful regression coverage for fixe
 
 Edge-case catalog to mine: null/undefined, zero, negatives, duplicates, huge payloads, invalid encoding/Unicode,
 expired sessions, concurrent updates, partial DB state, timezone boundaries (UTC vs local midnight, DST, month end,
-leap day), inclusive/exclusive ranges, pagination boundaries, floating-point money, integer overflow.
+leap day), inclusive/exclusive ranges, pagination boundaries, floating-point money, integer overflow,
+natural-language morphology (Indonesian clitics -nya/-lah/-kah, se-…-nya adverbs), ALL-CAPS input,
+topic switch inside a conversation, global UI listeners firing during streaming/auto-scroll.
+
+## 3b. Heuristics, regex, classifiers and NL rules
+
+Any rule that decides from text (regex, keyword list, stemmer, intent router, guard) needs:
+- **Contrast set**: pairs of near-identical inputs with opposite expected outcomes
+  ("rinciannya apa?" → follow-up vs "hanya untuk golongan I?" → not follow-up).
+- **Lexicon sweep**: list real words that share the pattern (suffix, prefix, casing) and assert each.
+  Example for Indonesian `-nya`: hanya, punya, tanya/bertanya, biasanya, sebenarnya, sebaiknya,
+  misalnya, lainnya, selanjutnya, sebelumnya.
+- **Topic-switch tests** for anything carrying conversation context.
+- **Input shape matrix**: ALL CAPS, lowercase, typo/informal, very short (1–2 words), very long,
+  mixed language, acronym-only.
+- A test file for a heuristic with only positive cases is incomplete.
 
 ## 4. Test quality rules
 

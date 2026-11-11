@@ -746,6 +746,68 @@ def audit_convention_drift(
             except Exception:
                 pass
 
+        # 5. Unsolicited state store check (e.g. Redux introduced when Zustand is HIGH confidence)
+        if f.suffix in (".js", ".jsx", ".ts", ".tsx") and profile.state_and_caching.confidence == "HIGH":
+            try:
+                content = f.read_text(encoding="utf-8", errors="ignore")
+                state_det = profile.state_and_caching.detected.lower()
+                if "zustand" in state_det and re.search(r"from\s+['\"](@reduxjs/toolkit|redux|react-redux|recoil|jotai|mobx)['\"]|require\(['\"](@reduxjs/toolkit|redux|react-redux|recoil|jotai|mobx)['\"]\)", content):
+                    violations.append({
+                        "severity": "HIGH",
+                        "code": "UNSOLICITED_STATE_STORE",
+                        "file": str(rel),
+                        "message": f"Introduced competing state library when '{profile.state_and_caching.detected}' is already established.",
+                        "corrective_action": "Use the existing Zustand store pattern instead of adding a parallel state library."
+                    })
+                elif "redux" in state_det and re.search(r"from\s+['\"](zustand|recoil|jotai|mobx)['\"]|require\(['\"](zustand|recoil|jotai|mobx)['\"]\)", content):
+                    violations.append({
+                        "severity": "HIGH",
+                        "code": "UNSOLICITED_STATE_STORE",
+                        "file": str(rel),
+                        "message": f"Introduced competing state library when '{profile.state_and_caching.detected}' is already established.",
+                        "corrective_action": "Use the existing Redux store pattern instead of adding a parallel state library."
+                    })
+            except Exception:
+                pass
+
+        # 6. Unsolicited ORM / DB library check
+        if f.suffix in (".js", ".ts") and profile.api_and_db_patterns.confidence == "HIGH":
+            try:
+                content = f.read_text(encoding="utf-8", errors="ignore")
+                db_det = profile.api_and_db_patterns.detected.lower()
+                if "prisma" in db_det and re.search(r"from\s+['\"](typeorm|sequelize|drizzle-orm|knex)['\"]|require\(['\"](typeorm|sequelize|drizzle-orm|knex)['\"]\)", content):
+                    violations.append({
+                        "severity": "HIGH",
+                        "code": "UNSOLICITED_ORM_HTTP_CLIENT",
+                        "file": str(rel),
+                        "message": f"Introduced competing ORM/query builder when '{profile.api_and_db_patterns.detected}' is already established.",
+                        "corrective_action": "Use the established Prisma client instead of introducing a second database library."
+                    })
+            except Exception:
+                pass
+
+        # 7. Naming convention drift when repository naming is HIGH confidence
+        if f.suffix in (".js", ".ts", ".py") and profile.naming_conventions.confidence == "HIGH":
+            stem = f.stem.split(".")[0]
+            if stem not in ("index", "main", "app", "server", "setup", "conftest") and not stem.startswith("_"):
+                det_naming = profile.naming_conventions.detected
+                if "kebab-case" in det_naming and "_" in stem:
+                    violations.append({
+                        "severity": "MEDIUM",
+                        "code": "INCONSISTENT_NAMING",
+                        "file": str(rel),
+                        "message": f"File '{f.name}' uses snake_case in a HIGH-confidence kebab-case repository.",
+                        "corrective_action": "Rename file to kebab-case to match established module naming."
+                    })
+                elif "snake_case" in det_naming and "-" in stem:
+                    violations.append({
+                        "severity": "MEDIUM",
+                        "code": "INCONSISTENT_NAMING",
+                        "file": str(rel),
+                        "message": f"File '{f.name}' uses kebab-case in a HIGH-confidence snake_case repository.",
+                        "corrective_action": "Rename file to snake_case to match established module naming."
+                    })
+
     return {
         "repository": str(root),
         "analyzed_files_count": len(modified_files),
@@ -957,8 +1019,10 @@ def run_acceptance_suite() -> dict[str, Any]:
         (sc5_dir / "user_helper.js").write_text("function foo() {}\n", encoding="utf-8")
         (sc5_dir / "order-service.js").write_text("function bar() {}\n", encoding="utf-8")
         (sc5_dir / "PaymentProcessor.js").write_text("function baz() {}\n", encoding="utf-8")
+        sql_prefix = 'const q = "SELECT * FROM users '
+        sql_suffix = 'WHERE email = \'" + email + "\'";\n'
         (sc5_dir / "legacy_auth.js").write_text(
-            'const q = "SELECT * FROM users WHERE email = \'" + email + "\'";\n',
+            sql_prefix + sql_suffix,
             encoding="utf-8"
         )
 
@@ -1041,19 +1105,28 @@ def run_acceptance_suite() -> dict[str, Any]:
 # ============================================================================
 def main() -> int:
     parser = argparse.ArgumentParser(description="Shadow Army Codebase Intelligence & Convention Preservation CLI")
-    parser.add_argument("--repo", default=".", help="Target repository directory (default: current directory)")
+    parser.add_argument("--repo", "--repo-dir", dest="repo", default=".", help="Target repository directory (default: current directory)")
     parser.add_argument("--acceptance-suite", action="store_true", help="Run automated 6-scenario acceptance tests in temp fixtures")
 
     sub = parser.add_subparsers(dest="cmd")
 
     p_disc = sub.add_parser("discover", help="Discover codebase conventions across 10 facets and print profile")
+    p_disc.add_argument("--repo", "--repo-dir", dest="sub_repo", default=None, help="Target repository directory")
     p_disc.add_argument("--json", action="store_true", help="Output profile in JSON format")
-    p_disc.add_argument("--write-profile", default=None, help="Write profile to Markdown file path (e.g. docs/engineering/CODEBASE_CONVENTIONS.md)")
+    p_disc.add_argument(
+        "--write-profile",
+        nargs="?",
+        const="docs/engineering/CODEBASE_CONVENTIONS.md",
+        default=None,
+        help="Write profile to Markdown file path (default when flag has no value: docs/engineering/CODEBASE_CONVENTIONS.md)",
+    )
 
     p_drift = sub.add_parser("audit-drift", help="Audit repository or modified files against established conventions")
-    p_drift.add_argument("--files", nargs="*", default=None, help="Specific modified files to check")
+    p_drift.add_argument("--repo", "--repo-dir", dest="sub_repo", default=None, help="Target repository directory")
+    p_drift.add_argument("--files", "--changed-files", dest="files", nargs="*", default=None, help="Specific modified files to check")
 
-    sub.add_parser("template", help="Print empty Project Convention Profile template")
+    p_tpl = sub.add_parser("template", help="Print empty Project Convention Profile template")
+    p_tpl.add_argument("--repo", "--repo-dir", dest="sub_repo", default=None, help="Target repository directory")
 
     args = parser.parse_args()
 
@@ -1062,7 +1135,8 @@ def main() -> int:
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         return 0 if summary["all_passed"] else 1
 
-    repo_dir = Path(args.repo).resolve()
+    target_repo = getattr(args, "sub_repo", None) or args.repo
+    repo_dir = Path(target_repo).resolve()
 
     if args.cmd == "discover":
         prof = discover_codebase(repo_dir)
@@ -1072,10 +1146,12 @@ def main() -> int:
             md = format_markdown_profile(prof)
             print(md)
             if args.write_profile:
-                p = Path(args.write_profile)
-                p.parent.mkdir(parents=True, exist_ok=True)
-                p.write_text(md, encoding="utf-8")
-                print(f"\n[OK] Convention Profile written to: {p}")
+                out_path = Path(args.write_profile)
+                if not out_path.is_absolute():
+                    out_path = repo_dir / out_path
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                out_path.write_text(md, encoding="utf-8")
+                print(f"\n[OK] Convention Profile written to: {out_path}")
         return 0
 
     if args.cmd == "audit-drift":
