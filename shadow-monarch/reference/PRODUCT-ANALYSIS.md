@@ -12,14 +12,19 @@ Use when translating business goals or user needs into requirements, PRDs, BRDs,
 - Validate requirements against existing system architecture and data contracts when working in an existing repo.
   Never write specs that contradict verified domain invariants without flagging a migration/breaking change.
 
-## 2. Discovery & scoping (PM / BA)
+## 2. Discovery, Assumption Mapping & Pre-Mortem (PM / BA)
 
-- **Objective & KPIs**: state the business goal, target user personas, success metrics (leading/lagging), and explicit
-  **Non-Goals (Out of Scope)** to prevent scope creep.
-- **Prioritization**: separate MVP / Must-Have (P0) from Should-Have (P1) and Nice-to-Have (P2) based on user value,
-  technical dependency, compliance/risk, and effort.
-- **Assumptions, dependencies & risks**: list external dependencies (third-party APIs, payment gateways, legal/PDP
-  compliance, legacy DB constraints) and open questions requiring stakeholder sign-off.
+> **Foreign-Key Deep References**:
+> - **PM Discovery, Strategy, Execution & GTM (124 `T1` files)**: [`shadow-design/references/external-upstreams/pm-skills/README.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/README.md)
+> - **Evidence & Story-to-Flow Traceability**: [`shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md) & [`10-handoff-and-measurement.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md)
+
+- **Evidence Tagging**: Label every product/UX statement as `[EVIDENCE]` (citing repo code, analytics, tickets, or dated user studies), `[ASSUMPTION]` (with risk & validation plan), `[PROPOSAL]`, or `[NEEDS VALIDATION]`. Never invent user interviews or personas.
+- **Objective & KPIs**: state the business goal, target user personas, success metrics (HEART / Goal-Signal-Metric leading & lagging indicators), and explicit **Non-Goals (Out of Scope)** to prevent scope creep.
+- **Prioritization**: separate MVP / Must-Have (P0) from Should-Have (P1) and Nice-to-Have (P2) based on user value, technical dependency, compliance/risk, and effort.
+- **5-Dimension Assumption Risk Mapping & Pre-Mortem**:
+  - Evaluate assumptions across **Value, Usability, Viability, Feasibility, and Ethics**.
+  - Run a **Pre-Mortem (`Tigers | Paper Tigers | Elephants`)** before locking scope: address genuine high-impact threats (*Tigers*) and unspoken systemic truths (*Elephants*), while de-escalating low-impact worries (*Paper Tigers*).
+- **End-to-End Traceability Contract**: Maintain stable IDs across revisions: `FR-ID -> US-ID / JOB-ID -> FLOW-ID -> SCR-ID / STATE-ID -> AC-ID -> TEST-ID -> METRIC-ID` (`CONFIRMED | PROPOSED | UNKNOWN | DEFERRED`).
 
 ## 3. Functional requirements & user stories
 

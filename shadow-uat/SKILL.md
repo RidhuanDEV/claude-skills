@@ -43,10 +43,18 @@ During UAT, strictly separate **Defects (Bugs)** from **New Scope / Change Reque
 - **Defect (Bug)**: Behavior deviates from agreed PRD/SRS (`FR-*`) -> Fix immediately before sign-off.
 - **Change Request (CR)**: Client requests a new field/workflow not in the agreed SRS -> Log in the CR backlog with impact analysis so UAT sign-off of the current scope is not derailed.
 
+### D. Intended-vs-Implemented Drift Audit & 12-Domain Adversarial Scenarios
+Before handing the Staging environment to client testers, run an internal **Intended-vs-Implemented Audit** ([`pm-ai-shipping/commands/ship-check.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-ai-shipping/commands/ship-check.md), [`design-qa-checklist/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/designer-skills/design-ops/skills/design-qa-checklist/SKILL.md), and [`pm-execution/skills/test-scenarios/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/test-scenarios/SKILL.md)):
+1. **State Machine Parity**: Verify all **9 UI states** specified in `FEATURE-DESIGN.md` exist in the live build (including distinct Empty vs No-Results vs Error states, `403` Permission-Denied, Offline, and `409`/`ETag` Stale Conflict recovery).
+2. **Async (`HTTP 202`) Honesty**: Verify background jobs show `Submitted / Queued / Processing` and never display a premature green `"Completed"` toast before worker indexing/settlement finishes.
+3. **Adversarial & Double-Submit Protection**: Verify double-clicking submit, refreshing mid-flight, or submitting invalid fields preserves user input and prevents duplicate records.
+4. **Privacy-Safe Outcome Telemetry (HEART / GSM)**: Verify success and error instrumentation events ([`ghaida-intent/skills/measure/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/skills/measure/SKILL.md)) fire without logging raw PII or secrets.
+
 ---
 
 ## 3. UAT Exit Gate Checklist (To Unlock Production Release / `/shadow-handover`)
-- [ ] $100\%$ of P0/P1 requirements mapped in the Requirement Traceability Matrix (`RTM`).
-- [ ] Zero open `Blocker` or `Critical` UAT defects.
-- [ ] All UAT scenarios have verified screenshot/document evidence attached.
+- [ ] $100\%$ of P0/P1 requirements mapped in the Requirement Traceability Matrix (`RTM`: `FR-ID -> US-ID -> FLOW-ID -> SCR/STATE-ID -> UAT-ID -> TEST-ID`).
+- [ ] Intended-vs-Implemented Drift Audit passed (all 9 states and `HTTP 202` async contracts verified).
+- [ ] Zero open `Blocker` or `Critical` UAT defects (Severity-First Gate: critical blockers override any numeric score).
+- [ ] All UAT scenarios have verified screenshot/document evidence attached (`NOT TESTED` explicitly labeled if any manual check was skipped).
 - [ ] Formal UAT Sign-Off sheet (`Berita Acara UAT`) ready for client signature.

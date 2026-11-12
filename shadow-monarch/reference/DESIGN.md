@@ -9,11 +9,19 @@ If it looks beautiful but is confusing, slow, hard to learn, inaccessible or uns
 > Gestalt & visual hierarchy, grid/spacing, mobile patterns & thumb zones, typography, WCAG AA accessibility,
 > component states, art direction, visual choreography, usability testing, developer handoff checklist, and AI prompt library), see
 > [`reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-monarch/reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md).
+>
+> **Product Design & 9-State Flow Pack (`/shadow-design`)**: For `US-ID -> FLOW-ID -> SCR-ID -> STATE-ID -> AC-ID` traceability,
+> 12-domain adversarial UX walkthroughs, and `FEATURE-DESIGN.md` / `UX-REVIEW.md` templates, see
+> [`shadow-design/SKILL.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/SKILL.md) and its audited `T1` reference modules in
+> `shadow-design/references/ai-product-designer-skill-pack/`.
 
-## 1. Before designing screens
+## 1. Before designing screens (Evidence & Existing Product Guardian)
 
 Understand the user's objective, the business goal, the main flow, edge cases and failure states.
 Design without a flow is decoration. The user must always know: where am I, what am I doing, what's next, how do I go back.
+
+- **Evidence Classification**: Tag UX/product claims as `[EVIDENCE]` (citing repo files, tickets, analytics, or dated studies), `[ASSUMPTION]` (with risk & validation plan), `[PROPOSAL]`, or `[NEEDS VALIDATION]`. Never invent fake user research or personas.
+- **Existing Product Guardian**: In brownfield products, inventory existing patterns (`pattern -> where used -> accepted behavior -> defects -> recommendation`) before proposing new navigation, shells, or components.
 
 ## 2. UX laws applied
 
@@ -54,14 +62,18 @@ and autocomplete attributes, inline validation on blur (not on every keystroke),
 language plus a summary for long forms, never reset the form after a failed submit, group long forms into sections or
 steps, mark optional rather than required when most fields are required, minimize fields, avoid aggressive CAPTCHA.
 
-## 5. States that must be designed
+## 5. Mandatory 9-State Machine & Concurrency Contract
 
-- **Empty** — explain, guide, give a CTA. Not "No data." but "No projects yet. Create your first project to start managing tasks."
-- **Loading** — skeletons for content, spinners with context for actions, progress for long tasks; never a blank screen;
-  avoid blocking the whole UI.
-- **Error** — human, specific, actionable, not blaming: "Upload failed because the connection dropped. Try again." Offer retry.
-- **Success** — clear confirmation; toast for minor, page/state change for major.
-- **Partial/permission/offline/long content/localization** cases.
+Model interactive views as `State + Event + Guard -> Next State / Side Effect / Visible Feedback` across all 9 states:
+1. **Initial / Pre-action** — clear entry affordance and preconditions.
+2. **Empty (3 distinct sub-states)** — (a) *No data yet* (explain + primary CTA), (b) *No search/filter results* (show active filters + 1-click Reset), (c) *Empty due to error/permission* (never mask API error as "0 items").
+3. **Loading / Pending** — skeletons for content, spinners with context for actions, step/queue progress for tasks `>3s`.
+4. **Partial / Degraded** — render healthy sections and isolate retry UI to the failed widget.
+5. **Populated / Success** — clear confirmation; handle long text/numbers (`tabular-nums`).
+6. **Validation / Recoverable Error** — human, specific, actionable inline + summary errors; **never wipe user input on failed submit**.
+7. **Permission-Denied (`401`/`403`)** — explain required role/action without leaking sensitive metadata.
+8. **Offline / Disconnected** — preserve local draft state, disable or queue unsafe mutations, reconcile on reconnect.
+9. **Stale / Concurrent-Edit Conflict (`409` / `ETag` mismatch)** — prevent silent overwrites when another user/tab modified the record; offer diff/reload/merge.
 
 ## 6. Accessibility (mandatory, WCAG 2.2 AA)
 
@@ -90,18 +102,15 @@ Data visualization: pick the chart for the question (trend → line, comparison 
 avoid pies with many slices), label axes and units, start bars at zero, no 3D, few colors, colorblind-safe palette,
 show context (targets, previous period), provide a table alternative for accessibility.
 
-## 9. AI / chat product UX
+## 9. Async (`HTTP 202` != Done) & AI / Chat Product UX
 
-AI must feel explainable, predictable, trustworthy. Show thinking/generating/streaming states, allow stop, retry,
-regenerate, edit prompt, copy; render markdown and code readably (including mobile); show sources/citations when
-available; communicate limitations and low confidence; design for failure and fallback; never present AI output as
-guaranteed fact in high-stakes flows — require human confirmation for consequential actions.
+- **Async Lifecycle Honesty**: Distinguish `Submitted -> Queued (HTTP 202) -> Processing -> Indexing/Finalizing -> Completed -> Failed -> Cancelled`. Never show a green "Completed/Ready" state on `HTTP 202 Accepted` while background processing or indexing is still running. Prevent duplicate submits via UI lock + idempotency keys.
+- **Human-AI UX Resilience**: AI must feel explainable, predictable, trustworthy. Show thinking/generating/streaming states, allow stop, retry, regenerate, edit prompt, copy; render markdown and code readably (including mobile); show sources/citations when available; communicate limitations and low confidence; handle 0-hit retrieval, mid-stream disconnects, tool refusal, and prompt-injection warnings in retrieved docs; require human confirmation for consequential actions.
 
-## 10. Design review output
+## 10. Design review output & Severity-First Gate
 
-For a design task or audit, analyze: business objective, user flow, edge cases, accessibility, responsive behavior,
-component scalability, design-system consistency, loading/empty/error/success states, mobile usability, hierarchy clarity,
-and engineering feasibility. Give findings with severity (CRITICAL/HIGH/MEDIUM/LOW/NIT) and concrete fixes.
+For a design task or audit, analyze: business objective, user flow (`US-ID -> FLOW-ID -> SCR-ID -> STATE-ID -> AC-ID`), 12-domain adversarial edge cases, accessibility, responsive behavior, component scalability, design-system consistency, 9-state coverage, mobile usability, hierarchy clarity, and engineering feasibility. Give findings with severity (CRITICAL/HIGH/MEDIUM/LOW/NIT) and concrete fixes.
+- **Severity-First Gate**: Any unmitigated CRITICAL blocker (data loss, deceptive `HTTP 202` completion, inaccessible core flow, or permission leak) forces `REJECT / REVISE` regardless of heuristic score. Always label empirical user testing as `NOT TESTED` when only expert heuristic review was performed.
 
 Checklist: hierarchy clear · spacing and type consistent · contrast AA · one clear CTA · no clutter · flow clear ·
 all states present · keyboard and screen-reader usable · mobile/tablet/desktop checked · no overflow · tokens used ·

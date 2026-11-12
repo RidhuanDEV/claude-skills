@@ -1,0 +1,3340 @@
+{
+  "schema_version": "1.0.0",
+  "pack_name": "ai-product-designer-skill-pack",
+  "source_location": "C:\\Users\\Ridhuan\\Downloads\\ai-product-designer-skill-pack",
+  "target_skill": "shadow-design",
+  "trust_tier": "T1_AUDITED_MARKDOWN",
+  "license_note": "Original vendor-authored Markdown reference pack; curated external links in 11-external-projects-and-trust.md are tracked at Tier T0 (read-only citation, not bundled).",
+  "audited_at": "2026-11-12T11:25:04.277410+00:00",
+  "last_synced_at": "2026-11-12T11:46:51.562153+00:00",
+  "safety_gate_passed": true,
+  "total_files": 354,
+  "upstream_citations": [
+    {
+      "name": "ai-product-designer-skill-pack",
+      "url": "local://ai-product-designer-skill-pack",
+      "license": "Custom / Vendor-Authored Markdown Pack (No bundled third-party code)",
+      "trust_tier": "T1",
+      "role": "Primary vendored product-design reference & template pack",
+      "bundled": true,
+      "git_commit": "local-pack-v1"
+    },
+    {
+      "name": "Design with Intent",
+      "url": "https://github.com/ghaida/intent",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T0",
+      "role": "discovery, experience design, evaluation, hardening, accessibility, handoff. Suggested first design reasoning reference.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "UX Flow Skills",
+      "url": "https://github.com/jpoindexter/ux-flow-skills",
+      "license": "MIT listed",
+      "trust_tier": "T0",
+      "role": "forms, auth, tables, search, error, AI-chat flow patterns; MIT listed.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "PM Skills",
+      "url": "https://github.com/phuryn/pm-skills",
+      "license": "MIT listed",
+      "trust_tier": "T0",
+      "role": "product management discovery and strategy; MIT listed.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "UI UX Pro Max",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T0",
+      "role": "visual design conventions; consult *after* flow modeling.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "Designer Skills",
+      "url": "https://github.com/Owl-Listener/designer-skills",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T0",
+      "role": "modular research, accessibility, interactions, evaluation.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "Penpot MCP",
+      "url": "https://github.com/penpot/penpot/blob/develop/mcp/README.md",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T3",
+      "role": "optional editable canvas; MCP plugin supports script execution in Penpot context: review privileges carefully.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "Excalidraw MCP",
+      "url": "https://github.com/excalidraw/excalidraw-mcp",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T3",
+      "role": "optional editable flow diagrams; review local vs remote processing, dependencies and data exposure.",
+      "bundled": false,
+      "git_commit": ""
+    },
+    {
+      "name": "Agent Skills standard",
+      "url": "https://agentskills.io/specification",
+      "license": "Verify upstream license before T1/T2 install",
+      "trust_tier": "T0",
+      "role": "packaging rules.",
+      "bundled": false,
+      "git_commit": ""
+    }
+  ],
+  "files": [
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "LICENSE",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/LICENSE.txt",
+      "sha256": "14d339c9753929cc99148173e25b63ae9d9e8af1f32a0df1909f0ed2ec99653d",
+      "size_bytes": 1094,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "README.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/README.md",
+      "sha256": "d54658931547ef1f3c5dd7d83fb3207d6f2ef3341c5345d74a42e57cb60d978a",
+      "size_bytes": 5729,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-ai-chat/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-ai-chat/SKILL.md",
+      "sha256": "340d4919b5cbc5d2351454148fa8cb2d606057cb7292e03fedfb068dbe066aa7",
+      "size_bytes": 16955,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-app-shell/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-app-shell/SKILL.md",
+      "sha256": "99b3431563aa9f5ee7bb257fec05a6ff270521e84d24c1632f87813c4bff9d8d",
+      "size_bytes": 13427,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-auth/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-auth/SKILL.md",
+      "sha256": "6fe3709e5102a65c4fba06eb1b47aa77403cea729dc20781b40466a56ba67ea4",
+      "size_bytes": 12223,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-checkout/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-checkout/SKILL.md",
+      "sha256": "5d257aa2469dbe35cd074233cc632ef85609990adf8cfefd272fe775d3ddec8b",
+      "size_bytes": 14506,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-empty-states/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-empty-states/SKILL.md",
+      "sha256": "9a20f8c848e73ceca560f758171631fde17d79a26edd2ac784645a7259441ca1",
+      "size_bytes": 14042,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-errors/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-errors/SKILL.md",
+      "sha256": "13a6a8d329db823199e470cb672f9de734420784f2c32fbe18a656fb5fafa774",
+      "size_bytes": 14110,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-forms/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-forms/SKILL.md",
+      "sha256": "e9aeeeb891c5a053e0f5ddc346678102e1176cad773ddf0940fb4b1e61925387",
+      "size_bytes": 19525,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-navigation/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-navigation/SKILL.md",
+      "sha256": "85e6e4304ada679308718928988edf64686c48b2a15ab320e15da880b9585892",
+      "size_bytes": 14538,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-onboarding/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-onboarding/SKILL.md",
+      "sha256": "eb0380caeca1ce67f1e6a66304b5bbc24ebe8f804ee805a4a2b3c97b8af7bd5f",
+      "size_bytes": 12300,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-paywall/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-paywall/SKILL.md",
+      "sha256": "8ee368e47c154283fc0ea1526fad13ceab0c16a659f97e2606a44ebe44ef52d7",
+      "size_bytes": 16549,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-permissions/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-permissions/SKILL.md",
+      "sha256": "39de3a8b7491ec19e3fc2b3b6567ebe03ba678f169fd296cfaf96a4ec9c0610b",
+      "size_bytes": 15227,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-search/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-search/SKILL.md",
+      "sha256": "670cc89fc8ac16ccbcd5cc91e71e9268ce85ed6c290d66f4a1782306108938ad",
+      "size_bytes": 14394,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-settings/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-settings/SKILL.md",
+      "sha256": "61284b56953598c4c5949f0664a16fdd47d812f9fe5d586f212d95e6614857b0",
+      "size_bytes": 14321,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-sharing/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-sharing/SKILL.md",
+      "sha256": "4bc89ef777c20b8c569c660d3f662620fb9d9b4de5337d9132f886fd860c612f",
+      "size_bytes": 15808,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/flow-tables/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/flow-tables/SKILL.md",
+      "sha256": "0e49f8f5062393b1b090b498902f79d0a887d9e9e1f8876a6546177d0823700c",
+      "size_bytes": 13928,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ux-flow-skills",
+      "relative_path": "skills/userflow/SKILL.md",
+      "vendored_path": "references/external-upstreams/ux-flow-skills/skills/userflow/SKILL.md",
+      "sha256": "b979de1df007a483013c03118830ae59939ed4bf3993552f9f5c989cec4e5064",
+      "size_bytes": 6235,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "LICENSE",
+      "vendored_path": "references/external-upstreams/pm-skills/LICENSE.txt",
+      "sha256": "591ab4c6a9e75f1f2cf517522759f96eb19f928ee72e637f32fd7d1337c533df",
+      "size_bytes": 1089,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/commands/derive-tests.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/commands/derive-tests.md",
+      "sha256": "e9082b6ba12c3ef02cf23aef593cc2530c5420cf80af0b20fd6d7d76f614778e",
+      "size_bytes": 1203,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/commands/document-app.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/commands/document-app.md",
+      "sha256": "906d166ed04b252e1508c2ee603be4c9a971374f94a2a75e760d077573c4a7b9",
+      "size_bytes": 1179,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/commands/performance-audit-static.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/commands/performance-audit-static.md",
+      "sha256": "cf0d2f8620408d6747c2eb5d102f4328c37320efb4d7670e298cc19f83fbed01",
+      "size_bytes": 1268,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/commands/security-audit-static.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/commands/security-audit-static.md",
+      "sha256": "1066a528c76f34fdb9ee75d54b856f0571611fc6ac0f509e8a6c9dfa0525ad4e",
+      "size_bytes": 1247,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/commands/ship-check.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/commands/ship-check.md",
+      "sha256": "f0ced6648ae28c97df0db54fea0d8b2537a702c3086c128aab596478485c8929",
+      "size_bytes": 1184,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/README.md",
+      "sha256": "d4ba591f6c06093a68a3c21f1249406265a17ca29b707af884d3c03ed28c7a3f",
+      "size_bytes": 1871,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/skills/code-review/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/skills/code-review/SKILL.md",
+      "sha256": "1b968513988ac68cbde7cecfe799706efd3726dc23f9149044ef00442b27efe1",
+      "size_bytes": 1138,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/skills/intended-vs-implemented/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/skills/intended-vs-implemented/SKILL.md",
+      "sha256": "46ccb61935c8016b55ba4fb2ad425a66d386327c689058f5df964d88d050e748",
+      "size_bytes": 1193,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-ai-shipping/skills/shipping-artifacts/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-ai-shipping/skills/shipping-artifacts/SKILL.md",
+      "sha256": "70f96b8a18c3d1eddc2a3cd8dc5ae816cc0a5e2d07133f9b8a61d217e2175360",
+      "size_bytes": 1167,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/commands/analyze-cohorts.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/commands/analyze-cohorts.md",
+      "sha256": "ea58afc0c1d7e90051dd6680104f9da3d5473b4644864bcc19c7aac5b7982d36",
+      "size_bytes": 3514,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/commands/analyze-test.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/commands/analyze-test.md",
+      "sha256": "999c3fde50836c584938ce510f882e0a0bdacddf9183967b6c729fd188396ccc",
+      "size_bytes": 4051,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/commands/write-query.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/commands/write-query.md",
+      "sha256": "43b8812e22d84bd44c7b6050704695888ad22293cdc751dd7e6d4c602337b05b",
+      "size_bytes": 2901,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/README.md",
+      "sha256": "33bfcbb9cc2fd4cab1cb0918ebf80f6d7a9ab41aa5fb4f2f7351ada79d3bf64e",
+      "size_bytes": 1080,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/skills/ab-test-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/skills/ab-test-analysis/SKILL.md",
+      "sha256": "ffe66e488c4866a53b8d76d07642f09d6b5551dfa31d74ba52d2abe699fd3bc2",
+      "size_bytes": 3669,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/skills/cohort-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/skills/cohort-analysis/SKILL.md",
+      "sha256": "18d694475f0ce3ad5eb1c8ff02f929eb19d96b70b1d0090ebfc254f2dda0972b",
+      "size_bytes": 5140,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-data-analytics/skills/sql-queries/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-data-analytics/skills/sql-queries/SKILL.md",
+      "sha256": "c7b402e74b1ebea7d17148e3afc17ca5f2c6620fdb40d371f940f766abc51670",
+      "size_bytes": 3715,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/generate-data.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/generate-data.md",
+      "sha256": "7b4b1853f6b105435df17a59dc640e6189c00c8855622af69d2f50c1190be3a9",
+      "size_bytes": 2892,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/meeting-notes.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/meeting-notes.md",
+      "sha256": "431144bd98821f7f0aa3858aa80865516ea41922ada07c149abfc2aa518b436c",
+      "size_bytes": 2971,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/plan-okrs.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/plan-okrs.md",
+      "sha256": "1a97f6b1907a7abac24a5f440cf443a09dc0571220ce527ab4f50191690bc9d9",
+      "size_bytes": 3727,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/pre-mortem.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/pre-mortem.md",
+      "sha256": "11d07d31910332ff97594277315b8564c6d28e6e83708ebc5f4c6948f883592e",
+      "size_bytes": 3837,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/red-team-prd.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/red-team-prd.md",
+      "sha256": "ac946b6d70bf0b8ec76928501a021bec4f4e5bcbf8f901dbcf9c78b0b0c1e593",
+      "size_bytes": 2814,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/sprint.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/sprint.md",
+      "sha256": "6404c02367bc59cc2331302c3f8e37d65b43b9e6189591d5a63084cae5d8f941",
+      "size_bytes": 5357,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/stakeholder-map.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/stakeholder-map.md",
+      "sha256": "c6e4315d75f1e95c147a250e86021e086c94f3b828e37e9922442107b6fda299",
+      "size_bytes": 3961,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/test-scenarios.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/test-scenarios.md",
+      "sha256": "d14e13337227bcc9460a29f80f845974523123a2e9824892e7a4d19aa97c43fd",
+      "size_bytes": 2951,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/transform-roadmap.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/transform-roadmap.md",
+      "sha256": "0b0c21f6d03f4f714fcf711645a34b5b6305a19363ebf1ea4b63be15bfda6f22",
+      "size_bytes": 3529,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/write-prd.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/write-prd.md",
+      "sha256": "64c1d0940942b8826f1da4a10aa12b2380a1b7aee7643f3557a3c7dc51d01f06",
+      "size_bytes": 3576,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/commands/write-stories.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/commands/write-stories.md",
+      "sha256": "db017ac0be6da19174ad933a6fe03a6333bef7e6da841531eb53220553d69edc",
+      "size_bytes": 4028,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/README.md",
+      "sha256": "0a564967ac6e780b0f6cf6d5adc668a6c16927252d1f4668c94c8f62febb11d3",
+      "size_bytes": 4557,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/brainstorm-okrs/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/brainstorm-okrs/SKILL.md",
+      "sha256": "a96a122efc1edbb89dfb30ee28f312d4f9ce390bb1d1a33b4e01e84a18bd40d0",
+      "size_bytes": 4421,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/create-prd/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/create-prd/SKILL.md",
+      "sha256": "1a3e3ebccbef5ad9e875585d1e3d4d7048350a43c71a1e5bd2395851e882ecff",
+      "size_bytes": 7398,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/dummy-dataset/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/dummy-dataset/SKILL.md",
+      "sha256": "86968aef8853341ca9abd7d0403826c576926e39e5981b48b52964c82fe87d0d",
+      "size_bytes": 4044,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/job-stories/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/job-stories/SKILL.md",
+      "sha256": "d88e19764ba6208c6a85957847922c31dae81a4256d74d5f77ffeb7dcff45354",
+      "size_bytes": 3043,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/live-polls/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/live-polls/SKILL.md",
+      "sha256": "b7e54a7d7124a51650b4c7033b5cd3481184e32af8b558da79765b117be46545",
+      "size_bytes": 7149,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/live-qa/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/live-qa/SKILL.md",
+      "sha256": "155e3e3b3c13dc574a2201f96507325f967a052d5e7da3fdaa5b88dacfe48cd7",
+      "size_bytes": 9794,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/outcome-roadmap/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/outcome-roadmap/SKILL.md",
+      "sha256": "3c1f66070ff62957d700f1878b2f7f61b35db230b4a9934ca2672b8575084138",
+      "size_bytes": 3669,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/pre-mortem/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/pre-mortem/SKILL.md",
+      "sha256": "8ad16da1102c7ce231f894568e1c0da71f10e7a3e635d35fb33f9ebc731390d1",
+      "size_bytes": 4449,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/prioritization-frameworks/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/prioritization-frameworks/SKILL.md",
+      "sha256": "32387e4f16e3d99f7155e001da74e6eaa1ad983e1849993013523a1748817955",
+      "size_bytes": 4532,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/retro/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/retro/SKILL.md",
+      "sha256": "44493442749c43ca394f4b1f388d8f30340fb8ef4b44ee3c543430259d613c05",
+      "size_bytes": 3184,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/sprint-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/sprint-plan/SKILL.md",
+      "sha256": "6cb759a0e8e86d484b3bdf9ad9399f16d9fc5e80893fbbccb945ee419b6b8924",
+      "size_bytes": 2432,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/stakeholder-map/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/stakeholder-map/SKILL.md",
+      "sha256": "c0cbcb7474d34496761476e3cd0b82e2dd8d377e4121f7c1ec6ee358b14f28b5",
+      "size_bytes": 2716,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/strategy-red-team/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/strategy-red-team/SKILL.md",
+      "sha256": "adbb7ed024df75243710823d7a2182920b8060f193500bf3fac7c24e84b34189",
+      "size_bytes": 4587,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/summarize-meeting/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/summarize-meeting/SKILL.md",
+      "sha256": "a478de8c6d2826b8e19ebbb8dd9871ec54dfd812f367c8285d9f5721b98663f8",
+      "size_bytes": 3078,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/test-scenarios/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/test-scenarios/SKILL.md",
+      "sha256": "f2d7179eb3e6fd6a33fce7a4bf0c10fc40a41850b1cd229dfa90fee33df44c9a",
+      "size_bytes": 3558,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/user-stories/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/user-stories/SKILL.md",
+      "sha256": "c9bb7c9d9d7e88ae34fb6b5f73e7f8c500dd49bbab21e2bcb42086f61a56a548",
+      "size_bytes": 3065,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-execution/skills/wwas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-execution/skills/wwas/SKILL.md",
+      "sha256": "3fe35daf79dee80590fed9d8b12f2d49dc3ebd404f0bbbd8d40cd40e7e97824a",
+      "size_bytes": 3155,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/commands/battlecard.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/commands/battlecard.md",
+      "sha256": "feda344ea3bf071ad5b39c717316cf98926159a4c4f60c3c532433d37f67f730",
+      "size_bytes": 3908,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/commands/growth-strategy.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/commands/growth-strategy.md",
+      "sha256": "a9f88ab3cb9e2546d38b97dc140ec20d8990395a1e554c418d9e415dcb4ee24f",
+      "size_bytes": 4226,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/commands/plan-launch.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/commands/plan-launch.md",
+      "sha256": "41a3c672f42be1d96fcb0cb4eadfa1bf189a949181deff62c750f83bb145549c",
+      "size_bytes": 4672,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/README.md",
+      "sha256": "0981470e7af71c2daa3047f5cb78a282e3db496f87284fd9d95f9d2124475b9e",
+      "size_bytes": 1417,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/beachhead-segment/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/beachhead-segment/SKILL.md",
+      "sha256": "f3d6279f2d28f20edfb6e80f798bd5a52cb66467acc072493436b1fc2ec519e0",
+      "size_bytes": 6021,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/competitive-battlecard/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/competitive-battlecard/SKILL.md",
+      "sha256": "986bb9382a8e60f1283ff725da325b4a04f39d910938a976f36a3056deb44308",
+      "size_bytes": 2963,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/growth-loops/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/growth-loops/SKILL.md",
+      "sha256": "82ca8c7a7ab380f0ecb0c5e3915d84a6e8447def50c7a4f26f65683e22ace56c",
+      "size_bytes": 5913,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/gtm-motions/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/gtm-motions/SKILL.md",
+      "sha256": "f38016633ae59fbd900be44e6ebded56414d7c14bd7f0abcfabb949366e2f780",
+      "size_bytes": 7711,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/gtm-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/gtm-strategy/SKILL.md",
+      "sha256": "5789a85f1b59d5711aa47f3ed8c3fc6ea4e6b331e7f5d6e8be66679d49aa64d1",
+      "size_bytes": 4318,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-go-to-market/skills/ideal-customer-profile/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-go-to-market/skills/ideal-customer-profile/SKILL.md",
+      "sha256": "2e8c0a21b8c2ebb1f935492216b14ff894b6c4ae304c98a677d8874c4e9605b8",
+      "size_bytes": 6166,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/commands/analyze-feedback.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/commands/analyze-feedback.md",
+      "sha256": "c1ee09741517d7579a650913adea17dabaa7581f769e047b7e9a73de04967209",
+      "size_bytes": 3743,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/commands/competitive-analysis.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/commands/competitive-analysis.md",
+      "sha256": "85e1baf1a9b8a88d6c878c5c3a44d1d2bc7e7544c046dd811cd04322b60ceef0",
+      "size_bytes": 3634,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/commands/research-users.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/commands/research-users.md",
+      "sha256": "ad41aa6b09c728e906cd3a5d9ebbee7332da6ba8fc8ff9c38795f31ce839f917",
+      "size_bytes": 4403,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/README.md",
+      "sha256": "7d354479272b58a58c1807c413af54b5100519dab4723e12deb25380fb96a5c4",
+      "size_bytes": 1774,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/competitor-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/competitor-analysis/SKILL.md",
+      "sha256": "ef66dae4ba0fa149efe63cdbae7744b5d6f0af86079e5b086d2dfed9e503176a",
+      "size_bytes": 4924,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/customer-journey-map/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/customer-journey-map/SKILL.md",
+      "sha256": "ce8fdb6d3a563a0d0984cfea5209403873b4f258cd44d85f9a4e00e23a44dadf",
+      "size_bytes": 3333,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/market-segments/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/market-segments/SKILL.md",
+      "sha256": "5042486321cfc7eecfc2888fb3f61d68e05d3ccd63bc0c2e83103ad679643a81",
+      "size_bytes": 3703,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/market-sizing/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/market-sizing/SKILL.md",
+      "sha256": "7aa8c27712995b93105129e0b20d61cf19977c1c32e1464ee7a6dec3c28ac4a7",
+      "size_bytes": 4514,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/sentiment-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/sentiment-analysis/SKILL.md",
+      "sha256": "9fb786b9cde15a7e74e441d10286acdf3d843157e4a124d0a435a95705ded0ab",
+      "size_bytes": 3583,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/survey-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/survey-design/SKILL.md",
+      "sha256": "2735d13bf34f3c5e394130fed56befb4704f67cfebd723e680c825cc4a36502a",
+      "size_bytes": 8626,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/user-personas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/user-personas/SKILL.md",
+      "sha256": "051b6bfd91a48ca6977bdccfa3bb4161b117651f036000814db7a5f56356ab50",
+      "size_bytes": 3116,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-market-research/skills/user-segmentation/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-market-research/skills/user-segmentation/SKILL.md",
+      "sha256": "d6e4f4ebd830fb2b3e9eabaa6a95cddbe3e591cb5f9d0c54581f59f7398f7259",
+      "size_bytes": 4190,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/commands/market-product.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/commands/market-product.md",
+      "sha256": "5ffffa2101edf430d3bd5e5a49036fce3b18762a2de5efba9bb0f17ea9f0d763",
+      "size_bytes": 3557,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/commands/north-star.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/commands/north-star.md",
+      "sha256": "42d2bd375fab44f2ecb87d25d1633aabb4609ed8e48409413c2ebba170fc5b14",
+      "size_bytes": 4130,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/README.md",
+      "sha256": "f6a8e7b3a5d89686d221c12a5f07e3ccb1c7cf0a310cd1a079c05cfa9b8d5370",
+      "size_bytes": 1230,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/skills/marketing-ideas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/skills/marketing-ideas/SKILL.md",
+      "sha256": "c48f9f22950af68b455edb11648416f8767c000e0856a324e2b2c7bd3f8faa3d",
+      "size_bytes": 2222,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/skills/north-star-metric/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/skills/north-star-metric/SKILL.md",
+      "sha256": "90a48556c90aa140435f96ef138c256df7e238a12f4b86995622446ade237335",
+      "size_bytes": 4226,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/skills/positioning-ideas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/skills/positioning-ideas/SKILL.md",
+      "sha256": "1269dd4ffe819983ce14f3ccc826afa5f3828538730c0cb7a8a988b66c5d9e67",
+      "size_bytes": 3063,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/skills/product-name/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/skills/product-name/SKILL.md",
+      "sha256": "a9dd5e8a18b289b2cfe06d48916d1791b60a94fb4335e417326ec2608c506034",
+      "size_bytes": 2243,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-marketing-growth/skills/value-prop-statements/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-marketing-growth/skills/value-prop-statements/SKILL.md",
+      "sha256": "8979b602c364bb567cd52adf61197c45123c4b6a6930840cd67dbf8e899d49d0",
+      "size_bytes": 3083,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/commands/brainstorm.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/commands/brainstorm.md",
+      "sha256": "a4d2c6e081ff73bb6f8f7fbb35f7b7365687ff7b77904446eed4b3d1664759c1",
+      "size_bytes": 5093,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/commands/discover.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/commands/discover.md",
+      "sha256": "9918ed92ff7f312bde1db3b30ad9c1fa78d2b3a05547e089288711484ed28b60",
+      "size_bytes": 5052,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/commands/interview.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/commands/interview.md",
+      "sha256": "8fac2f0cb4df667e023a93ff4122cf146ad1073e181de575d943e114b3ac1abd",
+      "size_bytes": 5470,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/commands/setup-metrics.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/commands/setup-metrics.md",
+      "sha256": "e0cfda0b5baf3f5f7c0178f74fdb0435406a052aeaee8ee8c894e46fcc3de635",
+      "size_bytes": 4567,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/commands/triage-requests.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/commands/triage-requests.md",
+      "sha256": "7b8a87198e65e0b0b76e2bdbc3a9573a520af0f1443b68655da054f26bd4eba7",
+      "size_bytes": 4603,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/README.md",
+      "sha256": "916fb51b0415873588c2de6aa7e15884f0b80e8b10cd7610d654da02e3151c41",
+      "size_bytes": 2857,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/analyze-feature-requests/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/analyze-feature-requests/SKILL.md",
+      "sha256": "15a798b755e4157297d7a432b1ce25b18bde5949d6813684f683577a91f82545",
+      "size_bytes": 2323,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/brainstorm-experiments-existing/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/brainstorm-experiments-existing/SKILL.md",
+      "sha256": "9ae9bc7966568870539198a87d542dbea2e58e71cfd66bcc4497baaf6843dd3c",
+      "size_bytes": 2459,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/brainstorm-experiments-new/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/brainstorm-experiments-new/SKILL.md",
+      "sha256": "e2ceff2c51080bc30230bb823eeaee2480cb134c34fb465f46434c92ca4d2a6c",
+      "size_bytes": 2583,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/brainstorm-ideas-existing/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/brainstorm-ideas-existing/SKILL.md",
+      "sha256": "9ae1fbaf67657bc7c79b4c96a3083b477b4d47fe1d38bec07243f50be08621de",
+      "size_bytes": 3005,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/brainstorm-ideas-new/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/brainstorm-ideas-new/SKILL.md",
+      "sha256": "0c0695d59d92bfb562c815240568884410f31119799498971c7c9e53fdfcf142",
+      "size_bytes": 2483,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/identify-assumptions-existing/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/identify-assumptions-existing/SKILL.md",
+      "sha256": "6d0b7265cf105fb47bf89f8d891ca612835e364249972291e40ec16e31c2a018",
+      "size_bytes": 2146,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/identify-assumptions-new/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/identify-assumptions-new/SKILL.md",
+      "sha256": "45ab137c02ed16becfda13071351f7e44bc93ca3c4048c9a8bb0034f075f26c3",
+      "size_bytes": 3279,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/interview-script/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/interview-script/SKILL.md",
+      "sha256": "be9fe91ec26b2ffea82578177f1e7e60be0a22b2a09cef9f1af62e5c21ee4819",
+      "size_bytes": 4922,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/metrics-dashboard/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/metrics-dashboard/SKILL.md",
+      "sha256": "9933f2f8749c436d3d48129543719899b2d1da5c602ff6a5add1ee48239e33d5",
+      "size_bytes": 5848,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/opportunity-solution-tree/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/opportunity-solution-tree/SKILL.md",
+      "sha256": "67c8644730477fd7518bfac3fda51358f236f55eb4070de4678256679a419180",
+      "size_bytes": 4345,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/prioritize-assumptions/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/prioritize-assumptions/SKILL.md",
+      "sha256": "676d49ce40da0ae5bad5abd560f439d733c4736da2a507fa4aca21529309a4ee",
+      "size_bytes": 2359,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/prioritize-features/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/prioritize-features/SKILL.md",
+      "sha256": "ebad72f12a4389d5dbf5dfab78afd1ff9d382cc96bcf9c1dd8b730709e3d2a74",
+      "size_bytes": 2549,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-discovery/skills/summarize-interview/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-discovery/skills/summarize-interview/SKILL.md",
+      "sha256": "d1a027f9a85d50d27072321945e79259753935e87b6f2d39f407257bd52d8188",
+      "size_bytes": 2089,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/commands/business-model.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/commands/business-model.md",
+      "sha256": "a9ebc87683bd7fa147df144e8a5897ccbb17e04a955b934bfb3c782e3bc06f85",
+      "size_bytes": 6184,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/commands/market-scan.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/commands/market-scan.md",
+      "sha256": "39afb5a6ae51b2bf71d7cedae9483658a3ab77402739ef9b28e84a3046f963cd",
+      "size_bytes": 4710,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/commands/pricing.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/commands/pricing.md",
+      "sha256": "a130710cebfd63f13d130b54ca1ed1fdf651a71b8c5455428b2588f8f2695503",
+      "size_bytes": 4705,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/commands/strategy.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/commands/strategy.md",
+      "sha256": "6f15fe6ac7e3b1dd4f785ca0b1bd48edaf6649a9381465bb99a3e00cb09496e7",
+      "size_bytes": 4332,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/commands/value-proposition.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/commands/value-proposition.md",
+      "sha256": "898ac81b775b5642cdefa0141518059f26f7035e5c54d5aa3ea2c2db24eed1b9",
+      "size_bytes": 2908,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/README.md",
+      "sha256": "a9f5147e38fc663cf4ff065b4b56d7b54bc8cd8b4e4a77829e66f24f02d22a48",
+      "size_bytes": 3167,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/ansoff-matrix/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/ansoff-matrix/SKILL.md",
+      "sha256": "c867b1dc518af57b21b0e971b39f89cb33c306797366170974627926231b6841",
+      "size_bytes": 5850,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/business-model/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/business-model/SKILL.md",
+      "sha256": "e0162fcc2e2ef2b95aa16334e070841f3fcd7ae76731ce7e20f0d6f2a18cf681",
+      "size_bytes": 5917,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/lean-canvas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/lean-canvas/SKILL.md",
+      "sha256": "084ccddee9f41abeb9cc52767713951a2791ae60fdb7deb270f3082ee7c6c9a0",
+      "size_bytes": 4981,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/monetization-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/monetization-strategy/SKILL.md",
+      "sha256": "2c89d0d985142b4c0f8284f586e7d6129317678523a4ee4e3320dd014c9cb66a",
+      "size_bytes": 6810,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/pestle-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/pestle-analysis/SKILL.md",
+      "sha256": "470408bc8e4f0cb08328ca96efb8b08a5adfae15f48645a70c1c71bdeace0dfc",
+      "size_bytes": 4771,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/porters-five-forces/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/porters-five-forces/SKILL.md",
+      "sha256": "19cb03430f4e253998346d4941158139e32c76cb873af5b22b68f7a71d4fa9a3",
+      "size_bytes": 8397,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/pricing-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/pricing-strategy/SKILL.md",
+      "sha256": "b7ebe83d1d8ad4e23de22dab50675b399b53f7b7005cc6e9dcc1776359420a25",
+      "size_bytes": 3751,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/product-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/product-strategy/SKILL.md",
+      "sha256": "89d79aca5083d5774f05760ce41326328f38284e47c7208c98f7f3c3dbf12ec0",
+      "size_bytes": 4944,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/product-vision/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/product-vision/SKILL.md",
+      "sha256": "941655557013cd66deaea9490871deedb373608715e6eea1954d30f838e2b9fa",
+      "size_bytes": 2570,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/startup-canvas/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/startup-canvas/SKILL.md",
+      "sha256": "8726ef698f301695ef68cd19d03859562bae88ebc234c31107edfd6876b9e61d",
+      "size_bytes": 6484,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/swot-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/swot-analysis/SKILL.md",
+      "sha256": "291f5bf853db79ae6e60d23208d6eccb3ebc68e19546d40faa38d7b5cd79f37f",
+      "size_bytes": 3909,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-product-strategy/skills/value-proposition/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-product-strategy/skills/value-proposition/SKILL.md",
+      "sha256": "a2ca6ccdf0b00597ed812a00df9ec3a8a7754eb6fc2f249554f3d355510872ce",
+      "size_bytes": 5944,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/commands/draft-nda.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/commands/draft-nda.md",
+      "sha256": "c8a6aa65e5384621f56e71de0a92213a8bb4f21bc617c230727cdf9e49c8e6fd",
+      "size_bytes": 2124,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/commands/privacy-policy.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/commands/privacy-policy.md",
+      "sha256": "0b67d35050e61b0bdbc45f4b6c06e6b148ed8d4ee2592724e08a53161c0b9b74",
+      "size_bytes": 2254,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/commands/proofread.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/commands/proofread.md",
+      "sha256": "fefe7e701fcc8dbba04b7eda766cc950b6ea553ef8ea382218e64f95fa719c2c",
+      "size_bytes": 1873,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/commands/review-resume.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/commands/review-resume.md",
+      "sha256": "f1d20e4e0243832ad1ee5386d33ce30dbddd7ceed32822456f59b3b982db76c0",
+      "size_bytes": 3245,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/commands/tailor-resume.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/commands/tailor-resume.md",
+      "sha256": "58683e3c66a2477a89139ab8abf106d20d01e52b3d89aca2d8d8c2e4fc04a0a2",
+      "size_bytes": 2595,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/README.md",
+      "sha256": "02f1f59cd62e2e322c33ed15467938467f8effa3eaf4588bd0da77e93889a660",
+      "size_bytes": 1592,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/skills/draft-nda/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/skills/draft-nda/SKILL.md",
+      "sha256": "3242473abc50b8de46106172258145840c9b2b9674b72523250dd2ae62aec5b4",
+      "size_bytes": 7644,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/skills/grammar-check/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/skills/grammar-check/SKILL.md",
+      "sha256": "1a9cb1a837f053fb83381b573bfa6ff2e7447517f5cf76c42373f0c180e313a7",
+      "size_bytes": 9882,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/skills/privacy-policy/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/skills/privacy-policy/SKILL.md",
+      "sha256": "8e326c2f2608c6d59ba7724545d890ffd99e0c635883a321c5257c1de526965c",
+      "size_bytes": 10937,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "pm-toolkit/skills/review-resume/SKILL.md",
+      "vendored_path": "references/external-upstreams/pm-skills/pm-toolkit/skills/review-resume/SKILL.md",
+      "sha256": "54d1e41b80a381ce08d8e8c5d22482356fe9333320404ce550a7a4651bf5889b",
+      "size_bytes": 11522,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "pm-skills",
+      "relative_path": "README.md",
+      "vendored_path": "references/external-upstreams/pm-skills/README.md",
+      "sha256": "b1efad1c7562f090ee07495b3b758fa5a716ad99fe50c23a6aca38d860680352",
+      "size_bytes": 26767,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/commands/handoff.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/commands/handoff.md",
+      "sha256": "5cf32af5a30bfaa9e226aa1fe4b3d3566a7f22fe88f4a507ed9ffae2e8492a73",
+      "size_bytes": 1011,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/commands/plan-sprint.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/commands/plan-sprint.md",
+      "sha256": "d9660e5d99ed1c1e5a1461bd6149beedd387adfbe75115080f64a08c4d7eb600",
+      "size_bytes": 1016,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/commands/setup-workflow.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/commands/setup-workflow.md",
+      "sha256": "eaf09be32df2971d78e14a83dd9e9ccdf0ac0aa108494e8b68f4dc3af44c73a0",
+      "size_bytes": 1093,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/README.md",
+      "sha256": "40ef6ff0c2f8f626e1bee6ba6928cd7c123c0145228f231ec4728f16ca06760f",
+      "size_bytes": 2724,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-critique/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-critique/SKILL.md",
+      "sha256": "6dec9af607113271ae6d841609121fbf44b5658339fe565fce79da5582a9b6d5",
+      "size_bytes": 2106,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-debt-audit/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-debt-audit/SKILL.md",
+      "sha256": "7b775637b381887353ef091f1bf31ec5ebc9ac60bb940b1032ae959ae59ab513",
+      "size_bytes": 4716,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-impact-reporting/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-impact-reporting/SKILL.md",
+      "sha256": "0c34b8ac0ec8b24dfa1e71e4f4ed22b9871ba58d426e4fcc77cd8a9c289ee3a9",
+      "size_bytes": 4889,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-qa-checklist/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-qa-checklist/SKILL.md",
+      "sha256": "9e7daf85e3dc5f00344ee5f1452605a425bc21cc2aca883086f868df7fd9b4c8",
+      "size_bytes": 2192,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-review-process/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-review-process/SKILL.md",
+      "sha256": "44fa86c00b272713756ca3268b75ea5ad30fbb374431508ae1cf07e1ccaf8ab7",
+      "size_bytes": 1873,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/design-sprint-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/design-sprint-plan/SKILL.md",
+      "sha256": "c026ad98460b8a219b136776ced4f6497549d1e0b563b68a221b158c32074328",
+      "size_bytes": 1937,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/handoff-spec/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/handoff-spec/SKILL.md",
+      "sha256": "7144e124920abe71094ee0f0fe136229fe4025c54a5287fb8b42e826d026864d",
+      "size_bytes": 2033,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/team-workflow/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/team-workflow/SKILL.md",
+      "sha256": "3646029ece058f395466c9faff89168151ba022fa8266cedde4154156ca2dce8",
+      "size_bytes": 2265,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-ops/skills/version-control-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-ops/skills/version-control-strategy/SKILL.md",
+      "sha256": "b393ed19590631176ad0d1e83d1a8c00a3b8be256efef68967bf6c7ded012771",
+      "size_bytes": 1912,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/commands/discover.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/commands/discover.md",
+      "sha256": "350b65f5b74a9c01a1137b2d31b8c8b18ee59c503b9bcb3f0e12ea230b6b8e6b",
+      "size_bytes": 774,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/commands/interview.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/commands/interview.md",
+      "sha256": "e62f03701ebd99116f38a48712dd5566cabb9f9ad5a5608e18dec12d002cc222",
+      "size_bytes": 730,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/commands/synthesize.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/commands/synthesize.md",
+      "sha256": "a0751b6aae2aef6e401b3f91c13edcd73757adc078292dc68a7975d9f17138ab",
+      "size_bytes": 711,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/commands/test-plan.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/commands/test-plan.md",
+      "sha256": "399c022364224a1b705ac2b434dff4df127b67000b482693179e887cf9ed342f",
+      "size_bytes": 705,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/README.md",
+      "sha256": "0dff213980bc938f31823716f285b0b5ddfacaeb611dd19cba22815a6f007e99",
+      "size_bytes": 4399,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/affinity-diagram/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/affinity-diagram/SKILL.md",
+      "sha256": "b19dc8d714f30ee639c96b5b3a67b2bf12d4bca118abf4fe27b8f3e8d7b042af",
+      "size_bytes": 2113,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/behavioural-analytics/EVALS.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/behavioural-analytics/EVALS.md",
+      "sha256": "e03b1f0f278c9310f27e0156623485d9847579647634b5161fb1a64ac70a8b05",
+      "size_bytes": 3688,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/behavioural-analytics/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/behavioural-analytics/SKILL.md",
+      "sha256": "43749e8c5956100058f9946d6ee3de3644ad35e2e6309e3025f3c769167adab3",
+      "size_bytes": 3878,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/card-sort-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/card-sort-analysis/SKILL.md",
+      "sha256": "a67eb87c1aa437de82af82f7566ab8c5b2ff826554c6240dc42339c7c434e503",
+      "size_bytes": 1167,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/diary-study-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/diary-study-plan/SKILL.md",
+      "sha256": "73cabf9072eedc3efa2eb203d8327ebf1278b4deef85b633cb3027a242ca6b97",
+      "size_bytes": 1281,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/empathy-map/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/empathy-map/SKILL.md",
+      "sha256": "2f4e72ea5908ab61661adf3b51f233ff93c8c8e0db2f2ab85981d88503d9f3f8",
+      "size_bytes": 1995,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/interview-script/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/interview-script/SKILL.md",
+      "sha256": "b77759d1f3b312ab754178992b5faaf7ee58a26e721a77a3a955ec31598ca26c",
+      "size_bytes": 2694,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/jobs-to-be-done/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/jobs-to-be-done/SKILL.md",
+      "sha256": "53e20aee0583727cb4bcd3a323296544e6b85ef32cc86a5bd6a920bfa5b0607b",
+      "size_bytes": 1636,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/journey-map/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/journey-map/SKILL.md",
+      "sha256": "d92a206aa91e52b7dc04f7c27624845da095e4a67e1e8ba9e8653d41b1ade9ae",
+      "size_bytes": 2117,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/qual-quant-triangulation/EVALS.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/qual-quant-triangulation/EVALS.md",
+      "sha256": "7e09fd37135c0a1db7ea18ae0a1f2629920bebb76c6f8c189767522cd77d04cb",
+      "size_bytes": 3755,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/qual-quant-triangulation/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/qual-quant-triangulation/SKILL.md",
+      "sha256": "40524c61f891fdbba2c636e96be1990ac1ed30261040126d758866b2a869cffc",
+      "size_bytes": 3689,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/research-repository/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/research-repository/SKILL.md",
+      "sha256": "cc0d587a82cec45531480d029be086f2b2c6e090da40d41ba5b8dba64da7e89e",
+      "size_bytes": 5626,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/summarize-interview/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/summarize-interview/SKILL.md",
+      "sha256": "1c2f8cbac563d32716739c41a48797af3d32ecb27ce192a17f4be4aa0b19b099",
+      "size_bytes": 1436,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/survey-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/survey-design/SKILL.md",
+      "sha256": "65eea193bb362ea2b0c33327f000868c6f51d0d0edc8c4ea285babe8805818ea",
+      "size_bytes": 5650,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/usability-test-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/usability-test-plan/SKILL.md",
+      "sha256": "a7ff9fb21a884e0b0e7eb9944eb33df3f8e49c38ba434cc078b86f7d1743e314",
+      "size_bytes": 1677,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-research/skills/user-persona/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-research/skills/user-persona/SKILL.md",
+      "sha256": "22f0eed7ebbbe40cb889b5cd55eb1946873523c6ebbee168b922c6d13bbe357b",
+      "size_bytes": 2452,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/commands/audit-system.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/commands/audit-system.md",
+      "sha256": "5d4777996afc16ed2f49cb8c5c2627bf3fbdc61748f750636d179bd6bacbf05a",
+      "size_bytes": 1038,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/commands/create-component.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/commands/create-component.md",
+      "sha256": "a185084dbe72bb666f6fd0fea652bed2d79bf85ce48427e22cc7603bc0c0e1d2",
+      "size_bytes": 1043,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/commands/tokenize.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/commands/tokenize.md",
+      "sha256": "e3c83dbbbdbcbf866ba30bfbdc1e6693ffc65da932b2800bb3be4de1bff94601",
+      "size_bytes": 917,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/README.md",
+      "sha256": "6e25a21344485deebdff4cf681667f421c1e44b5ab4685c81afe9eda6e879e5c",
+      "size_bytes": 3481,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/accessibility-audit/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/accessibility-audit/SKILL.md",
+      "sha256": "3a7b4b3fa193ec368a7be53bad2491c0b36a25cfaa30e55016bc8c641bd57a20",
+      "size_bytes": 1415,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/component-spec/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/component-spec/SKILL.md",
+      "sha256": "a0dfe8c6273dcb25fdd4af3e24464b10077ccba90469cf58fac14c18a2a48676",
+      "size_bytes": 1367,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/design-system-governance/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/design-system-governance/SKILL.md",
+      "sha256": "2a324e4ab06bbea5fcdc8cabdc3ad7a21e6ba3516ba9bb7f60069aba06c9a7b0",
+      "size_bytes": 5151,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/design-token/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/design-token/SKILL.md",
+      "sha256": "f0f5a91852550902a793ad83d59e83607a2ba81a02c32411db5a36c7a127b89f",
+      "size_bytes": 1581,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/documentation-template/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/documentation-template/SKILL.md",
+      "sha256": "7640591837c965f5a177fc2d9a68a79ce06e68f1636698bf1fe3dda5ba8b4567",
+      "size_bytes": 1195,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/icon-system/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/icon-system/SKILL.md",
+      "sha256": "4d9a700df9bf40e8e7d7efbc208d4f4e5092c83a5ee2b78e06adec19724bd38e",
+      "size_bytes": 1157,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/localization-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/localization-design/SKILL.md",
+      "sha256": "d95cfa1f9010d17741b68d33cc0b16edf7e997dcf82feec0110868fe57d904a3",
+      "size_bytes": 5381,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/motion-system/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/motion-system/SKILL.md",
+      "sha256": "23aadefdf7b70f345b7c6d40f8fc0084848707dc722ce621a16f6b941307a595",
+      "size_bytes": 4573,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/naming-convention/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/naming-convention/SKILL.md",
+      "sha256": "4f5803f14ddbaf34b4c41961949e47fa7d349bb846b1dda12512760b00bd4505",
+      "size_bytes": 1259,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/pattern-library/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/pattern-library/SKILL.md",
+      "sha256": "11fe69e6fed16d665f8c6982dd141dff39f1be2305204afb05152938b3f1fbcd",
+      "size_bytes": 1353,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "design-systems/skills/theming-system/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/design-systems/skills/theming-system/SKILL.md",
+      "sha256": "bf0aa675e693d6fc74a224fe2d9c428cf12a299c20670c2ea31b3a4d89b6436b",
+      "size_bytes": 1448,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/commands/build-presentation.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/commands/build-presentation.md",
+      "sha256": "813b96d1705717afe375782ee4bb66c9c8a642d1dd38dc82884cade70b1ed234",
+      "size_bytes": 960,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/commands/start-here.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/commands/start-here.md",
+      "sha256": "ccb2793e1286d03be1b24853857a44e281932f93d205d8af171344c495e29bf0",
+      "size_bytes": 5599,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/commands/write-case-study.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/commands/write-case-study.md",
+      "sha256": "56b91636740c9b93ad2ac8351a35ce2ffe3cbe2f10a64005fe500d0e9475d00d",
+      "size_bytes": 908,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/commands/write-rationale.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/commands/write-rationale.md",
+      "sha256": "6411d4a5d44f0f6282a8e64dc22e3d1a900add2793ea6f5024ab3dd23427c81d",
+      "size_bytes": 1048,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/README.md",
+      "sha256": "1ab5045e6167e4f8438337d0831d2e53c8da54e575f5d3785e54b90245ce7799",
+      "size_bytes": 2385,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/case-study/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/case-study/SKILL.md",
+      "sha256": "545d20af2bb9bedd8295d8d7b6f0104e2adafdb4551ec3fe6c1a271ee41ff11a",
+      "size_bytes": 2151,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/design-negotiation/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/design-negotiation/SKILL.md",
+      "sha256": "6ff1269455ecfb35539e875667a1237522ad3874d22ebf803d1123455d8bb8e1",
+      "size_bytes": 5664,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/design-rationale/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/design-rationale/SKILL.md",
+      "sha256": "70ba0909bab56b570c9b3e979e7cf36dcc65b39b0289677756894595c55630ec",
+      "size_bytes": 1899,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/design-system-adoption/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/design-system-adoption/SKILL.md",
+      "sha256": "cb5e80a9843722334718a397d01d69f44ff1a6e137d5f7eed3291a343a7b17f7",
+      "size_bytes": 2239,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/design-token-audit/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/design-token-audit/SKILL.md",
+      "sha256": "9caaba40ce4bdd3d77bb53fd3caae3cca1952979641ced2eba7d4fb043781c6d",
+      "size_bytes": 1984,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/presentation-deck/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/presentation-deck/SKILL.md",
+      "sha256": "09067d4ae9b34c8b1fb4edfbf263424a51ea94e5fe1c83723df03e3420cbd813",
+      "size_bytes": 2237,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "designer-toolkit/skills/ux-writing/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/designer-toolkit/skills/ux-writing/SKILL.md",
+      "sha256": "015dc9f777f706c4d75c79ac61dec3622a72d3bb1327ae2cf1384dfbebd4f910",
+      "size_bytes": 2093,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "INDEX.md",
+      "vendored_path": "references/external-upstreams/designer-skills/INDEX.md",
+      "sha256": "69898db5021e4b21b89af17b42eafac62a700423c623d5f4b94adb093895a666",
+      "size_bytes": 16996,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/commands/design-form.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/commands/design-form.md",
+      "sha256": "7580908b702b76d5f9ac89ae36c9dd3c6277731976bce458431833e5f20b228d",
+      "size_bytes": 1257,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/commands/design-interaction.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/commands/design-interaction.md",
+      "sha256": "5ec3b643c197ce755583cc13d435f0abcad3de5a4c98efbc1f35e55eb13ab7a2",
+      "size_bytes": 1097,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/commands/design-onboarding.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/commands/design-onboarding.md",
+      "sha256": "31dd8045b4da9d71a60938658dc10c8b21ccf5c9599120343fbec4eaa5af064b",
+      "size_bytes": 1168,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/commands/error-flow.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/commands/error-flow.md",
+      "sha256": "39e453728a6eb11a1dbc5826af4b87739bf3d0a76c3ff088d4aa9167b5c6f03b",
+      "size_bytes": 986,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/commands/map-states.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/commands/map-states.md",
+      "sha256": "7d261cbfe7d8dcf5badb479cc9b358b829bab78d9baeb716896da4dd4ef27916",
+      "size_bytes": 1005,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/README.md",
+      "sha256": "fc24ff07887985e5eac841f12e7bb604c1515259471c53c234b8cf0654ba9ad9",
+      "size_bytes": 6225,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/animation-principles/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/animation-principles/SKILL.md",
+      "sha256": "b78b94445da83db13fee213ee2478f2c97c7e3da6db204d059fa632614cfa522",
+      "size_bytes": 2011,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/conversational-ux/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/conversational-ux/SKILL.md",
+      "sha256": "f6e48d8423336aec07f56debfa363ed16d287f7386c108d14a7b72e2f0158920",
+      "size_bytes": 7264,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/doherty-threshold/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/doherty-threshold/SKILL.md",
+      "sha256": "0530b9a6630c7d0e15f8b505c17f7fcb18b64f57a6a2a561ea4d2fbb05a136e4",
+      "size_bytes": 3835,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/error-handling-ux/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/error-handling-ux/SKILL.md",
+      "sha256": "b0be9b678e50694d08cd4cf52ccadcc7f7d383b3038c939735cd24e9a3623dae",
+      "size_bytes": 1999,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/feedback-patterns/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/feedback-patterns/SKILL.md",
+      "sha256": "1d27f4c8d513f0ad74573223c1246388cf686b289cf5bfb1da326ddf6352bf1d",
+      "size_bytes": 2169,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/fitts-law/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/fitts-law/SKILL.md",
+      "sha256": "ecbd75c6a4d3e3b4b78e7934e854435f6fc62c1dad977e266350605ac04c0019",
+      "size_bytes": 3579,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/form-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/form-design/SKILL.md",
+      "sha256": "e17af7ae9ecc00927e1c52200d5489eada0e79281e06ad1f4731f1d4bbc15389",
+      "size_bytes": 4047,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/gesture-patterns/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/gesture-patterns/SKILL.md",
+      "sha256": "6c767820bfc17f06a2627af6f6be449df1cdc913f643949ccc05f0bff9a721bd",
+      "size_bytes": 2051,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/hicks-law/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/hicks-law/SKILL.md",
+      "sha256": "7e30cf320e052cb5c1bf0fecc3b732accc958b50759b7768cfc500b6dee722cc",
+      "size_bytes": 2703,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/interfaces-that-feel/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/interfaces-that-feel/SKILL.md",
+      "sha256": "df95943787e3439612578438fb1f7340a94d5bdea94c7a410b7f5583f3d710f1",
+      "size_bytes": 4016,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/jakobs-law/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/jakobs-law/SKILL.md",
+      "sha256": "dd8ef9da14f0e48dded03f068f6faecf8da668048873c8a38ef8cc04cee49648",
+      "size_bytes": 4083,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/loading-states/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/loading-states/SKILL.md",
+      "sha256": "77cc60ff6ce27c950f140ae5d1a5987185f866f878a3fa583569c77323faa683",
+      "size_bytes": 1954,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/micro-interaction-spec/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/micro-interaction-spec/SKILL.md",
+      "sha256": "bfa5b769868f3f82633dfafc2652a35cc17342041d6144de510face3033b8972",
+      "size_bytes": 1900,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/millers-law/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/millers-law/SKILL.md",
+      "sha256": "328d492af3432e6a455ea4b3ef990d752e5c36fc8983b7645377d049e13b7e2b",
+      "size_bytes": 2752,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/navigation-patterns/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/navigation-patterns/SKILL.md",
+      "sha256": "fb6cbce296b8840257c8cfeae9870ca551f8cc503309e0d3e35c198318a103f2",
+      "size_bytes": 4229,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/onboarding-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/onboarding-design/SKILL.md",
+      "sha256": "91ad39b03059baddc8027ff85436187d3c307ab9a6a2f0d9ac045e851049a2c2",
+      "size_bytes": 4544,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/peak-end-rule/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/peak-end-rule/SKILL.md",
+      "sha256": "817decfeecf8e12e918042308809d48e26b2c096798ea2f12e022fb34bec347f",
+      "size_bytes": 4081,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/search-ux/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/search-ux/SKILL.md",
+      "sha256": "cb246e5516fb49a208ad457c38091a9de2109c1e7a57d5951f6adce790df857b",
+      "size_bytes": 4409,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/serial-position-effect/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/serial-position-effect/SKILL.md",
+      "sha256": "05e4cf72d18feede37113df23e805741f69b0fedee9521693ef4ebdaef5d7d95",
+      "size_bytes": 4034,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/state-machine/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/state-machine/SKILL.md",
+      "sha256": "08cdc8aca50ca4bb500de692416a81db64a042277bc5f06584f7728d9c8d79fe",
+      "size_bytes": 1993,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/teslers-law/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/teslers-law/SKILL.md",
+      "sha256": "6b215b31fb9f47acd4fa8d352eac0a27baf6ee0e723676b8cf4b535b35c91d5d",
+      "size_bytes": 4025,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "interaction-design/skills/zeigarnik-effect/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/interaction-design/skills/zeigarnik-effect/SKILL.md",
+      "sha256": "a1434aff34192efaea132c57228789b899de286684dcc099f68439d671ef8b5b",
+      "size_bytes": 3659,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "LICENSE",
+      "vendored_path": "references/external-upstreams/designer-skills/LICENSE.txt",
+      "sha256": "6514aed70fa2446f3159fdb088e984a0e2a360736d24d1fe6c8a80a865cd7064",
+      "size_bytes": 1085,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/commands/evaluate.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/commands/evaluate.md",
+      "sha256": "e52984ad49419f77235859df476ccb0f26b772132d5ed2ff5739236e77318f2e",
+      "size_bytes": 948,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/commands/experiment.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/commands/experiment.md",
+      "sha256": "feae2c5a81bd3bf6f61898ac25cedad0a5782b21eb941e052acd6014a0e93143",
+      "size_bytes": 976,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/commands/explore-options.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/commands/explore-options.md",
+      "sha256": "a3d6c37beb8494a55a51c7acfc35d0745853f1d64bede61438ffa2e131a99596",
+      "size_bytes": 2105,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/commands/prototype-plan.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/commands/prototype-plan.md",
+      "sha256": "4e62b5307eb2ed5278aaf5227591d822143d73243cb1b883a53a082da97b0f84",
+      "size_bytes": 933,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/commands/test-plan.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/commands/test-plan.md",
+      "sha256": "7c3172ab1fafdee980a258bf30dfd654380c04df8b5343c521572f867d31bef5",
+      "size_bytes": 960,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/README.md",
+      "sha256": "9d7751d5165f735c8d7175f06afd9dee706f279af4717b2a58464634b9d62e0c",
+      "size_bytes": 3392,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/a-b-test-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/a-b-test-design/SKILL.md",
+      "sha256": "1f92f686f0cd0a7a71d8386e5bde96e1907bce731671cdd31780e0ef8971dcb9",
+      "size_bytes": 1933,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/accessibility-test-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/accessibility-test-plan/SKILL.md",
+      "sha256": "aa1453b2084856424d0b0791a7393712a2010e9eb57e80e16b0a1035611ce4ae",
+      "size_bytes": 1956,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/click-test-plan/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/click-test-plan/SKILL.md",
+      "sha256": "0bc9e1eb2df6d117db689893a71543d2de067d33e541092ff078af73850ede31",
+      "size_bytes": 1741,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/concept-selection/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/concept-selection/SKILL.md",
+      "sha256": "ed1fabc72da98ec2afbe41698328687cbdc5edefa9385c93a0b319ee301de1ca",
+      "size_bytes": 3464,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/heuristic-evaluation/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/heuristic-evaluation/SKILL.md",
+      "sha256": "d7310bf0876e028706dec9d9190ed9f5381a990d2be588014789ac330591b786",
+      "size_bytes": 2024,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/parallel-concepts/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/parallel-concepts/SKILL.md",
+      "sha256": "9ece5b12434e9ca4cf6c4b774ac523b5ec4fe914d27d378cd5d0da0dd1bd4fb9",
+      "size_bytes": 3747,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/prototype-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/prototype-strategy/SKILL.md",
+      "sha256": "e536f65d6ddf71461022263f3e73d1b26eab3f6cb720419170741b17febb5a83",
+      "size_bytes": 1896,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/test-scenario/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/test-scenario/SKILL.md",
+      "sha256": "75f14b85d6cceabf39ae64d49265531bd058d021cd2e30b20cda4d910fbe0dea",
+      "size_bytes": 1773,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/user-flow-diagram/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/user-flow-diagram/SKILL.md",
+      "sha256": "eefebab445afd6f52df2050db4418ec15dcd0960a2d45063d14475ebf6f603c1",
+      "size_bytes": 1833,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "prototyping-testing/skills/wireframe-spec/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/prototyping-testing/skills/wireframe-spec/SKILL.md",
+      "sha256": "cf331cd67e1100b72c179eaa6988dc44b7d14e09f2d1fc96c179684fd2f2cbd0",
+      "size_bytes": 1771,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/README.md",
+      "sha256": "7567ae77c7d5621da36935974d1b4cd67c41f256a5352bf567039e0c3c90d077",
+      "size_bytes": 17629,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "SKILL_TEMPLATE.md",
+      "vendored_path": "references/external-upstreams/designer-skills/SKILL_TEMPLATE.md",
+      "sha256": "0b1da11ed456c2719791ec074ea2d121935a589130d199eb14ff3690ea98e360",
+      "size_bytes": 2412,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/commands/color-palette.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/commands/color-palette.md",
+      "sha256": "37cf39293c922cf91cb51226877da172af2c626264e6497b09aeb1662c45c9f0",
+      "size_bytes": 1092,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/commands/design-screen.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/commands/design-screen.md",
+      "sha256": "bf80f6eed2db76b50f039a29975058c7a634d12b357bf4c6c10081552c1b27da",
+      "size_bytes": 1015,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/commands/platform-audit.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/commands/platform-audit.md",
+      "sha256": "ebfd71a6eb3bf239363227ee8719d831e4da6d150353e537bd940c81e4a324de",
+      "size_bytes": 1369,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/commands/responsive-audit.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/commands/responsive-audit.md",
+      "sha256": "084cba3b5b85a688e42dc94d13c000480097a5a2a7dc2ce3fb245ce8c6ee16e1",
+      "size_bytes": 997,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/commands/type-system.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/commands/type-system.md",
+      "sha256": "858129291eaf14a8c567bc390fb553bc86be52af3a9e3a6a993b49a7197b6bfd",
+      "size_bytes": 950,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/README.md",
+      "sha256": "a6804ede23dadba7b861fa8529f952a0ee258597a798a2b3072e4191265f1174",
+      "size_bytes": 5808,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/aesthetic-usability/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/aesthetic-usability/SKILL.md",
+      "sha256": "f486c90e35de676f5274aa008cd254901b58ead061a8ad08018027bf47b071f4",
+      "size_bytes": 2760,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/color-system/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/color-system/SKILL.md",
+      "sha256": "98cf57e2a186c2bc0b8c516b174967b91156ea6393509cba459fc31719f4d167",
+      "size_bytes": 1716,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/dark-mode-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/dark-mode-design/SKILL.md",
+      "sha256": "cdf29e967a020c0132436c99c2a8ec9da49fe43e6be2724e2bcc62b3dabaf948",
+      "size_bytes": 1757,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/data-visualization/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/data-visualization/SKILL.md",
+      "sha256": "f57b42cb3bcd71b1bd8edc22204759037309f50b9da4dfa6d030e8d742dae5d8",
+      "size_bytes": 2100,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/illustration-style/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/illustration-style/SKILL.md",
+      "sha256": "43897f062df1b9043a850e9074540018dba5545d33acf2d29e6396ed32632ef9",
+      "size_bytes": 1915,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-closure/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-closure/SKILL.md",
+      "sha256": "d3a19f0efd14c8bcfa433aecc9b32fa68257f52cbb4d1198f9215777845184f5",
+      "size_bytes": 4711,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-common-region/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-common-region/SKILL.md",
+      "sha256": "20cf91c0389ad289719776a39b92d0f2e1e961acfa86d192abac930a44097b9b",
+      "size_bytes": 3028,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-continuity/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-continuity/SKILL.md",
+      "sha256": "de6f5bca04b314de5fc3832521a26658680ab8d9d893384ed18326a0c5a501e7",
+      "size_bytes": 4468,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-figure-ground/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-figure-ground/SKILL.md",
+      "sha256": "5604df78e5398d8fe6b61789834a2bf5d0ab67cf6b3c1dd6b0d0762ec3fb5d04",
+      "size_bytes": 5048,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-proximity/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-proximity/SKILL.md",
+      "sha256": "0dc018ca60e1b160ab50ecbcd0fc9312c7664a3527fcddc0896f36a1cb471513",
+      "size_bytes": 2709,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/law-of-similarity/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/law-of-similarity/SKILL.md",
+      "sha256": "f11ce24578133ed923aa6b64195153a37b50903ba9be678a7b3e8aa3861a324e",
+      "size_bytes": 4744,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/layout-grid/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/layout-grid/SKILL.md",
+      "sha256": "03497bc2b0b7a62856b54afb75f5b918f0d74fec15448236b03b6413670e7be7",
+      "size_bytes": 1650,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/platform-conventions/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/platform-conventions/SKILL.md",
+      "sha256": "5345817e50742d87faff031ce842895855aa90320783b31ca0be6a42becff332",
+      "size_bytes": 6731,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/readable-measure/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/readable-measure/SKILL.md",
+      "sha256": "68f08dc4adce33062e896b7025340ee4bb06d9d091f3e4f467781397f42102eb",
+      "size_bytes": 2280,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/responsive-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/responsive-design/SKILL.md",
+      "sha256": "bc583566c73573e1ac7fba6ca1dc1b4536d80229571f5775045987d81b09388e",
+      "size_bytes": 1770,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/spacing-system/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/spacing-system/SKILL.md",
+      "sha256": "fb94998e618f160a1d516885b29ce2864d92910b6b6ab9a4ed357b39043acef4",
+      "size_bytes": 1454,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/typography-scale/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/typography-scale/SKILL.md",
+      "sha256": "bcdf3b1e5e1cde4c68b1bcc359dae1e91da9f07fecc75328a185a438bd85d846",
+      "size_bytes": 1585,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/visual-hierarchy/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/visual-hierarchy/SKILL.md",
+      "sha256": "599bc0728c23ec6a66aee34e6934d10d40d4d58598e883cfd14b297835b0ceb4",
+      "size_bytes": 1913,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ui-design/skills/von-restorff-effect/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ui-design/skills/von-restorff-effect/SKILL.md",
+      "sha256": "974eea8fe00f986c7d7da563f559819828cda4123c16f8cdca8156f51614a56f",
+      "size_bytes": 2427,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/commands/benchmark.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/commands/benchmark.md",
+      "sha256": "f1678f55bddc4f6a7a73459ca2a7a2825483ba8a9dfcf32453fffbab90fc9173",
+      "size_bytes": 975,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/commands/frame-problem.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/commands/frame-problem.md",
+      "sha256": "c15e64a688e7234002d1321515259abde7b606b38037efc92ba20f7d20ca1722",
+      "size_bytes": 1063,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/commands/strategize.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/commands/strategize.md",
+      "sha256": "5625f4552c86320b752ce65ac5ffb6c920960ef2aaa7988a24f84328a6058b23",
+      "size_bytes": 971,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/README.md",
+      "sha256": "3e8c78b25396df61e96348c5f9aade5fa9201fa9bcebbb683302907d489cd179",
+      "size_bytes": 3468,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/business-design/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/business-design/SKILL.md",
+      "sha256": "641375f70d4f2fa86ba4e78329b5711ce043c8e4226416a1edc7f3296e23c38a",
+      "size_bytes": 4438,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/competitive-analysis/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/competitive-analysis/SKILL.md",
+      "sha256": "57308cbf962bd4eaff89761e6d1e95fdb1b922eb9f2d6f269d9644d630805963",
+      "size_bytes": 1492,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/content-strategy/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/content-strategy/SKILL.md",
+      "sha256": "6f85b689873a66704e363a890d0450a0fb3c44b2ccd1f167c1dda3591a4190ba",
+      "size_bytes": 3467,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/design-brief/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/design-brief/SKILL.md",
+      "sha256": "6e4dee8d7e1870456b24d2bcc06cd42daf871d2b444f52bebf2b5a8bd1e47725",
+      "size_bytes": 1255,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/design-principles/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/design-principles/SKILL.md",
+      "sha256": "d120552fa2a2c305c41bbd6ae156abbebd849bd0d41a6596e9edc477ac3d1167",
+      "size_bytes": 1238,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/experience-map/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/experience-map/SKILL.md",
+      "sha256": "92b111b4afc74994ef9fd90f451579206556c51d156be805ee23eaec245e606d",
+      "size_bytes": 1442,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/information-architecture/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/information-architecture/SKILL.md",
+      "sha256": "174166ca9ea27b002585ea169400a509f375e945b7773850454255b6cc82bb2f",
+      "size_bytes": 3422,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/metrics-definition/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/metrics-definition/SKILL.md",
+      "sha256": "b76945a66ea7a8e1228c613c2fd433dcfdbe9b6bb3dbf20947a6d2d3c904c013",
+      "size_bytes": 1269,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/north-star-vision/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/north-star-vision/SKILL.md",
+      "sha256": "2192a92c3007c5caee03d093dd125fac77ef325283949481a3372c6ae218221a",
+      "size_bytes": 1245,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/opportunity-framework/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/opportunity-framework/SKILL.md",
+      "sha256": "1a09b240763bc2e3a460f2ade2a303dd640b4f4da58ad92bb2d1130f82165956",
+      "size_bytes": 1151,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/service-blueprint/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/service-blueprint/SKILL.md",
+      "sha256": "130fffecc31f23f04c95441be3de5fa965b6a61a9e379cf178e74e6fc856e0c4",
+      "size_bytes": 4146,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "ux-strategy/skills/stakeholder-alignment/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/ux-strategy/skills/stakeholder-alignment/SKILL.md",
+      "sha256": "18024b601c79f986a628a6ddfa756d4240ace5ba952aeb012e31a4e4f894d82e",
+      "size_bytes": 1298,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/commands/critique-screen.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/commands/critique-screen.md",
+      "sha256": "2988c263f3e667fdb8a59fac471dbf82ed39da7ded8003ac0a69ba7011ccf390",
+      "size_bytes": 2020,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/commands/critique-ux.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/commands/critique-ux.md",
+      "sha256": "95031dbb832b4b44b9335f290848be3dd98f78820e89267d6e4474dbb26185c8",
+      "size_bytes": 1696,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/README.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/README.md",
+      "sha256": "bb654328687470d5d9973e4f5d0f99a21d881c3ae7224870d175e81006dc4f7e",
+      "size_bytes": 2706,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-affordance/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-affordance/SKILL.md",
+      "sha256": "c277f54a40cadaf16a7a963509f1fac3070543c15e0b4f6ff59cc80ef9faf1f2",
+      "size_bytes": 3288,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-brand-consistency/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-brand-consistency/SKILL.md",
+      "sha256": "47cd46678b15be61cf5c804dba5ed3ddd3177594cdf6743d210006aa1c8ec829",
+      "size_bytes": 2956,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-color/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-color/SKILL.md",
+      "sha256": "aa65aa19c817d80970a38718dcecdbb7292d77446bc2c064f3508f9affa99f08",
+      "size_bytes": 3222,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-composition/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-composition/SKILL.md",
+      "sha256": "e4b80b3a886d334a0b1e4c9b577269c11e8f1d0b33afb23d7c472c318b3f8645",
+      "size_bytes": 3153,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-information-density/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-information-density/SKILL.md",
+      "sha256": "94bb66b3594ed0bf08a5be2b227d382784c7ba903c82ce51767472d2156386e5",
+      "size_bytes": 3457,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-typography/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-typography/SKILL.md",
+      "sha256": "ceec62ac92c0a57cdb779aa39b58c2d804a0bf36154b35048887c253966723b8",
+      "size_bytes": 3380,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "designer-skills",
+      "relative_path": "visual-critique/skills/critique-visual-hierarchy/SKILL.md",
+      "vendored_path": "references/external-upstreams/designer-skills/visual-critique/skills/critique-visual-hierarchy/SKILL.md",
+      "sha256": "5602da74b62fe47154dcfdaaf0dc4815dcbf8446efc36051456840c04b83a526",
+      "size_bytes": 2493,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/ember.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/ember.md",
+      "sha256": "84a0e089872815bf2403c6d9e57954587cb7e7d33c19a2b11e5d1ea22e754e22",
+      "size_bytes": 15211,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/noor.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/noor.md",
+      "sha256": "b4bbc1c4a21262317c020d33751debbf76a0c031f9344a9fd36c5fead2c70304",
+      "size_bytes": 36448,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/rune.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/rune.md",
+      "sha256": "89be8ec4217a237d257a98625b3cbede1fe759837b6da53e7a4322ee79c4a911",
+      "size_bytes": 12408,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/sage.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/sage.md",
+      "sha256": "25f212d4643be9c258f1381b71ea4cba073f90f2ca99294cbf7208cc461126de",
+      "size_bytes": 13436,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/vigil.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/vigil.md",
+      "sha256": "ce4fafaac347e1667fecb4705ab42eef9e3c0501a2ab9ae44fd98d529d5fdb4a",
+      "size_bytes": 26131,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "agents/wren.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/agents/wren.md",
+      "sha256": "c076c14c3074fd3e44b297086b33f16ae3d42df50ca2894734f8c88143a954a7",
+      "size_bytes": 30355,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "HOW-TO-USE.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/HOW-TO-USE.md",
+      "sha256": "a57b2cd7e618d88449ca35fbe5397ae494b6affcf0858ff9acf5bf426dca4f5e",
+      "size_bytes": 10929,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "LICENSE",
+      "vendored_path": "references/external-upstreams/ghaida-intent/LICENSE.txt",
+      "sha256": "f4e7f373b9b996950337e8d41a4a2939c2d90b7725e9baf3d5084a22717ad328",
+      "size_bytes": 7169,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "README.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/README.md",
+      "sha256": "f12cbbd79a3f8f44b04b77546500099d3ffe0db9c626f727642e39e8990031a9",
+      "size_bytes": 9683,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/articulate/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/articulate/SKILL.md",
+      "sha256": "938234d848e87f4672d80bda37311d0e514691985f417e6761ab8bd9d9e845b7",
+      "size_bytes": 26519,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/blueprint/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/blueprint/SKILL.md",
+      "sha256": "1288899f45ed8c0f312327ab21a9965a679aebd9bf42ea9382c83dc9a15245ab",
+      "size_bytes": 30876,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/evaluate/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/evaluate/SKILL.md",
+      "sha256": "fb034d058d6b1ae4c18919f889e125ca7128dcc0913a46e3aa1bb5de41b298b3",
+      "size_bytes": 28750,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/fortify/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/fortify/SKILL.md",
+      "sha256": "704d7808e82d29373017e530522b37a4d1809bb5a29e2e1db3ff271e1cf33385",
+      "size_bytes": 23359,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/include/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/include/SKILL.md",
+      "sha256": "74cc55f11db377a92d80165e04b4a2b2e9ac110f46c47395339f4502a0ac94d3",
+      "size_bytes": 32889,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/accessibility-foundations.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md",
+      "sha256": "81b17b0a368dd0b553a3a29ea2d6dc41c09811dd4ce17cf5ee1dfc7aeba9d229",
+      "size_bytes": 16896,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/content-strategy.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/content-strategy.md",
+      "sha256": "5a15d7d091018d93482ba1273c89195b81608cab39db295206a17cf9842bb68c",
+      "size_bytes": 15355,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/ethical-design.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/ethical-design.md",
+      "sha256": "622c46247f31deb2b76d1c446820dc2aa65fa42cda2f819c8507b0bd8c5fd22b",
+      "size_bytes": 16436,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/information-architecture.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/information-architecture.md",
+      "sha256": "ba2bb3ce165be6af97fda6ddabf9badbe4b6a5d6596a93fbcd3402be2f605aa9",
+      "size_bytes": 15817,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/interaction-patterns.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/interaction-patterns.md",
+      "sha256": "d65e2cee3caee70c5ccc0e052d695bdd46f58940f330ec4230d70da9727c0221",
+      "size_bytes": 16426,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/measurement-frameworks.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/measurement-frameworks.md",
+      "sha256": "9f3802a7350df1a5c4c04493b462bb0f5a6f9c590b28ab043004f9bfdb99ee6c",
+      "size_bytes": 17211,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/research-methods.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/research-methods.md",
+      "sha256": "56001871ffbbd94425411d1d9dade6b72f68476c2780177115df70df55b93638",
+      "size_bytes": 16433,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/references/service-design.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/references/service-design.md",
+      "sha256": "27d8566fe72400c87715ad3b9ebecd3e8a66e1748ed1b4d0a2b49009d2509ebc",
+      "size_bytes": 15245,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/intent/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/intent/SKILL.md",
+      "sha256": "9a1d9446764590c80b0abc37bedf45640f5fa08292349392d72d33fa0cb01ec4",
+      "size_bytes": 52605,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/investigate/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/investigate/SKILL.md",
+      "sha256": "a4d782f3013c1e8abf7386e3899ff67d4ab9c8d84089e75f9fa4f98535c97eed",
+      "size_bytes": 29581,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/journey/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/journey/SKILL.md",
+      "sha256": "ce984d6ea4363492bcd6aa5353ab9f8096e79ee28c2cda26a9803b52701bf221",
+      "size_bytes": 32420,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/localize/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/localize/SKILL.md",
+      "sha256": "23f1117eb636b271326a6a318f760b308f5ed984e6d4bdfecd98f250eb2b19d8",
+      "size_bytes": 18780,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/measure/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/measure/SKILL.md",
+      "sha256": "a16ce4cf0bf1d72b409db243b3bd2e679e818510977a61c0502dbc5f61d8433a",
+      "size_bytes": 21250,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/organize/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/organize/SKILL.md",
+      "sha256": "2838cf1fec2d7c28285fed8b9df10676c0cfb643f63a873e024869a8014f79ac",
+      "size_bytes": 33999,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/philosopher/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/philosopher/SKILL.md",
+      "sha256": "d68e6322205cc5152ba919ef10858563a67e4c8d52b5c679f9578ebf85700a1d",
+      "size_bytes": 19093,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/present/references/deck-theme.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/present/references/deck-theme.md",
+      "sha256": "a82751ce89477c411879cbf47468d03391e45be143cb172b542e467cfb790a69",
+      "size_bytes": 3878,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/present/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/present/SKILL.md",
+      "sha256": "bfd1559ea25658f49b132f1dadf7d0d5751f21979734d7c2a656aab54c9f9d52",
+      "size_bytes": 25815,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/specify/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/specify/SKILL.md",
+      "sha256": "721382e677d590a50e581ef5a46e963a187bbb5169fab5d7240ac312e5b88b24",
+      "size_bytes": 12108,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/storytelling/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/storytelling/SKILL.md",
+      "sha256": "fe84a3440e546cdc34da0783a6c9984def7b2b613036989ea811dea41ced2d4c",
+      "size_bytes": 13965,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/strategize/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/strategize/SKILL.md",
+      "sha256": "759c8d329584effe220f2fbc248ea7d053d9f1c2ac8180597df8cf81ed04cfb9",
+      "size_bytes": 25155,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/transpose/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/transpose/SKILL.md",
+      "sha256": "7b71fc23dd11e655b7f0557f4da5c0ba9f5cd77643da291e43e4356753ecee48",
+      "size_bytes": 16251,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ghaida-intent",
+      "relative_path": "skills/wireframe/SKILL.md",
+      "vendored_path": "references/external-upstreams/ghaida-intent/skills/wireframe/SKILL.md",
+      "sha256": "954c4b95352d251cd431bb97446c937b17c0e15f8cd7767ee02a93a916c12885",
+      "size_bytes": 48723,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/01-discovery-and-evidence.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/01-discovery-and-evidence.md",
+      "sha256": "6239b3fe2b10d791bd3141190db8ad7224b7c9e15db6944abc524b992cdbeff2",
+      "size_bytes": 1543,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/02-story-to-flow.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/02-story-to-flow.md",
+      "sha256": "611a57beb45874610c49eccc84d58973c248a7fa96f58b6f33b360435d6e55b4",
+      "size_bytes": 1631,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/03-state-machine-and-edge-cases.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/03-state-machine-and-edge-cases.md",
+      "sha256": "cafa68a752e9eac72335ddfea3f0db9f2cd1b3ccec83c078633c34ed460e6d2f",
+      "size_bytes": 2680,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/04-information-architecture-and-patterns.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/04-information-architecture-and-patterns.md",
+      "sha256": "472dceabe17a55b9bc8231932d36afba98e9bae56c036d2bea0b3cd7423ca9b6",
+      "size_bytes": 1593,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/05-existing-system-guardian.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/05-existing-system-guardian.md",
+      "sha256": "79b394dc64c052de19d0493b10e5370da487ebf012fa0d81c733c3064fa8a35a",
+      "size_bytes": 1267,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/06-accessibility-responsive-content.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md",
+      "sha256": "ae3c87f7f4ebbc0be1debb855d7b530c2558f3e1a77c4c246d7d0cd8f4149cde",
+      "size_bytes": 1351,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/07-privacy-security-and-ethics.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md",
+      "sha256": "6f5b4c737765ba8537eeab53ca355496daf14444ef6f8c579d2efb850edd3853",
+      "size_bytes": 1685,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/08-async-and-ai-ux.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/08-async-and-ai-ux.md",
+      "sha256": "8a0c51ddc22b435e9206709b0d3da48554b5338e1620d3eb253bbe335883e768",
+      "size_bytes": 1410,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/09-ux-evaluation-and-gates.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/09-ux-evaluation-and-gates.md",
+      "sha256": "1d32c73fc6370d397f379e59c99861f1eb064e567ed30a17dbbb8b7d8169cdae",
+      "size_bytes": 1381,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/10-handoff-and-measurement.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/10-handoff-and-measurement.md",
+      "sha256": "1a612a533e0af7c50bf1841476e85310616fa45d3fe4b14afb3af534ab7250a5",
+      "size_bytes": 1407,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/references/11-external-projects-and-trust.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/11-external-projects-and-trust.md",
+      "sha256": "41b011e44a255bc564a47aa42f00bca0e1fcae5562289df681211bb3f17fa2d9",
+      "size_bytes": 2029,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/SKILL.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/SKILL.md",
+      "sha256": "5052b25210b32cfb40a9d96a6b7e4cd4193375b2d65537fc969edf306133f26f",
+      "size_bytes": 5130,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/templates/FEATURE-DESIGN.md",
+      "vendored_path": "templates/FEATURE-DESIGN.md",
+      "sha256": "4e4105d98ac297336b53b2eae7dd49f5a5d13d2ab0848e295f8c13b7b158c081",
+      "size_bytes": 1221,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "ai-product-designer/templates/UX-REVIEW.md",
+      "vendored_path": "templates/UX-REVIEW.md",
+      "sha256": "e1106486e5883e6d83a0ac3da5b2a5b1bbba4d64477f8261113f6b52d549988e",
+      "size_bytes": 771,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "MASTER-PROMPT.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/MASTER-PROMPT.md",
+      "sha256": "b25aa02b77a0856da4dabb42c04534210c448c8a5700085fc300c65308362e75",
+      "size_bytes": 2657,
+      "status": "SAFE",
+      "reasons": []
+    },
+    {
+      "pack_name": "ai-product-designer-skill-pack",
+      "relative_path": "README.md",
+      "vendored_path": "references/ai-product-designer-skill-pack/README.md",
+      "sha256": "aa5367ed7bbe0118c042920d7099f993276d53450eba0e6419132085bcd193f7",
+      "size_bytes": 2478,
+      "status": "SAFE",
+      "reasons": []
+    }
+  ],
+  "vendored_packs": {
+    "ai-product-designer-skill-pack": {
+      "pack_name": "ai-product-designer-skill-pack",
+      "source_location": "C:\\Users\\Ridhuan\\Downloads\\ai-product-designer-skill-pack",
+      "upstream_url": "local://ai-product-designer-skill-pack",
+      "git_commit": "local-pack-v1",
+      "license_summary": "Vendor-authored Markdown reference pack",
+      "trust_tier": "T1_AUDITED_MARKDOWN",
+      "non_t1_excluded_count": 0,
+      "vendored_files_count": 16,
+      "synced_at": "2026-11-12T11:46:51.562051+00:00"
+    },
+    "ux-flow-skills": {
+      "pack_name": "ux-flow-skills",
+      "source_location": "https://github.com/jpoindexter/ux-flow-skills.git",
+      "upstream_url": "https://github.com/jpoindexter/ux-flow-skills.git",
+      "git_commit": "fc7f4a4b913dc5b1a2029af16fb8ec363331c821",
+      "license_summary": "MIT License | Copyright (c) 2026 Jason Poindexter | Permission is hereby granted, free of charge, to any person obtaining a copy",
+      "trust_tier": "T1_AUDITED_MARKDOWN",
+      "non_t1_excluded_count": 30,
+      "vendored_files_count": 18,
+      "synced_at": "2026-11-12T11:44:54.777946+00:00"
+    },
+    "pm-skills": {
+      "pack_name": "pm-skills",
+      "source_location": "https://github.com/phuryn/pm-skills.git",
+      "upstream_url": "https://github.com/phuryn/pm-skills.git",
+      "git_commit": "9af7bfd0bc47fdad43c2eaa7a43cd13918e7aaef",
+      "license_summary": "MIT License | Copyright (c) 2026 Pawel Huryn | Permission is hereby granted, free of charge, to any person obtaining a copy",
+      "trust_tier": "T1_AUDITED_MARKDOWN",
+      "non_t1_excluded_count": 67,
+      "vendored_files_count": 124,
+      "synced_at": "2026-11-12T11:44:57.338213+00:00"
+    },
+    "designer-skills": {
+      "pack_name": "designer-skills",
+      "source_location": "https://github.com/Owl-Listener/designer-skills.git",
+      "upstream_url": "https://github.com/Owl-Listener/designer-skills.git",
+      "git_commit": "9a6930cf84a822eb458624bd11c61aac5bbdf224",
+      "license_summary": "MIT License | Copyright (c) 2026 MC Dean | Permission is hereby granted, free of charge, to any person obtaining a copy",
+      "trust_tier": "T1_AUDITED_MARKDOWN",
+      "non_t1_excluded_count": 74,
+      "vendored_files_count": 160,
+      "synced_at": "2026-11-12T11:45:04.608193+00:00"
+    },
+    "ghaida-intent": {
+      "pack_name": "ghaida-intent",
+      "source_location": "https://github.com/ghaida/intent.git",
+      "upstream_url": "https://github.com/ghaida/intent.git",
+      "git_commit": "1806110106a472bc588d7a8a2b7e3d39aee4a4b8",
+      "license_summary": "Creative Commons Legal Code | CC0 1.0 Universal | CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE",
+      "trust_tier": "T1_AUDITED_MARKDOWN",
+      "non_t1_excluded_count": 181,
+      "vendored_files_count": 36,
+      "synced_at": "2026-11-12T11:45:48.483692+00:00"
+    }
+  }
+}

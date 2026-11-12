@@ -154,6 +154,13 @@ copy does not update itself). If `GLOBAL.md` changed, paste it into your profile
 The Shadow Army suite integrates and respects the work of open-source authors:
 - **Anti-Slop Suite** (`antislop`, `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `antislop-copywriting`, `antislop-code`): Created by [Miqdad Badjuber (`anti-slop`)](https://github.com/miqdadbadjuber/anti-slop) and Web Quality/Accessibility components by [Addy Osmani](https://github.com/addyosmani) (MIT License).
 - **H5BP & OWASP Web Guidelines**: Integrated into `/shadow-ops` knowledge base from HTML5 Boilerplate and OWASP projects.
+- **Product Design, UX Flows & PM Discovery (`T1_AUDITED_MARKDOWN` Packs in `/shadow-design`, `/shadow-discovery`, `/shadow-plan`, `/shadow-accessibility`, `/shadow-uat`)**:
+  - `ai-product-designer-skill-pack`: Vendored reference modules (`01`–`11`) and `FEATURE-DESIGN.md` / `UX-REVIEW.md` templates.
+  - [Design with Intent (`ghaida/intent`)](https://github.com/ghaida/intent) — CC0 1.0 Universal (Public Domain).
+  - [UX Flow Skills (`jpoindexter/ux-flow-skills`)](https://github.com/jpoindexter/ux-flow-skills) — MIT License, © 2026 Jason Poindexter.
+  - [PM Skills (`phuryn/pm-skills`)](https://github.com/phuryn/pm-skills) — MIT License, © 2026 Pawel Huryn.
+  - [Designer Skills (`Owl-Listener/designer-skills`)](https://github.com/Owl-Listener/designer-skills) — MIT License, © 2026 MC Dean.
+  - Tracked with full provenance, commit SHAs, and SHA-256 lockfiles in `shadow-design/UPSTREAM_PROVENANCE.json` and managed safely via `python shadow-quality/scripts/skill_vendor_sync.py` (`verify`, `check-remote-updates`, `update-remote`).
 
 - Keep each reference file focused and under about 10k characters so loading stays cheap.
 
