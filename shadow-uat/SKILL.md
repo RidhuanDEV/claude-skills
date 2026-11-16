@@ -1,6 +1,6 @@
 ---
 name: shadow-uat
-description: User Acceptance Testing (UAT) Governance: Requirement Traceability Matrix (RTM), UAT Test Scenarios from Acceptance Criteria, Defect Triage Log, Evidence Capture, Retest Verification, and Client Sign-Off (Staging UAT -> Production Release -> Production Smoke Test). Trigger with /shadow-uat.
+description: "Staging User Acceptance Testing (UAT) Governance. Use when creating Requirement Traceability Matrices (RTM), Staging UAT scenarios, defect triage logs, test evidence capture, or client UAT sign-off."
 ---
 
 # Shadow UAT (`/shadow-uat`) — Requirement Traceability, Staging UAT & Client Sign-Off

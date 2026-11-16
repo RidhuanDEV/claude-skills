@@ -1,6 +1,6 @@
 ---
 name: shadow-release
-description: Production Release Management: Semantic Versioning, Release Notes / Changelog generation, Pre-Flight Deployment Checklist, Database Migration Backward-Compatibility Gate, Feature Flags, Post-Deploy Smoke Verification, and Verified Rollback Runbook. Trigger with /shadow-release.
+description: "Production Release & Rollback Management. Use when preparing production deployments, SemVer changelogs, pre-flight checklists, migration backward-compatibility gates, feature flags, or rollback runbooks."
 ---
 
 # Shadow Release (`/shadow-release`) — Release Readiness Gate, Versioning & Rollback Verification

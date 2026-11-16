@@ -1,6 +1,6 @@
 ---
 name: shadow-plan
-description: Decompose PRD/SRS and Architecture Specs into Epics, User Stories, Technical Tasks, Dependency Graphs, Milestones, Definition of Ready (DoR), Definition of Done (DoD), and Effort Estimations. Trigger with /shadow-plan.
+description: "Agile Sprint & Delivery Planning. Use when decomposing approved PRD/SRS specs into Epics, User Stories, Sprint Tasks, dependency graphs, and DoR/DoD. Do NOT use for contractual Paid CR evaluation, PERT/Monte Carlo P80, or EVM (/shadow-pmo)."
 ---
 
 # Shadow Plan (`/shadow-plan`) — Task Decomposition & Delivery Roadmap (SDLC Stage 2 -> 3 Bridge)

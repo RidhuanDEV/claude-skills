@@ -1,6 +1,6 @@
 ---
 name: shadow-doc
-description: Enterprise & Government SDLC Document Engineering System v2.0 (.docx, .pdf, .xlsx, .csv, .md, .zip) using a Canonical JSON AST v2.0 + Hybrid v1.0 Backward-Compatible Importer. Supports 20 standardized SDLC templates, selective block updates, bidirectional requirement traceability, change-impact analysis, approval lifecycle governance, secret scanning, and multi-format rendering. Trigger with /shadow-doc.
+description: "Enterprise & Government SDLC Document Engineering. Use when generating or updating .docx, .pdf, .xlsx, or .csv deliverables from Canonical JSON AST v2.0 or .md sources, verifying citations with reference_verifier.py, or checking document traceability."
 ---
 
 # Shadow Doc v2.0 (`/shadow-doc`) — Enterprise & Institutional SDLC Document Engineering System

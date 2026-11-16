@@ -1,6 +1,6 @@
 ---
 name: shadow-observe
-description: Actionable Production Observability & SRE: SLI/SLO definitions, Multi-Window Error Budget Burn Alerts, Distributed Tracing (OpenTelemetry), Structured Log Correlation, Dashboard Health, and Alert-to-Runbook Escalation. Pairs with /shadow-ops. Trigger with /shadow-observe.
+description: "Production Observability & SRE. Use when defining SLIs/SLOs, error budget burn-rate alerts, OpenTelemetry distributed tracing, structured log correlation, or Prometheus/Loki/Grafana monitoring."
 ---
 
 # Shadow Observe (`/shadow-observe`) — SLI/SLO, Error Budgets, Tracing & Actionable Alerting

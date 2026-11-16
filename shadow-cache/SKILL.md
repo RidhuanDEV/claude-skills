@@ -1,6 +1,6 @@
 ---
 name: shadow-cache
-description: Client & Server Caching Architecture: TanStack Query / SWR state invalidation, Redis caching patterns (Cache-Aside, Write-Through), Cache Stampede protection, Optimistic UI updates, Realtime Sync, and Idempotency Keys. Trigger with /shadow-cache.
+description: "Client & Server Caching Architecture. Use when implementing or debugging TanStack Query/SWR invalidation, Redis caching, cache stampede protection, optimistic UI updates, or Idempotency-Key patterns."
 ---
 
 # Shadow Cache (`/shadow-cache`) — Client/Server Caching, Invalidation & Realtime Sync

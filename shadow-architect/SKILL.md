@@ -1,6 +1,6 @@
 ---
 name: shadow-architect
-description: System Design, C4 Architecture Diagrams (Context, Container, Component), Architecture Decision Records (ADR), Monolith vs Modular Monolith vs Microservices evaluation, Capacity Estimation, and NFR alignment. Trigger with /shadow-architect.
+description: "Single-System Architecture & Design. Use when designing one application architecture, C4 diagrams, ADRs, module boundaries, or deciding Monolith vs Modular Monolith vs Microservices. Do NOT use for multi-app enterprise portfolios or 6-Domain SPBE (/shadow-ea)."
 ---
 
 # Shadow Architect (`/shadow-architect`) — System Architecture & ADR Gate (SDLC Stage 2)

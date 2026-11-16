@@ -1,6 +1,6 @@
 ---
 name: shadow-handover
-description: Client Delivery, BAST (Berita Acara Serah Terima), Source-Code & Asset Inventory, Secure Credential Transfer, Admin Manual, Operator Manual, Deployment Runbook, User Training Package, and Warranty Checklist. Distinct from /handoff (which is AI agent session context transfer). Trigger with /shadow-handover.
+description: "Client Project Delivery & Handover. Use when preparing BAST (Berita Acara Serah Terima), source/SBOM inventory, credential transfer, Admin/Operator/User manuals, and Training of Trainers (ToT). Do NOT use for AI session memory handoff (/handoff)."
 ---
 
 # Shadow Handover (`/shadow-handover`) — Client System Delivery, BAST & Operational Independence

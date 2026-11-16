@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs all 36 Shadow Army skills across Claude Code, Codex, Gemini CLI & Antigravity (macOS / Linux)
+# Installs all 45 Shadow Army skills across Claude Code, Codex, Gemini CLI & Antigravity (macOS / Linux)
 # and syncs GLOBAL.md between markers in ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, and ~/.gemini/GEMINI.md.
 set -euo pipefail
 
@@ -60,4 +60,4 @@ for INST_FILE in "${INSTRUCTION_FILES[@]}"; do
   fi
 done
 
-echo "Done. All 36 Shadow Army skills and global instruction files are synced."
+echo "Done. All 45 Shadow Army skills and global instruction files are synced."

@@ -1,6 +1,6 @@
 ---
 name: shadow-sec
-description: Comprehensive Application & SDLC Security Auditor grounded in NIST SSDF (SP 800-218) and OWASP ASVS 5.0.0. Covers STRIDE Threat Modeling, Supply-Chain Security & SBOM, SAST/DAST, Secret Scanning, and Verifiable API/Auth/Data Controls. Trigger with /shadow-sec.
+description: "Application & SDLC Security Audit. Use when performing STRIDE threat modeling, SAST/DAST, secret scanning, SBOM/supply-chain checks, or verifying NIST SSDF (SP 800-218) & OWASP ASVS 5.0 controls. Do NOT use for UU PDP privacy (/shadow-privacy) or COBIT/OJK GRC (/shadow-grc)."
 ---
 
 # `/shadow-sec` — SDLC Security, Threat Modeling, Supply-Chain & OWASP ASVS 5.0 Auditor

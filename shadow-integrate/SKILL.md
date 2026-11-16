@@ -1,6 +1,6 @@
 ---
 name: shadow-integrate
-description: External & Third-Party Integration Engineering: Payment Gateways, Webhooks (HMAC Signature + Replay Protection), SMTP/Notifications, Government/Partner REST & SOAP APIs, Timeouts, Exponential Backoff Retries, Circuit Breakers, and Transactional Outbox. Trigger with /shadow-integrate.
+description: "External & Third-Party Integration Engineering. Use when integrating payment gateways (SNAP BI, Midtrans, Xendit, Stripe), HMAC webhooks with replay protection, SMTP/WhatsApp gateways, retries/circuit breakers, or Transactional Outbox."
 ---
 
 # Shadow Integrate (`/shadow-integrate`) — Resilient Third-Party APIs, Webhooks & Outbox

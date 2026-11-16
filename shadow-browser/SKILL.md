@@ -1,6 +1,6 @@
 ---
 name: shadow-browser
-description: "Run automated browser E2E verification, mobile viewport (375px) overflow checks, console error inspection, and interactive UI testing using the official Playwright MCP. Trigger with /shadow-browser."
+description: "Live Web Browser E2E Verification. Use when running real Playwright browser tests, inspecting 375px mobile viewport overflow, checking browser console/network errors, or clicking through live web UI flows. Do NOT use for native mobile store gates (/shadow-mobile)."
 ---
 
 # /shadow-browser — Automated Browser E2E & Responsive UI Verification (Shadow Army)

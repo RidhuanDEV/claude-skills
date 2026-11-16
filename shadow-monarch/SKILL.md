@@ -1,6 +1,6 @@
 ---
 name: shadow-monarch
-description: Implement, debug, refactor, review, design, or specify full-stack software, AI agents, data pipelines, and technical documentation with source-verified contracts and strict types. Use across engineering and IT roles (Backend, Frontend, Mobile, Architect, DevOps, Security, QA, AI/MCP Engineer, Product Manager, System Analyst, UI/UX Designer, Technical Writer). Loads focused relational references on demand; simple factual questions need no reference loading.
+description: "Full-Stack Engineering & Enterprise Consulting Orchestrator. Use when implementing, debugging, refactoring, reviewing, designing, or auditing software systems, AI agents, data pipelines, or consulting engagements; routes automatically to specialized references and companion skills."
 ---
 
 # Shadow Monarch — The Shadow Army
@@ -156,46 +156,61 @@ Every change must survive an attempt to break it before it is reported as done o
    must reuse a single container per suite and clean up in `try/finally` (`docker run --rm --label shadow.ephemeral=true` +
    `docker rm -f -v`, or `docker compose down -v --rmi local --remove-orphans`).
 
-## Load focused references (Foreign Key Routing — The Shadow Army)
+## Load Focused References & Companion Skills (Topic-Based Auto-Routing)
 
 Paths below are relative to this skill folder. Treat this table as a relational index: for non-trivial work, read
-`reference/CORE.md` first, then load **only** the Role/Domain, Language (`lang-*`), and Sub-Task (`sub-*`) references
-that match the active task. Do not load the entire library into context.
+`reference/CORE.md` first, then load **both** the matching `reference/*.md` file(s) **and** the matching companion
+`../<skill>/SKILL.md` file(s) automatically whenever the task's topic matches — **NEVER wait for the Monarch to type `/shadow-*`**.
+Budget: **0 references/companion skills** for trivial factual questions, **1–3** companion skills + **1–3** references for normal tasks.
+To resolve ambiguous or multi-domain prompts deterministically, run `python "shadow-monarch/scripts/skill_router.py" --route "<task summary>"`.
 
-### 1. Role & Domain Guides
+### 1. Role & Domain Guides (with Companion Skill Auto-Load)
 
-| Task / Role Domain | Reference |
-|---|---|
-| Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` |
-| Codebase Intelligence & Convention Preservation: 10-facet discovery, convention profile, minimal change policy & drift prevention | `reference/CODEBASE-INTELLIGENCE.md` |
-| Cross-Model Frontier Parity: unified instruction sync, pre-code checkpoints, deterministic `shadow_gate.py`, cross-model review & model routing | `reference/CROSS-MODEL-PARITY.md` |
-| Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` |
-| Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` |
-| Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` |
-| Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` |
-| Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` |
-| UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` |
-| UI/UX, Visual Art Direction & Product Interface Knowledge Base v2 (ID): 43 bab panduan desain antarmuka, art direction, visual choreography, pola mobile/web, design system, audit rubrics & AI prompts | `reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md` |
-| Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` |
-| Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` |
-| Refactoring Specialist: legacy modernization, contract-safe dead code elimination | `reference/REFACTORING.md` |
-| Security Engineer / AppSec: auth, sessions, uploads, secrets, security audit | `reference/SECURITY.md` |
-| Pentester, VAPT Auditor & DevSecOps: CVSS/VAPT reports, OWASP API/Mobile, WAF, Trivy/Semgrep, DFIR | `reference/SECOPS-PENTEST.md` |
-| DevOps Engineer: Docker, Nginx, CI/CD, environment, Git diagnostics | `reference/DEVOPS.md` |
-| Cloud Architect, SRE & SysAdmin: Terraform/IaC, K8s/Helm, Linux/systemd, SLI/SLO, FinOps | `reference/CLOUD-SRE.md` |
-| Enterprise Integration & IAM Specialist: Kafka/RabbitMQ, Keycloak/OIDC/SAML, ERP/Payment Ledger | `reference/ENTERPRISE-INTEGRATION.md` |
-| QA Engineer: test strategy, regression coverage, flaky tests | `reference/TESTING.md` |
-| Incident Responder / Debugger: bugs, errors, stack traces, incidents | `reference/DEBUGGING.md` |
-| Principal / Solutions Architect: system design, module boundaries, ADRs | `reference/ARCHITECTURE.md` |
-| Solutions Consultant & Pre-Sales: TOR/KAK, Technical Proposals, Server Sizing formulas, BoQ/RAB IT | `reference/PRESALES-PROPOSAL-KAK.md` |
-| Code Reviewer / Auditor: code review, readiness assessments | `reference/CODE-REVIEW.md` |
-| AI / LLM Engineer: prompts, RAG, embeddings, LLM reliability & evaluation | `reference/AI-LLM.md` |
-| AI Agent & MCP Engineer: multi-agent orchestration, subagents, MCP servers/tools, guardrails | `reference/AGENTS-MCP.md` |
-| Product Manager (PM), System Analyst (SA) & BA: PRD/SRS/FSD, user stories, system modeling | `reference/PRODUCT-ANALYSIS.md` |
-| IT Project Manager (PMO), Scrum Master & GRC/Compliance: WBS, RAID, RFC/CR, SLA, UU PDP/ISO 27001 | `reference/IT-PMO-GOVERNANCE.md` |
-| Technical Writer & Doc Engineer: source-driven `.md` → `.docx`/`.pdf` pipelines, SOP/Runbooks | `reference/DOCS-PIPELINE.md` |
-| Data Engineer & Automation: scripting, ETL, batch processing, CSV/Excel/JSON pipelines | `reference/DATA-AUTOMATION.md` |
-| Data Analyst, BI, Analytics Engineer (`dbt`) & Classical ML: Star Schema, SQL KPIs, ML pipelines | `reference/DATA-ANALYTICS-ML.md` |
+| Task / Role Domain | Reference | Auto-Load Companion Skill(s) |
+|---|---|---|
+| Core engineering mindset, code quality, abstraction discipline | `reference/CORE.md` | — (always active) |
+| Codebase Intelligence & Convention Preservation: 10-facet discovery, convention profile, minimal change policy & drift prevention | `reference/CODEBASE-INTELLIGENCE.md` | `/shadow-quality` |
+| Cross-Model Frontier Parity: unified instruction sync, pre-code checkpoints, deterministic `shadow_gate.py`, cross-model review & model routing | `reference/CROSS-MODEL-PARITY.md` | `/shadow-quality`, `/handoff` |
+| Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` | `/shadow-doc`, `/context7` |
+| Enterprise IT Consulting Core: Context-Aware Methodology, Evidence Provenance, Versioned Regulation Registry, Quantitative Decision & Cross-Skill Traceability | `reference/CONSULTING-INTELLIGENCE-CORE.md` | `/shadow-presales`, `/shadow-grc`, `/shadow-modernize`, `/shadow-pmo`, `/shadow-ea` |
+| Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` | `/handoff` (when context fills) |
+| Backend Engineer: APIs, services, jobs, webhooks, realtime | `reference/BACKEND.md` | `/shadow-api`, `/shadow-auth`, `/shadow-integrate`, `/shadow-cache` |
+| Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` | `/shadow-db` (introspect/ERD/DW), `/shadow-data` (migrations/backfills) |
+| Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` | `antislop` + `antislop-ui` + `antislop-layoutmobile`, `/shadow-cache`, `/shadow-browser` |
+| UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` | `/shadow-design`, `/shadow-accessibility`, `antislop-human` |
+| UI/UX, Visual Art Direction & Product Interface Knowledge Base v2 (ID): 43 bab panduan desain antarmuka, art direction, visual choreography, pola mobile/web, design system, audit rubrics & AI prompts | `reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md` | `/shadow-design`, `antislop-ui` |
+| Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` | `/shadow-design`, `/shadow-mobile` |
+| Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` | `/shadow-mobile` |
+| Refactoring Specialist: legacy modernization, contract-safe dead code elimination | `reference/REFACTORING.md` | `/shadow-quality`, `/shadow-modernize` (if full legacy audit) |
+| Security Engineer / AppSec: auth, sessions, uploads, secrets, security audit | `reference/SECURITY.md` | `/shadow-sec`, `/shadow-auth`, `/shadow-privacy` (if PII/UU PDP/GDPR) |
+| Pentester, VAPT Auditor & DevSecOps: CVSS/VAPT reports, OWASP API/Mobile, WAF, Trivy/Semgrep, DFIR | `reference/SECOPS-PENTEST.md` | `/shadow-sec` |
+| DevOps Engineer: Docker, Nginx, CI/CD, environment, Git diagnostics | `reference/DEVOPS.md` | `/shadow-ops`, `/shadow-git`, `/shadow-release`, `/shadow-bootstrap` |
+| Cloud Architect, SRE & SysAdmin: Terraform/IaC, K8s/Helm, Linux/systemd, SLI/SLO, FinOps | `reference/CLOUD-SRE.md` | `/shadow-ops`, `/shadow-observe`, `/shadow-finops`, `/shadow-resilience` |
+| Enterprise Integration & IAM Specialist: Kafka/RabbitMQ, Keycloak/OIDC/SAML, ERP/Payment Ledger | `reference/ENTERPRISE-INTEGRATION.md` | `/shadow-integrate`, `/shadow-auth` |
+| QA Engineer: test strategy, regression coverage, flaky tests | `reference/TESTING.md` | `/shadow-test`, `/shadow-uat`, `/shadow-browser`, `/shadow-compat` |
+| Incident Responder / Debugger: bugs, errors, stack traces, incidents | `reference/DEBUGGING.md` | `/shadow-maintain`, `/shadow-observe` |
+| Principal / Solutions Architect: system design, module boundaries, ADRs | `reference/ARCHITECTURE.md` | `/shadow-architect` (single app), `/shadow-ea` (multi-app / SPBE 6-domain) |
+| Solutions Consultant & Pre-Sales: TOR/KAK, Technical Proposals, Server Sizing formulas, BoQ/RAB IT | `reference/PRESALES-PROPOSAL-KAK.md` | `/shadow-presales` |
+| Code Reviewer / Auditor: code review, readiness assessments | `reference/CODE-REVIEW.md` | `/shadow-quality`, `/shadow-sec` |
+| AI / LLM Engineer: prompts, RAG, embeddings, LLM reliability & evaluation | `reference/AI-LLM.md` | `/shadow-eval`, `/shadow-finops` (token budgets) |
+| AI Agent & MCP Engineer: multi-agent orchestration, subagents, MCP servers/tools, guardrails | `reference/AGENTS-MCP.md` | `/shadow-eval` |
+| Product Manager (PM), System Analyst (SA) & BA: PRD/SRS/FSD, user stories, system modeling | `reference/PRODUCT-ANALYSIS.md` | `/shadow-discovery`, `/shadow-plan` |
+| IT Project Manager (PMO), Scrum Master & GRC/Compliance: WBS, RAID, RFC/CR, SLA, UU PDP/ISO 27001 | `reference/IT-PMO-GOVERNANCE.md` | `/shadow-pmo`, `/shadow-grc`, `/shadow-privacy`, `/shadow-handover` |
+| Technical Writer & Doc Engineer: source-driven `.md` → `.docx`/`.pdf` pipelines, SOP/Runbooks | `reference/DOCS-PIPELINE.md` | `/shadow-doc`, `antislop-copywriting` |
+| Data Engineer & Automation: scripting, ETL, batch processing, CSV/Excel/JSON pipelines | `reference/DATA-AUTOMATION.md` | `/shadow-db`, `/shadow-data` |
+| Data Analyst, BI, Analytics Engineer (`dbt`) & Classical ML: Star Schema, SQL KPIs, ML pipelines | `reference/DATA-ANALYTICS-ML.md` | `/shadow-db` |
+
+### 1b. Sibling Skill Disambiguation Boundaries
+
+| Pair | Load Skill A When... | Load Skill B When... |
+|---|---|---|
+| `/handoff` vs `/shadow-handover` | Saving/loading/merging **AI coding session memory** | Delivering **client BAST, Admin/User Manuals, credential transfer & ToT** |
+| `/shadow-architect` vs `/shadow-ea` | Designing **one application** (C4, ADRs, Modular Monolith) | Mapping **multi-system portfolios, TOGAF 10, TIME or 6-Domain SPBE** |
+| `/shadow-plan` vs `/shadow-pmo` | Breaking approved specs into **Sprints, Stories, Tasks** | Evaluating **contractual CRs, PERT+CPM+Monte Carlo P80, or EVM** |
+| `/shadow-sec` vs `/shadow-privacy` vs `/shadow-grc` | **AppSec / STRIDE / OWASP ASVS / SAST** | **UU PDP / GDPR PII & consent** (`/shadow-privacy`); **COBIT / ISO 27001 SoA / SPBE / OJK GRC** (`/shadow-grc`) |
+| `/shadow-data` vs `/shadow-db` | Writing **Expand-Contract app migrations, seeds, ACID tx** | **Live DB inspection, DBML/ERD, Star Schema DW, Pentaho** |
+| `/shadow-test` vs `/shadow-eval` vs `/shadow-perf` | **Unit/integration/contract tests** (`/shadow-test`) | **RAG/LLM evals & red-teaming** (`/shadow-eval`); **Pre-UAT `k6`/`EXPLAIN` ONLY** (`/shadow-perf`) |
+| `/shadow-browser` vs `/shadow-mobile` | **Web browser Playwright E2E & 375px overflow** | **iOS/Android/Flutter/RN MASVS, `PrivacyInfo.xcprivacy` & Store Gates** |
 
 ### 2. Language & Backend/Core Framework Authoring Rules (`lang-*.md`)
 
@@ -229,17 +244,17 @@ that match the active task. Do not load the entire library into context.
 | GIS & Geospatial (PostGIS SRID 4326, `GIST`, `ST_DWithin`, GeoJSON `[lng,lat]`, MapLibre/Leaflet, Vector Tiles, H3) | `reference/sub-GIS-GEOSPATIAL.md` |
 | Computer Vision, Document OCR (e-KTP/Invoice), Biometrics/Liveness, Whisper Audio & Safe `ffmpeg` | `reference/sub-VISION-OCR-MEDIA.md` |
 
-### 4. Full-Stack SDLC Orchestration & 36-Skill Shadow Army Matrix
+### 4. Full-Stack SDLC Orchestration & 45-Skill Shadow Army Matrix
 
-`shadow-monarch` acts as the **SDLC Orchestrator** across 8 quality-gated lifecycle stages (returning work to the appropriate stage whenever a gate fails rather than forcing deployment):
-`1. Discovery (/shadow-discovery)` -> `2. Architecture (/shadow-architect, /shadow-plan, /shadow-bootstrap)` -> `3. Implementation (/shadow-design, /shadow-auth, /shadow-data, /shadow-cache, /shadow-integrate, /shadow-api)` -> `4. Verification (/shadow-quality, /shadow-test, /shadow-sec, /shadow-browser, /shadow-compat, /shadow-accessibility)` -> `5. Pre-UAT (/shadow-perf)` -> `6. Staging UAT (/shadow-uat)` -> `7. Production Release & Smoke Test (/shadow-release, /shadow-ops)` -> `8. Handover & Maintenance (/shadow-handover, /shadow-observe, /shadow-resilience, /shadow-maintain)`.
+`shadow-monarch` acts as the **SDLC & Enterprise IT Consulting Orchestrator** across 8 quality-gated lifecycle stages plus dedicated Enterprise Consulting engagements (returning work to the appropriate stage whenever a gate fails rather than forcing deployment):
+`1. Discovery (/shadow-discovery)` -> `2. Architecture (/shadow-architect, /shadow-plan, /shadow-bootstrap)` -> `3. Implementation (/shadow-design, /shadow-auth, /shadow-data, /shadow-cache, /shadow-integrate, /shadow-api)` -> `4. Verification (/shadow-quality, /shadow-test, /shadow-eval, /shadow-sec, /shadow-privacy, /shadow-browser, /shadow-mobile, /shadow-compat, /shadow-accessibility)` -> `5. Pre-UAT (/shadow-perf)` -> `6. Staging UAT (/shadow-uat)` -> `7. Production Release & Smoke Test (/shadow-release, /shadow-ops)` -> `8. Handover & Maintenance (/shadow-handover, /shadow-observe, /shadow-finops, /shadow-resilience, /shadow-maintain)`.
 
 #### 3-Tier Skill Activation Policy
 1. **Tier 1 — Always-On (Lightweight Guardrails)**: `shadow-monarch`, `antislop` (`during` mode), strict typing (`0 any`, `0 as Type`), token efficiency, read-only by default for server/DB mutations, and ambiguity stop gate when requirements conflict.
 2. **Tier 2 — Conditional (Task-Triggered)**:
-   - `/shadow-api` when API contracts change · `/shadow-auth` when identity/RBAC/tenant logic changes · `/shadow-data` & `/shadow-db` when schemas or migrations change · `/shadow-cache` when client/Redis caching changes · `/shadow-integrate` when webhooks/3rd-party APIs change · `/shadow-test` when behavior changes · `/shadow-browser` when UI screens change · `/shadow-git` when syncing branches or resolving conflicts · `/context7` when checking library docs.
+   - `/shadow-api` when API contracts change · `/shadow-auth` when identity/RBAC/tenant logic changes · `/shadow-data` & `/shadow-db` when schemas or migrations change · `/shadow-cache` when client/Redis caching changes · `/shadow-integrate` when webhooks/3rd-party APIs change · `/shadow-test` when behavior changes · `/shadow-eval` when RAG/LLM prompts or agent tools change · `/shadow-browser` when web UI screens change · `/shadow-mobile` when Android/iOS/Flutter/RN native config or store builds change · `/shadow-git` when syncing branches or resolving conflicts · `/context7` when checking library docs.
 3. **Tier 3 — Gate-Based (High-Risk Stage Transitions)**:
-   - `/shadow-discovery` & `/shadow-architect` before new systems · `/shadow-bootstrap` when scaffolding from zero · `/shadow-quality` & `/shadow-sec` (NIST SSDF + OWASP ASVS 5.0) before release · `/shadow-perf` strictly at the **Pre-UAT Gate** · `/shadow-uat` at **Staging UAT & Client Acceptance** · `/shadow-release` at **Production Deployment** · `/shadow-handover` at **BAST & Client Delivery** · `/handoff` for AI session memory transfer.
+   - `/shadow-discovery` & `/shadow-architect` before new systems · `/shadow-bootstrap` when scaffolding from zero · `/shadow-quality`, `/shadow-sec` (NIST SSDF + OWASP ASVS 5.0), & `/shadow-privacy` (UU PDP UU No. 27/2022 + GDPR) before release · `/shadow-perf` strictly at the **Pre-UAT Gate** · `/shadow-uat` at **Staging UAT & Client Acceptance** · `/shadow-release` at **Production Deployment** · `/shadow-finops` for cloud & LLM cost optimization · `/shadow-handover` at **BAST & Client Delivery** · `/handoff` for AI session memory transfer.
 
 | Group | Slash Skill | Priority | Core Responsibility & Deliverable |
 |---|---|---|---|
@@ -257,14 +272,18 @@ that match the active task. Do not load the entire library into context.
 | | `/shadow-accessibility` | P2 | Deep WCAG 2.2 AA/AAA audit, keyboard focus traps, ARIA live regions & screen reader QA |
 | **C. Quality, UAT & Release** | `/shadow-quality` | P0 | Static analysis, strict typecheck/lint, complexity reduction, dead code cleanup & layer conformance |
 | | `/shadow-test` | P0 | Polyglot unit, integration & contract tests (8+ languages) with risk-based pyramid & 8-point matrix |
+| | `/shadow-eval` | P0 | RAG Triad metrics, heuristic precision/recall probes & OWASP LLM 2025 / NIST AI 600-1 red-teaming |
 | | `/shadow-sec` | P0 | STRIDE threat modeling, SBOM/supply-chain, secret scan & NIST SSDF / OWASP ASVS 5.0 verification |
+| | `/shadow-privacy` | P0 | UU PDP (UU No. 27/2022) & GDPR audit: personal data inventory, consent, DSAR, DPIA, cross-border & 3x24h breach readiness |
 | | `/shadow-perf` | P0 | **Pre-UAT Gate ONLY**: OpenAPI-to-`k6` load/stress/spike tests & SQL `EXPLAIN ANALYZE` profiling |
 | | `/shadow-uat` | P0 | Requirement Traceability Matrix (RTM), Staging UAT scenarios, defect triage, evidence & sign-off |
 | | `/shadow-release` | P0 | SemVer changelog, pre-flight checklist, backward-compatible migration gate & verified rollback |
 | | `/shadow-compat` | P1 | API backward compatibility, safe dependency upgrades & cross-browser/iOS/Android compatibility |
 | | `/shadow-browser` | P0 | Real Chromium E2E UI verification & 375px mobile viewport overflow checks (`playwright` MCP) |
+| | `/shadow-mobile` | P1 | OWASP MASVS v2.1.0 mobile hardening, iOS `PrivacyInfo.xcprivacy`, Android Play Integrity, signing & store gates |
 | **D. Ops & Maintenance** | `/shadow-ops` | P0 | Immutable Docker/K8s, Nginx/Caddy, Linux `systemd`/PM2, CI/CD & backups (local OWASP/H5BP KB) |
 | | `/shadow-observe` | P1 | SLI/SLO error budgets, multi-window burn alerts, OpenTelemetry trace/log correlation & triage |
+| | `/shadow-finops` | P1 | FinOps Framework & FOCUS cost governance, K8s right-sizing, LLM prompt caching & thinking-token budgets |
 | | `/shadow-resilience` | P1 | Automated DB backup restore drills (RPO/RTO proof), graceful degradation & fault isolation |
 | | `/shadow-maintain` | P1 | Post-production Harwat/OMKT, SLA bug triage, hotfix + regression test workflow & blameless RCA |
 | **E. Delivery & Collaboration** | `/shadow-handover` | P0 | Client BAST, source/SBOM inventory, secure credential transfer, Admin/User Manuals & ToT |
@@ -273,6 +292,11 @@ that match the active task. Do not load the entire library into context.
 | | `/handoff` | P0 | Cross-agent AI session context compaction & resumption (`shadow_handoff` MCP) |
 | | `/context7` | P0 | Real-time official library/framework documentation lookup (`context7` MCP) |
 | | `/antislop` (+5 sub) | P0 | Always-on (`during` mode) UI, mobile layout, human accessibility, copywriting & code comment filter |
+| **F. Enterprise IT Consulting** | `/shadow-presales` | P0 | Tender intelligence, 3-scenario workload capacity engineering, 3–5 yr TCO/NPV, Perpres 46/2025 RAB vs PPK HPS |
+| | `/shadow-grc` | P0 | Risk-based audit lifecycle, COBIT 2019 (Capability vs Maturity), ISO 27001:2022 (Clauses 4–10 + 93 SoA), SPBE, POJK 11/2022 + PADK OJK 1/2026 |
+| | `/shadow-pmo` | P0 | Contractual hierarchy CR triage, PERT + CPM + Monte Carlo (`P50/P80/P90`), EVM & BAST governance |
+| | `/shadow-modernize` | P1 | 8-area technical due diligence, business-rule archaeology, multi-dimensional risk vector & Strangler vs Rewrite TCO |
+| | `/shadow-ea` | P1 | TOGAF 10 ADM, explicit 6-Domain SPBE crosswalk (`Perpres 132/2022`), TIME portfolio rationalization & ABB/SBB |
 
 For other stacks use `reference/CORE.md` plus applicable domain references and verified ecosystem documentation.
 Framework-specific examples do not transfer unchanged to another framework. Resolve conflicting

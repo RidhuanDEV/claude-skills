@@ -1,6 +1,6 @@
 ---
 name: shadow-perf
-description: Pre-UAT Performance, Load/Stress/Spike Testing (Grafana k6 from OpenAPI 3.1), SQL EXPLAIN ANALYZE Query Profiling, and Frontend/API Bottleneck Audit. STRICTLY scoped to the Pre-UAT / Staging Testing phase (never run automatically during feature coding). Trigger with /shadow-perf.
+description: "Pre-UAT Performance & Load Testing Gate. Use ONLY when entering the Pre-UAT/Staging performance gate or when explicitly asked for k6 load/stress/spike testing or SQL EXPLAIN ANALYZE profiling. Do NOT use automatically during feature coding."
 ---
 
 # Shadow Perf (`/shadow-perf`) — Pre-UAT Load Testing (`k6`) & Bottleneck Profiler

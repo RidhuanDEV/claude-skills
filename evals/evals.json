@@ -245,6 +245,136 @@
         "States that passing positive tests does not prove the heuristic is safe",
         "Proposes a concrete fix (exception lexicon, stricter pattern, or LLM rewrite with validation)"
       ]
+    },
+    {
+      "id": 19,
+      "name": "uu-pdp-privacy-compliance-audit",
+      "prompt": "Kami sedang membangun aplikasi healthtech & fintech di Indonesia yang menyimpan NIK, rekam medis pasien, dan rekening bank user, serta memanggil API LLM luar negeri untuk ringkasan klaim. Terapkan /shadow-privacy untuk audit kepatuhan UU PDP sebelum rilis.",
+      "expected_output": "Mengklasifikasikan Data Spesifik (Pasal 4 Ayat 2: rekam medis, data keuangan pribadi) vs Umum (Pasal 4 Ayat 3: NIK), mewajibkan dasar pemrosesan Pasal 20 & consent eksplisit, DPIA Pasal 34, enkripsi/log redaction Pasal 35, mekanisme hak subjek Pasal 5-13, transfer lintas negara bertahap Pasal 56, kesiapan notifikasi kebocoran 3x24 jam Pasal 46, serta risiko denda administratif maksimal 2% pendapatan tahunan (Pasal 57).",
+      "files": [],
+      "assertions": [
+        "Classifies rekam medis and personal financial data as Data Pribadi yang Bersifat Spesifik (UU PDP Pasal 4 Ayat 2) and NIK as Data Umum (Pasal 4 Ayat 3)",
+        "Requires lawful basis verification (Pasal 20) and Data Protection Impact Assessment / DPIA (Pasal 34) for high-risk specific data",
+        "Enforces cross-border transfer 3-step safeguards (Pasal 56) before sending PII to foreign LLM APIs",
+        "Requires 3x24 hour written breach notification readiness (Pasal 46) and notes administrative fine up to 2% of annual revenue (Pasal 57)"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "ai-rag-eval-owasp-llm-2025",
+      "prompt": "Audit dan buatkan gerbang evaluasi (/shadow-eval) untuk chatbot RAG multi-tenant kami yang juga memanggil tool refund otomatis via SQL.",
+      "expected_output": "Menerapkan OWASP Top 10 for LLM Applications (2025) dan NIST AI 600-1: menguji LLM01 Prompt Injection, LLM05 Improper Output Handling (parameterized SQL), LLM06 Excessive Agency (HITL approval untuk refund), LLM08 Vector Weaknesses (100% tenant ACL pre-filtering), serta mengukur RAG Triad (Context Recall, Faithfulness, Citation Integrity) dan precision/recall probes.",
+      "files": [],
+      "assertions": [
+        "Maps controls to OWASP Top 10 for LLM Applications 2025 (LLM01, LLM05, LLM06, LLM08) and NIST AI 600-1",
+        "Enforces 100% tenant ACL pre-filtering inside vector retrieval (LLM08) and Faithfulness / Citation Integrity scoring",
+        "Requires Human-in-the-Loop (HITL) approval for financial refund tools (LLM06) and zero raw LLM-to-SQL interpolation (LLM05)",
+        "Includes precision probes (negative/out-of-scope/topic-switch) alongside recall probes"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "mobile-masvs-store-release-gate",
+      "prompt": "Aplikasi Flutter fintech kami mau submit ke Google Play Console dan Apple App Store Connect. Jalankan checklist /shadow-mobile agar tidak ditolak reviewer dan aman secara OWASP MASVS.",
+      "expected_output": "Menerapkan OWASP MASVS v2.1.0: iOS PrivacyInfo.xcprivacy untuk Required Reason APIs agar lolos ITMS-91053, NSAllowsArbitraryLoads false, Android usesCleartextTraffic false, debuggable false, Google Play Integrity API (menggantikan SafetyNet), signing secrets dari env vars, dan verifikasi Universal Links / App Links.",
+      "files": [],
+      "assertions": [
+        "Requires OWASP MASVS v2.1.0 controls (Keychain/Keystore storage, TLS without cleartext, internal exported=false)",
+        "Requires iOS PrivacyInfo.xcprivacy manifest declaring Required Reason APIs and NSAllowsArbitraryLoads set to false",
+        "Replaces deprecated SafetyNet with Google Play Integrity API verified server-side and checks Android targetSdkVersion / 16KB native alignment",
+        "Verifies signing credentials stay out of Gradle/Git and validates AASA / assetlinks.json deep links"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "finops-focus-llm-token-cost",
+      "prompt": "Tagihan cloud Kubernetes dan API LLM reasoning kita melonjak 3x bulan ini. Pakai /shadow-finops untuk mendiagnosis dan menyusun kontrol biayanya.",
+      "expected_output": "Menggunakan FinOps Foundation Framework (Inform, Optimize, Operate) dan spesifikasi FOCUS (EffectiveCost, BilledCost, Tags), memeriksa K8s requests/limits & NAT egress, menjaga system prompt prefix tetap statis agar prompt caching tidak jebol, serta membatasi thinking_budget dan max_output_tokens karena thinking tokens ditagih sebagai output tokens.",
+      "files": [],
+      "assertions": [
+        "Structures remediation around FinOps Foundation Framework (Inform, Optimize, Operate) and FOCUS billing columns/tags",
+        "Highlights that reasoning/thinking tokens are billed at the output token rate and enforces max_output_tokens / thinking_budget caps",
+        "Protects prefix prompt caching by keeping system prompts static and moving dynamic timestamps/IDs to trailing user context",
+        "Audits Kubernetes resources.requests/limits, HPA caps, and cross-AZ/NAT egress or Batch API routing"
+      ]
+    },
+    {
+      "id": 23,
+      "name": "presales-kak-tco-perpres-46-2025",
+      "prompt": "Klien K/L Pemerintah memberi KAK sistem perizinan publik dan meminta estimasi sizing server, 3-year TCO, dan draf HPS sesuai pengadaan nasional. Gunakan /shadow-presales.",
+      "expected_output": "Memisahkan Provider RAB/BoQ dari HPS resmi yang hanya ditetapkan PPK berdasarkan Perpres 46 Tahun 2025 (termasuk kepatuhan PDN/TKDN & >=40% UMKK), memodelkan 3 skenario kapasitas (conservative/expected/stress) berbasis CPU service demand & parameter DB teruji, serta menyusun 3-year TCO/NPV + Assumption Register & Bid/No-Bid Scorecard.",
+      "files": [],
+      "assertions": [
+        "Explicitly distinguishes Provider RAB estimate from official HPS determined solely by PPK under Perpres 46 Tahun 2025",
+        "Verifies PDN/TKDN and >=40% domestic UMKK allocation rules",
+        "Models 3 capacity scenarios (conservative, expected, stress) from explicit CPU service demand and configurable DB parameters",
+        "Delivers 3-year TCO/NPV with Assumption Register and Bid/No-Bid Scorecard"
+      ]
+    },
+    {
+      "id": 24,
+      "name": "grc-cobit-iso27001-padk-ojk-2026",
+      "prompt": "Bank umum di Indonesia meminta kesiapan audit TI (COBIT 2019, ISO 27001:2022, dan aturan TI OJK terbaru per 2026) termasuk evaluasi PPJTI cloud vendor, lalu mengklaim langsung tersertifikasi dari self-assessment. Jalankan /shadow-grc.",
+      "expected_output": "Menerapkan POJK 11/POJK.03/2022 bersama PADK OJK No. 1 Tahun 2026 (berlaku 1 Maret 2026 menggantikan SEOJK 21/2017 yang dicabut), memisahkan Process Capability 0-5 vs Focus Area Maturity 0-5 pada COBIT 2019, mencakup ISO 27001 Clauses 4-10 dan 93 kontrol SoA dengan Design vs Operating Effectiveness testing, 6 elemen temuan audit, dan menolak klaim sertifikasi resmi dari self-assessment.",
+      "files": [],
+      "assertions": [
+        "Applies POJK 11/POJK.03/2022 and PADK OJK No. 1 Tahun 2026 (replacing revoked SEOJK 21/SEOJK.03/2017)",
+        "Separates COBIT 2019 Process Capability (0-5) from Focus Area Maturity (0-5)",
+        "Covers ISO 27001:2022 Management Clauses 4-10 plus 93 Annex A SoA controls with Design vs Operating testing",
+        "Rejects self-assessment certification overclaims and structures findings with Criteria/Condition/Cause/Effect/Recommendation/Evidence"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "modernize-forensics-strangler-vs-rewrite",
+      "prompt": "Sistem core billing BUMN berjalan stabil di produksi dengan aturan bisnis pajak/tarif sangat kompleks tanpa automated test. Tim lain mengusulkan Full Rewrite dari nol berdasarkan satu angka Tech Debt. Evaluasi dengan /shadow-modernize.",
+      "expected_output": "Menolak keputusan berbasis satu skor Tech Debt tanpa metodologi, mengevaluasi vektor risiko 6 dimensi beserta confidence score, mewajibkan Business-Rule Archaeology & Characterization Tests karena ketiadaan test pada sistem stabil tidak otomatis berarti Full Rewrite, dan membandingkan TCO Strangler Fig Refactor vs Full Rewrite termasuk biaya koeksistensi/dual-run.",
+      "files": [],
+      "assertions": [
+        "Rejects single opaque Tech Debt score in favor of multi-dimensional risk vectors with evidence confidence",
+        "Explains why missing tests on a stable rule-heavy system do not justify blind Full Rewrite",
+        "Mandates Business-Rule Archaeology and Characterization Tests before extraction",
+        "Compares Strangler Fig Refactor vs Full Rewrite risk-adjusted TCO including coexistence/dual-run costs"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "pmo-contractual-cr-pert-monte-carlo",
+      "prompt": "Di tengah proyek, klien meminta penambahan integrasi payment baru dan menganggapnya revisi gratis karena merasa masih terkait pembayaran. Selain itu, sponsor meminta estimasi tanggal selesai P80 pada WBS paralel. Gunakan /shadow-pmo.",
+      "expected_output": "Menolak klasifikasi sepihak hanya dari perbandingan teks SRS; memeriksa hierarki Kontrak/Addendum/KAK/SOW/FSD/Exclusion Register dan mengarahkan ke CCB/approval berwenang sebelum status Paid CR final; menghitung PERT + Critical Path (CPM) + Monte Carlo P50/P80/P90 untuk mengantisipasi merge bias jalur paralel serta EVM (CPI/SPI).",
+      "files": [],
+      "assertions": [
+        "Evaluates CR against full contractual precedence (Contract/Addendum/KAK/SOW/FSD/Exclusions) rather than raw SRS text alone",
+        "Routes Paid CR candidate determination through human CCB / authorized contract approval",
+        "Combines PERT + Critical Path (CPM) with seeded Monte Carlo P50/P80/P90 schedule risk to address merge bias",
+        "Includes Earned Value Management (CPI/SPI/EAC) and traceable CR Decision Record"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "ea-togaf-spbe-6-domain-portfolio",
+      "prompt": "Kementerian memiliki 3 aplikasi kepegawaian silo yang tumpang tindih dan meminta blueprint Arsitektur Enterprise memakai 4 domain TOGAF saja. Evaluasi dan susun rancangannya menggunakan /shadow-ea.",
+      "expected_output": "Mewajibkan pemetaan eksplisit ke 6 Domain Arsitektur SPBE Nasional (Proses Bisnis, Data & Informasi, Infrastruktur, Aplikasi, Keamanan, Layanan) sesuai Perpres 95/2018 & Perpres 132/2022 + Satu Data Indonesia (Perpres 39/2019), memetakan katalog TIME (Migrate/Eliminate duplikasi aplikasi) serta memisahkan ABB vendor-neutral dari SBB.",
+      "files": [],
+      "assertions": [
+        "Rejects limiting Government SPBE architecture to 4 TOGAF domains and maps all 6 SPBE domains (Perpres 95/2018 & 132/2022)",
+        "Integrates Satu Data Indonesia (Perpres 39/2019) interoperability and master data ownership",
+        "Applies TIME portfolio rationalization to flag duplicate silo apps for consolidation (Migrate/Eliminate)",
+        "Distinguishes vendor-neutral Architecture Building Blocks (ABB) from Solution Building Blocks (SBB)"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "topic-based-auto-skill-routing-without-slash",
+      "prompt": "Tolong audit tabel pasien rumah sakit ini terhadap UU PDP dan buat endpoint REST API login multi-tenant tanpa menunggu saya mengetik slash command.",
+      "expected_output": "Otomatis memuat companion skill yang sesuai topik (/shadow-privacy, /shadow-api, /shadow-auth) beserta referensi yang relevan tanpa menunggu /shadow-* slash command, tidak memuat /shadow-perf selama normal implementation, dan memisahkan sibling boundaries seperti /handoff vs /shadow-handover.",
+      "files": [],
+      "assertions": [
+        "Auto-loads topic-matched companion skills (shadow-privacy, shadow-api, shadow-auth) without waiting for slash commands",
+        "Loads targeted shadow-monarch/reference modules only (Mana Conservation) rather than loading all references",
+        "Excludes Pre-UAT-only shadow-perf during normal feature implementation",
+        "Preserves sibling skill boundaries (e.g., handoff vs shadow-handover, shadow-architect vs shadow-ea)"
+      ]
     }
   ]
 }

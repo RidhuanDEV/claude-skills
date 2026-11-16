@@ -1,6 +1,6 @@
 ---
 name: shadow-test
-description: Polyglot Automated Unit, Integration, and API Contract Test Generator supporting TypeScript/JS (Vitest/Jest), Python (Pytest), Go (testing), PHP/Laravel (Pest/PHPUnit), Java/Kotlin (JUnit 5), .NET (xUnit), Rust, and Flutter. Enforces Risk-Based Test Pyramid, Deterministic Fixtures, Regression Selection, and Contract Compatibility. Trigger with /shadow-test.
+description: "Polyglot Automated Unit, Integration & Contract Testing. Use when writing or fixing Vitest/Jest, Pytest, Go test, Pest/PHPUnit, JUnit 5, xUnit, Rust, or Flutter tests. Do NOT use for RAG/LLM evals (/shadow-eval) or Pre-UAT k6 load tests (/shadow-perf)."
 ---
 
 # Shadow Test (`/shadow-test`) — Polyglot Automated Testing, Risk-Based Pyramid & Contract Compatibility

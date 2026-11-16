@@ -1,6 +1,6 @@
 ---
 name: context7
-description: "Fetch real-time, version-accurate official documentation and code examples for any library or framework using the Context7 MCP server. Trigger with /context7."
+description: "Fetch real-time, version-accurate official documentation and code examples via Context7 MCP. Use when implementing or debugging library, framework, or SDK APIs where training knowledge may be outdated."
 ---
 
 # /context7 — Live Official Documentation Lookup (Shadow Army)

@@ -1,6 +1,6 @@
 ---
 name: shadow-api
-description: "Test real HTTP API endpoints, generate OpenAPI 3.1 specifications from existing backends or new endpoints (compact or modular), and sync Postman v2.1 collections. Trigger with /shadow-api."
+description: "Backend API & Contract Sync. Use when creating, modifying, or testing HTTP/REST API endpoints, generating or validating OpenAPI 3.1 (openapi.yaml), or syncing Postman collections via shadow_api MCP."
 ---
 
 # /shadow-api — Real API Tester, OpenAPI 3.1 & Postman Sync (Shadow Army)

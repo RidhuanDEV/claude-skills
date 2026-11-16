@@ -1,6 +1,6 @@
 ---
 name: shadow-maintain
-description: Post-Production Maintenance, Bug Triage, Incident Root-Cause Analysis (Blameless Postmortem / RCA), Hotfix Workflow, Security Patch Management, SLA Tracking, and Maintenance Backlog Governance (Harwat / OMKT). Trigger with /shadow-maintain.
+description: "Post-Production Maintenance & Incident RCA. Use when triaging live production incidents, conducting blameless postmortems/RCA, managing SLA/Harwat/OMKT backlogs, or shipping hotfixes with regression tests."
 ---
 
 # Shadow Maintain (`/shadow-maintain`) — Post-Production Maintenance (Harwat), Incident RCA & SLA Governance

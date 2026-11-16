@@ -1,6 +1,6 @@
 ---
 name: shadow-resilience
-description: Disaster Recovery (DR), Automated Backup Restore Drills, RPO/RTO Verification, Graceful Degradation, Circuit Breakers, Chaos/Failure Injection, and Business Continuity Planning. Pairs with /shadow-ops. Trigger with /shadow-resilience.
+description: "Disaster Recovery & Business Continuity. Use when running automated DB backup restore drills (RPO/RTO verification), chaos/fault injection, circuit breakers, or graceful degradation planning."
 ---
 
 # Shadow Resilience (`/shadow-resilience`) — Disaster Recovery Drills, RPO/RTO & Graceful Degradation

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: "Save, load, or merge cross-agent session handoffs (Antigravity, Claude Code, Codex, Gemini CLI) when context/memory is full or when parallel sessions must be combined into one agent. Trigger with /handoff to save, '/handoff load' / 'lanjut handoff' to resume, '/handoff merge' to combine parallel sessions."
+description: "Save, load, or merge AI coding session context (\"handoff\", \"lanjut handoff\", \"load handoff\") via shadow_handoff MCP. Use when context memory is full or switching/merging agent sessions. Do NOT use for client BAST project delivery (/shadow-handover)."
 ---
 
 # /handoff — Cross-Agent Session Handoff (Shadow Army)

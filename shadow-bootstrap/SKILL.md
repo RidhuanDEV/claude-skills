@@ -1,6 +1,6 @@
 ---
 name: shadow-bootstrap
-description: Initialize and scaffold a new production-grade project from zero after architecture decisions are locked. Sets up repository structure, strict TypeScript/linting, runtime env validation, DB/ORM, testing framework, Docker dev environment, Git hooks, CI, and developer README. Trigger with /shadow-bootstrap.
+description: "Greenfield Project Scaffolder. Use when initializing or scaffolding a new project repository from zero (TypeScript/lint, env validation, DB/ORM, Docker dev, CI, seed). Do NOT use on existing brownfield codebases."
 ---
 
 # Shadow Bootstrap (`/shadow-bootstrap`) — Project Foundation & Zero-to-Runnable Scaffold

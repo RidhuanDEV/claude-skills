@@ -1,0 +1,111 @@
+{
+  "version": "2026.11.16",
+  "industry_packs": {
+    "GOVERNMENT_SPBE": {
+      "label": "Pemerintah / Kementerian / Lembaga / Pemda (SPBE)",
+      "mandatory_regulations": [
+        "PERPRES-95-2018",
+        "PERPRES-132-2022",
+        "PERPRES-39-2019",
+        "PERPRES-46-2025",
+        "UU-27-2022",
+        "BSSN-INDEKS-KAMI"
+      ],
+      "primary_methodologies": {
+        "presales": "LKPP tender intelligence, Provider RAB/BoQ (strictly distinct from PPK HPS), PDN/TKDN + >=40% UMKK compliance",
+        "grc": "6-Domain SPBE readiness + Indeks KAMI BSSN + UU PDP Pasal 4/20/34/46/56 + ISO 27001 Clauses 4-10",
+        "ea": "TOGAF 10 ADM explicitly mapped to 6 SPBE Architecture Domains + Satu Data Indonesia interoperability",
+        "pmo": "KAK/Kontrak/Addendum hierarchy + PPK/KPA change sign-off + Laporan Pendahuluan/Antara/Akhir",
+        "modernize": "Public-service continuity, data migration reconciliation, and phased Strangler Fig transition"
+      },
+      "escalation_authorities": ["PPK", "PA/KPA", "BSSN", "KemenPANRB", "Komdigi / Otoritas PDP"],
+      "prohibited_claims": [
+        "Setting or approving official HPS on behalf of PPK",
+        "Issuing official SPBE maturity certification or Indeks KAMI official rating"
+      ]
+    },
+    "BANKING": {
+      "label": "Perbankan Umum (OJK Regulated)",
+      "mandatory_regulations": [
+        "POJK-11-2022",
+        "PADK-OJK-1-2026",
+        "UU-27-2022",
+        "ISO-IEC-27001-2022",
+        "ISACA-COBIT-2019"
+      ],
+      "primary_methodologies": {
+        "presales": "Core/channel capacity sizing with DR/RPO/RTO HA topologies + 5-year TCO + vendor/PPJTI compliance costs",
+        "grc": "POJK 11/2022 + PADK OJK 1/2026 (effective 2026-03-01, replacing SEOJK 21/2017) + ISO 27001 + COBIT 2019 Design vs Operating control testing",
+        "ea": "TOGAF 10 ADM + RSTI alignment + PPJTI/DC/DRC boundary architecture",
+        "pmo": "Bank IT Steering Committee (Komite Pengarah TI) + Change Control Board + OJK reporting lead times",
+        "modernize": "Core/channel business-rule archaeology, financial ledger reconciliation invariants, zero-downtime parallel run"
+      },
+      "escalation_authorities": ["Komite Pengarah TI", "Direksi / Compliance", "Internal Audit (SKAI)", "OJK"],
+      "prohibited_claims": [
+        "Citing revoked SEOJK 21/SEOJK.03/2017 as active banking rule after 2026-03-01",
+        "Claiming ISO 27001 certification or OJK regulatory approval from advisory review"
+      ]
+    },
+    "FINTECH": {
+      "label": "Fintech / Payment / P2P Lending (BI / OJK Regulated)",
+      "mandatory_regulations": [
+        "UU-27-2022",
+        "ISO-IEC-27001-2022",
+        "ISACA-COBIT-2019"
+      ],
+      "primary_methodologies": {
+        "presales": "High-burst concurrency & idempotent ledger sizing + FinOps unit economics",
+        "grc": "UU PDP Pasal 4(2) personal financial/biometric controls + ISO 27001 + PCI/SNAP BI security alignment (verify license-specific BI/OJK rules per entity)",
+        "ea": "API-first domain boundaries, payment ledger isolation, observability & disaster failover",
+        "pmo": "Strict security/UAT sign-off gates before production cutover",
+        "modernize": "Double-entry ledger reconciliation & payment callback idempotency preservation"
+      },
+      "escalation_authorities": ["Chief Compliance / DPO", "Bank Indonesia / OJK", "Independent QSA / Auditor"],
+      "prohibited_claims": [
+        "Asserting BI PJP or OJK fintech licensing compliance without verifying entity-specific license category"
+      ]
+    },
+    "BUMN": {
+      "label": "Badan Usaha Milik Negara (BUMN)",
+      "mandatory_regulations": [
+        "PERPRES-46-2025",
+        "UU-27-2022",
+        "ISO-IEC-27001-2022",
+        "ISACA-COBIT-2019",
+        "TOGAF-STANDARD-10"
+      ],
+      "primary_methodologies": {
+        "presales": "TCO/NPV/ROI business case + internal BUMN procurement + PDN/TKDN alignment",
+        "grc": "COBIT 2019 governance + ISO 27001:2022 ISMS + BUMN internal IT governance & GCG alignment",
+        "ea": "Multi-subsidiary application rationalization (TIME) & shared master data",
+        "pmo": "Program/portfolio governance, EVM tracking, formal CR & BAST governance",
+        "modernize": "Multi-year ERP/legacy consolidation economics & coexistence cost modeling"
+      },
+      "escalation_authorities": ["Board / Komite Pemantau Risiko", "SPI (Internal Audit)", "Procurement Committee"],
+      "prohibited_claims": [
+        "Substituting internal BUMN procurement guidelines without verifying client corporate bylaws"
+      ]
+    },
+    "GENERAL_ENTERPRISE": {
+      "label": "Korporasi Swasta / Enterprise Umum",
+      "mandatory_regulations": [
+        "UU-27-2022",
+        "ISO-IEC-27001-2022",
+        "ISACA-COBIT-2019",
+        "TOGAF-STANDARD-10"
+      ],
+      "primary_methodologies": {
+        "presales": "Solution Options MCDA, 3-scenario capacity sizing, 3-5 yr TCO/NPV/Payback, commercial margin modeling",
+        "grc": "Risk-based control testing (Design vs Operating), ISO 27001:2022 Clauses 4-10 + SoA, COBIT 2019, UU PDP",
+        "ea": "Business Capability Mapping, TIME Portfolio Management, ABB/SBB Gap Analysis",
+        "pmo": "SOW/Contract hierarchy, PERT/CPM + Monte Carlo schedule risk, Earned Value & CCB governance",
+        "modernize": "8-area technical due diligence, business-rule archaeology, refactor vs rewrite TCO"
+      },
+      "escalation_authorities": ["Executive Sponsor / Steering Committee", "Legal Counsel", "Accredited External Auditor"],
+      "prohibited_claims": [
+        "Issuing binding legal determinations on Paid CR liability without contract/legal review",
+        "Claiming official ISO 27001 certification from internal advisory assessment"
+      ]
+    }
+  }
+}

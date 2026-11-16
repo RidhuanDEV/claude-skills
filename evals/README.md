@@ -31,6 +31,17 @@
 | 15 agents-mcp-server-design | token-safe paginated MCP tools, idempotency, HITL gate for financial actions |
 | 16 presales-kak-snap-bi-sizing | KAK server sizing formula + SNAP BI signature & transfer inquiry rules |
 | 17 ui-ux-design-knowledge-base-id | UI/UX v2 foundations & art direction, thumb zone/touch targets, WCAG AA, handoff checklist |
+| 18 review-followup-heuristic-false-positive | precision probes for Indonesian `-nya` follow-up regex false positives |
+| 19 uu-pdp-privacy-compliance-audit | `/shadow-privacy`: UU No. 27 Tahun 2022 (Pasal 4, 20, 34, 46, 56, 57) & GDPR controls |
+| 20 ai-rag-eval-owasp-llm-2025 | `/shadow-eval`: OWASP Top 10 for LLM 2025, NIST AI 600-1 & RAG Triad metrics |
+| 21 mobile-masvs-store-release-gate | `/shadow-mobile`: OWASP MASVS v2.1.0, `PrivacyInfo.xcprivacy`, Play Integrity API & manifest hardening |
+| 22 finops-focus-llm-token-cost | `/shadow-finops`: FinOps Framework, FOCUS, prefix prompt caching & thinking-token billing |
+| 23 presales-kak-tco-perpres-46-2025 | `/shadow-presales`: 3-scenario workload capacity, 3-yr TCO/NPV, Perpres 46/2025 RAB vs PPK HPS & UMKK |
+| 24 grc-cobit-iso27001-padk-ojk-2026 | `/shadow-grc`: COBIT capability vs maturity, ISO 27001 Clauses 4-10 + SoA, PADK OJK 1/2026 & no self-cert |
+| 25 modernize-forensics-strangler-vs-rewrite | `/shadow-modernize`: Multi-dim risk vector, business-rule archaeology & Strangler vs Rewrite TCO |
+| 26 pmo-contractual-cr-pert-monte-carlo | `/shadow-pmo`: Contractual precedence CR triage, PERT/CPM + Monte Carlo P80 & EVM |
+| 27 ea-togaf-spbe-6-domain-portfolio | `/shadow-ea`: TOGAF 10 <-> SPBE 6-Domain crosswalk, Satu Data, TIME rationalization & ABB/SBB |
+| 28 topic-based-auto-skill-routing-without-slash | Auto-loads topic-matched companion skills without `/shadow-*` slash commands & enforces sibling disambiguation |
 
 ## If something fails
 

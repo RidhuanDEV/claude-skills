@@ -1,6 +1,6 @@
 ---
 name: shadow-quality
-description: Code Quality Gate, Static Analysis, Strict Typecheck & Linting, Cyclomatic/Cognitive Complexity Reduction, Dead Code & Duplication Elimination, Dependency Hygiene, and Architecture Layer Conformance Review. Trigger with /shadow-quality.
+description: "Code Quality, Static Analysis & Drift Gate. Use when running strict typechecks, lint, shadow_gate.py, complexity reduction, dead code cleanup, or brownfield convention drift audits."
 ---
 
 # Shadow Quality (`/shadow-quality`) — Static Analysis, Architecture Conformance & Code Review Gate

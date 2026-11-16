@@ -1,6 +1,6 @@
 ---
 name: shadow-data
-description: Data Lifecycle Engineering: Zero-Downtime Expand-Contract Schema Migrations, Deterministic Seeding, Safe Backfills, Bulk Import/Export Streaming, Transaction Integrity (ACID/Locking), and Data Retention/Archival. Pairs with /shadow-db. Trigger with /shadow-data.
+description: "Application Data Lifecycle & Migrations. Use when writing zero-downtime Expand-Contract database migrations, deterministic seeds, safe backfills, bulk import/export streaming, or ACID transaction locking. Do NOT use for live DB introspection or Pentaho/DW ETL (/shadow-db)."
 ---
 
 # Shadow Data (`/shadow-data`) — Data Lifecycle, Safe Migrations & Transaction Integrity

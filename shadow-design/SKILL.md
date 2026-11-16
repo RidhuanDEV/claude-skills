@@ -1,6 +1,6 @@
 ---
 name: shadow-design
-description: Design system tokens, evidence-tagged UX discovery, US-ID to state-machine user flows, 9-state component contracts, async HTTP 202 & human-AI UX resilience, 12-domain adversarial walkthroughs, and severity-first UX release gates. Works alongside antislop-ui and antislop-layoutmobile. Trigger with /shadow-design.
+description: "Product UI/UX & Design Systems. Use when designing design tokens, UX user flows, wireframes, 9-state component contracts, or human-AI UX states. Pair with antislop-ui."
 ---
 
 # Shadow Design (`/shadow-design`) — Product Design, User Flows, 9-State Machines & Design Systems

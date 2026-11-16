@@ -1,6 +1,6 @@
 ---
 name: shadow-discovery
-description: Requirement elicitation, stakeholder mapping, functional/non-functional requirements (FR/NFR), scope boundaries, testable acceptance criteria (Given/When/Then), and contradiction/gap analysis before architecture or coding begins. Trigger with /shadow-discovery.
+description: "Requirements Engineering & Discovery. Use when eliciting software requirements, mapping stakeholders, writing PRD/SRS/BRD, defining FR/NFR, Given/When/Then acceptance criteria, or detecting requirement gaps. Do NOT use for tender KAK pricing (/shadow-presales) or CR disputes (/shadow-pmo)."
 ---
 
 # Shadow Discovery (`/shadow-discovery`) — Requirement Engineering & Scope Gate (SDLC Stage 1)

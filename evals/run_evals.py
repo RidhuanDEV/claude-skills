@@ -44,6 +44,70 @@ EVAL_18_CHECKS: list[tuple[str, re.Pattern[str]]] = [
     ),
 ]
 
+EVAL_CHECKS_BY_ID: dict[int, list[tuple[str, re.Pattern[str]]]] = {
+    18: EVAL_18_CHECKS,
+    19: [
+        ("Cites UU PDP Pasal 4 Ayat (2) Specific Data vs Pasal 4 Ayat (3) General Data", re.compile(r"pasal\s*4.*?(spesifik|umum)", re.IGNORECASE | re.DOTALL)),
+        ("Requires Lawful Basis (Pasal 20) and DPIA (Pasal 34)", re.compile(r"(pasal\s*20|lawful\s*basis).*(pasal\s*34|dpia)|(pasal\s*34|dpia).*(pasal\s*20|lawful\s*basis)", re.IGNORECASE | re.DOTALL)),
+        ("Requires Cross-Border Transfer cascade (Pasal 56)", re.compile(r"pasal\s*56|cross[- ]border|transfer.*luar", re.IGNORECASE)),
+        ("Requires 3x24h breach notification (Pasal 46) & 2% revenue sanction (Pasal 57)", re.compile(r"(pasal\s*46|3\s*x\s*24|72\s*jam).*(pasal\s*57|2%)", re.IGNORECASE | re.DOTALL)),
+    ],
+    20: [
+        ("Maps OWASP Top 10 for LLM 2025 (LLM01/LLM05/LLM06/LLM08) & NIST AI 600-1", re.compile(r"LLM0[1568].*(NIST\s*AI\s*600-1|AI\s*600-1)", re.IGNORECASE | re.DOTALL)),
+        ("Enforces 100% tenant ACL pre-filtering & Faithfulness/Citation integrity", re.compile(r"(tenant|acl).*(faithfulness|citation)", re.IGNORECASE | re.DOTALL)),
+        ("Requires HITL approval on financial tools & zero raw SQL interpolation", re.compile(r"(hitl|human[- ]in[- ]the[- ]loop).*(parameterized|sql)", re.IGNORECASE | re.DOTALL)),
+        ("Requires precision probes (negative/topic-switch) and recall probes", re.compile(r"(precision\s*probe|negative).*(recall\s*probe)", re.IGNORECASE | re.DOTALL)),
+    ],
+    21: [
+        ("Enforces OWASP MASVS v2.1.0 storage/network/exported controls", re.compile(r"MASVS.*(keychain|keystore|cleartext|exported)", re.IGNORECASE | re.DOTALL)),
+        ("Requires iOS PrivacyInfo.xcprivacy & NSAllowsArbitraryLoads false", re.compile(r"PrivacyInfo\.xcprivacy.*NSAllowsArbitraryLoads", re.IGNORECASE | re.DOTALL)),
+        ("Replaces SafetyNet with Play Integrity API & checks targetSdkVersion/16KB", re.compile(r"Play\s*Integrity.*(SafetyNet|16\s*KB|targetSdkVersion)", re.IGNORECASE | re.DOTALL)),
+        ("Verifies signing secrets out of Git & AASA/assetlinks.json deep links", re.compile(r"(assetlinks\.json|apple-app-site-association|AASA)", re.IGNORECASE)),
+    ],
+    22: [
+        ("Structures around FinOps Framework (Inform/Optimize/Operate) & FOCUS", re.compile(r"(Inform.*Optimize.*Operate|FinOps).*FOCUS", re.IGNORECASE | re.DOTALL)),
+        ("Bills thinking tokens at output rate & enforces max_output_tokens/thinking_budget", re.compile(r"(thinking\s*token.*output|output\s*token.*rate).*(max_output_tokens|thinking_budget)", re.IGNORECASE | re.DOTALL)),
+        ("Keeps system prompt static for prefix prompt caching", re.compile(r"(prefix|prompt\s*cach).*(static|statis)", re.IGNORECASE | re.DOTALL)),
+        ("Audits K8s requests/limits, egress, or Batch API", re.compile(r"(requests.*limits|resources\.limits|Batch\s*API|egress)", re.IGNORECASE | re.DOTALL)),
+    ],
+    23: [
+        ("Separates Provider RAB from official PPK HPS under Perpres 46 Tahun 2025", re.compile(r"(RAB.*PPK.*HPS|PPK.*HPS.*Perpres\s*46)", re.IGNORECASE | re.DOTALL)),
+        ("Checks PDN/TKDN and >=40% UMKK rule", re.compile(r"(TKDN|PDN).*40%|40%.*UMKK", re.IGNORECASE | re.DOTALL)),
+        ("Models conservative/expected/stress capacity from CPU service demand & DB params", re.compile(r"(conservative.*expected.*stress|3\s*skenario).*service\s*demand", re.IGNORECASE | re.DOTALL)),
+        ("Includes 3-year TCO/NPV, Assumption Register & Bid/No-Bid Scorecard", re.compile(r"(TCO|NPV).*Assumption\s*Register.*Bid/No-Bid", re.IGNORECASE | re.DOTALL)),
+    ],
+    24: [
+        ("Applies POJK 11/2022 & PADK OJK 1/2026 replacing SEOJK 21/2017", re.compile(r"POJK\s*11.*PADK\s*OJK.*1.*2026", re.IGNORECASE | re.DOTALL)),
+        ("Separates COBIT 2019 Process Capability vs Focus Area Maturity", re.compile(r"Capability.*Maturity", re.IGNORECASE | re.DOTALL)),
+        ("Covers ISO 27001 Clauses 4-10 + 93 Annex A SoA & Design/Operating testing", re.compile(r"Clauses?\s*4.?10.*93.*(Design.*Operating|DE.*OE)", re.IGNORECASE | re.DOTALL)),
+        ("Blocks self-assessment certification claims & enforces 6-part finding", re.compile(r"(tidak|tolak|reject|cannot).*(sertifika|certif).*Criteria.*Condition.*Cause.*Evidence", re.IGNORECASE | re.DOTALL)),
+    ],
+    25: [
+        ("Uses multi-dimensional risk vectors + evidence confidence instead of single score", re.compile(r"(vektor\s*risiko|multi-dimensional\s*risk).*confidence", re.IGNORECASE | re.DOTALL)),
+        ("Refuses blind Full Rewrite on stable rule-heavy core without tests", re.compile(r"(?:tidak\s+otomatis|bukan\s+otomatis|do\s+not|does\s+not|avoid|hindari).{0,50}(?:Full\s*Rewrite|rewrite\s*buta)", re.IGNORECASE | re.DOTALL)),
+        ("Mandates Business-Rule Archaeology & Characterization Tests", re.compile(r"(Business[- ]Rule\s*Archaeology|archaeology).*Characterization\s*Test", re.IGNORECASE | re.DOTALL)),
+        ("Compares Strangler Fig vs Rewrite TCO with coexistence costs", re.compile(r"Strangler\s*Fig.*(?:coexistence|koeksistensi|dual[- ]run).*TCO|Strangler\s*Fig.*TCO.*(?:coexistence|koeksistensi|dual[- ]run)", re.IGNORECASE | re.DOTALL)),
+    ],
+    26: [
+        ("Checks full contractual precedence beyond SRS text", re.compile(r"(Kontrak|Contract).*Addendum.*(KAK|SOW).*FSD", re.IGNORECASE | re.DOTALL)),
+        ("Routes Paid CR candidate through CCB / human approval", re.compile(r"(?:CCB|Change\s*Control\s*Board|approval|persetujuan).*Paid\s*CR|Paid\s*CR.*(?:CCB|Change\s*Control\s*Board|approval|persetujuan)", re.IGNORECASE | re.DOTALL)),
+        ("Uses PERT + CPM + Monte Carlo P50/P80/P90 for merge bias", re.compile(r"PERT.*CPM.*Monte\s*Carlo.*P80", re.IGNORECASE | re.DOTALL)),
+        ("Includes EVM (CPI/SPI) & CR Decision Record", re.compile(r"(CPI|SPI|EVM).*CR\s*Decision\s*Record", re.IGNORECASE | re.DOTALL)),
+    ],
+    27: [
+        ("Maps all 6 SPBE domains (Perpres 95/2018 & 132/2022) beyond 4 TOGAF domains", re.compile(r"6\s*Domain\s*SPBE.*Proses\s*Bisnis.*Keamanan.*Layanan", re.IGNORECASE | re.DOTALL)),
+        ("Integrates Satu Data Indonesia (Perpres 39/2019)", re.compile(r"Satu\s*Data.*39/2019", re.IGNORECASE | re.DOTALL)),
+        ("Applies TIME portfolio rationalization on duplicate apps", re.compile(r"TIME.*(Migrate|Eliminate|duplik)", re.IGNORECASE | re.DOTALL)),
+        ("Separates vendor-neutral ABB from concrete SBB", re.compile(r"ABB.*SBB", re.IGNORECASE | re.DOTALL)),
+    ],
+    28: [
+        ("Auto-loads shadow-privacy, shadow-api, and shadow-auth without slash commands", re.compile(r"(shadow-privacy.*shadow-api.*shadow-auth|tanpa.*slash\s*command)", re.IGNORECASE | re.DOTALL)),
+        ("Conserves tokens by loading targeted reference modules only", re.compile(r"(Mana\s*Conservation|targeted\s*reference|hanya\s*referensi\s*terkait)", re.IGNORECASE | re.DOTALL)),
+        ("Excludes shadow-perf during routine implementation", re.compile(r"(tidak|exclude|kecuali).*shadow-perf", re.IGNORECASE | re.DOTALL)),
+        ("Enforces sibling skill disambiguation boundaries", re.compile(r"(handoff.*shadow-handover|disambiguat|batas\s*skill)", re.IGNORECASE | re.DOTALL)),
+    ],
+}
+
 
 def load_evals(path: Path = EVALS_FILE) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -65,8 +129,8 @@ def score_response(eval_item: dict[str, Any], response_text: str) -> dict[str, A
     assertions: list[str] = eval_item.get("assertions", [])
     scored: list[dict[str, Any]] = []
 
-    if eval_item["id"] == 18:
-        for desc, pattern in EVAL_18_CHECKS:
+    if eval_item["id"] in EVAL_CHECKS_BY_ID:
+        for desc, pattern in EVAL_CHECKS_BY_ID[eval_item["id"]]:
             match = pattern.search(response_text)
             scored.append({
                 "assertion": desc,
@@ -181,9 +245,143 @@ def run_self_test() -> dict[str, Any]:
             "score": f"{res['passed_assertions']}/{res['total_assertions']}",
         })
 
+    # Companion skill eval recall probes (Evals #19-#22) + precision probes (generic non-compliant answers must fail)
+    domain_probes: list[tuple[int, str, str, bool]] = [
+        (
+            19,
+            "PRECISION-19 (generic security note missing UU PDP citations must fail)",
+            "Make sure the database uses SSL and strong passwords.",
+            False,
+        ),
+        (
+            19,
+            "RECALL-19 (UU PDP audit citing Pasal 4, 20, 34, 46, 56, 57)",
+            "Berdasarkan UU PDP, rekam medis dan keuangan pribadi adalah Data Spesifik (Pasal 4 Ayat 2), sedangkan NIK adalah Data Umum (Pasal 4 Ayat 3). Wajib ada lawful basis (Pasal 20) dan DPIA (Pasal 34), transfer luar negeri bertahap (Pasal 56), notifikasi kebocoran 3x24 jam (Pasal 46), serta risiko denda administratif 2% (Pasal 57).",
+            True,
+        ),
+        (
+            20,
+            "PRECISION-20 (vague AI check without OWASP/ACL/HITL must fail)",
+            "Test the chatbot with 10 sample prompts and check if answers look polite.",
+            False,
+        ),
+        (
+            20,
+            "RECALL-20 (OWASP LLM 2025 + NIST AI 600-1 + RAG Triad + HITL + probes)",
+            "Audit mengacu pada OWASP LLM01, LLM05, LLM06, LLM08 dan NIST AI 600-1: wajib 100% tenant ACL filter serta pengukuran Faithfulness & Citation integrity, HITL approval untuk refund dengan parameterized SQL, dan precision probe + recall probe.",
+            True,
+        ),
+        (
+            21,
+            "PRECISION-21 (generic mobile advice missing MASVS/store gates must fail)",
+            "Test the app on an Android phone and upload the APK.",
+            False,
+        ),
+        (
+            21,
+            "RECALL-21 (OWASP MASVS v2.1.0 + xcprivacy + Play Integrity + App Links)",
+            "Terapkan OWASP MASVS v2.1.0 (Keychain/Keystore, usesCleartextTraffic false, exported=false), wajibkan PrivacyInfo.xcprivacy dan NSAllowsArbitraryLoads false, ganti SafetyNet dengan Google Play Integrity API dan alignment 16 KB / targetSdkVersion, serta verifikasi AASA dan assetlinks.json.",
+            True,
+        ),
+        (
+            22,
+            "PRECISION-22 (vague cost tip missing FinOps/FOCUS/thinking billing must fail)",
+            "Turn off unused servers on weekends to save money.",
+            False,
+        ),
+        (
+            22,
+            "RECALL-22 (FinOps Inform/Optimize/Operate + FOCUS + static prefix + thinking rate)",
+            "Gunakan FinOps Framework (Inform, Optimize, Operate) dan skema FOCUS. Perhatikan thinking tokens ditagih pada output token rate sehingga wajib set max_output_tokens dan thinking_budget, jaga system prompt prefix tetap static untuk prompt caching, dan cek K8s resources.limits serta Batch API.",
+            True,
+        ),
+        (
+            23,
+            "PRECISION-23 (naive DAU-only sizing & claiming PPK HPS authority must fail)",
+            "Dari 10.000 DAU, pakai server 4 vCPU 8 GB RAM dan tetapkan ini sebagai HPS resmi.",
+            False,
+        ),
+        (
+            23,
+            "RECALL-23 (Perpres 46/2025 RAB vs PPK HPS + UMKK 40% + 3-scenario service demand + TCO/Bid Scorecard)",
+            "Penyedia menyusun estimasi RAB terpisah dari official PPK HPS berdasarkan Perpres 46 Tahun 2025, memeriksa TKDN dan alokasi 40% UMKK. Kapasitas dimodelkan dalam skenario conservative, expected, dan stress berbasis CPU service demand & parameter DB, dilengkapi 3-yr TCO/NPV, Assumption Register, dan Bid/No-Bid Scorecard.",
+            True,
+        ),
+        (
+            24,
+            "PRECISION-24 (citing SEOJK 21/2017 & claiming ISO certified from checklist must fail)",
+            "Berdasarkan SEOJK 21/2017 dan checklist 93 kontrol Annex A, bank dinyatakan tersertifikasi ISO 27001.",
+            False,
+        ),
+        (
+            24,
+            "RECALL-24 (POJK 11/2022 + PADK OJK 1/2026 + COBIT Capability/Maturity + ISO Clauses 4-10 + 6-part finding)",
+            "Audit mengacu POJK 11/POJK.03/2022 dan PADK OJK No. 1 Tahun 2026 (menggantikan SEOJK 21/2017). COBIT 2019 memisahkan Capability vs Maturity; ISO 27001 mencakup Clauses 4-10 dan 93 kontrol dengan Design vs Operating testing. Tolak klaim sertifikasi dari self-assessment; susun temuan Criteria/Condition/Cause/Effect/Recommendation/Evidence.",
+            True,
+        ),
+        (
+            25,
+            "PRECISION-25 (single tech-debt score recommending blind rewrite must fail)",
+            "Skor tech debt 78/100 dan tidak ada unit test, langsung Full Rewrite dari nol.",
+            False,
+        ),
+        (
+            25,
+            "RECALL-25 (Multi-dim risk vector + archaeology + characterization tests + Strangler TCO)",
+            "Gunakan vektor risiko multi-dimensi dengan confidence score. Ketiadaan test pada core stabil tidak otomatis menuntut Full Rewrite; lakukan Business-Rule Archaeology dan Characterization Tests lebih dulu, lalu bandingkan Strangler Fig Refactor vs Rewrite TCO termasuk biaya coexistence/dual-run.",
+            True,
+        ),
+        (
+            26,
+            "PRECISION-26 (declaring Paid CR from SRS diff alone & naive PERT average must fail)",
+            "Fitur tidak ada di SRS berarti otomatis Paid CR dan jadwal selesai tinggal jumlahkan rata-rata PERT.",
+            False,
+        ),
+        (
+            26,
+            "RECALL-26 (Contractual precedence + CCB gate + PERT/CPM/Monte Carlo P80 + EVM)",
+            "Cek hierarki Kontrak, Addendum, KAK/SOW, dan FSD/Exclusion Register serta teruskan kandidat Paid CR ke approval CCB. Jadwal dihitung memakai PERT + CPM + simulasi Monte Carlo P80 untuk merge bias, dipadukan EVM (CPI/SPI) dan CR Decision Record.",
+            True,
+        ),
+        (
+            27,
+            "PRECISION-27 (4 TOGAF domains only for Indonesian Gov SPBE must fail)",
+            "Gunakan 4 domain TOGAF saja tanpa SPBE atau pengelompokan portofolio.",
+            False,
+        ),
+        (
+            27,
+            "RECALL-27 (6 Domain SPBE Perpres 132/2022 + Satu Data + TIME + ABB/SBB)",
+            "Petakan seluruh 6 Domain SPBE (Proses Bisnis, Data & Informasi, Infrastruktur, Aplikasi, Keamanan, Layanan) sesuai Perpres 132/2022 dan Satu Data Indonesia (Perpres 39/2019), gunakan matriks TIME untuk aplikasi duplikat (Migrate/Eliminate), serta pisahkan ABB vendor-neutral dan SBB.",
+            True,
+        ),
+        (
+            28,
+            "PRECISION-28 (ignoring topic skills because no slash command was typed must fail)",
+            "Karena user tidak mengetik slash command, cukup baca CORE.md saja tanpa skill lain.",
+            False,
+        ),
+        (
+            28,
+            "RECALL-28 (Topic-based auto-routing without slash + Mana Conservation + shadow-perf exclusion + disambiguation)",
+            "Secara otomatis memuat shadow-privacy, shadow-api, dan shadow-auth tanpa menunggu slash command, menjaga Mana Conservation dengan hanya memuat targeted reference modules, tidak memuat shadow-perf saat ngoding fitur, serta menjaga batas skill handoff vs shadow-handover.",
+            True,
+        ),
+    ]
+
+    for eid, label, text, expect_all_pass in domain_probes:
+        ev_item = next(e for e in data["evals"] if e["id"] == eid)
+        res = score_response(ev_item, text)
+        passed = res["all_passed"] if expect_all_pass else (not res["all_passed"])
+        probes.append({
+            "probe": label,
+            "passed": passed,
+            "score": f"{res['passed_assertions']}/{res['total_assertions']}",
+        })
+
     all_passed = all(p["passed"] for p in probes)
     return {
-        "suite": "evals/run_evals.py Self-Test (Eval #18 Precision & Recall Probes)",
+        "suite": "evals/run_evals.py Self-Test (Precision & Recall Probes Evals #18-#28)",
         "total_evals_in_catalog": len(data["evals"]),
         "total_probes": len(probes),
         "passed": sum(1 for p in probes if p["passed"]),

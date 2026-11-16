@@ -1,6 +1,6 @@
 ---
 name: shadow-ops
-description: Full-Spectrum DevOps, Linux SysAdmin, Immutable Docker/Compose Deployments, Environment Parity, Release Provenance, Kubernetes, Nginx/Caddy Reverse Proxy, CI/CD (GitHub Actions/GitLab CI), Observability, 3-2-1 Backups, and Incident Runbooks backed by a local OWASP & H5BP knowledge base. Pairs with /shadow-release, /shadow-observe, and /shadow-resilience. Trigger with /shadow-ops.
+description: "DevOps, Docker, Kubernetes & Infrastructure Operations. Use when configuring Docker/Compose, Kubernetes, Nginx/Caddy reverse proxies, Linux systemd/PM2, CI/CD pipelines, SSL/TLS, or 3-2-1 backup infrastructure."
 ---
 
 # Shadow Ops (`/shadow-ops`) — Full-Spectrum DevOps, Immutable Deployments & Infrastructure Hardening

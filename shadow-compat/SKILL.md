@@ -1,6 +1,6 @@
 ---
 name: shadow-compat
-description: Compatibility & Upgrade Assurance: API & Webhook Backward Compatibility, Database Schema Evolution Compatibility, Dependency Upgrade Risk Analysis, Cross-Browser/Device Matrix (Safari/iOS, Chrome/Android, Firefox, Edge), and Breaking-Change Detection. Trigger with /shadow-compat.
+description: "Compatibility & Upgrade Assurance. Use when auditing API/webhook backward compatibility, database schema evolution safety, dependency upgrade breaking changes, or cross-browser/device support matrices."
 ---
 
 # Shadow Compat (`/shadow-compat`) — API, Dependency & Cross-Browser/Device Compatibility

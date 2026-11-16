@@ -1,0 +1,36 @@
+---
+name: shadow-pmo
+description: "Contractual IT Delivery & PMO Governance. Use when triaging client requests across contractual hierarchy (Contract/Addendum/KAK/SOW/FSD) as Defect vs Paid CR candidate, computing PERT + CPM + Monte Carlo (P50/P80/P90), EVM (CPI/SPI), or Laporan Proyek."
+---
+
+# `/shadow-pmo` — Contractual & Delivery Governance
+
+Use this skill whenever the **Monarch** invokes `/shadow-pmo`, evaluates a mid-project client request (Defect vs Paid CR), builds WBS & PERT/CPM schedules, runs P50/P80 schedule risk simulations, tracks Earned Value (`CPI`/`SPI`), or prepares **Laporan Pendahuluan / Antara / Akhir** and **BAST** acceptance packages.
+
+Integrates with [`shadow-monarch/reference/CONSULTING-INTELLIGENCE-CORE.md`](../shadow-monarch/reference/CONSULTING-INTELLIGENCE-CORE.md) and deep methodologies:
+- [`methodologies/CONTRACTUAL-GOVERNANCE-AND-SCHEDULE-RISK.md`](methodologies/CONTRACTUAL-GOVERNANCE-AND-SCHEDULE-RISK.md) — Contractual document precedence, CR decision logic, PERT + Critical Path + Monte Carlo P50/P80/P90, and EVM math.
+- [`playbooks/PMO-DELIVERABLES-AND-CR-TEMPLATES.md`](playbooks/PMO-DELIVERABLES-AND-CR-TEMPLATES.md) — Scope Baseline Register, CR Decision Record, Schedule Impact Assessment, RAID Log, Earned Value Dashboard, and Acceptance Evidence Pack.
+
+---
+
+## 1. Execution Contract (No Unauthorized Legal Verdicts)
+
+1. **Contractual Precedence Before CR Classification**:
+   - Never classify a client request as `IN_SCOPE_DEFECT` or `PAID_CHANGE_REQUEST` solely by comparing SRS text.
+   - Always evaluate against the full **Contractual Hierarchy**: `Master Contract & Change Clauses -> Approved Addendum -> KAK / SOW -> Signed FSD / SRS -> UAT Baseline & Warranty Clauses`, plus **implicit statutory/baseline obligations**.
+   - Any recommendation impacting commercial billing (`PAID_CHANGE_REQUEST_CANDIDATE`) MUST explicitly route through **Change Control Board (CCB) / Contract Counsel / Authorized Client PPK or Sponsor** (`requires_human_approval: true`).
+2. **Schedule & Risk Engineering (PERT + CPM + Monte Carlo)**:
+   - Compute activity expected duration $E = \frac{O + 4M + P}{6}$ and $\sigma = \frac{P - O}{6}$ across dependency DAGs.
+   - Compute deterministic **Critical Path (`ES`, `EF`, `LS`, `LF`, `Total Float`)** AND run **Monte Carlo simulation** (fixed seed for reproducibility) to report realistic **`P50` / `P80` / `P90` completion dates** rather than naive summed averages.
+3. **Earned Value & Traceable Audit Trail**:
+   - Track `PV`, `EV`, `AC`, `CPI = EV/AC`, `SPI = EV/PV`, and `EAC`, plus an immutable `CR Decision Record` linking request -> baseline reference -> impact assessment -> CCB sign-off.
+
+---
+
+## 2. Deterministic PMO Governance Engine
+
+```powershell
+python "shadow-pmo/scripts/pmo_governance_engine.py" --self-test
+python "shadow-pmo/scripts/pmo_governance_engine.py" --analyze-schedule path/to/wbs_dag.json
+python "shadow-pmo/scripts/pmo_governance_engine.py" --evaluate-cr path/to/cr_request.json
+```

@@ -1,6 +1,6 @@
 ---
 name: shadow-auth
-description: Identity, Authentication (AuthN), Authorization (RBAC/ABAC), OAuth2/OIDC, SSO, Session & JWT Refresh Rotation Lifecycle, Multi-Tenant Isolation, and Security Audit Trails. Trigger with /shadow-auth.
+description: "Identity, AuthN & AuthZ Engineering. Use when implementing or reviewing login, RBAC/ABAC, OAuth2/OIDC, SSO, JWT/session rotation, multi-tenant isolation, or security audit trails."
 ---
 
 # Shadow Auth (`/shadow-auth`) — Identity, RBAC/ABAC, Multi-Tenancy & Session Lifecycle

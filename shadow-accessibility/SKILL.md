@@ -1,6 +1,6 @@
 ---
 name: shadow-accessibility
-description: Advanced Accessibility QA & Engineering (WCAG 2.2 AA/AAA): Semantic HTML landmarks, ARIA roles & live regions, full keyboard navigation & focus management, screen reader compatibility, color-blindness safety, and reduced-motion support. Trigger with /shadow-accessibility.
+description: "Advanced Accessibility QA & Engineering (WCAG 2.2 AA/AAA). Use when auditing or fixing semantic HTML landmarks, ARIA roles, keyboard focus traps, screen reader labels, color-blind safety, or reduced-motion support."
 ---
 
 # Shadow Accessibility (`/shadow-accessibility`) — Deep WCAG 2.2 AA/AAA & Assistive Tech QA

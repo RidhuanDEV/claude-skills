@@ -1,6 +1,6 @@
 ---
 name: shadow-db
-description: Inspect live databases (PostgreSQL, MySQL, MariaDB, SQL Server/MSSQL, MongoDB, SQLite), run safe read-only queries, auto-generate DBML/Mermaid ERDs, compare schemas across databases, enforce zero-downtime migration safety, and generate Cross-DB ETL, Pentaho (.ktr/.kjb), Cron/Airflow & Data Warehouse Star Schemas. Pairs with /shadow-data and /shadow-resilience. Trigger with /shadow-db.
+description: "Live Database Inspection, ERD & Data Warehousing. Use when inspecting live DBs via shadow_db MCP, running read-only SQL diagnostics, generating DBML/Mermaid ERDs, diffing schemas, or building Star Schema DW and Pentaho (.ktr/.kjb) ETL jobs."
 ---
 
 # `/shadow-db` — Multi-Engine Database Inspector, Schema Diff, Auto-ERD, Migration Safety & Data Warehouse Generator

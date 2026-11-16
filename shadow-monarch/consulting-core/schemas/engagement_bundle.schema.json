@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shadow Army Consulting Engagement Bundle",
+  "type": "object",
+  "required": [
+    "engagement_id",
+    "context",
+    "evidence_registry",
+    "assumption_register",
+    "findings",
+    "decisions",
+    "traceability_links",
+    "review_gate"
+  ],
+  "properties": {
+    "engagement_id": { "type": "string", "minLength": 4 },
+    "context": {
+      "type": "object",
+      "required": ["org_type", "engagement_type", "sector_regulations", "assessment_date"],
+      "properties": {
+        "org_type": { "enum": ["GOVERNMENT_SPBE", "BANKING", "FINTECH", "BUMN", "GENERAL_ENTERPRISE"] },
+        "engagement_type": { "enum": ["PRESALES", "ADVISORY", "ASSESSMENT", "AUDIT_ASSURANCE", "DUE_DILIGENCE", "PMO_DELIVERY", "ARCHITECTURE"] },
+        "sector_regulations": { "type": "array", "items": { "type": "string" } },
+        "assessment_date": { "type": "string" },
+        "access_limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence_registry": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "source_type", "source_path", "collected_at", "method", "integrity_hash"],
+        "properties": {
+          "evidence_id": { "type": "string" },
+          "source_type": { "type": "string" },
+          "source_path": { "type": "string" },
+          "collected_at": { "type": "string" },
+          "method": { "type": "string" },
+          "integrity_hash": { "type": "string", "minLength": 8 }
+        }
+      }
+    },
+    "assumption_register": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["assumption_id", "statement", "owner", "sensitivity", "validation_status"],
+        "properties": {
+          "assumption_id": { "type": "string" },
+          "statement": { "type": "string" },
+          "owner": { "type": "string" },
+          "sensitivity": { "enum": ["LOW", "MEDIUM", "HIGH"] },
+          "validation_status": { "enum": ["UNVERIFIED", "CLIENT_CONFIRMED", "MEASURED"] }
+        }
+      }
+    },
+    "systems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["system_id", "name", "capability"],
+        "properties": {
+          "system_id": { "type": "string" },
+          "name": { "type": "string" },
+          "capability": { "type": "string" },
+          "time_quadrant": { "enum": ["TOLERATE", "INVEST", "MIGRATE", "ELIMINATE"] }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "claim", "severity", "confidence", "evidence_refs", "review_status"],
+        "properties": {
+          "finding_id": { "type": "string" },
+          "claim": { "type": "string" },
+          "criteria": { "type": "string" },
+          "condition": { "type": "string" },
+          "cause": { "type": "string" },
+          "effect": { "type": "string" },
+          "recommendation": { "type": "string" },
+          "severity": { "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"] },
+          "confidence": { "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "limitations": { "type": "array", "items": { "type": "string" } },
+          "review_status": { "enum": ["PENDING", "REVIEWED_APPROVED", "ESCALATED_HUMAN"] }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["decision_id", "skill", "recommendation", "alternatives_compared", "assumption_refs", "requires_human_approval"],
+        "properties": {
+          "decision_id": { "type": "string" },
+          "skill": { "type": "string" },
+          "recommendation": { "type": "string" },
+          "alternatives_compared": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "assumption_refs": { "type": "array", "items": { "type": "string" } },
+          "requires_human_approval": { "type": "boolean" },
+          "approval_authority": { "type": "string" }
+        }
+      }
+    },
+    "traceability_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from_id", "to_id", "relation"],
+        "properties": {
+          "from_id": { "type": "string" },
+          "to_id": { "type": "string" },
+          "relation": { "type": "string" }
+        }
+      }
+    },
+    "review_gate": {
+      "type": "object",
+      "required": ["independent_review_status", "reviewer_role", "hard_gates_checked"],
+      "properties": {
+        "independent_review_status": { "enum": ["PENDING", "PASSED", "BLOCKED"] },
+        "reviewer_role": { "type": "string" },
+        "hard_gates_checked": { "type": "boolean" }
+      }
+    }
+  }
+}

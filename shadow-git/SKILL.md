@@ -1,6 +1,6 @@
 ---
 name: shadow-git
-description: Advanced Git Branching, Worktree Management, Parallel Multi-Agent Development, Independent Feature Integration, Forward Sync from Main, Pre-Pull Dry-Run Conflict & Semantic Risk Detection (git merge-tree), Safe Pull with Stash Protection, and 6-Point Safe Cleanup. Trigger with /shadow-git.
+description: "Safe Team Git & Worktree Collaboration. Use when syncing team branches, running git merge-tree dry-run conflict checks, managing parallel multi-agent worktrees, integrating independent feature branches, or resolving merge conflicts safely."
 ---
 
 # Shadow Git v2.0 (`/shadow-git`) — Branching, Worktree & Parallel Multi-Agent Orchestrator

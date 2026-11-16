@@ -1,0 +1,191 @@
+{
+  "registry_version": "2026.11.16",
+  "last_verified": "2026-11-16",
+  "regulations": [
+    {
+      "regulation_id": "PERPRES-46-2025",
+      "title": "Peraturan Presiden Nomor 46 Tahun 2025 tentang Perubahan Kedua atas Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah",
+      "issuer": "Pemerintah Republik Indonesia / LKPP",
+      "effective_date": "2025-04-30",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": ["PERPRES-16-2018", "PERPRES-12-2021"],
+      "applicability": ["GOVERNMENT_SPBE", "BUMN"],
+      "primary_source_url": "https://peraturan.bpk.go.id/",
+      "obligations": [
+        "PPK must hold competency certification matching procurement typology; where PPK is absent in Pemda APBD procurement, PA/KPA may assign a PPK-certified PPTK.",
+        "Provider RAB / commercial bid estimates must remain strictly distinct from official HPS determined by authorized PPK/PA/KPA.",
+        "Mandatory domestic product (PDN) and TKDN + BMP layering priority (Pasal 66) and minimum 40% budget allocation for domestic UMKK products."
+      ],
+      "licensing_boundary": "Public statutory regulation; verify latest LKPP implementing regulations (PerLKPP) per tender."
+    },
+    {
+      "regulation_id": "PERPRES-95-2018",
+      "title": "Peraturan Presiden Nomor 95 Tahun 2018 tentang Sistem Pemerintahan Berbasis Elektronik (SPBE)",
+      "issuer": "Pemerintah Republik Indonesia",
+      "effective_date": "2018-10-05",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE"],
+      "primary_source_url": "https://peraturan.bpk.go.id/",
+      "obligations": [
+        "Establishes national SPBE governance, management, audit, and 6 Architecture Domains: Proses Bisnis, Data dan Informasi, Infrastruktur SPBE, Aplikasi SPBE, Keamanan SPBE, and Layanan SPBE."
+      ],
+      "licensing_boundary": "Public statutory regulation."
+    },
+    {
+      "regulation_id": "PERPRES-132-2022",
+      "title": "Peraturan Presiden Nomor 132 Tahun 2022 tentang Arsitektur Sistem Pemerintahan Berbasis Elektronik Nasional",
+      "issuer": "Pemerintah Republik Indonesia",
+      "effective_date": "2022-12-16",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE"],
+      "primary_source_url": "https://peraturan.bpk.go.id/",
+      "obligations": [
+        "Operationalizes the 6 SPBE Architecture Domains across ministries, agencies, and regional governments (K/L/Pemda) aligned with national SPBE roadmap."
+      ],
+      "licensing_boundary": "Public statutory regulation."
+    },
+    {
+      "regulation_id": "PERPRES-39-2019",
+      "title": "Peraturan Presiden Nomor 39 Tahun 2019 tentang Satu Data Indonesia",
+      "issuer": "Pemerintah Republik Indonesia",
+      "effective_date": "2019-06-17",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE", "BUMN"],
+      "primary_source_url": "https://peraturan.bpk.go.id/",
+      "obligations": [
+        "Government data must satisfy Data Standards, Metadata, Data Interoperability, and Reference Codes / Master Data."
+      ],
+      "licensing_boundary": "Public statutory regulation."
+    },
+    {
+      "regulation_id": "UU-27-2022",
+      "title": "Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)",
+      "issuer": "Pemerintah Republik Indonesia & DPR RI",
+      "effective_date": "2024-10-17",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE", "BANKING", "FINTECH", "BUMN", "GENERAL_ENTERPRISE"],
+      "primary_source_url": "https://peraturan.bpk.go.id/Details/229798/uu-no-27-tahun-2022",
+      "obligations": [
+        "Classify Specific (Pasal 4(2)) vs General (Pasal 4(3)) Personal Data; record lawful basis (Pasal 20); honor Subject Rights (Pasal 5-13); maintain ROPA (Pasal 31) and DPIA (Pasal 34); notify breaches within 3x24 hours (Pasal 46); enforce cross-border transfer cascade (Pasal 56); administrative fines up to 2% annual revenue (Pasal 57)."
+      ],
+      "licensing_boundary": "Public statutory regulation; enacted 2022-10-17 with full compliance per Pasal 74 on 2024-10-17."
+    },
+    {
+      "regulation_id": "POJK-11-2022",
+      "title": "Peraturan Otoritas Jasa Keuangan Nomor 11/POJK.03/2022 tentang Penyelenggaraan Teknologi Informasi oleh Bank Umum",
+      "issuer": "Otoritas Jasa Keuangan (OJK)",
+      "effective_date": "2022-10-07",
+      "verification_status": "VERIFIED",
+      "supersedes": ["POJK-38-2016"],
+      "amends": [],
+      "applicability": ["BANKING"],
+      "primary_source_url": "https://www.ojk.go.id/",
+      "obligations": [
+        "Governs commercial bank IT Governance, IT Architecture & RSTI, IT Risk Management, Cyber Security, Vendor/PPJTI outsourcing, Data/PDP, and Data Center / DRC placement."
+      ],
+      "licensing_boundary": "Public sectoral regulation; read alongside implementing PADK OJK 1/2026."
+    },
+    {
+      "regulation_id": "PADK-OJK-1-2026",
+      "title": "Peraturan Anggota Dewan Komisioner OJK Nomor 1 Tahun 2026 tentang Penyelenggaraan Teknologi Informasi oleh Bank Umum",
+      "issuer": "Otoritas Jasa Keuangan (OJK)",
+      "effective_date": "2026-03-01",
+      "verification_status": "VERIFIED",
+      "supersedes": ["SEOJK-21-2017"],
+      "amends": [],
+      "applicability": ["BANKING"],
+      "primary_source_url": "https://www.ojk.go.id/",
+      "obligations": [
+        "Enacted 23 January 2026, effective 1 March 2026 as technical implementing regulation for POJK 11/POJK.03/2022 (revoking SEOJK 21/SEOJK.03/2017).",
+        "Strengthens Board/Komite Pengarah TI accountability, IT Architecture & RSTI stages, cyber risk controls, PPJTI vendor due diligence & materiality re-assessment (including offshore supervision access), PDP alignment, and DC/DRC licensing/reporting."
+      ],
+      "licensing_boundary": "Public sectoral regulation."
+    },
+    {
+      "regulation_id": "SEOJK-21-2017",
+      "title": "Surat Edaran OJK Nomor 21/SEOJK.03/2017 tentang Penerapan Manajemen Risiko dalam Penggunaan Teknologi Informasi oleh Bank Umum",
+      "issuer": "Otoritas Jasa Keuangan (OJK)",
+      "effective_date": "2017-06-06",
+      "verification_status": "SUPERSEDED",
+      "supersedes": [],
+      "superseded_by": "PADK-OJK-1-2026",
+      "superseded_effective_date": "2026-03-01",
+      "amends": [],
+      "applicability": ["BANKING"],
+      "primary_source_url": "https://www.ojk.go.id/",
+      "obligations": [
+        "REVOKED effective 2026-03-01 by PADK OJK No. 1 Tahun 2026. Do not cite as active controlling banking regulation."
+      ],
+      "licensing_boundary": "Historical / revoked reference only."
+    },
+    {
+      "regulation_id": "BSSN-INDEKS-KAMI",
+      "title": "Indeks Keamanan Informasi (Indeks KAMI) — Badan Siber dan Sandi Negara (BSSN)",
+      "issuer": "Badan Siber dan Sandi Negara (BSSN)",
+      "effective_date": "2023-01-01",
+      "verification_status": "VERIFIED",
+      "supersedes": [],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE", "BUMN"],
+      "primary_source_url": "https://www.bssn.go.id/",
+      "obligations": [
+        "Assesses Electronic System category, Security Governance, Risk Management, Framework, Asset Management, Technology, plus Cloud, Third-Party, and PDP supplements. Verify exact client-mandated workbook version before scoring."
+      ],
+      "licensing_boundary": "Official BSSN public instrument; lock exact active assessment version per engagement."
+    },
+    {
+      "regulation_id": "ISO-IEC-27001-2022",
+      "title": "ISO/IEC 27001:2022 Information Security, Cybersecurity and Privacy Protection — Information Security Management Systems",
+      "issuer": "ISO / IEC",
+      "effective_date": "2022-10-25",
+      "verification_status": "VERIFIED",
+      "supersedes": ["ISO-IEC-27001-2013"],
+      "amends": [],
+      "applicability": ["GOVERNMENT_SPBE", "BANKING", "FINTECH", "BUMN", "GENERAL_ENTERPRISE"],
+      "primary_source_url": "https://www.iso.org/standard/27001",
+      "obligations": [
+        "Requires ISMS Clauses 4-10 (Context, Leadership, Planning, Support, Operation, Performance Evaluation, Improvement) plus Statement of Applicability (SoA) across 93 Annex A controls (37 Organizational, 8 People, 14 Physical, 34 Technological) with inclusion/exclusion justifications."
+      ],
+      "licensing_boundary": "Copyrighted ISO/IEC standard: summarize structure and map controls legitimately; never reproduce full licensed standard text."
+    },
+    {
+      "regulation_id": "ISACA-COBIT-2019",
+      "title": "COBIT 2019 Framework: Governance and Management Objectives",
+      "issuer": "ISACA",
+      "effective_date": "2018-11-01",
+      "verification_status": "VERIFIED",
+      "supersedes": ["COBIT-5"],
+      "amends": [],
+      "applicability": ["BANKING", "FINTECH", "BUMN", "GENERAL_ENTERPRISE", "GOVERNMENT_SPBE"],
+      "primary_source_url": "https://www.isaca.org/resources/cobit",
+      "obligations": [
+        "40 Governance and Management Objectives across 5 domains (EDM01-05, APO01-14, BAI01-11, DSS01-06, MEA01-04). Process Capability (0-5 per objective) must not be conflated with Focus Area Maturity (0-5 systemic aggregate)."
+      ],
+      "licensing_boundary": "Copyrighted ISACA framework: apply methodology and reference objective IDs without reproducing proprietary full text."
+    },
+    {
+      "regulation_id": "TOGAF-STANDARD-10",
+      "title": "The TOGAF Standard, 10th Edition",
+      "issuer": "The Open Group",
+      "effective_date": "2022-04-25",
+      "verification_status": "VERIFIED",
+      "supersedes": ["TOGAF-9-2"],
+      "amends": [],
+      "applicability": ["BANKING", "BUMN", "GENERAL_ENTERPRISE", "GOVERNMENT_SPBE"],
+      "primary_source_url": "https://www.opengroup.org/togaf",
+      "obligations": [
+        "ADM lifecycle (Preliminary, Phases A-H, Requirements Management), Business/Data/Application/Technology domains, ABB vs SBB distinction, and Architecture Governance / Compliance Review. Map to 6 SPBE domains for Indonesian public sector."
+      ],
+      "licensing_boundary": "Copyrighted Open Group standard: use methodology and reference concepts without verbatim full-text reproduction."
+    }
+  ]
+}
