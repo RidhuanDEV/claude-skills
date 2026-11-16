@@ -117,3 +117,9 @@ git merge-tree --write-tree HEAD origin/<target-branch>
 - **`/shadow-sec`**: Runs secret scanning and ASVS access-control checks before merging into `main`.
 - **`/shadow-release`**: Verifies release tags, migration backward compatibility, and rollback SHAs after `main` integration.
 - **`/handoff`**: Persists worktree path, branch name, and active task state across AI agent sessions (`shadow_handoff` MCP).
+
+## 5. Parallel Worktree Path-Ownership & Reconciliation Protocol
+
+- **Explicit Path-Ownership Invariant**: Before spawning parallel worktrees or swarm workers, partition modified file paths so each worktree owns a disjoint set of directories/files. Shared contracts (`openapi.yaml`, `schema.prisma`, `package.json`, shared types/router indexes) MUST NOT be edited concurrently by multiple feature branches; assign shared contracts to a serialized coordinator gate or prerequisite base branch first.
+- **Deterministic Post-Merge Reconciliation**: After integrating worktrees sequentially into an integration branch, run cross-boundary checks (`typecheck`, `openapi` validation, integration tests, and `/shadow-quality` drift checks) on the combined tree before cleanup. Conflict resolution MUST merge both worktrees' semantic invariants rather than taking `--ours`/`--theirs` blindly.
+- **Execution Approval Boundary (`L0` vs `L4`)**: Read-only `status`/`diff`/`merge-tree` diagnostics are `L0_READ_ONLY`, whereas `--approve` branch integration, rebase, force cleanup, or `git push` are **`L4: HIGH_IMPACT`** requiring explicit Monarch authorization (`shadow-monarch/scripts/execution_approval_gate.py`).

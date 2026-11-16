@@ -26,11 +26,12 @@ Scan modified modules and clean up:
 - Functions exceeding ~40–50 lines or nesting deeper than 3 levels (`if -> for -> if -> try`) must be refactored using **guard clauses (early returns)** and small, pure domain helper functions.
 - Eliminate copy-pasted validation or mapping logic across controllers/services by extracting shared, typed utilities.
 
-### 4. Architecture Layer Conformance
-Verify strict directional dependencies:
+### 4. Architecture Layer Conformance & Fitness Rules
+Verify strict directional dependencies and architectural fitness checks:
 - **Controllers / UI Components** -> call **Services / Use Cases** (never raw SQL/ORM queries inside controllers or React components).
 - **Services** -> enforce business rules and transactions, calling **Repositories / Adapters**.
 - **Cross-Module Isolation**: Module A must not import internal repository files of Module B.
+- **Forbidden Dependency & Change-Risk Scoring**: Reject circular package imports, unapproved cross-domain table joins, and schema/output drift; emit structured check statuses (`PASS | FAIL | NOT_RUN | BLOCKED | NOT_APPLICABLE`) with exact `command` and `exit_code` proof.
 
 ### 5. Contract Synchronization Check
 - Verify that every backend route parameter, request DTO, and response shape matches `openapi.yaml`, `postman_collection.json` (`/shadow-api`), and frontend consumer types (`100%` parity).
@@ -67,3 +68,6 @@ When asked to review code or a PR, report findings ordered by severity:
 - `[MEDIUM]` Missing edge-case handling, missing validation, architectural boundary violation, or convention drift.
 - `[LOW / NIT]` Naming clarity, dead code removal, or minor readability improvement.
 *(Every finding must include exact `file:line`, impact explanation, and concrete replacement code).*
+
+## 2. Execution Approval & Intent Boundary (`L0`–`L2`)
+- Lint, strict typecheck, and `shadow_gate.py` are `L0`/`L1` on verified local workspaces, whereas **code review requests are strictly `L0_READ_ONLY`** (`0` source file mutations during review). Unrequested cross-module edits/cleanup require `L2` Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

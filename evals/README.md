@@ -42,6 +42,14 @@
 | 26 pmo-contractual-cr-pert-monte-carlo | `/shadow-pmo`: Contractual precedence CR triage, PERT/CPM + Monte Carlo P80 & EVM |
 | 27 ea-togaf-spbe-6-domain-portfolio | `/shadow-ea`: TOGAF 10 <-> SPBE 6-Domain crosswalk, Satu Data, TIME rationalization & ABB/SBB |
 | 28 topic-based-auto-skill-routing-without-slash | Auto-loads topic-matched companion skills without `/shadow-*` slash commands & enforces sibling disambiguation |
+| 29 debug-hypothesis-falsification-repro | `/shadow-debug`: hypothesis ranking, disconfirming evidence, redacted bisect timeline & red-before/green-after test |
+| 30 concurrency-outbox-idempotency-dlq | `/shadow-concurrency`: commit->outbox->ack ordering, no false exactly-once external claims & poison DLQ recovery |
+| 31 refactor-characterization-no-unsolicited-abstraction | `/shadow-refactor`: precedent discovery, invariant ledger, characterization golden I/O & untouched unrelated files |
+| 32 domain-invariants-vs-crud-overengineering | `/shadow-domain`: state transition invariants, aggregate locks & rejecting heavy DDD on trivial CRUD |
+| 33 search-hybrid-rrf-tenant-acl-prefilter | `/shadow-search`: pre-top-K tenant ACL filtering, Indonesian BM25+vector RRF, alias swap & retrieval-vs-generation split |
+| 34 realtime-sse-resume-auth-revocation | `/shadow-realtime`: SSE `Last-Event-ID`/WS ADR, mid-session token revocation, slow-consumer bounds & multi-node fan-out |
+| 35 supplychain-sbom-pinning-slsa-gate | `/shadow-supplychain`: SBOM vs lockfile 1:1 reconciliation, pinned 40-char SHAs/digests & offline unverified labeling |
+| 36 user-intent-boundary-and-execution-approval-protocol | `shadow-monarch`: `L0`–`L4` execution approval gate, 7-part approval contract, testing boundaries & sub-agent inheritance |
 
 ## If something fails
 

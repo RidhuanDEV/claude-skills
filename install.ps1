@@ -1,4 +1,4 @@
-# Installs the full 45-skill Shadow Army suite (shadow-monarch + companion /shadow-* skills)
+# Installs the full 52-skill Shadow Army suite (shadow-monarch + companion /shadow-* skills)
 # and updates %USERPROFILE%\.claude\CLAUDE.md between markers.
 # Run with: powershell -ExecutionPolicy Bypass -File .\install.ps1
 $ErrorActionPreference = 'Stop'
@@ -30,6 +30,13 @@ $SkillFolders = @(
     'shadow-accessibility',
     'shadow-quality',
     'shadow-test',
+    'shadow-debug',
+    'shadow-refactor',
+    'shadow-concurrency',
+    'shadow-domain',
+    'shadow-search',
+    'shadow-realtime',
+    'shadow-supplychain',
     'shadow-eval',
     'shadow-sec',
     'shadow-privacy',
@@ -118,4 +125,4 @@ foreach ($InstructionFile in $GlobalInstructionFiles) {
     }
 }
 
-Write-Host 'Done. All 45 Shadow Army skills and global instruction files (CLAUDE.md, AGENTS.md, GEMINI.md) are synced across Antigravity, Gemini CLI, Claude Code, and Codex.'
+Write-Host 'Done. All 52 Shadow Army skills and global instruction files (CLAUDE.md, AGENTS.md, GEMINI.md) are synced across Antigravity, Gemini CLI, Claude Code, and Codex.'

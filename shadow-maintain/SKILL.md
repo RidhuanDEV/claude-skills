@@ -24,7 +24,7 @@ Use this skill after go-live during the warranty or **Pemeliharaan & Perawatan (
 
 When a `P0` or `P1` bug requires an urgent production fix:
 1. **Stabilize First**: If caused by the latest deploy, roll back immediately (`/shadow-release`) before debugging code.
-2. **Reproduce & Pinpoint Root Cause**: Trace using `requestId` logs (`/shadow-observe`) and separate **Symptom**, **Contributing Factor**, and **Root Cause**.
+2. **Reproduce & Pinpoint Root Cause**: Trace using `requestId` logs (`/shadow-observe`) and hand off causal diagnosis, minimal reproduction, and red-before/green-after hypothesis falsification to **`/shadow-debug`** (never treat a single log line as proven root cause).
 3. **Minimal Surgical Patch + Regression Test**:
    - Write the smallest possible fix on a clean hotfix branch (`fix/hotfix-<issue>`).
    - **Mandatory**: Add a regression test (`/shadow-test`) that fails without the fix and passes with the fix so the exact bug can never return silently.

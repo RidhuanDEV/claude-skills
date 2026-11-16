@@ -39,4 +39,11 @@ Ensure a single `X-Request-Id` / W3C `traceparent` flows unbroken across:
 1. **Frontend UI Error Boundary / Toast** -> displays `Ref ID: req_01H...` so a client reporting a bug on WhatsApp/Email gives the exact lookup key.
 2. **Nginx / Reverse Proxy Access Log** -> logs `$http_x_request_id`.
 3. **Backend Structured JSON Log** -> every log line includes `"requestId": "req_01H..."`, `"userId"`, `"tenantId"`, `"route"`, `"durationMs"`.
-4. **Database / Queue Worker** -> passes `requestId` in job metadata and SQL comments (`/* req_id=req_01H... */`) for slow-query tracing.
+4. **Database / Queue Worker** -> passes `requestId` & `traceparent` across async queue headers (`shadow-concurrency`) and SQL comments (`/* req_id=req_01H... */`) for slow-query tracing.
+
+---
+
+## 4. Cardinality Controls, Redaction & Debugging Handoff
+- **Cardinality Cost Guardrail**: Never attach unbounded values (`userId`, `requestId`, `email`, raw URL path with UUIDs) as Prometheus metric labels — put high-cardinality IDs in OpenTelemetry spans and structured logs only.
+- **Telemetry Redaction**: Strip `Authorization`, cookies, NIK, and credentials before exporting spans or logs.
+- **Diagnostic Handoff**: When alerts or trace anomalies pinpoint a failing subsystem, hand off trace timeline + redacted logs to `/shadow-debug` for causal hypothesis falsification.

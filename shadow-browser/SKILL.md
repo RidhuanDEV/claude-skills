@@ -17,3 +17,6 @@ Connects to the official **`playwright` MCP server** (`@playwright/mcp`) and `ch
    - Inspect browser console logs and network requests; report any unhandled JS exceptions, React hydration errors, CORS failures, or 4xx/5xx API responses.
 3. **Interactive Control Verification**:
    - Click interactive buttons, modals, tabs, and forms to verify real behavior (`antislop` R-26).
+
+## Execution Approval & Intent Boundary (`L1` vs `L2`)
+- Targeted Playwright/browser checks for explicitly modified UI routes on local/sandbox are `L1_SAFE_VERIFICATION`. Unrequested broad E2E suite runs (`playwright test` full repo suite during unit-test or minor edits) are **`L2: SCOPE_EXPANSION`** and require explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

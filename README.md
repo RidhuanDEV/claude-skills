@@ -1,8 +1,8 @@
 # Shadow Monarch — Antigravity, Codex, and Claude Skill
 
-A full-spectrum **Shadow Monarch + IT** skill for Antigravity, Codex, and Claude: combining **sovereign AI token & context efficiency ("Mana Conservation")** with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, AI/RAG/GPU infrastructure, and specialized sub-tasks** through a 3-Tier Foreign Key routing index (49 reference modules loaded strictly on demand):
+A full-spectrum **Shadow Monarch + IT** skill suite (`52` skills) for Antigravity, Codex, and Claude: combining **sovereign AI token & context efficiency ("Mana Conservation")** with source-verified contracts, strict types (`no any`, `no typecasting`), automatic dead-code elimination, and source-driven document rules. It covers **all IT roles, languages, AI/RAG/GPU infrastructure, and specialized sub-tasks** through a 3-Layer Progressive Foreign Key routing index (`54` reference modules loaded strictly on demand):
 
-- **27 Role & Domain Guides**: Core Mindset, Shadow Monarch Token & Context Efficiency (`TOKEN-EFFICIENCY`), Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design (`DESIGN`), UI/UX, Art Direction & Product Interface Knowledge Base v2 ID (`UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID`), Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM Core, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
+- **32 Role & Domain Guides**: Core Mindset, Execution Approval Protocol (`EXECUTION-APPROVAL-PROTOCOL`), Codebase Intelligence (`CODEBASE-INTELLIGENCE`), Cross-Model Parity (`CROSS-MODEL-PARITY`), Research Source Policy (`RESEARCH-SOURCE-POLICY`), Consulting Intelligence Core (`CONSULTING-INTELLIGENCE-CORE`), Shadow Monarch Token & Context Efficiency (`TOKEN-EFFICIENCY`), Architecture, Pre-Sales/TOR/KAK & Server Sizing, Backend, Database, Frontend, UI/UX Design (`DESIGN`), UI/UX, Art Direction & Product Interface Knowledge Base v2 ID (`UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID`), Mobile Illustration/Lottie Motion Design (`MOBILE-DESIGN`), Mobile Architecture, Refactoring & Dead Code Cleanup, AppSec, VAPT Pentesting/DevSecOps, DevOps, Cloud/SRE/K8s/Terraform, Enterprise Integration (Kafka/IAM/Payment Ledger), Testing Strategy, Debugging, Code Review, AI/LLM Core, AI Agents & MCP, PM/System Analysis (PRD/SRS/FSD), IT PMO/Scrum/ITIL/UU PDP Governance, Technical Writing & `.md` → `.docx` Pipelines, Data Automation/ETL, and Data Analytics/BI/`dbt`/ML.
 - **9 Language Guides (`lang-*`)**: TypeScript/JavaScript (Node, NestJS, Express, React, Next.js), Go, .NET/C#, Python (FastAPI, Django, Flask), Java/Kotlin (Spring Boot), PHP/Laravel, Rust (`tokio`, `axum`), Dart/Flutter, and Modern C/C++20/Embedded (ESP32/STM32/CMake/Wasm).
 - **13 Specialized Sub-Task & Tooling Guides (`sub-*`)**: Advanced RAG/Hybrid Search/Reranking/Vector DBs/GraphRAG, AI & GPU Infrastructure (`vLLM`/`SGLang`/`TGI`/`Ollama`, VRAM Sizing, K8s GPU, `LiteLLM` Gateways), LLM Fine-Tuning (`LoRA`/`QLoRA`/`DPO`/Unsloth, Guardrails, LLMOps Tracing), Vue 3/Nuxt/Angular Signals/Tailwind/React Native/Jetpack Compose/SwiftUI, PostgreSQL/Redis/Elasticsearch/MongoDB, Playwright/Cypress/`k6`/Bruno/TCM/UAT, OpenAPI 3.1/DBML/Strict Mermaid/`python-docx` & Node `docx` Generators, PowerShell/Bash/Taskfiles, OpenTelemetry/PromQL/LogQL/Grafana/Profiling, WebSockets/SSE/WebRTC/MQTT IoT/Electron/Tauri/Chrome MV3, Indonesian Fintech & Gov (SNAP BI, TTE BSrE/e-Meterai, SatuSehat FHIR/BPJS, Tax PPN/PPh), GIS/PostGIS/MapLibre/Vector Tiles, and Computer Vision/OCR/Whisper/FFmpeg.
 
@@ -10,16 +10,19 @@ A full-spectrum **Shadow Monarch + IT** skill for Antigravity, Codex, and Claude
 
 ## How it works
 
-The skill uses progressive Foreign Key loading so it stays small in context:
+The skill uses 3-layer progressive Foreign Key loading so it stays small in context:
 
 ```text
 shadow-monarch/
-├─ SKILL.md          core rules + Shadow Monarch token doctrine + 3-tier Foreign Key router
+├─ SKILL.md          core rules + Shadow Monarch token doctrine + 3-layer Foreign Key router
 ├─ GLOBAL.md         account-wide summary for Claude / global agent instructions
 ├─ agents/openai.yaml Codex display name and invocation prompt
-└─ reference/        49 focused modules loaded only when the active task needs them
-   ├─ Role & Domain (27):
-   │  CORE.md  TOKEN-EFFICIENCY.md  ARCHITECTURE.md  PRESALES-PROPOSAL-KAK.md
+└─ reference/        54 focused modules loaded only when the active task needs them
+   ├─ Role & Domain (32):
+   │  CORE.md  EXECUTION-APPROVAL-PROTOCOL.md  CODEBASE-INTELLIGENCE.md
+   │  CROSS-MODEL-PARITY.md  RESEARCH-SOURCE-POLICY.md
+   │  CONSULTING-INTELLIGENCE-CORE.md  TOKEN-EFFICIENCY.md
+   │  ARCHITECTURE.md  PRESALES-PROPOSAL-KAK.md
    │  BACKEND.md  DATABASE.md  FRONTEND.md  DESIGN.md
    │  UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md
    │  MOBILE-DESIGN.md  MOBILE.md  REFACTORING.md  SECURITY.md  SECOPS-PENTEST.md
@@ -48,8 +51,15 @@ shadow-api/          /shadow-api (OpenAPI 3.1 Compact/Modular, Postman v2.1 sync
 shadow-cache/        /shadow-cache (TanStack Query, Redis caching, stampede protection & Idempotency-Key)
 shadow-integrate/    /shadow-integrate (Payment gateways, HMAC webhooks, SMTP, retries & Outbox pattern)
 shadow-accessibility/ /shadow-accessibility (WCAG 2.2 AA/AAA audit, keyboard navigation & ARIA live regions)
-shadow-quality/      /shadow-quality (Static analysis, strict typecheck/lint, dead code cleanup & layer conformance)
-shadow-test/         /shadow-test (Polyglot Unit, Integration & Contract Testing across 8+ languages)
+shadow-quality/      /shadow-quality (Static analysis, strict typecheck/lint, fitness rules & drift gates)
+shadow-test/         /shadow-test (Polyglot Unit, Integration, Property-Based, Mutation & Contract Testing)
+shadow-debug/        /shadow-debug (Systematic causal debugging, hypothesis falsification, bisect & repro proof)
+shadow-refactor/     /shadow-refactor (Characterization tests, branch-by-abstraction & incremental legacy refactor)
+shadow-concurrency/  /shadow-concurrency (State machines, outbox/inbox idempotency, locking, retries & DLQ durability)
+shadow-domain/       /shadow-domain (DDD bounded contexts, aggregate invariants, domain events vs CRUD boundaries)
+shadow-search/       /shadow-search (Lexical BM25, Indonesian analyzers, vector ANN, hybrid RRF, NDCG & tenant ACL)
+shadow-realtime/     /shadow-realtime (WebSockets, SSE Last-Event-ID resume, token revocation & slow-consumer backpressure)
+shadow-supplychain/  /shadow-supplychain (CycloneDX/SPDX SBOM reconciliation, typosquatting, pinned SHAs & SLSA provenance)
 shadow-eval/         /shadow-eval (AI/RAG Triad Evals & OWASP Top 10 for LLM 2025 / NIST AI 600-1 Red-Teaming)
 shadow-sec/          /shadow-sec (STRIDE threat modeling, SBOM & NIST SSDF SP 800-218 / OWASP ASVS 5.0 audit)
 shadow-privacy/      /shadow-privacy (Indonesia UU PDP UU No. 27/2022 & GDPR privacy, consent, DPIA & 72h breach gate)

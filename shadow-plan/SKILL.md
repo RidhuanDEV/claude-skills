@@ -61,3 +61,8 @@ Always provide a Mermaid `flowchart LR` dependency graph showing execution waves
 - [ ] Automated unit & integration tests (`/shadow-test`) pass (`100%` green on happy path, 400/401/403/404/409/422) with zero leftover ephemeral Docker test containers/images (`--check-docker-leaks`).
 - [ ] Responsive UI verified at `320px/375px` mobile and `1440px` desktop + `200%` zoom across all 9 states (`/shadow-browser` + `antislop`).
 - [ ] Lint, typecheck, and build succeed with zero errors (`/shadow-quality`).
+
+---
+
+## 4. Execution Approval & Intent Boundary (`L0`–`L4`)
+- Planning and decomposition are `L0_READ_ONLY`. Never treat a planned recommendation as Monarch authorization: tag all `L2` (broad E2E), `L3` (`/shadow-perf` load/stress/high-cost eval), and `L4` (destructive migrations/prod deploy) backlog tasks with `[APPROVAL-REQUIRED]` under `shadow-monarch/reference/EXECUTION-APPROVAL-PROTOCOL.md` (`execution_approval_gate.py`).

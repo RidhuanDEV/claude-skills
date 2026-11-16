@@ -20,3 +20,7 @@ This skill connects directly to the **`shadow_api` MCP server** (`test_api_endpo
    - Ensure zero missing summaries or responses.
 4. **Live HTTP Verification (`test_api_endpoint` / `run_api_collection`)**:
    - When the local/staging backend server is running, fire real HTTP requests to verify status codes, latency (`ms`), and response payloads, recording real responses directly into OpenAPI.
+5. **Contract-First, RFC 9457 Errors, Idempotency & Pagination Discipline**:
+   - **Standard Error Envelope**: Use structured `application/problem+json` (RFC 9457: `type`, `title`, `status`, `detail`, `instance` / `errors[]`) without leaking stack traces or internal SQL errors.
+   - **Idempotency & Pagination**: Enforce `Idempotency-Key` semantics on non-idempotent payment/order `POST` routes (`/shadow-concurrency`/`/shadow-cache`); enforce bounded cursor (`seek` / keyset) or validated offset pagination (`limit <= 100`) with stable sort keys (tie-broken by `id`).
+   - **Evolution & Negative Testing**: Document breaking vs additive changes (`/shadow-compat`), emit `Deprecation`/`Sunset` headers before removing fields, and test invalid payloads (`400/422`), unauthorized (`401/403`), and conflicts (`409`).

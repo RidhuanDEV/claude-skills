@@ -1,0 +1,9 @@
+# Phase 5 — Cross-Agent Compatibility Report (`SA-SE-ENH-001`)
+
+| Runtime Target | Adapter / Manifest Path | Sync Mechanism | Status | Evidence & Notes |
+|---|---|---|---|---|
+| **Codex (Windows)** | `install-codex.ps1` | Dynamic scan of root dirs containing `SKILL.md`; creates NTFS directory junctions | `PASS` (Isolated Temp) / `NOT_RUN` (Home) | Temp smoke test (`install-codex.ps1 -SkillsDirectory $env:TEMP\...`) exited `0`, linked `52` junctions, and cleaned up temp dir cleanly (`temp_cleanup_exists=False`). Global `~/.agents/skills` untouched by constraint. |
+| **Claude Code / Gemini CLI / Antigravity (Windows)** | `install.ps1` | Explicit `$SkillFolders` array (`52` skills) + marker block sync from `shadow-monarch/GLOBAL.md` (`14,221` bytes) | `READY-LOCAL` / `NOT_RUN` (Global Home) | `$SkillFolders` updated with all `7` new skills; PowerShell parser syntax verified; not executed against `~/.claude`, `~/.gemini`, `~/.agents`, `~/.codex` per authorization rule. |
+| **macOS / Linux Agents** | `install.sh` | Dynamic loop `"$SCRIPT_DIR"/*/SKILL.md` + `GLOBAL.md` awk sync | `READY-LOCAL` / `NOT_RUN` (macOS/Linux host) | Dynamically discovers all `52` skill directories; bash header/footer counts synced (`45 -> 52`); actual bash execution on POSIX host is `NOT_RUN` on Windows host. |
+| **Claude Desktop / claude.ai** | `shadow-monarch.zip` | Zip bundle of `shadow-monarch/` (`SKILL.md`, `GLOBAL.md`, `agents/openai.yaml`, `reference/`, `scripts/`, `consulting-core/`) | `PASS` | Local archive rebuilt cleanly (`281,496 -> 287,036` bytes) after final `shadow-monarch` edits. |
+| **MCP Tool Integrations** | `mcp-servers/shadow-*-mcp/` | Shared MCP binaries unchanged (`shadow-api-mcp`, `shadow-db-mcp`, `shadow-handoff-mcp`) | `PASS` (unchanged contracts) | Zero breaking modifications introduced to existing MCP servers. |

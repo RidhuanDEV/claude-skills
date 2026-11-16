@@ -43,3 +43,15 @@ Watch for and eliminate common cross-platform pitfalls:
   - Never pass non-standard date strings like `"2026-11-10 14:30:00"` into `new Date(...)` (returns `Invalid Date` in Safari/WebKit!). Always use strict ISO-8601 `"2026-11-10T14:30:00Z"` or explicit date parsers.
 - **Windows vs Linux Path & Case-Sensitivity**:
   - Git on Windows is case-insensitive by default (`import './Header'` works locally even if file is `header.tsx`), which breaks immediately on Linux CI/Docker builds! Always verify exact filename casing.
+
+### Schema Evolution Compatibility Matrix & Contract Governance
+- **Wire & Schema Evolution Rules**:
+
+| Evolution Mode | Constraint | Safe Deployment Order |
+| --- | --- | --- |
+| **Backward Compatible** | New consumer/reader reads old producer payloads (`add optional field` with safe default) | Deploy **Consumer first**, then Producer |
+| **Forward Compatible** | Old consumer ignores new optional fields (`tolerant reader` + no `additionalProperties: false` breakage) | Deploy **Producer first**, then Consumer |
+| **Full Compatible** | Only add/remove fields that both old and new versions default safely; never rename/retype in place | Expand-Contract dual-write / dual-read window (`/shadow-data`) |
+
+- **Semantic API Diff & Consumer-Driven Contract Tests**: Beyond AST/OpenAPI syntactic diffs, audit **semantic breaking changes** (default value flips, keyset/sort order changes, error code remapping, `null` vs omitted field semantics, pagination limit caps). Enforce consumer-driven contract tests (Pact, OpenAPI schema snapshots, or golden payload replay) against every active client before merging.
+- **Deprecation & Sunset Policy**: Annotate deprecated endpoints/fields with RFC 8594/9745 headers (`Deprecation` and `Sunset` timestamps), document migration guides, and verify telemetry shows near-zero legacy traffic before the Contract phase removes the field or route.

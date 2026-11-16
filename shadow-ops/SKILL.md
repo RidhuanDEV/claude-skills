@@ -42,3 +42,8 @@ Use this skill whenever the **Monarch** asks to containerize, deploy, harden, co
    - **Always provide an automated post-deploy smoke check and 1-command rollback path** in CI/CD scripts (`/shadow-release`).
    - **Always pair monitoring setups with actionable SLO alerts** (`/shadow-observe`).
    - **Always pair database backup scripts with periodic restore drills** (`/shadow-resilience`).
+4. **Progressive Delivery, IaC Drift & Secret Rotation**:
+   - Use canary/blue-green promotion with automated health & SLO burn rollback triggers; detect Terraform/K8s config drift in CI before `apply` (read-only `plan` first).
+   - Support dual-key overlap windows for zero-downtime secret/JWT rotation; require `/shadow-supplychain` pinned image SHA-256 digests and pinned CI action commit SHAs.
+5. **Execution Approval & Environment Boundary (`L0` vs `L4`)**:
+   - Log/config inspection and read-only dry-run previews are `L0_READ_ONLY`. Unknown target environments fail closed conservatively, and any live/staging/prod infra mutation, secret/permission change, or deploy is **`L4: HIGH_IMPACT`** requiring explicit 7-part Monarch approval and verified rollback (`shadow-monarch/scripts/execution_approval_gate.py`).

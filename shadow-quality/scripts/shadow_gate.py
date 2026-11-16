@@ -296,6 +296,37 @@ def run_shadow_gate(
         drift_result = audit_convention_drift(root, files, profile)
         violations.extend(drift_result.get("violations", []))
 
+    approval_gate_verified: bool | None = None
+    approval_gate_script = root / "shadow-monarch" / "scripts" / "execution_approval_gate.py"
+    if approval_gate_script.is_file():
+        try:
+            proc = subprocess.run(
+                [sys.executable, str(approval_gate_script), "--self-test"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            gate_data = json.loads(proc.stdout) if proc.returncode == 0 and proc.stdout.strip() else {}
+            approval_gate_verified = proc.returncode == 0 and bool(gate_data.get("all_passed"))
+            if not approval_gate_verified:
+                violations.append({
+                    "severity": "CRITICAL",
+                    "code": "EXECUTION_APPROVAL_GATE_FAILURE",
+                    "file": "shadow-monarch/scripts/execution_approval_gate.py",
+                    "message": "Execution approval gate negative/positive self-test failed.",
+                    "corrective_action": "Fix failing L0-L4 boundary checks in `execution_approval_gate.py --self-test`.",
+                })
+        except Exception as exc:
+            approval_gate_verified = False
+            violations.append({
+                "severity": "CRITICAL",
+                "code": "EXECUTION_APPROVAL_GATE_ERROR",
+                "file": "shadow-monarch/scripts/execution_approval_gate.py",
+                "message": f"Failed executing approval gate self-test: {exc}",
+                "corrective_action": "Inspect Python execution environment and `execution_approval_gate.py`.",
+            })
+
     blocking = [v for v in violations if v.get("severity") in ("CRITICAL", "HIGH")]
     passed = len(blocking) == 0
 
@@ -303,6 +334,7 @@ def run_shadow_gate(
         "gate": "shadow-gate v1.0",
         "repository": str(root),
         "checked_files_count": len(files),
+        "execution_approval_gate_verified": approval_gate_verified,
         "passed": passed,
         "recommended_max_readiness": "VERIFIED-LOCAL" if passed and not warnings else ("IMPLEMENTED" if passed else "BLOCKED"),
         "blocking_violations_count": len(blocking),

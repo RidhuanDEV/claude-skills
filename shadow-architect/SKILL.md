@@ -13,9 +13,11 @@ Use this skill after `/shadow-discovery` (or when evaluating major structural ch
 
 1. **Default to a Modular Monolith** unless independent team scaling, heterogeneous compute (e.g., heavy GPU worker vs CRUD API), or strict regulatory isolation proves that distributed microservices are necessary.
 2. **Enforce Strict Module Boundaries**: Modules communicate via explicit public service interfaces or domain events — never by reaching directly into another module's internal tables or private repositories.
-3. **Trace Every NFR to an Architectural Mechanism**:
+3. **Trace Every NFR to an Architectural Mechanism & Consistency Model**:
+   - **Consistency & Distributed Failure Assumptions**: State explicitly where **strict serializability / ACID** is required (money, inventory, auth grants) vs **eventual consistency** (search index sync, analytics projections); document failure assumptions under network partitions, split-brain locks, and clock skew (`monotonic` vs wall clock).
+   - **Architectural Fitness Functions**: Define measurable automated guardrails (max p95 latency, zero cross-module DB table imports, acyclic dependency graph, max fan-out).
    - High read concurrency -> Read replicas + `/shadow-cache` (`Redis` / `TanStack Query`).
-   - Slow/unreliable external third-party calls -> Asynchronous outbox/queue worker + `/shadow-integrate` circuit breaker.
+   - Slow/unreliable external third-party calls -> Asynchronous outbox/queue worker + `/shadow-concurrency` + `/shadow-integrate` circuit breaker.
    - Multi-client data isolation -> `/shadow-auth` tenant-scoped queries / PostgreSQL RLS.
 
 ---

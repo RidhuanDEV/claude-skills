@@ -33,6 +33,10 @@ Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, addi
    - For financial balances, stock counts, and quota deductions, use atomic SQL updates (`UPDATE wallets SET balance = balance - $1 WHERE id = $2 AND balance >= $1`), pessimistic row locks (`SELECT ... FOR UPDATE`), or optimistic concurrency (`version = version + 1 WHERE id = $1 AND version = $2`).
 3. **Monetary & Numeric Precision**:
    - Never store currency or exact quantities as `FLOAT` / `DOUBLE` / JS `number` floats. Use integer minor units (`BIGINT` cents/rupiah) or `NUMERIC(18, 2)`.
+4. **Isolation Anomalies, Lock Budgets & Outbox/CDC Boundary**:
+   - Explicitly match transaction isolation level (`READ COMMITTED` + atomic `UPDATE ... WHERE` or `SERIALIZABLE` with retry on `40001` / `40P01`) against read-skew, write-skew, and phantom-read hazards.
+   - Set explicit `lock_timeout` and `statement_timeout` on online DDL/backfill sessions so migrations never queue behind slow queries and block production traffic.
+   - Coordinate durable outbox/CDC event inserts inside the same transaction with `/shadow-concurrency`.
 
 ---
 
@@ -51,3 +55,8 @@ Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, addi
 
 - When using soft deletes (`deleted_at TIMESTAMPTZ`), remember that unique constraints must use partial indexes (`CREATE UNIQUE INDEX ... WHERE deleted_at IS NULL`) so a deleted email/code can be reused later.
 - Define archival/retention policies for high-growth log/telemetry tables (e.g., monthly declarative partitioning `PARTITION BY RANGE (created_at)`).
+
+---
+
+## 5. Execution Approval & Migration Boundary (`L1` vs `L4`)
+- Authoring additive Expand-only migrations locally is `L1_SAFE_VERIFICATION`. Running destructive DDL (`DROP`, `TRUNCATE`, `RENAME`, `migrate reset`) or executing migrations against staging/production/unknown databases is **`L4: HIGH_IMPACT`** and NEVER authorized by a bug fix without explicit Monarch approval and verified backup/rollback (`shadow-monarch/scripts/execution_approval_gate.py`).

@@ -28,9 +28,10 @@ Prioritize testing effort where business and financial risk is highest:
 - Whenever fixing a bug or production incident (`/shadow-maintain`), write a targeted regression test that reproduces the exact failure first, then verify the fix turns it green.
 - Run affected module tests first (`vitest related`, `pytest --lf`, `go test ./pkg/...`) for fast feedback before running the full test suite.
 
-### C. Deterministic Fixtures & Zero Flakiness
-- Inject or freeze clocks (`vi.useFakeTimers()`, `freezegun`) when testing token expiration, SLA deadlines, or date boundaries.
-- Seed any random generators and use unique per-test identifiers (`randomUUID()`) or automatic transaction rollback (`BEGIN ... ROLLBACK` / `RefreshDatabase`) so tests pass in any execution order and in parallel CI runs.
+### C. Deterministic Fixtures, Advanced Techniques & Zero Flakiness
+- **Property-Based & State-Machine Testing**: For monetary math, parsers, serializers, and order/approval workflows, pair example tests with property-based checks (`fast-check`, `Hypothesis`, `proptest`) and randomized state-transition sequences verifying core invariants hold across arbitrary inputs.
+- **Mutation & Fault/Race Injection**: Verify critical business tests catch seeded bugs (mutation mindset); inject concurrent duplicate requests, DB deadlocks, or simulated ack timeouts when testing async/transactional code (`/shadow-concurrency`).
+- **Flaky-Test Triage**: Never ignore intermittent CI failures or blindly wrap with retries; isolate shared mutable globals, wall-clock timers (`vi.useFakeTimers()`, `freezegun`), seeded RNGs, and per-test DB transaction rollback (`BEGIN ... ROLLBACK`) before reporting `PASS`.
 
 ### D. Mandatory Docker & Test Database Teardown (Zero Orphan Containers/Volumes/Images)
 Never leave exited test or migration-verification containers (`*-test-<timestamp>`, `*-migration-verification*`), anonymous volumes, or temporary test-built images behind in Docker:
@@ -77,3 +78,8 @@ For every module, service, or endpoint under test, cover:
 6. **Idempotency / Conflict (`409`)**: Duplicate unique key or repeated `Idempotency-Key` request (`/shadow-cache`).
 7. **Boundary Values**: `0`, `-1`, empty list `[]`, `max + 1`, timezone/midnight edge cases, decimal/currency rounding.
 8. **State & Container Isolation**: Verify zero leftover test records in development databases AND zero leftover Docker test containers, anonymous volumes, or temporary test-built images after suite teardown.
+
+---
+
+## 4. Execution Approval & Intent Boundary (`L0`–`L4`)
+- Bounded unit/integration tests on verified local/sandbox environments are `L1_SAFE_VERIFICATION`. A unit-test request NEVER automatically authorizes `L2` broad E2E suites (`/shadow-browser`) or `L3` load/stress testing (`/shadow-perf`); require explicit approval (`execution_approval_gate.py`).

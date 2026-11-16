@@ -47,8 +47,13 @@ Check for `Seq Scan` / `ALL` full-table scans on tables with $> 1,000$ rows, mis
 - Verify response compression (`gzip` / `brotli` / `zstd`) and static asset `Cache-Control` headers.
 - For web frontends, verify bundle chunk splitting and Core Web Vitals (`LCP < 2.5s`, `INP < 200ms`, `CLS < 0.1`).
 
-### Step 4: Produce Pre-UAT Performance Sign-Off Report
-Write a concise report in `docs/perf/PRE-UAT-PERFORMANCE-REPORT.md` documenting:
-- Target VU concurrency & RPS vs measured `p50`, `p95`, `p99` latency and error rate (`%`).
-- SQL indexes added or N+1 queries eliminated.
-- Readiness verdict (`PASS FOR UAT` or `TUNING REQUIRED`).
+### Step 4: Profiling Before Optimization, Variance & Regression Baseline
+- **Profile First**: Never guess bottlenecks — capture CPU/heap flamegraphs or `EXPLAIN (ANALYZE, BUFFERS)` before changing code or indexes.
+- **Run-to-Run Variance & Longitudinal Baseline**: Execute >= 3 warm runs per benchmark, report `p50/p95/p99` plus variance/spread across runs, and enforce a strict no-regression comparison against the previous Pre-UAT baseline.
+- Write a concise report in `docs/perf/PRE-UAT-PERFORMANCE-REPORT.md` documenting:
+  - Target VU concurrency & RPS vs measured `p50`, `p95`, `p99` latency, error rate (`%`), and run-to-run variance.
+  - SQL indexes added or N+1 queries eliminated.
+  - Readiness verdict (`PASS FOR UAT` or `TUNING REQUIRED`).
+
+## 3. Execution Approval & Intent Boundary (`L3` / `L4`)
+- Generating `k6` scaffolds (`--out`) or read-only local `EXPLAIN` is `L0`/`L1`, whereas executing `k6` load/stress/soak/spike runs is strictly **`L3: RESOURCE_INTENSIVE`** (and **`L4: HIGH_IMPACT`** on staging/production/unknown environments). NEVER execute load or stress benchmarks without explicit action-specific 7-part Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

@@ -28,10 +28,10 @@ Evaluate affected components against the 6 STRIDE threat categories:
 - Verify `.gitignore` blocks `.env*`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, and local SQLite/dump files.
 - Scan both working files and `git ls-files` for hardcoded API keys, database DSNs with passwords, private keys, or Bearer tokens.
 
-### Pillar 3: Supply-Chain Security, Lockfile Integrity & SBOM (`NIST SSDF PW.4` & `ASVS V14`)
-- Run package vulnerability audits (`npm audit --omit=dev`, `pip-audit`, `govulncheck`, `composer audit`, `cargo audit`).
-- Verify lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `poetry.lock`, `go.sum`) are committed and in sync.
-- Flag unmaintained, typosquatted, or overly permissive packages, and generate a CycloneDX/SPDX Software Bill of Materials (`SBOM`) when preparing client handover (`/shadow-handover`).
+### Pillar 3: Supply-Chain Security, Lockfile Integrity & Attack-Surface Diffs (`NIST SSDF PW.4` & `ASVS V14`)
+- **Hand Off SBOM/Attestation Deep Audits to `/shadow-supplychain`**: For CycloneDX/SPDX SBOM generation, SLSA provenance verification, unpinned digest/floating tag scans, typosquatting checks, and license gates, invoke `/shadow-supplychain` (`supplychain_sbom_gate.py`). In `/shadow-sec`, focus on vulnerability triage, lockfile commit presence, and dependency-to-runtime risk.
+- **Exploitability & Reachability Triage**: Separate noisy SCA CVE alerts from **reachable exploit paths** by tracing whether vulnerable symbols are actually imported, invoked on untrusted input paths, and missing runtime mitigations.
+- **Multi-Hop AuthZ & Attack-Surface Diff Review**: Audit every diff/PR for newly exposed routes, auth middleware bypasses, trust-boundary crossings, and **multi-hop authorization gaps** (e.g., Gateway -> Internal Service -> Batch Query / Indirect IDOR / Confused Deputy across background workers via `/shadow-auth`).
 
 ### Pillar 4: Verifiable OWASP ASVS 5.0 Control Audit (`SAST` Code Inspection)
 Read [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP-ASVS-5.md) and verify:
@@ -48,3 +48,6 @@ Deliver findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with:
 - **Exact Location** (`file:line` or endpoint route)
 - **Exploit Scenario & Business Impact**
 - **Concrete Remediation Patch**
+
+### Pillar 6: Execution Approval & Security Scan Boundary (`L0`–`L4`)
+- Static SAST, STRIDE analysis, and secret scanning are `L0_READ_ONLY`. High-volume active fuzzing / aggressive DAST against live services is **`L3: RESOURCE_INTENSIVE`**, while secret rotation, permission edits, or external payload transmission are **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

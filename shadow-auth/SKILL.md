@@ -44,3 +44,10 @@ Every privileged or security-sensitive action (login success/failure, password r
 - `action` (e.g., `USER_ROLE_UPDATED`, `INVOICE_APPROVED`)
 - `target_entity`, `target_id`
 - `before_state` & `after_state` (with secrets/PII redacted)
+
+---
+
+## 4. Policy Test Matrix, Confused Deputy & Escalation Gates
+1. **Object/Tenant Policy Matrix Tests**: Every protected endpoint must include automated negative authorization tests asserting `403`/`404` for (a) unauthenticated caller, (b) authenticated Tenant A accessing Tenant B object (`IDOR`/`BOLA`), and (c) lower-role caller attempting privileged mutation.
+2. **Confused Deputy & Privilege Escalation Prevention**: Never derive acting identity or tenant scope from request parameters when an authenticated session exists; reject mass-assignment of `role`, `permissions`, `tenant_id`, or `is_verified` via explicit DTO allowlists.
+3. **Revocation Propagation**: Session revocation, password rotation, or role downgrade must reject existing access/refresh tokens (and notify active `/shadow-realtime` connections) within bounded SLA.

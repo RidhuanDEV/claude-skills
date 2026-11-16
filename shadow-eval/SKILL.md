@@ -50,3 +50,9 @@ python "shadow-eval/scripts/ai_eval_gate.py" --redteam-check path/to/src_or_prom
 ```
 
 Report metrics with explicit **Claim -> Measured Score -> Threshold -> Untested Surfaces** rather than subjective "model sounds good" claims.
+
+### Pillar 6: Search Retrieval Handoff, Dataset Splits & Independent Judge Calibration
+- **`/shadow-search` Retrieval Handoff**: Split RAG evaluation strictly into Retrieval (`/shadow-search`: Recall@k, MRR, NDCG@k, pre-generation ACL tenant leak rate) vs Generation (`/shadow-eval`: faithfulness, citation grounding, refusal accuracy). Never tune prompts to mask broken retrieval ranking or missing RBAC filters.
+- **Dataset Versioning & Held-Out Split**: Version every golden evaluation dataset with an immutable version tag/SHA hash (`dataset_vX.Y`). Enforce a strict **Dev/Tuning Split** vs **Blind Held-Out Split** so prompt engineers cannot overfit system prompts against the acceptance gate set.
+- **Independent Judge Calibration**: Never rely on the same model family/temperature that generated outputs as an uncalibrated sole judge. Calibrate LLM-as-a-judge rubrics against human-labeled anchor items, mitigate positional/verbosity bias via swapped-order trials, and measure inter-rater agreement (e.g., Cohen's kappa or accuracy >= threshold) before promoting judge thresholds.
+- **Execution Approval Boundary (`L1` vs `L3`)**: Offline deterministic `ai_eval_gate.py` scoring is bounded `L1_SAFE_VERIFICATION`, whereas high-cost live LLM judge sweeps or `--agent` batches (`>= $` API budget) are **`L3: RESOURCE_INTENSIVE`** requiring explicit 7-part Monarch approval with estimated token cost (`shadow-monarch/scripts/execution_approval_gate.py`).

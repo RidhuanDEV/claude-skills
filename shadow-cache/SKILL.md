@@ -49,3 +49,6 @@ For payment, order creation, approval, or webhook endpoints:
 - Accept an `Idempotency-Key` header (or deterministic event ID).
 - Store `{ status: "PROCESSING" | "COMPLETED", statusCode, responseBody }` in Redis/DB with a 24-hour TTL using atomic `SET NX` / unique constraint.
 - If a duplicate request arrives while `"PROCESSING"`, return `409 Conflict`; if `"COMPLETED"`, return the stored response without re-executing the business transaction.
+4. **Coherency Boundaries & Multi-Tier Invalidation**:
+   - Separate public catalog caches from tenant/user-authorized keys (`user_id`/`tenant_id` in cache key mandatory to prevent cross-user leakage).
+   - Define exact invalidation triggers across CDN/edge, Redis, and client `TanStack Query` caches so stale authorization or balance views never persist past security/mutation events.

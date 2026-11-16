@@ -36,3 +36,9 @@ Design the application so a non-critical subsystem failure never takes down the 
 | **SMTP / WhatsApp Gateway Down** | User registration or order approval hangs for 60s then fails `500` | Commit DB transaction + write to `outbox_events`; background worker retries delivery when gateway recovers. |
 | **Analytics / Export Worker OOM** | Crashes main API process sharing the same container | Isolate heavy report/export workers into a separate process/container with bounded memory limits. |
 | **Database Connection Spike** | App opens 1,000 raw connections and crashes Postgres | Enforce bounded connection pool (`max: 20`) + `PgBouncer` + fast queue timeout (`5s`) returning `503 Retry-After`. |
+
+---
+
+## 3. Scoped Fault Injection, Bulkheads & Queue Recovery
+- Run failure-injection tests strictly against isolated staging/test fixtures (never live production without explicit authorization): inject dependency HTTP 503s, broker disconnects, and slow-consumer stalls.
+- Isolate critical APIs from heavy export/AI workers using separate pools/queues (**bulkheads**) and verify dead-letter queue replay procedures (`/shadow-concurrency`) restore backlog safely without exceeding DB pool budgets.

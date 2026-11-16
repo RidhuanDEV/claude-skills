@@ -1,0 +1,12 @@
+# Phase 5 — Unresolved Issues, Limitations & Non-Claimed Surfaces (`SA-SE-ENH-001`)
+
+Transparency register documenting every surface that remains `NOT_RUN`, `UNVERIFIED`, or `BLOCKED` by scope/safety rules:
+
+| ID | Category | Item / Surface | Current Status | Reason / Constraint | Safe Mitigation / Next Step |
+|---|---|---|---|---|---|
+| `OPEN-01` | Global Environment Sync | Executing `./install.ps1` or `./install-codex.ps1` against `%USERPROFILE%\.gemini`, `.claude`, `.codex`, `.agents` | `NOT_RUN` (Auth Gate) | Forbidden by `§0.4` & Monarch authorization guardrail until repo verification is reviewed and approved. | Run `./install.ps1` (or `./install-codex.ps1` for Codex junctions) once Monarch approves global deployment. |
+| `OPEN-02` | VCS Publishing | `git commit` / `git push` to `origin/main` | `NOT_RUN` (Auth Gate) | Global rule & `§0.4` prohibit unrequested git commits or remote pushes. | Wait for Monarch authorization before staging, committing, and pushing. |
+| `OPEN-03` | Live Model Execution | End-to-end inference via `evals/run_evals.py --agent claude` / `codex` across Evals `#1`–`#35` | `NOT_RUN` | Deterministic offline regex/schema assertions ran (`42/42` PASS), whereas live multi-turn LLM generation against real repositories was outside offline verification scope. | Sample key eval prompts live on target agent runtimes after approving `./install.ps1`. |
+| `OPEN-04` | POSIX Shell Runtime | Live execution of `install.sh` on macOS/Linux | `NOT_RUN` | Repository edits executed on Windows host (`powershell`). | Validate `./install.sh` in a Linux/WSL or CI runner if distributing on POSIX machines. |
+| `OPEN-05` | Host Docker Isolation | `shadow_gate.py --cleanup-docker-leaks` | `NOT_RUN` (Safety) | Unrelated container `slos-e2e-db` (`postgres:18-alpine`, port `55432`) is active on host; cleanup flag intentionally skipped to avoid interfering with external project state. | Never invoke `--cleanup-docker-leaks` automatically without explicit Monarch confirmation. |
+| `OPEN-06` | Deepening Scope Note | `shadow-monarch` + `19` deepened specialist `SKILL.md` files | `VERIFIED-LOCAL` | Existing deepened skills gained rigorous domain playbooks/boundaries in `SKILL.md` plus router/gate enforcement; where appropriate, dedicated heavy deterministic gate scripts live in the 7 new skills rather than duplicating scripts across unchanged skills. | Extend `evals/` golden scenarios further if real repo feedback surfaces any edge-case gaps. |

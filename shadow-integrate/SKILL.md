@@ -42,4 +42,6 @@ When receiving webhooks from external providers (Payment status, GitHub/GitLab, 
 
 When a database transaction must trigger an email, webhook, or message queue event:
 - Do NOT send the email/HTTP call inside the DB transaction.
-- Instead, insert an `outbox_events` record inside the same DB transaction, and let a background worker poll/stream and deliver it with retries (`PENDING -> PROCESSING -> PUBLISHED | DEAD_LETTER`).
+- Instead, insert an `outbox_events` record inside the same DB transaction, and hand off durable locking, retry budgets, DLQ, and crash-before-ack idempotency semantics to `/shadow-concurrency`.
+4. **Reconciliation & Partial Failure Safety**:
+   - Pair asynchronous payment/ERP webhooks with scheduled **reconciliation jobs** (querying provider status APIs for unresolved `PENDING` transactions beyond SLA) so dropped webhooks or partial outages never leave ledger mismatches.
