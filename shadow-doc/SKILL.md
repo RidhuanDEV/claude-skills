@@ -81,7 +81,7 @@ Before invoking the Global Engine directly on any project, run **`doc_orchestrat
 1. **Existing Project Generator First**: Precedence `Explicit User Selection -> Project-Local Discovery -> Project Config (.shadow/document-engine.json) -> Global Engine Fallback (shadow-doc) -> User Decision Gate (Options A/B/C/D)`.
 2. **15-Criterion Compatibility & Adapter-First**: Classify discovered generators (`COMPATIBLE | PARTIALLY_COMPATIBLE | INCOMPATIBLE | UNKNOWN`). Reuse compatible generators untouched; bridge partial gaps via `MarkdownCompatibilityAdapter` / `domain_adapters.py` rather than silently replacing pipelines.
 3. **JSON AST Scope**: Canonical JSON AST v2.0/v2.1 (`heading`, `paragraph`, `table`, `figure [mermaid|dbml|image]`, `list`, `code`, `opaque`, `finding`, `decision-matrix`, `appendix`) is the internal standard **when using the Global Document Engine** — never force repos already using Markdown/YAML generators to migrate without authorization.
-4. **Output Safety**: `export` blocks path traversal (`--allowed-root`), blocks silent overwrites unless `--overwrite` is explicitly passed, and emits `*.build-manifest.json` per build.
+4. **Output Safety & Execution Authorization**: `export` blocks path traversal and ancestor symlinks (`--allowed-root`), enforces `execution_approval_gate.py` at execution boundaries (even `--overwrite` fails closed unless paired with a valid scoped `--approval-file`), and emits `*.build-manifest.json` per build.
 
 ---
 

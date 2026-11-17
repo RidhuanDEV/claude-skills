@@ -48,6 +48,7 @@ from doc_orchestrator import (
     assess_generator_compatibility,
     check_output_overwrite_safety,
     discover_project_generators,
+    enforce_document_execution_authorization,
     resolve_document_generator,
     validate_safe_path,
 )
@@ -300,8 +301,11 @@ def main() -> int:
     p_export.add_argument("--doc", required=True, help="Canonical v2.0/v2.1 JSON path")
     p_export.add_argument("--format", required=True, help="Comma-separated formats: md,html,docx,pdf,xlsx,csv,all")
     p_export.add_argument("--out-dir", required=True, help="Output directory")
-    p_export.add_argument("--overwrite", action="store_true", help="Allow overwriting existing rendered files")
+    p_export.add_argument("--overwrite", action="store_true", help="Request overwrite of existing files (requires valid --approval-file)")
     p_export.add_argument("--allowed-root", default=None, help="Optional root containment boundary for traversal guard")
+    p_export.add_argument("--project-root", default=None, help="Authorized project root for execution authorization checks")
+    p_export.add_argument("--env", default="local", help="Target environment (local/development/staging/production/unknown)")
+    p_export.add_argument("--approval-file", default=None, help="Path to scoped user approval JSON record (required for L2+ protected actions)")
     p_export.add_argument("--generator", default="shadow-doc-global", help="Generator ID or path")
 
     p_mig_schema = sub.add_parser("migrate-schema", help="[v2.1] Migrate v1.0 or v2.0 AST cleanly to v2.1 without data loss")
@@ -451,6 +455,7 @@ def main() -> int:
         doc = normalize_document_v2(json.loads(doc_p.read_text(encoding="utf-8")))
         allowed_root = Path(args.allowed_root).resolve() if args.allowed_root else None
         out_dir = validate_safe_path(Path(args.out_dir), allowed_root=allowed_root)
+        project_root = Path(args.project_root).resolve() if args.project_root else (allowed_root or out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
         stem = doc.get("document_id", doc_p.stem)
         fmts = [f.strip().lower() for f in args.format.split(",") if f.strip()]
@@ -458,11 +463,32 @@ def main() -> int:
             fmts = ["md", "html", "docx", "pdf", "xlsx", "csv"]
         rendered: Dict[str, Path] = {}
         ext_map = {"md": ".md", "html": ".html", "docx": ".docx", "pdf": ".pdf", "xlsx": ".xlsx", "csv": ".csv"}
+        target_files: List[Path] = []
+        existing_targets: List[Path] = []
         for f_key in fmts:
             if f_key not in ext_map:
                 raise ValueError(f"Unsupported export format: '{f_key}'")
             target_file = validate_safe_path(out_dir / f"{stem}{ext_map[f_key]}", allowed_root=out_dir)
-            check_output_overwrite_safety(target_file, overwrite=bool(args.overwrite))
+            target_files.append(target_file)
+            if target_file.exists():
+                existing_targets.append(target_file)
+                check_output_overwrite_safety(target_file, overwrite=bool(args.overwrite))
+
+        approval_payload = None
+        if args.approval_file:
+            approval_payload = json.loads(Path(args.approval_file).read_text(encoding="utf-8"))
+        action_name = "overwrite_document" if existing_targets else "export_local"
+        auth = enforce_document_execution_authorization(
+            action_name,
+            project_root=project_root,
+            target_paths=existing_targets if existing_targets else target_files,
+            environment=args.env,
+            approval=approval_payload,
+            task_id=str(doc.get("document_id") or "DOC-EXPORT"),
+        )
+        if not auth["allowed"]:
+            print(json.dumps({"status": "BLOCKED", "auth": auth}, indent=2))
+            return 1
         if "md" in fmts:
             rendered["md"] = render_v2_to_markdown(doc, out_dir / f"{stem}.md")
         if "html" in fmts:

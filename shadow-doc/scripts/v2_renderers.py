@@ -15,11 +15,16 @@ import html as html_lib
 import json
 import re
 import shutil
+import subprocess
+import sys
+import tempfile
 import zipfile
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from doc_orchestrator import atomic_write_text
 from v2_core import compute_file_sha256, scan_and_redact_secrets
 
 RENDERER_ENGINE_VERSION = "2.1.0"
@@ -82,21 +87,163 @@ RENDERER_CONTRACTS: Dict[str, Dict[str, Any]] = {
 }
 
 
-def render_diagram_asset(diagram_type: str, source_text: str) -> Dict[str, Any]:
+def render_diagram_asset(
+    diagram_type: str,
+    source_text: str,
+    *,
+    render_to_asset: bool = False,
+    output_dir: Path | None = None,
+    asset_stem: str = "diagram",
+    output_format: str = "svg",
+    timeout_sec: int = 10,
+    cli_override: str | None = None,
+) -> Dict[str, Any]:
     """
-    Attempt diagram CLI vector detection safely without corrupting canonical document.
-    Explicitly reports fallback status when diagram CLIs (e.g. mmdc) are absent.
+    Attempt bounded diagram CLI rendering safely without shell interpolation or AST corruption (`R07`).
+    Explicitly distinguishes: CLI_MISSING | RENDER_UNSUPPORTED_FOR_TOOL | RENDERED | RENDER_FAILED |
+    RENDER_TIMEOUT | FALLBACK_SOURCE_PRESERVED. Never treats dbml2sql as a diagram-to-image renderer.
     """
     d_type = (diagram_type or "mermaid").lower()
-    cli_name = "mmdc" if d_type == "mermaid" else "dbml2sql"
-    cli_path = shutil.which(cli_name)
-    return {
-        "diagram_type": d_type,
-        "cli_tool": cli_name,
-        "cli_available": cli_path is not None,
-        "render_status": "CLI_AVAILABLE" if cli_path else "FALLBACK_SOURCE_PRESERVED",
-        "source_length": len(source_text or ""),
-    }
+    if d_type == "dbml":
+        # dbml2sql transpiles DBML -> SQL DDL, NOT SVG/PNG diagram images!
+        dbml_img_cli = cli_override if cli_override is not None else None
+        if not dbml_img_cli:
+            return {
+                "diagram_type": "dbml",
+                "cli_tool": None,
+                "cli_available": False,
+                "render_attempted": False,
+                "render_status": "FALLBACK_SOURCE_PRESERVED",
+                "reason": "No DBML diagram-image CLI configured (dbml2sql only outputs SQL, not image assets); source preserved verbatim.",
+                "source_length": len(source_text or ""),
+            }
+        cli_path = shutil.which(dbml_img_cli) if not Path(dbml_img_cli).exists() else dbml_img_cli
+        cli_name = str(dbml_img_cli)
+    else:
+        cli_name = cli_override or "mmdc"
+        cli_path = cli_override if (cli_override and Path(cli_override).exists()) else shutil.which(cli_name)
+
+    if not cli_path:
+        return {
+            "diagram_type": d_type,
+            "cli_tool": cli_name,
+            "cli_available": False,
+            "render_attempted": False,
+            "render_status": "FALLBACK_SOURCE_PRESERVED" if not render_to_asset else "CLI_MISSING",
+            "fallback_used": True,
+            "source_length": len(source_text or ""),
+        }
+
+    if not render_to_asset or output_dir is None:
+        return {
+            "diagram_type": d_type,
+            "cli_tool": cli_name,
+            "cli_available": True,
+            "render_attempted": False,
+            "render_status": "CLI_DETECTED_NOT_ATTEMPTED",
+            "fallback_used": True,
+            "source_length": len(source_text or ""),
+        }
+
+    ext = "png" if output_format.lower() == "png" else "svg"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    target_asset = (output_dir / f"{asset_stem}.{ext}").resolve()
+    try:
+        target_asset.relative_to(output_dir.resolve())
+    except ValueError:
+        return {
+            "diagram_type": d_type,
+            "cli_tool": cli_name,
+            "cli_available": True,
+            "render_attempted": False,
+            "render_status": "RENDER_FAILED",
+            "reason": "Invalid diagram asset stem path traversal rejected.",
+            "fallback_used": True,
+            "source_length": len(source_text or ""),
+        }
+
+    with tempfile.TemporaryDirectory() as tmpd:
+        in_file = Path(tmpd) / f"in.{d_type}"
+        tmp_out = Path(tmpd) / f"out.{ext}"
+        in_file.write_text(source_text or "", encoding="utf-8")
+
+        # Argument-array execution ONLY (shell=False, bounded timeout)
+        if Path(cli_path).suffix.lower() == ".py":
+            cmd = [sys.executable, str(cli_path), "-i", str(in_file), "-o", str(tmp_out)]
+        else:
+            cmd = [str(cli_path), "-i", str(in_file), "-o", str(tmp_out)]
+
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout_sec,
+                shell=False,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return {
+                "diagram_type": d_type,
+                "cli_tool": cli_name,
+                "cli_available": True,
+                "render_attempted": True,
+                "render_status": "RENDER_TIMEOUT",
+                "fallback_used": True,
+                "reason": f"Diagram renderer exceeded {timeout_sec}s timeout.",
+                "source_length": len(source_text or ""),
+            }
+        except OSError as exc:
+            return {
+                "diagram_type": d_type,
+                "cli_tool": cli_name,
+                "cli_available": True,
+                "render_attempted": True,
+                "render_status": "RENDER_FAILED",
+                "fallback_used": True,
+                "reason": f"OS error invoking diagram CLI: {exc}",
+                "source_length": len(source_text or ""),
+            }
+
+        if proc.returncode != 0 or not tmp_out.is_file() or tmp_out.stat().st_size == 0:
+            return {
+                "diagram_type": d_type,
+                "cli_tool": cli_name,
+                "cli_available": True,
+                "render_attempted": True,
+                "render_status": "RENDER_FAILED",
+                "fallback_used": True,
+                "exit_code": proc.returncode,
+                "reason": (proc.stderr or proc.stdout or "Renderer failed to emit non-empty asset.")[:300],
+                "source_length": len(source_text or ""),
+            }
+
+        raw_bytes = tmp_out.read_bytes()
+        valid_asset = (raw_bytes.startswith(b"\x89PNG\r\n\x1a\n") if ext == "png" else (b"<svg" in raw_bytes[:2048].lower()))
+        if not valid_asset:
+            return {
+                "diagram_type": d_type,
+                "cli_tool": cli_name,
+                "cli_available": True,
+                "render_attempted": True,
+                "render_status": "RENDER_FAILED",
+                "fallback_used": True,
+                "reason": f"Rendered output failed .{ext} format signature validation.",
+                "source_length": len(source_text or ""),
+            }
+
+        shutil.copyfile(tmp_out, target_asset)
+        return {
+            "diagram_type": d_type,
+            "cli_tool": cli_name,
+            "cli_available": True,
+            "render_attempted": True,
+            "render_status": "RENDERED",
+            "fallback_used": False,
+            "asset_path": str(target_asset),
+            "size_bytes": len(raw_bytes),
+            "source_length": len(source_text or ""),
+        }
 
 I18N_LABELS: Dict[str, Dict[str, str]] = {
     "id-ID": {
@@ -246,7 +393,7 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
             lines.append("")
         elif kind == "table" and isinstance(b.get("table_data"), dict):
             td = b["table_data"]
-            cols = [str(c) for c in td.get("columns", td.get("headers", []))]
+            cols = [str(c).replace("|", "\\|") for c in td.get("columns", td.get("headers", []))]
             if cols:
                 if td.get("caption"):
                     lines.append(f"**{td['caption']}**")
@@ -254,7 +401,7 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
                 lines.append("| " + " | ".join(cols) + " |")
                 lines.append("| " + " | ".join(["---"] * len(cols)) + " |")
                 for r in td.get("rows", []):
-                    padded = [str(c) for c in r] + [""] * max(0, len(cols) - len(r))
+                    padded = [str(c).replace("|", "\\|") for c in r] + [""] * max(0, len(cols) - len(r))
                     lines.append("| " + " | ".join(padded[: len(cols)]) + " |")
                 lines.append("")
         elif kind == "list":
@@ -312,9 +459,12 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
                 lines.append("")
         elif kind == "code":
             lang = b.get("code_language", "text")
-            lines.append(f"```{lang}")
-            lines.append(str(b.get("body", "")))
-            lines.append("```")
+            code_body = str(b.get("body", ""))
+            runs = re.findall(r"`+", code_body)
+            fence = "`" * max(3, max((len(r) for r in runs), default=0) + 1)
+            lines.append(f"{fence}{lang}")
+            lines.append(code_body)
+            lines.append(fence)
             lines.append("")
         elif kind == "opaque":
             lines.append(f"<!-- OPAQUE BLOCK {bid} -->")
@@ -333,8 +483,7 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
             lines.append(f"- **Git Commits**: {', '.join(d['git_commits'])}")
         lines.append("")
 
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines), encoding="utf-8")
+    atomic_write_text(out_path, "\n".join(lines), encoding="utf-8")
     return out_path
 
 
@@ -601,6 +750,9 @@ def render_v2_to_docx(doc: Dict[str, Any], out_path: Path) -> Path:
             r.font.name = "Consolas"
             r.font.size = Pt(9.5)
 
+    wdoc.core_properties.title = str(d.get("title", "Document"))
+    wdoc.core_properties.author = str(d.get("owner") or "Shadow Army")
+    wdoc.core_properties.subject = f"{d.get('project_id')} | {d.get('document_id')} | {d.get('revision')}"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     wdoc.save(str(out_path))
     return out_path
@@ -782,6 +934,45 @@ def _ascii_clean(text: Any) -> str:
     return s.encode("latin-1", "replace").decode("latin-1")
 
 
+def _discover_unicode_pdf_fonts() -> Dict[str, Any]:
+    """Discover licensed OS system Unicode TTF fonts cleanly without bundling proprietary binaries (H01)."""
+    sans_sets = [
+        (r"C:\Windows\Fonts\arial.ttf", r"C:\Windows\Fonts\arialbd.ttf", r"C:\Windows\Fonts\ariali.ttf"),
+        (r"C:\Windows\Fonts\segoeui.ttf", r"C:\Windows\Fonts\segoeuib.ttf", r"C:\Windows\Fonts\segoeuii.ttf"),
+        ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf"),
+        ("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf"),
+        ("/System/Library/Fonts/Supplemental/Arial.ttf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf", "/System/Library/Fonts/Supplemental/Arial Italic.ttf"),
+    ]
+    mono_cands = [
+        r"C:\Windows\Fonts\consola.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+        "/System/Library/Fonts/Supplemental/Courier New.ttf",
+    ]
+    sans_reg = sans_bold = sans_ital = mono_reg = None
+    for reg, bld, itl in sans_sets:
+        if Path(reg).is_file():
+            sans_reg = reg
+            sans_bold = bld if Path(bld).is_file() else reg
+            sans_ital = itl if Path(itl).is_file() else reg
+            break
+    for m in mono_cands:
+        if Path(m).is_file():
+            mono_reg = m
+            break
+    return {
+        "unicode_enabled": sans_reg is not None,
+        "sans": (sans_reg, sans_bold, sans_ital),
+        "mono": mono_reg,
+    }
+
+
+def _safe_pdf_text(text: Any, unicode_enabled: bool) -> str:
+    if unicode_enabled:
+        return str(text if text is not None else "")
+    return _ascii_clean(text)
+
+
 def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
     from fpdf import FPDF
 
@@ -789,39 +980,53 @@ def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
     L = get_labels(d)
     is_landscape = str(d.get("document_type", "")).upper() == "RTM"
     orientation = "L" if is_landscape else "P"
+    font_info = _discover_unicode_pdf_fonts()
+    u_on = bool(font_info["unicode_enabled"])
+    body_family = "ShadowSans" if u_on else "Helvetica"
+    mono_family = "ShadowMono" if (u_on and font_info["mono"]) else ("ShadowSans" if u_on else "Courier")
 
     class ShadowPDF(FPDF):
         def header(self) -> None:
-            self.set_font("Helvetica", "I", 8)
+            self.set_font(body_family, "I", 8)
             self.set_text_color(100, 116, 139)
-            hdr = _ascii_clean(
-                f"{d.get('project_id')} | {d.get('classification', 'INTERNAL')} | {d.get('document_id')}"
+            hdr = _safe_pdf_text(
+                f"{d.get('project_id')} | {d.get('classification', 'INTERNAL')} | {d.get('document_id')}",
+                u_on,
             )
             self.cell(0, 6, hdr, align="R", new_x="LMARGIN", new_y="NEXT")
             self.ln(2)
 
         def footer(self) -> None:
             self.set_y(-15)
-            self.set_font("Helvetica", "I", 8)
+            self.set_font(body_family, "I", 8)
             self.set_text_color(100, 116, 139)
-            ftr = _ascii_clean(
-                f"Rev {d.get('revision')} ({d.get('status')}) | {L['page']} {self.page_no()}/{{nb}}"
+            ftr = _safe_pdf_text(
+                f"Rev {d.get('revision')} ({d.get('status')}) | {L['page']} {self.page_no()}/{{nb}}",
+                u_on,
             )
             self.cell(0, 10, ftr, align="R")
 
     pdf = ShadowPDF(orientation=orientation, unit="mm", format="A4")
+    if u_on:
+        s_reg, s_bld, s_itl = font_info["sans"]
+        pdf.add_font("ShadowSans", "", s_reg)
+        pdf.add_font("ShadowSans", "B", s_bld)
+        pdf.add_font("ShadowSans", "I", s_itl)
+        if font_info["mono"]:
+            pdf.add_font("ShadowMono", "", font_info["mono"])
+
     pdf.set_margins(20, 20, 20)
     pdf.set_auto_page_break(auto=True, margin=20)
     pdf.alias_nb_pages()
     pdf.add_page()
 
-    pdf.set_font("Helvetica", "B", 15)
+    pdf.set_font(body_family, "B", 15)
     pdf.set_text_color(15, 23, 42)
-    pdf.multi_cell(0, 8, _ascii_clean(d.get("title", "Document")))
+    pdf.multi_cell(0, 8, _safe_pdf_text(d.get("title", "Document"), u_on), new_x="LMARGIN", new_y="NEXT")
     pdf.ln(2)
 
-    pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(0, 7, _ascii_clean(L["doc_info"]), new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font(body_family, "B", 11)
+    pdf.cell(0, 7, _safe_pdf_text(L["doc_info"], u_on), new_x="LMARGIN", new_y="NEXT")
     for k, v in [
         (L["project_id"], d.get("project_id")),
         (L["doc_id"], d.get("document_id")),
@@ -832,10 +1037,10 @@ def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
         (L["owner"], d.get("owner") or "[ISI DARI SUMBER PROYEK]"),
         (L["updated_at"], d.get("updated_at")),
     ]:
-        pdf.set_font("Helvetica", "B", 8.5)
-        pdf.cell(48, 5.5, _ascii_clean(k) + ":", border=1)
-        pdf.set_font("Helvetica", "", 8.5)
-        pdf.cell(0, 5.5, _ascii_clean(v), border=1, new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font(body_family, "B", 8.5)
+        pdf.cell(48, 5.5, _safe_pdf_text(k, u_on) + ":", border=1)
+        pdf.set_font(body_family, "", 8.5)
+        pdf.cell(0, 5.5, _safe_pdf_text(v, u_on), border=1, new_x="LMARGIN", new_y="NEXT")
     pdf.ln(4)
 
     for b in d.get("blocks", []):
@@ -843,80 +1048,80 @@ def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
         bid = str(b.get("id", ""))
         pdf.set_x(pdf.l_margin)
         if kind == "heading":
-            t_str = _ascii_clean(b.get("title", bid))
+            t_str = _safe_pdf_text(b.get("title", bid), u_on)
             lvl = max(0, min(int(b.get("level", 2)) - 2, 2))
             try:
                 pdf.start_section(t_str, level=lvl)
             except Exception:
                 pass
-            pdf.set_font("Helvetica", "B", max(12 - lvl, 10))
+            pdf.set_font(body_family, "B", max(12 - lvl, 10))
             pdf.set_text_color(30, 41, 59)
             pdf.multi_cell(0, 6.5, t_str, new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1)
         elif kind == "paragraph":
-            pdf.set_font("Helvetica", "", 9.5)
+            pdf.set_font(body_family, "", 9.5)
             pdf.set_text_color(15, 23, 42)
             prefix = f"[{bid}] " if re.match(r"^(?:FR|NFR|TC|UAT|BUG|INC|CR|ADR|SDD|RISK)-\d+", bid) else ""
-            pdf.multi_cell(0, 5, _ascii_clean(f"{prefix}{b.get('body', '')}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(0, 5, _safe_pdf_text(f"{prefix}{b.get('body', '')}", u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1.5)
         elif kind == "table" and isinstance(b.get("table_data"), dict):
             td = b["table_data"]
-            cols = [_ascii_clean(c) for c in td.get("columns", td.get("headers", []))]
+            cols = [_safe_pdf_text(c, u_on) for c in td.get("columns", td.get("headers", []))]
             if cols:
-                pdf.set_font("Helvetica", "B", 8)
+                pdf.set_font(body_family, "B", 8)
                 pdf.set_x(pdf.l_margin)
                 pdf.multi_cell(0, 5, " | ".join(cols), border=1, new_x="LMARGIN", new_y="NEXT")
-                pdf.set_font("Helvetica", "", 8)
+                pdf.set_font(body_family, "", 8)
                 for r in td.get("rows", []):
                     pdf.set_x(pdf.l_margin)
-                    pdf.multi_cell(0, 4.8, " | ".join(_ascii_clean(c) for c in r), border=1, new_x="LMARGIN", new_y="NEXT")
+                    pdf.multi_cell(0, 4.8, " | ".join(_safe_pdf_text(c, u_on) for c in r), border=1, new_x="LMARGIN", new_y="NEXT")
                 pdf.ln(2)
         elif kind == "list":
-            pdf.set_font("Helvetica", "", 9.5)
+            pdf.set_font(body_family, "", 9.5)
             items = b.get("list_items") or str(b.get("body", "")).splitlines()
             ordered = bool(b.get("ordered", False))
             for idx_it, it in enumerate(items, start=1):
                 pdf.set_x(pdf.l_margin)
                 prefix_li = f"{idx_it}." if ordered else "*"
-                pdf.multi_cell(0, 5, f"  {prefix_li} {_ascii_clean(it)}", new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 5, f"  {prefix_li} {_safe_pdf_text(it, u_on)}", new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1)
         elif kind == "finding":
             fnd = b.get("finding_data") or {}
-            pdf.set_font("Helvetica", "B", 9.5)
-            pdf.multi_cell(0, 5.5, _ascii_clean(f"[{bid}] {b.get('title') or bid} ({fnd.get('severity', 'INFO')})"), new_x="LMARGIN", new_y="NEXT")
-            pdf.set_font("Helvetica", "", 8.5)
+            pdf.set_font(body_family, "B", 9.5)
+            pdf.multi_cell(0, 5.5, _safe_pdf_text(f"[{bid}] {b.get('title') or bid} ({fnd.get('severity', 'INFO')})", u_on), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font(body_family, "", 8.5)
             for lbl, k in (("Criteria", "criteria"), ("Condition", "condition"), ("Cause", "cause"), ("Effect", "effect"), ("Recommendation", "recommendation"), ("Evidence Ref", "evidence_ref")):
                 if fnd.get(k):
                     pdf.set_x(pdf.l_margin)
-                    pdf.multi_cell(0, 4.8, _ascii_clean(f"  - {lbl}: {fnd[k]}"), new_x="LMARGIN", new_y="NEXT")
+                    pdf.multi_cell(0, 4.8, _safe_pdf_text(f"  - {lbl}: {fnd[k]}", u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1.5)
         elif kind == "decision-matrix":
             dd = b.get("decision_data") or {}
-            pdf.set_font("Helvetica", "B", 9.5)
-            pdf.multi_cell(0, 5.5, _ascii_clean(f"[{bid}] {b.get('title') or bid}"), new_x="LMARGIN", new_y="NEXT")
-            pdf.set_font("Helvetica", "", 8.5)
+            pdf.set_font(body_family, "B", 9.5)
+            pdf.multi_cell(0, 5.5, _safe_pdf_text(f"[{bid}] {b.get('title') or bid}", u_on), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font(body_family, "", 8.5)
             for o in dd.get("options", []):
                 pdf.set_x(pdf.l_margin)
-                pdf.multi_cell(0, 4.8, _ascii_clean(f"  [{o.get('id')}] {o.get('title')} ({o.get('status')})"), new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 4.8, _safe_pdf_text(f"  [{o.get('id')}] {o.get('title')} ({o.get('status')})", u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.set_x(pdf.l_margin)
-            pdf.multi_cell(0, 4.8, _ascii_clean(f"  Decision: selected={dd.get('selectedOption')}, approvedBy={dd.get('approvedBy')}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(0, 4.8, _safe_pdf_text(f"  Decision: selected={dd.get('selectedOption')}, approvedBy={dd.get('approvedBy')}", u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1.5)
         elif kind == "figure":
             fd = b.get("figure_data") or {}
             cap = fd.get("caption") or b.get("title") or bid
-            pdf.set_font("Helvetica", "B", 9)
-            pdf.multi_cell(0, 5, _ascii_clean(cap), new_x="LMARGIN", new_y="NEXT")
-            pdf.set_font("Courier", "", 8)
+            pdf.set_font(body_family, "B", 9)
+            pdf.multi_cell(0, 5, _safe_pdf_text(cap, u_on), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font(mono_family, "", 8)
             raw_src = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
             for ln in raw_src.splitlines() or [""]:
                 pdf.set_x(pdf.l_margin)
-                pdf.multi_cell(0, 4.5, _ascii_clean(ln), new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 4.5, _safe_pdf_text(ln, u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1.5)
         else:
-            pdf.set_font("Courier", "", 8)
+            pdf.set_font(mono_family, "", 8)
             for ln in str(b.get("body", "")).splitlines() or [""]:
                 pdf.set_x(pdf.l_margin)
-                pdf.multi_cell(0, 4.5, _ascii_clean(ln), new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 4.5, _safe_pdf_text(ln, u_on), new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1.5)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1025,22 +1230,35 @@ def render_v2_to_html(doc: Dict[str, Any], out_path: Path) -> Path:
             parts.append(f'<pre id="{esc(bid)}"><code class="language-{esc(lang)}">{esc(str(b.get("body", "")))}</code></pre>')
 
     parts.extend(["</body>", "</html>"])
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
-    tmp_path.write_text("\n".join(parts), encoding="utf-8")
-    tmp_path.replace(out_path)
+    atomic_write_text(out_path, "\n".join(parts), encoding="utf-8")
     return out_path
 
 
 # ============================================================================
-# 5. CROSS-FORMAT QA VERIFIER (AT-08) & BUILD MANIFEST (SA-DOC-ENGINE-001)
+# 5. CROSS-FORMAT QA VERIFIER (AT-08 & R06 Real Content Validation)
 # ============================================================================
+class _HtmlStructureChecker(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.tags: List[str] = []
+        self.external_urls: List[str] = []
+
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, str | None]]) -> None:
+        self.tags.append(tag.lower())
+        for k, v in attrs:
+            if k in ("src", "href") and v and re.match(r"^https?://", v, re.IGNORECASE):
+                self.external_urls.append(v)
+
+
 def verify_rendered_outputs_qa(
     doc: Dict[str, Any], rendered_paths: Dict[str, Path]
 ) -> Dict[str, Any]:
     checks: List[Dict[str, Any]] = []
+    parity_failures: List[str] = []
     expected_doc_id = str(doc.get("document_id", ""))
     expected_rev = str(doc.get("revision", ""))
+    expected_title = str(doc.get("title", ""))
+    expected_headings = [str(b.get("title", "")) for b in doc.get("blocks", []) if b.get("kind") == "heading" and b.get("title")]
 
     for fmt, p in rendered_paths.items():
         exists = p.exists() and p.stat().st_size > 0
@@ -1055,22 +1273,58 @@ def verify_rendered_outputs_qa(
     md_ok = True
     if "md" in rendered_paths and rendered_paths["md"].exists():
         md_txt = rendered_paths["md"].read_text(encoding="utf-8")
-        md_ok = (expected_doc_id in md_txt) and (expected_rev in md_txt)
+        md_ok = (expected_doc_id in md_txt) and (expected_rev in md_txt) and (not expected_title or expected_title in md_txt)
+        if not md_ok:
+            parity_failures.append("md: missing doc_id, revision, or title")
 
     html_ok = True
     if "html" in rendered_paths and rendered_paths["html"].exists():
         html_txt = rendered_paths["html"].read_text(encoding="utf-8")
-        html_ok = (expected_doc_id in html_txt) and (expected_rev in html_txt) and ("<!DOCTYPE html>" in html_txt)
+        hc = _HtmlStructureChecker()
+        hc.feed(html_txt)
+        has_core = all(t in hc.tags for t in ("html", "head", "body", "h1", "table"))
+        no_raw_script = "<script" not in html_txt.lower()
+        no_ext_deps = len(hc.external_urls) == 0
+        has_headings = all(html_lib.escape(h) in html_txt or h in html_txt for h in expected_headings[:3])
+        html_ok = (expected_doc_id in html_txt) and (expected_rev in html_txt) and ("<!DOCTYPE html>" in html_txt) and has_core and no_raw_script and no_ext_deps and has_headings
+        if not html_ok:
+            parity_failures.append(f"html: core={has_core}, no_raw_script={no_raw_script}, no_ext_deps={no_ext_deps}, has_headings={has_headings}")
 
     docx_ok = True
     if "docx" in rendered_paths and rendered_paths["docx"].exists():
         import docx as _docx
 
+        pkg_ok = False
+        with zipfile.ZipFile(str(rendered_paths["docx"]), "r") as zf:
+            names = set(zf.namelist())
+            pkg_ok = "[Content_Types].xml" in names and "word/document.xml" in names
         d = _docx.Document(str(rendered_paths["docx"]))
         all_txt = "\n".join(p.text for p in d.paragraphs) + "\n" + "\n".join(
             c.text for t in d.tables for r in t.rows for c in r.cells
         )
-        docx_ok = (expected_doc_id in all_txt) and (expected_rev in all_txt)
+        heading_paras = [p.text for p in d.paragraphs if p.style and "heading" in p.style.name.lower()]
+        meta_ok = bool(d.core_properties.title) or (expected_title in all_txt)
+        headings_ok = all(h in all_txt for h in expected_headings[:3]) and len(heading_paras) >= 1
+        docx_ok = pkg_ok and (expected_doc_id in all_txt) and (expected_rev in all_txt) and meta_ok and headings_ok and len(d.tables) >= 2
+        if not docx_ok:
+            parity_failures.append(f"docx: pkg_ok={pkg_ok}, meta_ok={meta_ok}, headings_ok={headings_ok}, tables={len(d.tables)}")
+
+    pdf_ok = True
+    pdf_pages = 0
+    if "pdf" in rendered_paths and rendered_paths["pdf"].exists():
+        try:
+            from pypdf import PdfReader
+
+            reader = PdfReader(str(rendered_paths["pdf"]))
+            pdf_pages = len(reader.pages)
+            pdf_txt = "\n".join((pg.extract_text() or "") for pg in reader.pages)
+            # Note: header/footer carries doc_id and rev; verify body title + headings extracted cleanly
+            pdf_ok = pdf_pages >= 1 and (expected_doc_id in pdf_txt) and (expected_rev in pdf_txt) and (not expected_headings or any(h[:12] in pdf_txt for h in expected_headings))
+            if not pdf_ok:
+                parity_failures.append(f"pdf: pages={pdf_pages}, doc_id_present={expected_doc_id in pdf_txt}, rev_present={expected_rev in pdf_txt}")
+        except Exception as exc:
+            pdf_ok = False
+            parity_failures.append(f"pdf: parse_error={exc}")
 
     xlsx_ok = True
     if "xlsx" in rendered_paths and rendered_paths["xlsx"].exists():
@@ -1079,8 +1333,10 @@ def verify_rendered_outputs_qa(
         wb = _oxl.load_workbook(str(rendered_paths["xlsx"]), read_only=True)
         xlsx_ok = "README_Metadata" in wb.sheetnames and "Register_Data" in wb.sheetnames
         wb.close()
+        if not xlsx_ok:
+            parity_failures.append("xlsx: missing required sheets")
 
-    passed = all(c["exists_and_non_empty"] for c in checks) and md_ok and html_ok and docx_ok and xlsx_ok
+    passed = all(c["exists_and_non_empty"] for c in checks) and md_ok and html_ok and docx_ok and pdf_ok and xlsx_ok
     return {
         "passed": passed,
         "document_id": expected_doc_id,
@@ -1088,7 +1344,10 @@ def verify_rendered_outputs_qa(
         "md_parity": md_ok,
         "html_parity": html_ok,
         "docx_parity": docx_ok,
+        "pdf_parity": pdf_ok,
+        "pdf_pages": pdf_pages,
         "xlsx_parity": xlsx_ok,
+        "parity_failures": parity_failures,
         "artifacts": checks,
     }
 
@@ -1130,10 +1389,7 @@ def write_build_manifest(
         "generation_status": "PASS" if qa_result.get("passed") else "FAIL",
         "warnings_and_limitations": warnings or [],
     }
-    out_manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_p = out_manifest_path.with_suffix(".tmp")
-    tmp_p.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    tmp_p.replace(out_manifest_path)
+    atomic_write_text(out_manifest_path, json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     return out_manifest_path
 
 

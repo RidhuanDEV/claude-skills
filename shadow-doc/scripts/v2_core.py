@@ -512,12 +512,15 @@ def parse_markdown_into_blocks(md_text: str, doc_type: str = "SRS") -> tuple[lis
             i += 1
             continue
 
-        # Code or Mermaid block
-        if stripped.startswith("```"):
-            lang = stripped[3:].strip()
+        # Code, Mermaid, or DBML block (supports dynamic backtick fences >= 3)
+        fence_match = re.match(r"^(`{3,})(.*)$", stripped)
+        if fence_match:
+            fence_str = fence_match.group(1)
+            lang = fence_match.group(2).strip()
+            close_pat = re.compile(rf"^`{{{len(fence_str)},}}\s*$")
             code_lines: list[str] = []
             i += 1
-            while i < n and not lines[i].strip().startswith("```"):
+            while i < n and not close_pat.match(lines[i].strip()):
                 code_lines.append(lines[i])
                 i += 1
             i += 1
@@ -560,11 +563,16 @@ def parse_markdown_into_blocks(md_text: str, doc_type: str = "SRS") -> tuple[lis
                 )
             continue
 
-        # Markdown table
+        # Markdown table (supports escaped \| inside cells cleanly)
         if stripped.startswith("|"):
             t_rows: list[list[str]] = []
             while i < n and lines[i].strip().startswith("|"):
-                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                inner = lines[i].strip()
+                if inner.startswith("|"):
+                    inner = inner[1:]
+                if inner.endswith("|") and not inner.endswith("\\|"):
+                    inner = inner[:-1]
+                cells = [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", inner)]
                 t_rows.append(cells)
                 i += 1
             if len(t_rows) >= 2:
