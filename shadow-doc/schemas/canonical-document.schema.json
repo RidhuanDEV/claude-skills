@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Shadow Doc Canonical AST V2",
+  "title": "Shadow Doc Canonical AST (v2.0 & v2.1)",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "enum": ["2.0", "2.1"]
     },
     "document_id": {
       "type": "string",
@@ -84,6 +84,9 @@
     "effective_date": {
       "type": ["string", "null"]
     },
+    "template_id": {
+      "type": ["string", "null"]
+    },
     "template_version": {
       "type": ["string", "null"]
     },
@@ -103,6 +106,24 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "code_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "git_commits": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rendering_hints": {
+      "type": "object"
+    },
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^x-[a-z0-9-]+:": {}
+      },
+      "additionalProperties": false
+    },
     "sources": {
       "type": "array",
       "items": {
@@ -111,6 +132,9 @@
         "properties": {
           "source_id": { "type": "string" },
           "reference": { "type": "string" },
+          "source_type": { "type": "string" },
+          "doi_or_url": { "type": ["string", "null"] },
+          "peer_reviewed": { "type": ["boolean", "null"] },
           "verified_at": { "type": ["string", "null"] },
           "checksum": { "type": ["string", "null"] }
         }
@@ -131,12 +155,16 @@
               "figure",
               "list",
               "code",
-              "opaque"
+              "opaque",
+              "finding",
+              "decision-matrix",
+              "appendix"
             ]
           },
           "level": { "type": ["integer", "null"] },
           "title": { "type": ["string", "null"] },
           "body": { "type": ["string", "null"] },
+          "ordered": { "type": ["boolean", "null"] },
           "status": { "type": ["string", "null"] },
           "owner": { "type": ["string", "null"] },
           "table_data": {
@@ -159,10 +187,38 @@
           "figure_data": {
             "type": ["object", "null"],
             "properties": {
+              "diagram_type": {
+                "type": ["string", "null"],
+                "enum": ["mermaid", "dbml", "image", "external", null]
+              },
               "path": { "type": ["string", "null"] },
               "caption": { "type": ["string", "null"] },
               "alt_text": { "type": ["string", "null"] },
-              "mermaid": { "type": ["string", "null"] }
+              "mermaid": { "type": ["string", "null"] },
+              "dbml": { "type": ["string", "null"] }
+            }
+          },
+          "finding_data": {
+            "type": ["object", "null"],
+            "properties": {
+              "severity": { "type": "string" },
+              "confidence": { "type": ["string", "null"] },
+              "criteria": { "type": "string" },
+              "condition": { "type": "string" },
+              "cause": { "type": "string" },
+              "effect": { "type": "string" },
+              "recommendation": { "type": "string" },
+              "evidence_ref": { "type": "string" }
+            }
+          },
+          "decision_data": {
+            "type": ["object", "null"],
+            "properties": {
+              "options": { "type": "array", "items": { "type": "object" } },
+              "selectedOption": { "type": ["string", "null"] },
+              "approvedBy": { "type": ["string", "null"] },
+              "approvedAt": { "type": ["string", "null"] },
+              "rationale": { "type": ["string", "null"] }
             }
           },
           "list_items": {
@@ -174,9 +230,35 @@
             "type": "array",
             "items": { "type": "string" }
           },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "requirement_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "code_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "git_commits": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
           "trace_ids": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "rendering_hints": {
+            "type": ["object", "null"]
+          },
+          "extensions": {
+            "type": ["object", "null"],
+            "patternProperties": {
+              "^x-[a-z0-9-]+:": {}
+            },
+            "additionalProperties": false
           },
           "last_reviewed_at": { "type": ["string", "null"] }
         }
@@ -233,6 +315,9 @@
     },
     "legacy_v1_bagian": {
       "type": ["array", "null"]
+    },
+    "schema_migration": {
+      "type": ["object", "null"]
     }
   }
 }

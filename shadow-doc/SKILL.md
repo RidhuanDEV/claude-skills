@@ -75,7 +75,17 @@ All 20 templates live in [`templates/`](templates/) and are cataloged in [`TEMPL
 
 ---
 
-## 4. CLI Reference (`scripts/doc_scaffold.py`)
+## 3A. Generator-Agnostic Discovery & Resolution Precedence (`SA-DOC-ENGINE-001`)
+
+Before invoking the Global Engine directly on any project, run **`doc_orchestrator.py`** (`discover` / `resolve`) to check existing repo generators:
+1. **Existing Project Generator First**: Precedence `Explicit User Selection -> Project-Local Discovery -> Project Config (.shadow/document-engine.json) -> Global Engine Fallback (shadow-doc) -> User Decision Gate (Options A/B/C/D)`.
+2. **15-Criterion Compatibility & Adapter-First**: Classify discovered generators (`COMPATIBLE | PARTIALLY_COMPATIBLE | INCOMPATIBLE | UNKNOWN`). Reuse compatible generators untouched; bridge partial gaps via `MarkdownCompatibilityAdapter` / `domain_adapters.py` rather than silently replacing pipelines.
+3. **JSON AST Scope**: Canonical JSON AST v2.0/v2.1 (`heading`, `paragraph`, `table`, `figure [mermaid|dbml|image]`, `list`, `code`, `opaque`, `finding`, `decision-matrix`, `appendix`) is the internal standard **when using the Global Document Engine** — never force repos already using Markdown/YAML generators to migrate without authorization.
+4. **Output Safety**: `export` blocks path traversal (`--allowed-root`), blocks silent overwrites unless `--overwrite` is explicitly passed, and emits `*.build-manifest.json` per build.
+
+---
+
+## 4. CLI Reference (`scripts/doc_scaffold.py` & `scripts/doc_orchestrator.py`)
 
 ```powershell
 # 1. Create a canonical v2.0 JSON document from any of the 20 templates

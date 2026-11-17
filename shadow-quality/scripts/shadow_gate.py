@@ -358,6 +358,37 @@ def run_shadow_gate(
                 "corrective_action": "Inspect Python environment and `official_first_verifier.py`.",
             })
 
+    doc_engine_verified: bool | None = None
+    doc_orchestrator_script = root / "shadow-doc" / "scripts" / "doc_orchestrator.py"
+    if doc_orchestrator_script.is_file():
+        try:
+            proc_doc = subprocess.run(
+                [sys.executable, str(doc_orchestrator_script), "--self-test"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            doc_data = json.loads(proc_doc.stdout) if proc_doc.returncode == 0 and proc_doc.stdout.strip() else {}
+            doc_engine_verified = proc_doc.returncode == 0 and bool(doc_data.get("all_passed"))
+            if not doc_engine_verified:
+                violations.append({
+                    "severity": "CRITICAL",
+                    "code": "DOCUMENT_ORCHESTRATOR_GATE_FAILURE",
+                    "file": "shadow-doc/scripts/doc_orchestrator.py",
+                    "message": "Document orchestrator discovery/safety self-test failed.",
+                    "corrective_action": "Fix failing checks in `doc_orchestrator.py --self-test`.",
+                })
+        except Exception as exc:
+            doc_engine_verified = False
+            violations.append({
+                "severity": "CRITICAL",
+                "code": "DOCUMENT_ORCHESTRATOR_GATE_ERROR",
+                "file": "shadow-doc/scripts/doc_orchestrator.py",
+                "message": f"Failed executing doc orchestrator self-test: {exc}",
+                "corrective_action": "Inspect Python environment and `doc_orchestrator.py`.",
+            })
+
     blocking = [v for v in violations if v.get("severity") in ("CRITICAL", "HIGH")]
     passed = len(blocking) == 0
 
@@ -367,6 +398,7 @@ def run_shadow_gate(
         "checked_files_count": len(files),
         "execution_approval_gate_verified": approval_gate_verified,
         "official_first_gate_verified": official_first_verified,
+        "document_engine_gate_verified": doc_engine_verified,
         "passed": passed,
         "recommended_max_readiness": "VERIFIED-LOCAL" if passed and not warnings else ("IMPLEMENTED" if passed else "BLOCKED"),
         "blocking_violations_count": len(blocking),

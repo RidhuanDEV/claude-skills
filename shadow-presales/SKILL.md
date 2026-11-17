@@ -35,3 +35,8 @@ python "shadow-presales/scripts/presales_commercial_engine.py" --self-test
 python "shadow-presales/scripts/presales_commercial_engine.py" --size-capacity path/to/workload.json
 python "shadow-presales/scripts/presales_commercial_engine.py" --model-tco path/to/commercial.json
 ```
+
+## 3. Document Rendering Boundary (`SA-DOC-ENGINE-001`)
+
+- `/shadow-presales` owns Bid/No-Bid, 3-scenario workload capacity, TCO/NPV, and Perpres 46/2025 RAB logic; NEVER duplicate `.docx`/`.pdf`/`.html` renderers.
+- Route formal `PRESALES_PROPOSAL` deliverables through `shadow-doc/scripts/doc_orchestrator.py` (existing project generator first, or Global Engine via `domain_adapters.py::adapt_presales_payload`).

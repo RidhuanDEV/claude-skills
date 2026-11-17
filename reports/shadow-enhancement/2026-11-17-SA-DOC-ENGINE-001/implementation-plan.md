@@ -1,0 +1,10 @@
+# SA-DOC-ENGINE-001 — Dependency-Ordered Implementation Plan (`G0`)
+
+| Gate | Phase | Scope & Deliverables | Verification Criteria |
+|---|---|---|---|
+| **G0** | Discovery & Baseline | Audit skills/scripts, run baseline tests, publish 6 `G0` docs in `reports/shadow-enhancement/2026-11-17-SA-DOC-ENGINE-001/` | Baseline `--selftest`, `--acceptance-suite` (`16/16`), `reference_verifier` (`10/10`) pass |
+| **G1** | Generator Resolution & Compatibility | Implement `shadow-doc/scripts/doc_orchestrator.py` (5-tier precedence, 8 distinct path types, 15-criteria compatibility scorer, adapter interface, A/B/C/D User Decision Gate, auth & path safety guards) | Discovery/compatibility unit & fixture tests (Cases 1–16, 32–38) pass |
+| **G2** | Structured Document Core (`2.1`) | Upgrade `canonical-document.schema.json` & `v2_core.py` for `2.1` nodes (`finding`, `decision-matrix`, `appendix`, `dbml`, `evidence_refs`, `code_refs`, `git_commits`, `rendering_hints`, `x-*` extensions), explicit unsupported-node error, schema normalization & `2.0->2.1` migration | Existing `16/16` acceptance tests stay `PASS` + Cases 17–22 pass |
+| **G3** | Renderer, Registry & Safety Integration | Upgrade `v2_renderers.py` & `doc_scaffold.py`: add `html` renderer, DBML/Mermaid preservation + optional vector hook, `RENDERER_CONTRACTS`, `templates/registry.json` + templates `21..25`, `discover`/`assess`/`resolve`/`migrate-schema` CLI, `--overwrite` protection & `build-manifest.json` | Cases 23–31 & output safety verified |
+| **G4** | Cross-Skill Integration & Routing | Add domain-to-AST/MD adapters (`handover`, `pmo`, `grc`, `presales`, `ea`); update `SKILL.md` boundaries & `skill_router.py` + `shadow_gate.py` | `skill_router.py`, `shadow_gate.py`, and Cases 39–44 pass |
+| **G5** | Final Verification & Readiness | Build & run `doc_engine_test_suite.py` covering all 44 scenarios, update `evals/evals.json`, emit `test-report.md`, `migration-and-rollback-guide.md`, `user-configuration-guide.md`, `implementation-summary.md`, `known-limitations.md` | All mandatory local suites pass; global install & git push gated on Monarch approval |

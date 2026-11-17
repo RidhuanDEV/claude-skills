@@ -31,3 +31,8 @@ Integrates with [`shadow-monarch/reference/CONSULTING-INTELLIGENCE-CORE.md`](../
 python "shadow-ea/scripts/ea_portfolio_engine.py" --self-test
 python "shadow-ea/scripts/ea_portfolio_engine.py" --analyze-portfolio path/to/portfolio.json
 ```
+
+## 3. Document Rendering Boundary (`SA-DOC-ENGINE-001`)
+
+- `/shadow-ea` owns TOGAF 10, 6-Domain SPBE, TIME rationalization, and ABB/SBB modeling; NEVER duplicate document renderers.
+- Route formal `ARCHITECTURE_REPORT` blueprints through `shadow-doc/scripts/doc_orchestrator.py` (existing repo generator first, or Global Engine via `domain_adapters.py::adapt_pmo_or_ea_payload`).

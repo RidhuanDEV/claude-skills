@@ -1,0 +1,14 @@
+# SA-DOC-ENGINE-001 — Capability Gap Matrix (`G0`)
+
+Generated: 2026-11-17
+
+| Requirement Area | Current State (`G0`) | Target State (`SA-DOC-ENGINE-001`) | Priority |
+|---|---|---|---|
+| **Generator Discovery & Resolution** | Hardcoded to `shadow-doc/scripts/doc_scaffold.py` only; no inspection of repo manifests, npm/pyproject scripts, CLI tools (`pandoc`, `typst`, `latex`), or `.shadow/document-engine.json` | Deterministic 5-tier precedence (`Explicit User Selection -> Project-Local Discovery -> Project Config -> Global Engine -> User Decision`) distinguishing all 8 path types | Critical |
+| **Compatibility Assessment & Reuse** | None | 15-criteria assessment classifying candidates (`COMPATIBLE`, `PARTIALLY_COMPATIBLE`, `INCOMPATIBLE`, `UNKNOWN`), Adapter-first routing, A/B/C/D User Decision Gate | Critical |
+| **Canonical AST Governance** | Schema `2.0` fixed (`const "2.0"`), 7 block kinds, `mermaid` only, no native `finding` / `decision-matrix` / `appendix`, no schema migration to `2.1`, no extension namespacing | Support both `2.0` (unchanged) and `2.1` (`finding`, `decision-matrix`, `appendix`, `dbml`, `evidence_refs`, `code_refs`, `git_commits`, `rendering_hints`, `x-*` extensions), explicit `SCHEMA_UNSUPPORTED_NODE` errors, deterministic normalizer & migrator | High |
+| **Multi-Format Rendering** | `.md`, `.docx`, `.pdf`, `.xlsx`, `.csv`, `.zip`; no `.html`; DBML not recognized cleanly; no declared `RENDERER_CONTRACTS` | Add semantic `.html` renderer, explicit DBML + Mermaid handling & optional vector rendering without AST corruption, formal `RENDERER_CONTRACTS` | High |
+| **Template Registry & Domain Templates** | `20` SDLC `.md` templates (`01..20`); no formal `registry.json`; missing `GRC_ASSESSMENT`, `PROJECT_REPORT`, `PRESALES_PROPOSAL`, `ARCHITECTURE_REPORT`, `TECH_AUDIT` | Add `templates/registry.json` + templates `21..25` covering all specialist skill deliverables | Medium |
+| **Cross-Skill Traceability Bridges** | Consulting scripts (`pmo`, `grc`, `presales`, `ea`) output standalone JSON with zero bridge to `shadow-doc` / project generators | Domain-to-AST/Markdown adapters preserving `sources[]`, `evidence_refs`, and calculation integrity | High |
+| **Output Safety & Reproducibility** | Atomic JSON writes exist; `export` overwrites existing files silently; no `--allowed-root` traversal block; no per-export `build-manifest.json` | Path traversal validation, explicit `--overwrite` protection (default fail-closed on collision), per-export `build-manifest.json` with SHA-256 + versions + warnings | Critical |
+| **Router & Gate Enforcement** | `skill_router.py` matches narrow `.docx`/`.xlsx`/`SRS doc` phrases; `shadow_gate.py` has no doc-engine check | Broaden doc-orchestration routing cleanly + wire `doc_orchestrator.py --self-test` into `shadow_gate.py` | Medium |

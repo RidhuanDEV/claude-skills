@@ -27,6 +27,8 @@ from v2_core import (
     create_document_from_template,
     diff_documents_v2,
     import_existing_file_to_v2,
+    migrate_schema_version,
+    normalize_document_v2,
     selective_update_v2,
     transition_approval_status,
     validate_document_v2,
@@ -35,10 +37,19 @@ from v2_renderers import (
     build_stage_package,
     render_v2_to_csv,
     render_v2_to_docx,
+    render_v2_to_html,
     render_v2_to_markdown,
     render_v2_to_pdf,
     render_v2_to_xlsx,
     verify_rendered_outputs_qa,
+    write_build_manifest,
+)
+from doc_orchestrator import (
+    assess_generator_compatibility,
+    check_output_overwrite_safety,
+    discover_project_generators,
+    resolve_document_generator,
+    validate_safe_path,
 )
 from v2_acceptance import run_acceptance_suite
 
@@ -285,10 +296,26 @@ def main() -> int:
     p_approve.add_argument("--role", default="Approver", help="Approver role")
     p_approve.add_argument("--evidence-ref", default=None, help="Approval evidence reference (required for APPROVED/RELEASED)")
 
-    p_export = sub.add_parser("export", help="[v2] Render canonical v2.0 JSON into docx, pdf, xlsx, csv, or md")
-    p_export.add_argument("--doc", required=True, help="Canonical v2.0 JSON path")
-    p_export.add_argument("--format", required=True, help="Comma-separated formats: md,docx,pdf,xlsx,csv,all")
+    p_export = sub.add_parser("export", help="[v2] Render canonical JSON into md, html, docx, pdf, xlsx, csv")
+    p_export.add_argument("--doc", required=True, help="Canonical v2.0/v2.1 JSON path")
+    p_export.add_argument("--format", required=True, help="Comma-separated formats: md,html,docx,pdf,xlsx,csv,all")
     p_export.add_argument("--out-dir", required=True, help="Output directory")
+    p_export.add_argument("--overwrite", action="store_true", help="Allow overwriting existing rendered files")
+    p_export.add_argument("--allowed-root", default=None, help="Optional root containment boundary for traversal guard")
+    p_export.add_argument("--generator", default="shadow-doc-global", help="Generator ID or path")
+
+    p_mig_schema = sub.add_parser("migrate-schema", help="[v2.1] Migrate v1.0 or v2.0 AST cleanly to v2.1 without data loss")
+    p_mig_schema.add_argument("--in", dest="input_path", required=True, help="Input AST JSON path")
+    p_mig_schema.add_argument("--to", default="2.1", choices=["2.0", "2.1"], help="Target schema version")
+    p_mig_schema.add_argument("--out", required=True, help="Output migrated JSON path")
+
+    p_disc = sub.add_parser("discover", help="[Orchestrator] Discover project document generators and configuration")
+    p_disc.add_argument("--repo", default=".", help="Target repository root")
+
+    p_res = sub.add_parser("resolve", help="[Orchestrator] Resolve best generator using 5-tier precedence & 15-criteria assessment")
+    p_res.add_argument("--repo", default=".", help="Target repository root")
+    p_res.add_argument("--outputs", default="md", help="Comma-separated desired outputs")
+    p_res.add_argument("--generator", default="auto", help="Explicit generator ID or path")
 
     p_pkg = sub.add_parser("package", help="[v2] Build stage handover ZIP package with SHA-256 manifest.json")
     p_pkg.add_argument("--source-dir", required=True, help="Directory containing project documents")
@@ -421,16 +448,25 @@ def main() -> int:
 
     if args.cmd == "export":
         doc_p = Path(args.doc)
-        doc = json.loads(doc_p.read_text(encoding="utf-8"))
-        out_dir = Path(args.out_dir)
+        doc = normalize_document_v2(json.loads(doc_p.read_text(encoding="utf-8")))
+        allowed_root = Path(args.allowed_root).resolve() if args.allowed_root else None
+        out_dir = validate_safe_path(Path(args.out_dir), allowed_root=allowed_root)
         out_dir.mkdir(parents=True, exist_ok=True)
         stem = doc.get("document_id", doc_p.stem)
-        fmts = [f.strip().lower() for f in args.format.split(",")]
+        fmts = [f.strip().lower() for f in args.format.split(",") if f.strip()]
         if "all" in fmts:
-            fmts = ["md", "docx", "pdf", "xlsx", "csv"]
+            fmts = ["md", "html", "docx", "pdf", "xlsx", "csv"]
         rendered: Dict[str, Path] = {}
+        ext_map = {"md": ".md", "html": ".html", "docx": ".docx", "pdf": ".pdf", "xlsx": ".xlsx", "csv": ".csv"}
+        for f_key in fmts:
+            if f_key not in ext_map:
+                raise ValueError(f"Unsupported export format: '{f_key}'")
+            target_file = validate_safe_path(out_dir / f"{stem}{ext_map[f_key]}", allowed_root=out_dir)
+            check_output_overwrite_safety(target_file, overwrite=bool(args.overwrite))
         if "md" in fmts:
             rendered["md"] = render_v2_to_markdown(doc, out_dir / f"{stem}.md")
+        if "html" in fmts:
+            rendered["html"] = render_v2_to_html(doc, out_dir / f"{stem}.html")
         if "docx" in fmts:
             rendered["docx"] = render_v2_to_docx(doc, out_dir / f"{stem}.docx")
         if "pdf" in fmts:
@@ -440,8 +476,29 @@ def main() -> int:
         if "csv" in fmts:
             rendered["csv"] = render_v2_to_csv(doc, out_dir / f"{stem}.csv")
         qa = verify_rendered_outputs_qa(doc, rendered)
+        manifest_p = write_build_manifest(
+            doc, rendered, qa, out_dir / f"{stem}.build-manifest.json", generator_id=args.generator
+        )
+        qa["build_manifest"] = str(manifest_p)
         print(json.dumps(qa, indent=2))
         return 0 if qa["passed"] else 1
+
+    if args.cmd == "migrate-schema":
+        src_doc = json.loads(Path(args.input_path).read_text(encoding="utf-8"))
+        migrated = migrate_schema_version(src_doc, target_version=args.to)
+        out_p = Path(args.out)
+        atomic_write_json(out_p, migrated)
+        print(json.dumps({"status": "MIGRATED", "to": args.to, "path": str(out_p), "semantic_hash": migrated.get("semantic_hash")}, indent=2))
+        return 0
+
+    if args.cmd == "discover":
+        print(json.dumps(discover_project_generators(Path(args.repo)), indent=2))
+        return 0
+
+    if args.cmd == "resolve":
+        req = {"required_outputs": [x.strip() for x in args.outputs.split(",") if x.strip()]}
+        print(json.dumps(resolve_document_generator(Path(args.repo), req, explicit_generator=args.generator), indent=2))
+        return 0
 
     if args.cmd == "package":
         res = build_stage_package(Path(args.source_dir), args.project_id, args.stage, Path(args.out))

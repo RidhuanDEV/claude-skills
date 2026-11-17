@@ -34,3 +34,8 @@ python "shadow-pmo/scripts/pmo_governance_engine.py" --self-test
 python "shadow-pmo/scripts/pmo_governance_engine.py" --analyze-schedule path/to/wbs_dag.json
 python "shadow-pmo/scripts/pmo_governance_engine.py" --evaluate-cr path/to/cr_request.json
 ```
+
+## 3. Document Rendering Boundary (`SA-DOC-ENGINE-001`)
+
+- `/shadow-pmo` owns PERT/CPM/Monte Carlo/EVM calculations and CR contractual governance; NEVER duplicate `.docx`/`.pdf`/`.html` rendering inside `pmo_governance_engine.py`.
+- Route formal `PROJECT_REPORT` / `CHANGE_REQUEST` deliverables through `shadow-doc/scripts/doc_orchestrator.py` (reusing existing repo generators first, or bridging PMO JSON outputs via `domain_adapters.py::adapt_pmo_or_ea_payload`).

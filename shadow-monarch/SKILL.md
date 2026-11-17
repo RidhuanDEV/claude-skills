@@ -304,7 +304,7 @@ Run `python "shadow-monarch/scripts/skill_router.py" --route "<task summary>"` t
 | | `/shadow-resilience` | P1 | Automated DB backup restore drills (RPO/RTO proof), graceful degradation & fault isolation |
 | | `/shadow-maintain` | P1 | Post-production Harwat/OMKT, SLA bug triage, hotfix + regression test workflow & blameless RCA |
 | **E. Delivery & Collaboration** | `/shadow-handover` | P0 | Client BAST, source/SBOM inventory, secure credential transfer, Admin/User Manuals & ToT |
-| | `/shadow-doc` | P0 | Canonical JSON AST v2.0 + 20 SDLC templates + selective block updates + bidirectional traceability + approval governance -> `.docx` / `.pdf` / `.xlsx` / `.csv` / `.md` / `.zip` |
+| | `/shadow-doc` | P0 | Generator-Agnostic Document Orchestrator (`doc_orchestrator.py`: repo-local first -> adapter -> Global AST v2.0/v2.1 engine fallback, 25 templates, HTML/DOCX/PDF/XLSX/MD/ZIP + `build-manifest.json`) |
 | | `/shadow-git` | P0 | Branching strategy detection, Git worktrees, parallel multi-agent isolation, independent feature integration, forward sync from `main`, `git merge-tree` conflict/semantic risk prediction & 6-point safe cleanup |
 | | `/handoff` | P0 | Cross-agent AI session context compaction & resumption (`shadow_handoff` MCP) |
 | | `/context7` | P0 | Real-time official library/framework documentation lookup (`context7` MCP) |

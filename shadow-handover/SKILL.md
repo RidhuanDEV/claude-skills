@@ -48,3 +48,10 @@ Task-oriented guide grouped by **User Role** (`Operator`, `Verifikator`, `Pimpin
 
 ### 7. Warranty / Masa Pemeliharaan (Garansi) Handover Checklist
 - Support escalation contacts, SLA response tiers (`/shadow-maintain`), and scope boundaries distinguishing **Warranty Bug Fixes (Covered)** from **New Feature Requests (Out of Warranty Scope)**.
+
+---
+
+## 2. Generator-Agnostic Rendering Boundary (`SA-DOC-ENGINE-001`)
+
+- Never embed custom `.docx`/`.pdf`/`.html` generation scripts inside `/shadow-handover`.
+- Always resolve the repository's existing document generator first via `shadow-doc/scripts/doc_orchestrator.py resolve --repo . --outputs docx,pdf,md`; only fall back to the Global Document Engine (`shadow-doc/scripts/domain_adapters.py::adapt_handover_payload`) when no compatible project generator exists and authorization permits.

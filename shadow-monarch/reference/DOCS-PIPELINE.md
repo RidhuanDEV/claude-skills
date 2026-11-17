@@ -3,8 +3,10 @@
 Use when creating, updating, or automating technical documentation, user manuals, SOPs, ADRs, API collections
 (OpenAPI/Bruno), or document generation pipelines (`.md` / structured data → `.docx` / `.pdf` / `.xlsx` / `.html`).
 
-## 1. Golden rule: Source-of-Truth document pipeline
+## 1. Golden rule: Generator-Agnostic & Source-of-Truth document pipeline
 
+- **Existing Project Generator First (`SA-DOC-ENGINE-001`)**: Never assume the Global Document Engine (`shadow-doc`) is superior to a working repository generator. Discover existing generators via `shadow-doc/scripts/doc_orchestrator.py` (`1. Explicit User Selection -> 2. Project-Local Discovery -> 3. Project Config (.shadow/document-engine.json) -> 4. Global Engine Fallback -> 5. User Decision Gate Options A/B/C/D`). Reuse compatible generators untouched; bridge partial gaps via non-destructive adapters before considering replacement.
+- **Canonical JSON AST v2.0/v2.1 Scope**: JSON AST is the canonical internal representation **for documents managed by the Global Document Engine**; never force repositories using Markdown, YAML, XML, or native templates to migrate without authorization.
 - **NEVER directly edit generated output files (`.docx`, `.pdf`, `.xlsx`, compiled `.html`)**.
 - All content, structure, styling rules, and data updates **MUST** be made in the **source files** (`.md`, `.json`,
   `.yaml`, templates, or generator scripts) that serve as the single source of truth, and then **regenerated** via the

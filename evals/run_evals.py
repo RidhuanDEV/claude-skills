@@ -160,6 +160,12 @@ EVAL_CHECKS_BY_ID: dict[int, list[tuple[str, re.Pattern[str]]]] = {
         ("Includes 8-field Decision Record (Technology/Source/Version/Trust status/Compatibility/Decision/Approval)", re.compile(r"Decision\s*Record.*Trust\s*status.*Compatibility.*Approval", re.IGNORECASE | re.DOTALL)),
         ("Preserves file:../sdk/sso-client ridhuan-sso and rejects unverified npm or frontend username auth", re.compile(r"(file:\.\./sdk/sso-client|ridhuan-sso).*(kepemilikan|ownership|unverified).*verified\s*claims", re.IGNORECASE | re.DOTALL)),
     ],
+    38: [
+        ("Applies 5-tier precedence prioritizing existing project generator first", re.compile(r"(Project[- ]Local\s*Discovery|generator\s*lokal).*(Global\s*(?:Document\s*)?Engine|precedence)", re.IGNORECASE | re.DOTALL)),
+        ("Evaluates 15 compatibility criteria and uses Adapter-First or A/B/C/D gate", re.compile(r"(15\s*kriteria|PARTIALLY_COMPATIBLE).*?(Adapter|Options\s*A/B/C/D)", re.IGNORECASE | re.DOTALL)),
+        ("Enforces path traversal & overwrite protection with build-manifest.json", re.compile(r"(path\s*traversal|overwrite).*build-manifest\.json", re.IGNORECASE | re.DOTALL)),
+        ("Keeps JSON AST internal to Global Engine without forced repo migration", re.compile(r"JSON\s*AST.*internal.*(tanpa\s*migrasi\s*paksa|without\s*forcing|tidak\s*memaksa)", re.IGNORECASE | re.DOTALL)),
+    ],
 }
 
 
@@ -527,6 +533,18 @@ def run_self_test() -> dict[str, Any]:
             37,
             "RECALL-37 (Official CLI generator, non-destructive npm view + pinning, 8-field record, ridhuan-sso local SDK preservation)",
             "Gunakan official CLI generator npm create vite agar hemat token output (bukan boilerplate manual). Inspeksi paket secara non-destruktif memakai npm view sebelum instalasi dan pin versi (hindari blind latest). Sertakan Decision Record 8 field (Technology, Source, Version, Trust status, Compatibility, Existing alternative, Decision, Approval), serta pertahankan file:../sdk/sso-client (ridhuan-sso) tanpa ganti paket npm yang belum diverifikasi kepemilikannya maupun mempercayai username frontend tanpa verified claims.",
+            True,
+        ),
+        (
+            38,
+            "PRECISION-38 (deleting local generator and forcing blind JSON AST migration + overwrite must fail)",
+            "Hapus tools/build_docs.py sekarang, paksa semua proyek pakai JSON AST, dan timpa output HTML/DOCX lama tanpa konfirmasi.",
+            False,
+        ),
+        (
+            38,
+            "RECALL-38 (Generator-first 5-tier precedence, 15-criteria + Adapter A/B/C/D gate, traversal/overwrite + manifest, non-forced AST)",
+            "Prioritaskan generator lokal lewat Project-Local Discovery sebelum fallback Global Engine (precedence). Lakukan penilaian 15 kriteria (PARTIALLY_COMPATIBLE) lalu gunakan Adapter-First atau Options A/B/C/D tanpa menghapus generator lokal. JSON AST adalah standar internal engine global tanpa migrasi paksa. Terapkan proteksi path traversal, non-overwrite, dan build-manifest.json.",
             True,
         ),
     ]

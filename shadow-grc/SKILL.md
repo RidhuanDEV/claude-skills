@@ -39,3 +39,8 @@ python "shadow-grc/scripts/grc_assurance_engine.py" --assess-cobit path/to/cobit
 python "shadow-grc/scripts/grc_assurance_engine.py" --validate-soa path/to/iso27001_soa.json
 python "shadow-grc/scripts/grc_assurance_engine.py" --validate-findings path/to/findings.json --sector BANKING
 ```
+
+## 3. Document Rendering Boundary (`SA-DOC-ENGINE-001`)
+
+- `/shadow-grc` owns COBIT/ISO 27001/POJK/SPBE assurance logic and 6-part findings; NEVER duplicate `.docx`/`.pdf`/`.html` rendering inside `grc_assurance_engine.py`.
+- Route formal `GRC_ASSESSMENT` deliverables through `shadow-doc/scripts/doc_orchestrator.py` (existing repo generator first, or Global Engine via `domain_adapters.py::adapt_grc_payload` preserving all finding evidence refs).

@@ -22,3 +22,10 @@
 | `18_SECURITY_RISK.md` | Security Assessment and Risk Register |
 | `19_MAINTENANCE.md` | Maintenance and Service Level Report |
 | `20_DEPLOYMENT.md` | Deployment and Production Verification Record |
+| `21_GRC_ASSESSMENT.md` | GRC & Regulatory Assurance Report |
+| `22_PROJECT_REPORT.md` | Project Progress & PMO Governance Report |
+| `23_PRESALES_PROPOSAL.md` | Enterprise Solution & Commercial Proposal |
+| `24_ARCHITECTURE_REPORT.md` | Enterprise & Solution Architecture Report |
+| `25_TECH_AUDIT.md` | Technical Due Diligence & Code Audit Report |
+
+Machine-readable metadata & template-to-skill mappings: [`templates/registry.json`](templates/registry.json).

@@ -1,0 +1,16 @@
+{
+  "registryVersion": "2.1.0",
+  "contentPresentationSeparated": true,
+  "templates": [
+    { "type": "HANDOVER", "file": "17_HANDOVER.md", "version": "2.0.0", "ownerSkill": "shadow-handover", "recommendedFormats": ["docx", "pdf", "md", "html", "zip"] },
+    { "type": "SRS", "file": "03_SRS.md", "version": "2.0.0", "ownerSkill": "shadow-discovery", "recommendedFormats": ["docx", "pdf", "md", "html"] },
+    { "type": "SDD", "file": "04_SDD.md", "version": "2.0.0", "ownerSkill": "shadow-architect", "recommendedFormats": ["docx", "pdf", "md", "html"] },
+    { "type": "ADR", "file": "05_ADR.md", "version": "2.0.0", "ownerSkill": "shadow-architect", "recommendedFormats": ["md", "html", "docx", "pdf"] },
+    { "type": "DECISION_RECORD", "file": "05_ADR.md", "version": "2.1.0", "ownerSkill": "shadow-monarch", "recommendedFormats": ["md", "html", "docx", "pdf"] },
+    { "type": "GRC_ASSESSMENT", "file": "21_GRC_ASSESSMENT.md", "version": "2.1.0", "ownerSkill": "shadow-grc", "recommendedFormats": ["docx", "pdf", "xlsx", "md", "html"] },
+    { "type": "PROJECT_REPORT", "file": "22_PROJECT_REPORT.md", "version": "2.1.0", "ownerSkill": "shadow-pmo", "recommendedFormats": ["docx", "pdf", "xlsx", "md", "html"] },
+    { "type": "PRESALES_PROPOSAL", "file": "23_PRESALES_PROPOSAL.md", "version": "2.1.0", "ownerSkill": "shadow-presales", "recommendedFormats": ["docx", "pdf", "xlsx", "md", "html"] },
+    { "type": "ARCHITECTURE_REPORT", "file": "24_ARCHITECTURE_REPORT.md", "version": "2.1.0", "ownerSkill": "shadow-ea", "recommendedFormats": ["docx", "pdf", "md", "html"] },
+    { "type": "TECH_AUDIT", "file": "25_TECH_AUDIT.md", "version": "2.1.0", "ownerSkill": "shadow-modernize", "recommendedFormats": ["docx", "pdf", "md", "html"] }
+  ]
+}

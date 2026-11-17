@@ -41,7 +41,34 @@ TEMPLATE_MAP: dict[str, tuple[str, str]] = {
     "SECURITY_RISK": ("18_SECURITY_RISK.md", "Security Assessment and Risk Register"),
     "MAINTENANCE": ("19_MAINTENANCE.md", "Maintenance and Service Level Report"),
     "DEPLOYMENT": ("20_DEPLOYMENT.md", "Deployment and Production Verification Record"),
+    "GRC_ASSESSMENT": ("21_GRC_ASSESSMENT.md", "GRC & Regulatory Assurance Report"),
+    "GRC": ("21_GRC_ASSESSMENT.md", "GRC & Regulatory Assurance Report"),
+    "PROJECT_REPORT": ("22_PROJECT_REPORT.md", "Project Progress & PMO Governance Report"),
+    "PMO_REPORT": ("22_PROJECT_REPORT.md", "Project Progress & PMO Governance Report"),
+    "PRESALES_PROPOSAL": ("23_PRESALES_PROPOSAL.md", "Enterprise Solution & Commercial Proposal"),
+    "PRESALES": ("23_PRESALES_PROPOSAL.md", "Enterprise Solution & Commercial Proposal"),
+    "ARCHITECTURE_REPORT": ("24_ARCHITECTURE_REPORT.md", "Enterprise & Solution Architecture Report"),
+    "EA_BLUEPRINT": ("24_ARCHITECTURE_REPORT.md", "Enterprise & Solution Architecture Report"),
+    "TECH_AUDIT": ("25_TECH_AUDIT.md", "Technical Due Diligence & Code Audit Report"),
+    "DECISION_RECORD": ("05_ADR.md", "Technical Decision Record"),
 }
+
+SUPPORTED_SCHEMA_VERSIONS: frozenset[str] = frozenset({"2.0", "2.1"})
+EXTENDED_BLOCK_KINDS: frozenset[str] = frozenset(
+    {
+        "heading",
+        "paragraph",
+        "table",
+        "figure",
+        "list",
+        "code",
+        "opaque",
+        "finding",
+        "decision-matrix",
+        "appendix",
+    }
+)
+EXTENSION_KEY_RE = re.compile(r"^x-[a-z0-9-]+:")
 
 # Normative Industry Standards per Document Type (Research Source Policy)
 NORMATIVE_STANDARDS_MAP: dict[str, dict[str, Any]] = {
@@ -316,13 +343,13 @@ def validate_schema_v2(doc: dict[str, Any]) -> list[dict[str, str]]:
                     "message": f"Required field '{req}' is missing.",
                 }
             )
-    if doc.get("schema_version") != "2.0":
+    if doc.get("schema_version") not in SUPPORTED_SCHEMA_VERSIONS:
         issues.append(
             {
                 "severity": "CRITICAL",
                 "code": "SCHEMA_VERSION_MISMATCH",
                 "location": "root.schema_version",
-                "message": f"Expected schema_version '2.0', got '{doc.get('schema_version')}'.",
+                "message": f"Expected schema_version in {sorted(SUPPORTED_SCHEMA_VERSIONS)}, got '{doc.get('schema_version')}'.",
             }
         )
     valid_statuses = {
@@ -352,17 +379,52 @@ def validate_schema_v2(doc: dict[str, Any]) -> list[dict[str, str]]:
                 "message": f"Invalid language '{doc.get('language')}'. Expected 'id-ID' or 'en-US'.",
             }
         )
-    valid_kinds = {"heading", "paragraph", "table", "figure", "list", "code", "opaque"}
+    exts = doc.get("extensions")
+    if isinstance(exts, dict):
+        for ek in exts:
+            if not EXTENSION_KEY_RE.match(str(ek)):
+                issues.append(
+                    {
+                        "severity": "CRITICAL",
+                        "code": "SCHEMA_INVALID_EXTENSION_NAMESPACE",
+                        "location": f"root.extensions.{ek}",
+                        "message": f"Extension key '{ek}' must use 'x-<namespace>:' prefix.",
+                    }
+                )
     for idx, b in enumerate(doc.get("blocks", [])):
-        if not isinstance(b, dict) or not b.get("id") or b.get("kind") not in valid_kinds:
+        if not isinstance(b, dict) or not b.get("id"):
             issues.append(
                 {
                     "severity": "CRITICAL",
                     "code": "SCHEMA_INVALID_BLOCK",
                     "location": f"blocks[{idx}]",
-                    "message": "Block must be an object with non-empty 'id' and valid 'kind'.",
+                    "message": "Block must be an object with non-empty 'id'.",
                 }
             )
+            continue
+        b_kind = b.get("kind")
+        if b_kind not in EXTENDED_BLOCK_KINDS:
+            issues.append(
+                {
+                    "severity": "CRITICAL",
+                    "code": "SCHEMA_UNSUPPORTED_NODE",
+                    "location": f"blocks[{idx}]",
+                    "message": f"Unsupported block kind '{b_kind}'. Supported kinds: {sorted(EXTENDED_BLOCK_KINDS)}.",
+                }
+            )
+            continue
+        b_exts = b.get("extensions")
+        if isinstance(b_exts, dict):
+            for ek in b_exts:
+                if not EXTENSION_KEY_RE.match(str(ek)):
+                    issues.append(
+                        {
+                            "severity": "CRITICAL",
+                            "code": "SCHEMA_INVALID_EXTENSION_NAMESPACE",
+                            "location": f"blocks[{idx}].extensions.{ek}",
+                            "message": f"Extension key '{ek}' must use 'x-<namespace>:' prefix.",
+                        }
+                    )
     return issues
 
 
@@ -460,19 +522,26 @@ def parse_markdown_into_blocks(md_text: str, doc_type: str = "SRS") -> tuple[lis
                 i += 1
             i += 1
             blk_counter += 1
-            if lang.lower() == "mermaid":
+            if lang.lower() in ("mermaid", "dbml"):
+                d_type = lang.lower()
+                raw_diagram = "\n".join(code_lines)
+                fig_data: dict[str, Any] = {
+                    "diagram_type": d_type,
+                    "path": None,
+                    "caption": f"{'DBML Schema' if d_type == 'dbml' else 'Mermaid'} Diagram {blk_counter}",
+                    "alt_text": f"Architecture/Data Diagram {blk_counter}",
+                }
+                if d_type == "mermaid":
+                    fig_data["mermaid"] = raw_diagram
+                else:
+                    fig_data["dbml"] = raw_diagram
                 blocks.append(
                     {
                         "id": f"FIG-{blk_counter:03d}",
                         "kind": "figure",
                         "title": f"Diagram {blk_counter}",
-                        "body": "\n".join(code_lines),
-                        "figure_data": {
-                            "path": None,
-                            "caption": f"Mermaid Diagram {blk_counter}",
-                            "alt_text": f"Architecture/Flow Diagram {blk_counter}",
-                            "mermaid": "\n".join(code_lines),
-                        },
+                        "body": raw_diagram,
+                        "figure_data": fig_data,
                         "source_refs": [],
                         "trace_ids": [],
                     }
@@ -1479,3 +1548,65 @@ def validate_document_v2(
         "warning_count": warning_count,
         "issues": issues,
     }
+
+
+def normalize_document_v2(doc: dict[str, Any]) -> dict[str, Any]:
+    """Deterministic AST normalizer (preserving all extended v2.1 nodes & metadata cleanly)."""
+    norm = copy.deepcopy(doc)
+    norm.setdefault("schema_version", "2.0")
+    norm.setdefault("classification", "INTERNAL")
+    norm.setdefault("style_profile", "corporate")
+    norm.setdefault("sources", [])
+    norm.setdefault("history", [])
+    norm.setdefault("blocks", [])
+    for b in norm["blocks"]:
+        if isinstance(b, dict):
+            b.setdefault("source_refs", [])
+            b.setdefault("trace_ids", [])
+            if b.get("kind") == "figure" and isinstance(b.get("figure_data"), dict):
+                fd = b["figure_data"]
+                if not fd.get("diagram_type"):
+                    if fd.get("dbml"):
+                        fd["diagram_type"] = "dbml"
+                    elif fd.get("mermaid"):
+                        fd["diagram_type"] = "mermaid"
+                    elif fd.get("path"):
+                        fd["diagram_type"] = "image"
+    norm["semantic_hash"] = compute_semantic_hash(norm)
+    norm["hash"] = compute_full_hash(norm)
+    return norm
+
+
+def migrate_schema_version(doc: dict[str, Any], target_version: str = "2.1") -> dict[str, Any]:
+    """Migrate a v1.0 (`bagian`) or v2.0 Canonical AST deterministically to target_version ('2.0' or '2.1')."""
+    if target_version not in SUPPORTED_SCHEMA_VERSIONS:
+        raise ValueError(f"Unsupported target schema_version: '{target_version}'")
+
+    if "bagian" in doc and doc.get("schema_version") not in SUPPORTED_SCHEMA_VERSIONS:
+        migrated = migrate_v1_dict_to_v2(doc, project_id=str(doc.get("project_id", "PROJ")))
+    else:
+        migrated = copy.deepcopy(doc)
+
+    prev_version = str(migrated.get("schema_version", "1.0"))
+    migrated["schema_version"] = target_version
+    migrated.setdefault("code_refs", [])
+    migrated.setdefault("git_commits", [])
+    migrated.setdefault("rendering_hints", {})
+    migrated["schema_migration"] = {
+        "from_version": prev_version,
+        "to_version": target_version,
+        "migrated_at": utc_now_iso(),
+    }
+    migrated.setdefault("history", []).append(
+        {
+            "revision": str(migrated.get("revision", "0.1-DRAFT")),
+            "reason": f"Schema migrated from {prev_version} to {target_version}",
+            "changed_by": "Shadow-Doc Schema Migrator",
+            "changed_at": utc_now_iso(),
+            "before_hash": migrated.get("hash"),
+            "after_hash": None,
+        }
+    )
+    migrated = normalize_document_v2(migrated)
+    migrated["history"][-1]["after_hash"] = migrated["hash"]
+    return migrated

@@ -492,6 +492,19 @@
         "Provides the 8-field Decision Record (Technology, Source, Version, Trust status, Compatibility, Existing alternative, Decision, Approval)",
         "Preserves local ridhuan-sso (file:../sdk/sso-client) without unverified npm replacement or trusting frontend username without verified claims"
       ]
+    },
+    {
+      "id": 38,
+      "name": "doc-orchestrator-generator-first-and-safe-rendering",
+      "prompt": "Kita masuk ke repository client yang sudah punya `tools/build_docs.py` (berbasis `python-docx` + script npm `docs:build`), dan ingin men-generate GRC Assessment Report ke HTML, DOCX, dan PDF. Tim mengusulkan langsung menghapus `tools/build_docs.py`, memaksa seluruh repo bermigrasi ke Canonical JSON AST, dan menimpa file laporan lama tanpa `--overwrite`.",
+      "expected_output": "Menolak penghapusan atau migrasi paksa tanpa otorisasi: menerapkan precedensi Generator-Agnostic (`Explicit User Selection -> Project-Local Discovery -> Project Config -> Global Engine Fallback -> User Decision Options A/B/C/D`), menilai 15 kriteria kompatibilitas (`COMPATIBLE`/`PARTIALLY_COMPATIBLE`/`INCOMPATIBLE`/`UNKNOWN`), memprioritaskan generator lokal atau adapter non-destruktif (`MarkdownCompatibilityAdapter`) sebelum mengganti pipeline, menjaga JSON AST sebagai standar internal Global Document Engine saja, serta mengaktifkan proteksi path traversal dan non-overwrite (`build-manifest.json`).",
+      "files": [],
+      "assertions": [
+        "Prioritizes existing project generator discovery before Global Document Engine fallback via 5-tier precedence",
+        "Assesses 15 compatibility criteria and applies Adapter-First or A/B/C/D User Decision Gate instead of silent replacement or forced JSON AST migration",
+        "Protects against path traversal and silent output overwrite while emitting reproducible build-manifest.json",
+        "Keeps JSON AST as internal standard of the Global Engine without forcing migration onto Markdown/project-native repos"
+      ]
     }
   ]
 }

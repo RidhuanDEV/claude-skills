@@ -340,7 +340,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DOCS-PIPELINE.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
-            r"\b(?:\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
+            r"\b(?:document\s+generator|document\s+engine|doc_orchestrator|export\s+(?:to\s+)?(?:docx|pdf|html|xlsx)|render\s+(?:handover|grc|presales|pmo|architecture)\s+(?:report|document|proposal)|build-manifest|\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
             re.IGNORECASE,
         ),
     },
@@ -1012,6 +1012,13 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-auth"],
             ["shadow-perf"],
             "shadow-auth",
+        ),
+        (
+            "DOC-ENGINE-1: Multi-format GRC export with generator discovery routes shadow-doc + shadow-grc",
+            "Audit ISO 27001 controls and export the GRC assessment report to docx and html using our document generator.",
+            ["shadow-doc", "shadow-grc"],
+            ["shadow-perf"],
+            None,
         ),
     ]
 

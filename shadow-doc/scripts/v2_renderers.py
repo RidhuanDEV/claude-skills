@@ -11,13 +11,92 @@ Renders Canonical AST v2.0 (`blocks[]`, `history[]`, `signoff_record[]`) into:
 
 import copy
 import csv
+import html as html_lib
 import json
+import re
+import shutil
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from v2_core import compute_file_sha256, scan_and_redact_secrets
+
+RENDERER_ENGINE_VERSION = "2.1.0"
+
+RENDERER_CONTRACTS: Dict[str, Dict[str, Any]] = {
+    "md": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["heading", "paragraph", "table", "figure", "list", "code", "opaque", "finding", "decision-matrix", "appendix"],
+        "output_formats": ["md"],
+        "dependencies": ["stdlib"],
+        "asset_support": ["mermaid-fenced", "dbml-fenced", "image-link"],
+        "limitations": [],
+        "validation": "verify_rendered_outputs_qa(md_parity)",
+    },
+    "html": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["heading", "paragraph", "table", "figure", "list", "code", "opaque", "finding", "decision-matrix", "appendix"],
+        "output_formats": ["html"],
+        "dependencies": ["stdlib"],
+        "asset_support": ["mermaid-pre", "dbml-pre", "svg-embed-when-cli-available"],
+        "limitations": ["Interactive Mermaid/DBML rendering in browser requires external JS or pre-rendered SVG via mmdc"],
+        "validation": "verify_rendered_outputs_qa(html_parity)",
+    },
+    "docx": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["heading", "paragraph", "table", "figure", "list", "code", "opaque", "finding", "decision-matrix", "appendix"],
+        "output_formats": ["docx"],
+        "dependencies": ["python-docx"],
+        "asset_support": ["mermaid-source", "dbml-source", "png-embed-when-present"],
+        "limitations": ["Word TOC page numbers populate upon pressing Ctrl+A -> F9 in Microsoft Word"],
+        "validation": "verify_rendered_outputs_qa(docx_parity)",
+    },
+    "pdf": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["heading", "paragraph", "table", "figure", "list", "code", "opaque", "finding", "decision-matrix", "appendix"],
+        "output_formats": ["pdf"],
+        "dependencies": ["fpdf2"],
+        "asset_support": ["mermaid-source", "dbml-source"],
+        "limitations": ["fpdf2 built-in Helvetica normalizes non-ASCII characters via _ascii_clean"],
+        "validation": "verify_rendered_outputs_qa(exists_and_non_empty)",
+    },
+    "xlsx": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["table", "heading", "paragraph", "finding", "decision-matrix"],
+        "output_formats": ["xlsx"],
+        "dependencies": ["openpyxl"],
+        "asset_support": ["structured-sheets"],
+        "limitations": ["Primarily exports tabular registers and traceability matrices"],
+        "validation": "verify_rendered_outputs_qa(xlsx_parity)",
+    },
+    "csv": {
+        "schema_versions": ["2.0", "2.1"],
+        "node_types": ["table"],
+        "output_formats": ["csv"],
+        "dependencies": ["stdlib"],
+        "asset_support": ["flat-table"],
+        "limitations": ["Exports primary tabular block only"],
+        "validation": "verify_rendered_outputs_qa(exists_and_non_empty)",
+    },
+}
+
+
+def render_diagram_asset(diagram_type: str, source_text: str) -> Dict[str, Any]:
+    """
+    Attempt diagram CLI vector detection safely without corrupting canonical document.
+    Explicitly reports fallback status when diagram CLIs (e.g. mmdc) are absent.
+    """
+    d_type = (diagram_type or "mermaid").lower()
+    cli_name = "mmdc" if d_type == "mermaid" else "dbml2sql"
+    cli_path = shutil.which(cli_name)
+    return {
+        "diagram_type": d_type,
+        "cli_tool": cli_name,
+        "cli_available": cli_path is not None,
+        "render_status": "CLI_AVAILABLE" if cli_path else "FALLBACK_SOURCE_PRESERVED",
+        "source_length": len(source_text or ""),
+    }
 
 I18N_LABELS: Dict[str, Dict[str, str]] = {
     "id-ID": {
@@ -180,16 +259,57 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
                 lines.append("")
         elif kind == "list":
             items = b.get("list_items") or str(b.get("body", "")).splitlines()
-            for it in items:
-                lines.append(f"- {it}")
+            ordered = bool(b.get("ordered", False))
+            for idx_item, it in enumerate(items, start=1):
+                lines.append(f"{idx_item}. {it}" if ordered else f"- {it}")
             lines.append("")
         elif kind == "figure":
             fd = b.get("figure_data") or {}
+            d_type = (fd.get("diagram_type") or ("dbml" if fd.get("dbml") else "mermaid")).lower()
+            raw_src = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
             lines.append(f"**{fd.get('caption') or b.get('title') or bid}**")
-            lines.append("```mermaid")
-            lines.append(str(fd.get("mermaid") or b.get("body") or ""))
-            lines.append("```")
+            if fd.get("path"):
+                lines.append(f"![{fd.get('alt_text') or b.get('title') or bid}]({fd['path']})")
+            if raw_src.strip():
+                fence = "dbml" if d_type == "dbml" else "mermaid"
+                lines.append(f"```{fence}")
+                lines.append(raw_src)
+                lines.append("```")
             lines.append("")
+        elif kind == "finding":
+            fnd = b.get("finding_data") or {}
+            lines.append(f"### Finding [{bid}] ({fnd.get('severity', b.get('status') or 'INFO')}) — {b.get('title') or bid}")
+            lines.append("")
+            for lbl, key in (
+                ("Criteria", "criteria"),
+                ("Condition", "condition"),
+                ("Cause", "cause"),
+                ("Effect", "effect"),
+                ("Recommendation", "recommendation"),
+                ("Evidence Ref", "evidence_ref"),
+            ):
+                if fnd.get(key):
+                    lines.append(f"- **{lbl}**: {fnd[key]}")
+            lines.append("")
+        elif kind == "decision-matrix":
+            dd = b.get("decision_data") or {}
+            lines.append(f"### Decision Matrix [{bid}] — {b.get('title') or bid}")
+            lines.append("")
+            opts = dd.get("options", [])
+            if opts:
+                lines.append("| Option | Title | Status |")
+                lines.append("| --- | --- | --- |")
+                for o in opts:
+                    lines.append(f"| {o.get('id', '-')} | {o.get('title', '-')} | {o.get('status', '-')} |")
+                lines.append("")
+            lines.append(f"- **Selected Option**: `{dd.get('selectedOption')}` | **Approved By**: `{dd.get('approvedBy')}` | **Approved At**: `{dd.get('approvedAt')}`")
+            lines.append("")
+        elif kind == "appendix":
+            lines.append(f"## Appendix [{bid}]: {b.get('title') or bid}")
+            lines.append("")
+            if b.get("body"):
+                lines.append(str(b.get("body")))
+                lines.append("")
         elif kind == "code":
             lang = b.get("code_language", "text")
             lines.append(f"```{lang}")
@@ -201,12 +321,21 @@ def render_v2_to_markdown(doc: Dict[str, Any], out_path: Path) -> Path:
             lines.append(str(b.get("body", "")))
             lines.append("")
 
+    # Source & Evidence Traceability Appendix (Section 6.1)
+    if d.get("sources") or d.get("code_refs") or d.get("git_commits"):
+        lines.append("## Sources & Traceability")
+        lines.append("")
+        for s in d.get("sources", []):
+            lines.append(f"- `{s.get('source_id')}`: {s.get('reference')}")
+        if d.get("code_refs"):
+            lines.append(f"- **Code Refs**: {', '.join(d['code_refs'])}")
+        if d.get("git_commits"):
+            lines.append(f"- **Git Commits**: {', '.join(d['git_commits'])}")
+        lines.append("")
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("\n".join(lines), encoding="utf-8")
     return out_path
-
-
-import re
 
 
 # ============================================================================
@@ -423,9 +552,50 @@ def render_v2_to_docx(doc: Dict[str, Any], out_path: Path) -> Path:
             _add_table(cols, rows)
         elif kind == "list":
             items = b.get("list_items") or str(b.get("body", "")).splitlines()
+            style_nm = "List Number" if b.get("ordered") else "List Bullet"
             for it in items:
-                wdoc.add_paragraph(str(it), style="List Bullet")
-        elif kind in ("code", "figure", "opaque"):
+                wdoc.add_paragraph(str(it), style=style_nm)
+        elif kind == "finding":
+            fnd = b.get("finding_data") or {}
+            hf = wdoc.add_heading(f"[{bid}] {b.get('title') or bid} ({fnd.get('severity', 'INFO')})", level=2)
+            hf.paragraph_format.keep_with_next = True
+            _add_table(
+                ["Field", "Detail"],
+                [[lbl, str(fnd.get(k, "-"))] for lbl, k in (
+                    ("Criteria", "criteria"), ("Condition", "condition"), ("Cause", "cause"),
+                    ("Effect", "effect"), ("Recommendation", "recommendation"), ("Evidence Ref", "evidence_ref"),
+                ) if fnd.get(k)],
+            )
+        elif kind == "decision-matrix":
+            dd = b.get("decision_data") or {}
+            hd = wdoc.add_heading(f"[{bid}] {b.get('title') or bid}", level=2)
+            hd.paragraph_format.keep_with_next = True
+            opts = dd.get("options", [])
+            if opts:
+                _add_table(
+                    ["Option", "Title", "Status"],
+                    [[str(o.get("id", "")), str(o.get("title", "")), str(o.get("status", ""))] for o in opts],
+                )
+            wdoc.add_paragraph(f"Selected: {dd.get('selectedOption')} | ApprovedBy: {dd.get('approvedBy')} | ApprovedAt: {dd.get('approvedAt')}")
+        elif kind == "appendix":
+            ha = wdoc.add_heading(f"Appendix [{bid}]: {b.get('title') or bid}", level=1)
+            ha.paragraph_format.keep_with_next = True
+            if b.get("body"):
+                wdoc.add_paragraph(str(b.get("body")))
+        elif kind == "figure":
+            fd = b.get("figure_data") or {}
+            cap = fd.get("caption") or b.get("title") or bid
+            cp = wdoc.add_paragraph(str(cap))
+            cp.paragraph_format.keep_with_next = True
+            for r in cp.runs:
+                r.font.bold = True
+            raw_src = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
+            if raw_src:
+                p = wdoc.add_paragraph()
+                r = p.add_run(raw_src)
+                r.font.name = "Consolas"
+                r.font.size = Pt(9.5)
+        elif kind in ("code", "opaque"):
             p = wdoc.add_paragraph()
             r = p.add_run(str(b.get("body", "")))
             r.font.name = "Consolas"
@@ -704,10 +874,44 @@ def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
         elif kind == "list":
             pdf.set_font("Helvetica", "", 9.5)
             items = b.get("list_items") or str(b.get("body", "")).splitlines()
-            for it in items:
+            ordered = bool(b.get("ordered", False))
+            for idx_it, it in enumerate(items, start=1):
                 pdf.set_x(pdf.l_margin)
-                pdf.multi_cell(0, 5, f"  * {_ascii_clean(it)}", new_x="LMARGIN", new_y="NEXT")
+                prefix_li = f"{idx_it}." if ordered else "*"
+                pdf.multi_cell(0, 5, f"  {prefix_li} {_ascii_clean(it)}", new_x="LMARGIN", new_y="NEXT")
             pdf.ln(1)
+        elif kind == "finding":
+            fnd = b.get("finding_data") or {}
+            pdf.set_font("Helvetica", "B", 9.5)
+            pdf.multi_cell(0, 5.5, _ascii_clean(f"[{bid}] {b.get('title') or bid} ({fnd.get('severity', 'INFO')})"), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 8.5)
+            for lbl, k in (("Criteria", "criteria"), ("Condition", "condition"), ("Cause", "cause"), ("Effect", "effect"), ("Recommendation", "recommendation"), ("Evidence Ref", "evidence_ref")):
+                if fnd.get(k):
+                    pdf.set_x(pdf.l_margin)
+                    pdf.multi_cell(0, 4.8, _ascii_clean(f"  - {lbl}: {fnd[k]}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.ln(1.5)
+        elif kind == "decision-matrix":
+            dd = b.get("decision_data") or {}
+            pdf.set_font("Helvetica", "B", 9.5)
+            pdf.multi_cell(0, 5.5, _ascii_clean(f"[{bid}] {b.get('title') or bid}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 8.5)
+            for o in dd.get("options", []):
+                pdf.set_x(pdf.l_margin)
+                pdf.multi_cell(0, 4.8, _ascii_clean(f"  [{o.get('id')}] {o.get('title')} ({o.get('status')})"), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_x(pdf.l_margin)
+            pdf.multi_cell(0, 4.8, _ascii_clean(f"  Decision: selected={dd.get('selectedOption')}, approvedBy={dd.get('approvedBy')}"), new_x="LMARGIN", new_y="NEXT")
+            pdf.ln(1.5)
+        elif kind == "figure":
+            fd = b.get("figure_data") or {}
+            cap = fd.get("caption") or b.get("title") or bid
+            pdf.set_font("Helvetica", "B", 9)
+            pdf.multi_cell(0, 5, _ascii_clean(cap), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Courier", "", 8)
+            raw_src = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
+            for ln in raw_src.splitlines() or [""]:
+                pdf.set_x(pdf.l_margin)
+                pdf.multi_cell(0, 4.5, _ascii_clean(ln), new_x="LMARGIN", new_y="NEXT")
+            pdf.ln(1.5)
         else:
             pdf.set_font("Courier", "", 8)
             for ln in str(b.get("body", "")).splitlines() or [""]:
@@ -721,7 +925,115 @@ def render_v2_to_pdf(doc: Dict[str, Any], out_path: Path) -> Path:
 
 
 # ============================================================================
-# 5. CROSS-FORMAT QA VERIFIER (AT-08)
+# 4B. SEMANTIC HTML RENDERER (.html) (SA-DOC-ENGINE-001 G3)
+# ============================================================================
+def render_v2_to_html(doc: Dict[str, Any], out_path: Path) -> Path:
+    d = prepare_redacted_doc(doc)
+    L = get_labels(d)
+    esc = html_lib.escape
+    profile = str(d.get("style_profile", "corporate"))
+    font_css = '"Times New Roman", Georgia, serif' if profile == "institutional" else '"Segoe UI", Calibri, system-ui, sans-serif'
+
+    parts: List[str] = [
+        "<!DOCTYPE html>",
+        f'<html lang="{esc(str(d.get("language", "id-ID")))}">',
+        "<head>",
+        '<meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        f"<title>{esc(str(d.get('title', 'Document')))}</title>",
+        "<style>",
+        f"body{{font-family:{font_css};line-height:1.6;max-width:960px;margin:2rem auto;padding:0 1.25rem;color:#0f172a;background:#fff}}",
+        "table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #cbd5e1;padding:.5rem .65rem;text-align:left;vertical-align:top}",
+        "th{background:#1e3a8a;color:#fff}pre{background:#f8fafc;border:1px solid #cbd5e1;padding:.75rem;overflow-x:auto;border-radius:4px}",
+        ".meta-card,.finding-card,.decision-card{border:1px solid #cbd5e1;border-radius:6px;padding:1rem;margin:1rem 0;background:#f8fafc}",
+        ".badge{display:inline-block;padding:.15rem .45rem;border-radius:4px;background:#e2e8f0;font-size:.85rem;font-weight:600}",
+        "</style>",
+        "</head>",
+        "<body>",
+        f"<h1>{esc(str(d.get('title', 'Document')))}</h1>",
+        f'<section class="meta-card"><h2>{esc(L["doc_info"])}</h2><table><tbody>',
+    ]
+    for lbl, val in [
+        (L["project_id"], d.get("project_id")),
+        (L["doc_id"], d.get("document_id")),
+        (L["doc_type"], d.get("document_type")),
+        (L["classification"], d.get("classification", "INTERNAL")),
+        (L["status"], d.get("status")),
+        (L["revision"], d.get("revision")),
+        (L["owner"], d.get("owner") or "[ISI DARI SUMBER PROYEK]"),
+        (L["updated_at"], d.get("updated_at")),
+    ]:
+        parts.append(f"<tr><th>{esc(str(lbl))}</th><td>{esc(str(val))}</td></tr>")
+    parts.append("</tbody></table></section>")
+
+    for b in d.get("blocks", []):
+        kind = b.get("kind", "paragraph")
+        bid = str(b.get("id", ""))
+        if kind == "heading":
+            lvl = max(2, min(int(b.get("level", 2)), 6))
+            parts.append(f'<h{lvl} id="{esc(bid)}">{esc(str(b.get("title", bid)))}</h{lvl}>')
+        elif kind == "paragraph":
+            parts.append(f'<p id="{esc(bid)}">{esc(str(b.get("body", "")))}</p>')
+        elif kind == "table" and isinstance(b.get("table_data"), dict):
+            td = b["table_data"]
+            cols = [str(c) for c in td.get("columns", td.get("headers", []))]
+            if cols:
+                parts.append(f'<table id="{esc(bid)}">')
+                if td.get("caption"):
+                    parts.append(f"<caption>{esc(str(td['caption']))}</caption>")
+                parts.append("<thead><tr>" + "".join(f"<th>{esc(c)}</th>" for c in cols) + "</tr></thead><tbody>")
+                for row in td.get("rows", []):
+                    padded = [str(c) for c in row] + [""] * max(0, len(cols) - len(row))
+                    parts.append("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in padded[: len(cols)]) + "</tr>")
+                parts.append("</tbody></table>")
+        elif kind == "list":
+            items = b.get("list_items") or str(b.get("body", "")).splitlines()
+            tag = "ol" if b.get("ordered") else "ul"
+            parts.append(f"<{tag}>" + "".join(f"<li>{esc(str(it))}</li>" for it in items) + f"</{tag}>")
+        elif kind == "figure":
+            fd = b.get("figure_data") or {}
+            d_type = (fd.get("diagram_type") or ("dbml" if fd.get("dbml") else "mermaid")).lower()
+            raw_src = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
+            cap = str(fd.get("caption") or b.get("title") or bid)
+            parts.append(f'<figure id="{esc(bid)}">')
+            if fd.get("path"):
+                parts.append(f'<img src="{esc(str(fd["path"]))}" alt="{esc(str(fd.get("alt_text") or cap))}" />')
+            if raw_src:
+                parts.append(f'<pre class="{esc(d_type)}"><code>{esc(raw_src)}</code></pre>')
+            parts.append(f"<figcaption>{esc(cap)}</figcaption></figure>")
+        elif kind == "finding":
+            fnd = b.get("finding_data") or {}
+            parts.append(f'<section class="finding-card" id="{esc(bid)}"><h3>[{esc(bid)}] {esc(str(b.get("title") or bid))} <span class="badge">{esc(str(fnd.get("severity", "INFO")))}</span></h3><ul>')
+            for lbl, k in (("Criteria", "criteria"), ("Condition", "condition"), ("Cause", "cause"), ("Effect", "effect"), ("Recommendation", "recommendation"), ("Evidence Ref", "evidence_ref")):
+                if fnd.get(k):
+                    parts.append(f"<li><strong>{esc(lbl)}:</strong> {esc(str(fnd[k]))}</li>")
+            parts.append("</ul></section>")
+        elif kind == "decision-matrix":
+            dd = b.get("decision_data") or {}
+            parts.append(f'<section class="decision-card" id="{esc(bid)}"><h3>[{esc(bid)}] {esc(str(b.get("title") or bid))}</h3>')
+            opts = dd.get("options", [])
+            if opts:
+                parts.append("<table><thead><tr><th>Option</th><th>Title</th><th>Status</th></tr></thead><tbody>")
+                for o in opts:
+                    parts.append(f"<tr><td>{esc(str(o.get('id', '')))}</td><td>{esc(str(o.get('title', '')))}</td><td>{esc(str(o.get('status', '')))}</td></tr>")
+                parts.append("</tbody></table>")
+            parts.append(f"<p><strong>Selected:</strong> {esc(str(dd.get('selectedOption')))} | <strong>Approved By:</strong> {esc(str(dd.get('approvedBy')))} | <strong>Approved At:</strong> {esc(str(dd.get('approvedAt')))}</p></section>")
+        elif kind == "appendix":
+            parts.append(f'<section id="{esc(bid)}"><h2>Appendix [{esc(bid)}]: {esc(str(b.get("title") or bid))}</h2><p>{esc(str(b.get("body") or ""))}</p></section>')
+        elif kind in ("code", "opaque"):
+            lang = str(b.get("code_language") or "text")
+            parts.append(f'<pre id="{esc(bid)}"><code class="language-{esc(lang)}">{esc(str(b.get("body", "")))}</code></pre>')
+
+    parts.extend(["</body>", "</html>"])
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
+    tmp_path.write_text("\n".join(parts), encoding="utf-8")
+    tmp_path.replace(out_path)
+    return out_path
+
+
+# ============================================================================
+# 5. CROSS-FORMAT QA VERIFIER (AT-08) & BUILD MANIFEST (SA-DOC-ENGINE-001)
 # ============================================================================
 def verify_rendered_outputs_qa(
     doc: Dict[str, Any], rendered_paths: Dict[str, Path]
@@ -745,6 +1057,11 @@ def verify_rendered_outputs_qa(
         md_txt = rendered_paths["md"].read_text(encoding="utf-8")
         md_ok = (expected_doc_id in md_txt) and (expected_rev in md_txt)
 
+    html_ok = True
+    if "html" in rendered_paths and rendered_paths["html"].exists():
+        html_txt = rendered_paths["html"].read_text(encoding="utf-8")
+        html_ok = (expected_doc_id in html_txt) and (expected_rev in html_txt) and ("<!DOCTYPE html>" in html_txt)
+
     docx_ok = True
     if "docx" in rendered_paths and rendered_paths["docx"].exists():
         import docx as _docx
@@ -763,16 +1080,61 @@ def verify_rendered_outputs_qa(
         xlsx_ok = "README_Metadata" in wb.sheetnames and "Register_Data" in wb.sheetnames
         wb.close()
 
-    passed = all(c["exists_and_non_empty"] for c in checks) and md_ok and docx_ok and xlsx_ok
+    passed = all(c["exists_and_non_empty"] for c in checks) and md_ok and html_ok and docx_ok and xlsx_ok
     return {
         "passed": passed,
         "document_id": expected_doc_id,
         "revision": expected_rev,
         "md_parity": md_ok,
+        "html_parity": html_ok,
         "docx_parity": docx_ok,
         "xlsx_parity": xlsx_ok,
         "artifacts": checks,
     }
+
+
+def write_build_manifest(
+    doc: Dict[str, Any],
+    rendered_paths: Dict[str, Path],
+    qa_result: Dict[str, Any],
+    out_manifest_path: Path,
+    *,
+    generator_id: str = "shadow-doc-global",
+    generator_version: str = RENDERER_ENGINE_VERSION,
+    warnings: List[str] | None = None,
+) -> Path:
+    """Emit reproducible build-manifest.json recording versions, refs, output SHA-256 hashes, and limitations."""
+    diag_checks = []
+    for b in doc.get("blocks", []):
+        if b.get("kind") == "figure" and isinstance(b.get("figure_data"), dict):
+            fd = b["figure_data"]
+            d_type = str(fd.get("diagram_type") or ("dbml" if fd.get("dbml") else "mermaid"))
+            src_txt = str(fd.get("dbml") or fd.get("mermaid") or b.get("body") or "")
+            if src_txt:
+                diag_checks.append(render_diagram_asset(d_type, src_txt))
+
+    payload = {
+        "manifest_version": "1.0.0",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "document_schema_version": str(doc.get("schema_version", "2.0")),
+        "document_id": doc.get("document_id"),
+        "document_type": doc.get("document_type"),
+        "revision": doc.get("revision"),
+        "generator": {"id": generator_id, "version": generator_version},
+        "template": {"id": doc.get("template_id") or doc.get("document_type"), "version": doc.get("template_version") or "2.1.0"},
+        "renderer_version": RENDERER_ENGINE_VERSION,
+        "renderer_contracts_used": {fmt: RENDERER_CONTRACTS.get(fmt, {}) for fmt in rendered_paths},
+        "input_source_refs": [s.get("source_id") for s in doc.get("sources", []) if isinstance(s, dict)],
+        "diagram_status": diag_checks,
+        "output_artifacts": qa_result.get("artifacts", []),
+        "generation_status": "PASS" if qa_result.get("passed") else "FAIL",
+        "warnings_and_limitations": warnings or [],
+    }
+    out_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_p = out_manifest_path.with_suffix(".tmp")
+    tmp_p.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    tmp_p.replace(out_manifest_path)
+    return out_manifest_path
 
 
 # ============================================================================
