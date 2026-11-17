@@ -51,3 +51,4 @@ Immediately after deployment finishes (within `< 2 minutes`):
 3. Execute read-only smoke checks on critical public/authenticated routes (`/shadow-api` / `/shadow-browser`).
 4. Monitor error rate and `p95` latency for 15 minutes (`/shadow-observe`). If 5xx rate spikes above threshold, execute the rollback command immediately.
 5. **Execution Approval Boundary (`L0` vs `L4`)**: Preparing release checklists, SBOM verification, and SemVer changelogs is `L0_READ_ONLY`. Executing production deploys, live migrations, or tag pushes is **`L4: HIGH_IMPACT`** requiring explicit 7-part Monarch approval and rollback verification (`shadow-monarch/scripts/execution_approval_gate.py`).
+6. **Dependency Traceability & Pinning (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Confirm every newly adopted package in the release has a `Verified` 8-field Decision Record, pinned version (no floating `latest`), and lockfile parity (`official_first_verifier.py`).

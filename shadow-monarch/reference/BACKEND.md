@@ -114,4 +114,4 @@ critical values), and never ships secrets to clients. Feature flags for risky ro
 Validation at boundary · authorization per resource · consistent errors · pagination with max size · timeouts on all
 outbound calls · bounded retries · idempotency on critical mutations · transactions sized correctly (no network calls
 inside) · no N+1 · structured logs with request ID · metrics on critical flows · rate limits on sensitive endpoints ·
-graceful shutdown · health/readiness endpoints.
+graceful shutdown · health/readiness endpoints · existing trusted/local SSO SDKs preserved and packages verified before install (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`; never trust frontend `username` without verified claims).

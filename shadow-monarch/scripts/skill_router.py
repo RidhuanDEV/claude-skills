@@ -374,9 +374,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
     {
         "skill": "shadow-bootstrap",
         "layer": "task",
-        "references": ["CORE.md", "DEVOPS.md"],
+        "references": ["OFFICIAL-FIRST-DEPENDENCY-POLICY.md", "CORE.md", "DEVOPS.md"],
         "include": re.compile(
-            r"\b(?:scaffold\s+new\s+project|from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+project)\b",
+            r"\b(?:scaffold\s+new\s+project|from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+project|buat\s+proyek\s+baru|(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:technical\s+due\s+diligence|legacy\s+(?:codebase|module|feature)|refactor)\b", re.IGNORECASE),
@@ -620,6 +620,23 @@ def route_prompt(
 
     if not is_trivial and not matched_refs and companion_skills:
         matched_refs.append("CORE.md")
+
+    # Attach Official-First policy for new-project scaffolding, dependency adoption, or SSO/SDK integration
+    is_official_first_task = bool(
+        re.search(
+            r"\b(?:scaffold|new\s+project|from\s+scratch|from\s+zero|buat\s+proyek\s+baru|create-next-app|create\s+vite|"
+            r"npm\s+install|add\s+package|tambah\s+library|dependency|ridhuan-sso|sso-client|file:\.\./sdk|SSO\s+SDK)\b",
+            stripped,
+            re.IGNORECASE,
+        )
+    )
+    if not is_trivial and is_official_first_task and "OFFICIAL-FIRST-DEPENDENCY-POLICY.md" not in matched_refs:
+        matched_refs.insert(0, "OFFICIAL-FIRST-DEPENDENCY-POLICY.md")
+    if not is_trivial and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
+        if "shadow-auth" not in companion_skills and "shadow-auth" in known_skills:
+            companion_skills.append("shadow-auth")
+        if "shadow-auth" not in supporting_skills and primary_skill != "shadow-auth":
+            supporting_skills.append("shadow-auth")
 
     unauth_prod = bool(PROD_ACCESS_UNAUTH_RE.search(stripped))
     required_perms = ["read_repository", "run_local_tests"]
@@ -982,6 +999,20 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-perf"],
             "shadow-debug",
         ),
+        (
+            "OFFICIAL-1: Greenfield project initialization loads shadow-bootstrap + OFFICIAL-FIRST-DEPENDENCY-POLICY.md",
+            "Initialize a new React + Vite project using the official generator without writing boilerplate manually.",
+            ["shadow-bootstrap"],
+            ["shadow-perf"],
+            "shadow-bootstrap",
+        ),
+        (
+            "OFFICIAL-2: ridhuan-sso SDK integration loads shadow-auth + OFFICIAL-FIRST-DEPENDENCY-POLICY.md",
+            "Integrate existing ridhuan-sso (file:../sdk/sso-client) SDK into our backend app.",
+            ["shadow-auth"],
+            ["shadow-perf"],
+            "shadow-auth",
+        ),
     ]
 
     required_dr_keys = {
@@ -1025,6 +1056,8 @@ def run_self_test() -> dict[str, Any]:
             ok_intent = dr.get("permission_policy", {}).get("intent_mode") == "unit_test" and dr.get("subagent_policy", {}).get("allow_level_upgrade") is False
         elif "INTENT-3" in name:
             ok_intent = dr.get("permission_policy", {}).get("intent_mode") == "debug" and dr.get("subagent_policy", {}).get("inherit_parent_scope") is True
+        elif name.startswith("OFFICIAL-"):
+            ok_intent = "OFFICIAL-FIRST-DEPENDENCY-POLICY.md" in routed["reference_modules"]
 
         results.append(
             {

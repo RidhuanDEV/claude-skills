@@ -33,3 +33,5 @@ python "shadow-modernize/scripts/modernize_forensics_engine.py" --self-test
 python "shadow-modernize/scripts/modernize_forensics_engine.py" --scan-repo path/to/legacy_repo
 python "shadow-modernize/scripts/modernize_forensics_engine.py" --evaluate-options path/to/system_profile.json
 ```
+
+- **Reuse & Preservation Gate (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Preserve established framework routing, auth/SSO SDKs (`file:../sdk/sso-client`), and package patterns unless verified insecure/obsolete or explicitly approved for replacement by the Monarch (`official_first_verifier.py`).

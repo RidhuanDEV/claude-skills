@@ -47,3 +47,4 @@ python "shadow-mobile/scripts/mobile_release_gate.py" --self-test
 ```
 
 Report findings with exact `MASVS ID / Store Policy`, `file:line`, impact (rejection risk vs security exploit), and concrete XML/Gradle/Plist patch.
+Use official CLI generators (`create-expo-app`, `flutter create`) and non-destructively verified packages with pinned versions per `shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md` (`official_first_verifier.py`).

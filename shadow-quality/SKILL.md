@@ -71,3 +71,4 @@ When asked to review code or a PR, report findings ordered by severity:
 
 ## 2. Execution Approval & Intent Boundary (`L0`–`L2`)
 - Lint, strict typecheck, and `shadow_gate.py` are `L0`/`L1` on verified local workspaces, whereas **code review requests are strictly `L0_READ_ONLY`** (`0` source file mutations during review). Unrequested cross-module edits/cleanup require `L2` Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
+- **Official-First & Code Review Checks (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Flag PRs/changes that hand-write framework boilerplate instead of official generators, add unverified registry packages or floating `latest` pins in prod, replace local/SSO SDKs (`file:../sdk/...`) without approval, or invent unsupported SDK methods.

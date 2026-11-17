@@ -125,8 +125,8 @@ def _infer_required_level(req: dict[str, Any]) -> tuple[str, list[str]]:
         reasons.append(f"Targeted restricted environment `{env}`.")
         return "L4_HIGH_IMPACT", reasons
 
-    if is_destructive or action_type in {"destructive_migration", "deploy", "infra_change", "secret_rotation", "git_push", "global_install", "external_data_transfer"} or L4_CMD_RE.search(cmd):
-        reasons.append("High-impact/destructive/remote action matches L4 criteria.")
+    if is_destructive or action_type in {"destructive_migration", "deploy", "infra_change", "secret_rotation", "git_push", "global_install", "external_data_transfer", "replace_auth_sdk"} or L4_CMD_RE.search(cmd):
+        reasons.append("High-impact/destructive/auth-SDK-replacement action matches L4 criteria.")
         return "L4_HIGH_IMPACT", reasons
 
     if action_type in {"stress_test", "load_test", "soak_test", "fuzzing", "large_benchmark", "mass_api", "high_cost_eval"} or L3_CMD_RE.search(cmd):
@@ -134,7 +134,7 @@ def _infer_required_level(req: dict[str, Any]) -> tuple[str, list[str]]:
         return "L3_RESOURCE_INTENSIVE", reasons
 
     # Scope expansion checks (L2)
-    if action_type in {"broad_e2e", "unrelated_refactor", "extra_feature", "unrequested_dependency"} or L2_CMD_RE.search(cmd):
+    if action_type in {"broad_e2e", "unrelated_refactor", "extra_feature", "unrequested_dependency", "change_framework_or_package_manager", "add_unrequested_infrastructure", "major_architecture_dependency"} or L2_CMD_RE.search(cmd):
         if not (user_intent == "broad_e2e" and action_type == "broad_e2e"):
             reasons.append("Scope-expanding action matches L2 criteria.")
             return "L2_SCOPE_EXPANSION", reasons
@@ -483,6 +483,27 @@ def run_self_test() -> dict[str, Any]:
         },
     )
     probes.append({"probe": "NEG-10: Stale/cross-task/over-budget approval rejected", "passed": r10["decision"] == "BLOCKED" and r10["code"] == "BLOCKED_APPROVAL_SCOPE_MISMATCH", "code": r10["code"]})
+
+    # NEG-11: Unauthorized SSO/Auth SDK replacement blocked (L4)
+    r11 = evaluate_execution_request({
+        "task_id": "T-11",
+        "user_intent": "feature_implementation",
+        "action_type": "replace_auth_sdk",
+        "target_paths": ["package.json", "src/auth"],
+        "is_mutation": True,
+        "environment": "local",
+    })
+    probes.append({"probe": "NEG-11: Unauthorized auth/SSO SDK replacement blocked (L4)", "passed": r11["decision"] == "BLOCKED" and r11["permission_level"] == "L4_HIGH_IMPACT", "code": r11["code"]})
+
+    # NEG-12: Unapproved framework/infrastructure addition blocked (L2)
+    r12 = evaluate_execution_request({
+        "task_id": "T-12",
+        "user_intent": "feature_implementation",
+        "action_type": "add_unrequested_infrastructure",
+        "command": "add Redis and Kafka containers",
+        "environment": "local",
+    })
+    probes.append({"probe": "NEG-12: Unrequested infrastructure/framework deviation blocked (L2)", "passed": r12["decision"] == "BLOCKED" and r12["permission_level"] == "L2_SCOPE_EXPANSION", "code": r12["code"]})
 
     # POS-01: Code review L0 read-only allowed cleanly without prompt
     p1 = evaluate_execution_request({

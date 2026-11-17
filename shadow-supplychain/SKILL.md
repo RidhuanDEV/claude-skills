@@ -11,6 +11,7 @@ description: "Dependency, Build & Artifact Supply-Chain Integrity. Use when gene
 ## 1. Preconditions, Isolation & Failure Rules
 - **Offline/Restricted Environments:** Explicitly declare when vulnerability databases or external signature registries are unreachable (`UNVERIFIED` / `NOT_RUN`), never fabricating provenance trust.
 - **Zero Unverifiable Trust:** Reject artifacts with unverifiable signer identity, floating mutable image/action tags (`:latest`, `@main`), or SBOMs diverging from resolved lockfiles.
+- **Pre-Adoption Registry Inspection (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md` Phase 3):** Before installing any new package, run non-destructive metadata inspection (`npm view <pkg> version repository maintainers engines dist-tags`), verify publisher authenticity, provenance, license, and advisories, pin approved versions in regulated/prod envs, and NEVER install an unverified package merely to inspect it.
 
 ## 2. 6-Step Supply-Chain Integrity Playbook
 Read [`methodologies/SBOM-SLSA-PROVENANCE-AND-LOCKFILE-INTEGRITY.md`](methodologies/SBOM-SLSA-PROVENANCE-AND-LOCKFILE-INTEGRITY.md) and [`playbooks/SBOM-RISK-REGISTER-AND-ATTESTATION.md`](playbooks/SBOM-RISK-REGISTER-AND-ATTESTATION.md):

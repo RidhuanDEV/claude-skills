@@ -24,7 +24,7 @@ Use this skill to translate approved requirements (`/shadow-discovery`) and syst
    - Preserve stable IDs (`US-ID -> FLOW-ID -> SCR-ID / STATE-ID -> AC-ID -> TASK-ID -> TEST-ID -> METRIC-ID`) across revisions (`CONFIRMED | PROPOSED | UNKNOWN | DEFERRED`).
 3. **Technical Tasks (`TASK-01.1.A`)**: Concrete layer implementation steps:
    - `[DB]` Schema migration & seed (`/shadow-data`)
-   - `[API]` Backend service, validation, controller, async `HTTP 202` contract & OpenAPI/Postman sync (`/shadow-api`)
+   - `[API]` Backend service, validation, controller, async `HTTP 202` contract & OpenAPI + existing collection (Bruno/Postman) sync (`/shadow-api`)
    - `[UI]` Frontend screen, 9-state machine (`Initial, Empty, Loading, Partial, Success, Validation Error, 403 Denied, Offline, 409/ETag Conflict`), responsive mobile layout & state wiring (`/shadow-design` + `antislop` + `/shadow-cache`)
    - `[QA]` Automated unit/integration tests with ephemeral Docker teardown (`/shadow-test`) & E2E verification (`/shadow-browser`)
 4. **Pre-Mortem Risk Table (Before Wave Execution)**:
@@ -57,7 +57,7 @@ Always provide a Mermaid `flowchart LR` dependency graph showing execution waves
 
 ### Definition of Done (DoD — Required Before Marking Any Story Complete)
 - [ ] Code adheres to strict typing (`0 any`, `0 as Type` casting) and zero dead code (`shadow_gate.py`).
-- [ ] Backend endpoints updated in `openapi.yaml` and `postman_collection.json` (`/shadow-api`).
+- [ ] Backend endpoints updated in `openapi.yaml` and the project's existing API collection (Bruno `.bru` or Postman) (`/shadow-api`).
 - [ ] Automated unit & integration tests (`/shadow-test`) pass (`100%` green on happy path, 400/401/403/404/409/422) with zero leftover ephemeral Docker test containers/images (`--check-docker-leaks`).
 - [ ] Responsive UI verified at `320px/375px` mobile and `1440px` desktop + `200%` zoom across all 9 states (`/shadow-browser` + `antislop`).
 - [ ] Lint, typecheck, and build succeed with zero errors (`/shadow-quality`).

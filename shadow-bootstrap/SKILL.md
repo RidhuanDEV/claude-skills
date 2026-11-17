@@ -9,7 +9,9 @@ Use this skill **after** architectural decisions (`/shadow-architect`) are confi
 
 ---
 
-## 1. The 8 Mandatory Bootstrap Pillars
+## 1. The 8 Mandatory Bootstrap Pillars + Official CLI Generator First (`Pillar 0`)
+
+- **Pillar 0 — Official-First Generator & Token Conservation (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Before writing starter config or boilerplate from scratch, inspect existing repo files/SDKs and check `/context7` for the chosen framework's official non-interactive CLI generator (e.g., `npm create vite@latest`, `npx create-next-app`, `@angular/cli`, `create-vue`, `@nestjs/cli`, `composer create-project`) so output tokens are never wasted hand-authoring boilerplate. Pin resolved approved versions in regulated/production environments, inspect new dependencies non-destructively (`npm view ...`) before install, emit the 8-field Decision Record, and verify via `shadow-monarch/scripts/official_first_verifier.py`.
 
 When scaffolding a new repository (Monorepo or Single-Service), `/shadow-bootstrap` MUST set up and verify all 8 pillars:
 
@@ -17,7 +19,7 @@ When scaffolding a new repository (Monorepo or Single-Service), `/shadow-bootstr
 - Clean separation of concerns:
   - **Backend**: `src/config/`, `src/modules/<domain>/{controller,service,repository,dto,entities}`, `src/common/{middleware,errors,guards,logger}`, `tests/`.
   - **Frontend**: `src/app/` (or `pages/`), `src/components/ui/`, `src/features/<domain>/`, `src/lib/`, `src/types/`.
-  - **Documentation & Specs**: `docs/{adr,api,db,uat,handover}/`, `openapi.yaml`, `postman_collection.json`.
+  - **Documentation & Specs**: `docs/{adr,api,db,uat,handover}/`, `openapi.yaml`, and an API client collection only in the format the Monarch/project uses (Bruno `bruno/` or Postman).
 - Standard `.gitignore`, `.gitattributes` (enforcing LF line endings for scripts), and `.editorconfig`.
 
 ### 2. Strict Compiler, Linter & Formatter Configuration

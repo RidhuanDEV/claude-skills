@@ -93,3 +93,4 @@ Always resolve architectural decisions using this hierarchy:
 - [ ] ADRs written for all critical stack and infrastructure choices.
 - [ ] Capacity sizing confirms infrastructure fits client budget and SLA targets.
 - [ ] For Brownfield projects: Project Convention Profile (`docs/engineering/CODEBASE_CONVENTIONS.md`) inspected and architectural preservation confirmed.
+- [ ] **Official-First & Technology Decision Record (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Selected technologies follow the 5-tier hierarchy (`Existing trusted -> Official SDK -> Verified mature package -> Justified small custom -> Approved replacement`), emit the 8-field Decision Record, and require explicit Monarch approval before introducing new frameworks or extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices).

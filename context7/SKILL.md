@@ -13,3 +13,4 @@ This skill connects directly to the **`context7` MCP server** (`resolve-library-
 1. Call `resolve-library-id` on the `context7` MCP server with the library/package name and query to get the exact Context7-compatible library ID.
 2. Call `query-docs` with that `libraryId` and the specific technical question or API symbol to retrieve current official documentation and code examples.
 3. Apply the verified official syntax directly to the **Monarch's** codebase without guessing from outdated training weights.
+4. **Official-First Project Initialization (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Always check `/context7` for the chosen framework's current official CLI generator command, supported runtime versions, and authentic SDK exports before scaffolding or adopting new packages.

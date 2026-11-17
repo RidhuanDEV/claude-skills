@@ -45,3 +45,8 @@ When a database transaction must trigger an email, webhook, or message queue eve
 - Instead, insert an `outbox_events` record inside the same DB transaction, and hand off durable locking, retry budgets, DLQ, and crash-before-ack idempotency semantics to `/shadow-concurrency`.
 4. **Reconciliation & Partial Failure Safety**:
    - Pair asynchronous payment/ERP webhooks with scheduled **reconciliation jobs** (querying provider status APIs for unresolved `PENDING` transactions beyond SLA) so dropped webhooks or partial outages never leave ledger mismatches.
+
+---
+
+## 4. Official-First SDK Reuse & Publisher Verification (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)
+- Prefer official provider SDKs or existing trusted internal adapters over bespoke HTTP wrappers unless verified unmaintained/unsuitable. Inspect package publisher, upstream repo, engines, and advisories via `npm view` + `/context7` before installing, and emit the 8-field Decision Record.

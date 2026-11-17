@@ -327,6 +327,37 @@ def run_shadow_gate(
                 "corrective_action": "Inspect Python execution environment and `execution_approval_gate.py`.",
             })
 
+    official_first_verified: bool | None = None
+    official_first_script = root / "shadow-monarch" / "scripts" / "official_first_verifier.py"
+    if official_first_script.is_file():
+        try:
+            proc_of = subprocess.run(
+                [sys.executable, str(official_first_script), "--self-test"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            of_data = json.loads(proc_of.stdout) if proc_of.returncode == 0 and proc_of.stdout.strip() else {}
+            official_first_verified = proc_of.returncode == 0 and bool(of_data.get("all_passed"))
+            if not official_first_verified:
+                violations.append({
+                    "severity": "CRITICAL",
+                    "code": "OFFICIAL_FIRST_VERIFIER_FAILURE",
+                    "file": "shadow-monarch/scripts/official_first_verifier.py",
+                    "message": "Official-first / dependency verification self-test failed.",
+                    "corrective_action": "Fix failing checks in `official_first_verifier.py --self-test`.",
+                })
+        except Exception as exc:
+            official_first_verified = False
+            violations.append({
+                "severity": "CRITICAL",
+                "code": "OFFICIAL_FIRST_VERIFIER_ERROR",
+                "file": "shadow-monarch/scripts/official_first_verifier.py",
+                "message": f"Failed executing official-first verifier self-test: {exc}",
+                "corrective_action": "Inspect Python environment and `official_first_verifier.py`.",
+            })
+
     blocking = [v for v in violations if v.get("severity") in ("CRITICAL", "HIGH")]
     passed = len(blocking) == 0
 
@@ -335,6 +366,7 @@ def run_shadow_gate(
         "repository": str(root),
         "checked_files_count": len(files),
         "execution_approval_gate_verified": approval_gate_verified,
+        "official_first_gate_verified": official_first_verified,
         "passed": passed,
         "recommended_max_readiness": "VERIFIED-LOCAL" if passed and not warnings else ("IMPLEMENTED" if passed else "BLOCKED"),
         "blocking_violations_count": len(blocking),

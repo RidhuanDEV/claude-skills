@@ -55,3 +55,4 @@ Watch for and eliminate common cross-platform pitfalls:
 
 - **Semantic API Diff & Consumer-Driven Contract Tests**: Beyond AST/OpenAPI syntactic diffs, audit **semantic breaking changes** (default value flips, keyset/sort order changes, error code remapping, `null` vs omitted field semantics, pagination limit caps). Enforce consumer-driven contract tests (Pact, OpenAPI schema snapshots, or golden payload replay) against every active client before merging.
 - **Deprecation & Sunset Policy**: Annotate deprecated endpoints/fields with RFC 8594/9745 headers (`Deprecation` and `Sunset` timestamps), document migration guides, and verify telemetry shows near-zero legacy traffic before the Contract phase removes the field or route.
+- **Version Pinning & Decision Record (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Resolve peer/runtime `engines` compatibility first and pin approved concrete versions in production/regulated projects instead of leaving floating `latest` ranges.

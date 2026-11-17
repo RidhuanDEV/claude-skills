@@ -11,6 +11,7 @@
  */
 
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import readline from 'node:readline'
 import YAML from 'yaml'
@@ -18,7 +19,7 @@ import YAML from 'yaml'
 const PROTOCOL_VERSION = '2024-11-05'
 const SERVER_INFO = {
   name: 'shadow-api-mcp',
-  version: '1.1.0',
+  version: '1.2.0',
 }
 
 const METHOD_SORT_ORDER = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
@@ -94,26 +95,53 @@ const TOOLS = [
     },
   },
   {
+    name: 'discover_api_artifacts',
+    description:
+      'Read-only discovery of all existing OpenAPI/Swagger files, modular spec folders (modules/, paths/, domains/, specs/), and API client collections (Bruno, Postman, Insomnia, Hoppscotch, Thunder Client, .http/.rest) anywhere in the project before reading, updating, or generating files.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectRoot: {
+          type: 'string',
+          description: 'Absolute path to the project root (or any path inside the project).',
+        },
+      },
+      required: ['projectRoot'],
+    },
+  },
+  {
     name: 'upsert_openapi_endpoint',
     description:
-      'Create or update an endpoint definition in a project OpenAPI 3.1.0 specification. Supports both Compact Mode (single docs/api/openapi.yaml for small projects) and Modular Mode (docs/api/modules/<moduleName>.openapi.yaml + auto-bundled master docs/api/openapi.yaml for multi-module projects).',
+      'Create or update an endpoint definition in the project OpenAPI specification. Auto-discovers existing OpenAPI/Swagger files (.yaml/.yml/.json) and modular folders (modules/, paths/, domains/, specs/) to avoid duplicates, and preserves single-file layouts unless allowAutoSplit or moduleName is passed.',
     inputSchema: {
       type: 'object',
       properties: {
         specPath: {
           type: 'string',
           description:
-            'Absolute path to the master openapi.yaml (recommended: <project>/docs/api/openapi.yaml)',
+            'Absolute path to the OpenAPI/Swagger spec (.yaml/.yml/.json). If missing on disk, resolves against an existing project OpenAPI spec when unambiguous.',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Optional explicit project root for discovering existing specs/collections.',
+        },
+        allowNewSpec: {
+          type: 'boolean',
+          description: 'Set true only when intentionally creating an additional spec file alongside existing ones.',
         },
         moduleName: {
           type: 'string',
           description:
-            'Optional module slug for large/multi-module projects (e.g. "auth", "users", "inventory"). Writes the endpoint into docs/api/modules/<moduleName>.openapi.yaml and bundles all modules into master specPath.',
+            'Optional module slug for modular specs. Writes into the existing modular folder/extension convention (or modules/<moduleName>.openapi.yaml) and bundles into master specPath.',
         },
         autoModularThreshold: {
           type: 'number',
           description:
-            'Automatically split into docs/api/modules/<tag>.openapi.yaml when total tags exceed this count (default: 4). Set 0 to disable auto-splitting.',
+            'Tag count threshold for splitting new compact specs (default: 4; set 0 to disable). Existing single-file specs are NOT split unless allowAutoSplit=true.',
+        },
+        allowAutoSplit: {
+          type: 'boolean',
+          description: 'Allow splitting an existing single-file spec when tags exceed autoModularThreshold (default: false).',
         },
         title: {
           type: 'string',
@@ -197,13 +225,25 @@ const TOOLS = [
   {
     name: 'bulk_upsert_openapi_endpoints',
     description:
-      'Batch-create or update multiple endpoints at once in OpenAPI 3.1.0 (ideal for generating OpenAPI + Postman collections from an existing backend codebase in a single call). Automatically uses Modular Mode (docs/api/modules/<module>.openapi.yaml + master bundle) when modules/tags exceed threshold, and optionally syncs Postman collection immediately.',
+      'Batch-create or update multiple endpoints in OpenAPI (.yaml/.yml/.json). Auto-discovers existing OpenAPI specs/folders and existing API client collections (Bruno, Postman, Insomnia, Hoppscotch, .http) across the project; only generates/updates Postman when Postman is the project convention or collectionFormat="postman".',
     inputSchema: {
       type: 'object',
       properties: {
         specPath: {
           type: 'string',
-          description: 'Absolute path to master openapi.yaml (e.g. <project>/docs/api/openapi.yaml)',
+          description: 'Absolute path to OpenAPI/Swagger spec (.yaml/.yml/.json). Resolves to existing spec when unambiguous.',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Optional explicit project root for discovering existing specs/collections.',
+        },
+        allowNewSpec: {
+          type: 'boolean',
+          description: 'Set true only when intentionally creating a new spec file alongside existing ones.',
+        },
+        allowAutoSplit: {
+          type: 'boolean',
+          description: 'Allow auto-splitting an existing single-file spec when tags exceed threshold (default: false).',
         },
         title: {
           type: 'string',
@@ -215,7 +255,12 @@ const TOOLS = [
         },
         autoSyncPostman: {
           type: 'boolean',
-          description: 'If true (default), automatically generates/updates postman_collection.json and postman_environment.json after upserting all endpoints',
+          description: 'Deprecated. false is equivalent to collectionFormat="none". Prefer collectionFormat.',
+        },
+        collectionFormat: {
+          type: 'string',
+          enum: ['auto', 'postman', 'bruno', 'none'],
+          description: 'API client collection handling. "auto" (default) detects existing collections anywhere in the project and only updates Postman when Postman is already used; "postman" forces Postman; "bruno"/"none" generate no Postman files.',
         },
         endpoints: {
           type: 'array',
@@ -246,18 +291,22 @@ const TOOLS = [
   {
     name: 'sync_postman_collection',
     description:
-      'Generate or update a neatly structured Postman Collection v2.1.0 (postman_collection.json) and Postman Environment (postman_environment.json) from OpenAPI 3.1/3.0. Supports nested folder hierarchies (via tag paths like "Module/Submodule"), sorted HTTP methods, {{baseUrl}} and {{bearerToken}} variables, and per-module Postman collections when docs/api/modules/ exists.',
+      'Generate or update a Postman Collection v2.1.0 and Environment from an OpenAPI/Swagger spec. Detects existing Postman collections anywhere in the project to update in-place, and refuses on Bruno/Insomnia/etc. projects unless force=true.',
     inputSchema: {
       type: 'object',
       properties: {
         specPath: {
           type: 'string',
-          description: 'Absolute path to master openapi.yaml or openapi.json',
+          description: 'Absolute path to OpenAPI/Swagger spec (.yaml/.yml/.json)',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Optional explicit project root for discovering existing specs/collections.',
         },
         collectionOutputPath: {
           type: 'string',
           description:
-            'Optional output path for postman_collection.json (defaults to docs/api/postman/postman_collection.json when modular, or next to specPath when compact)',
+            'Optional output path (defaults to existing detected Postman collection path, or next to specPath)',
         },
         environmentOutputPath: {
           type: 'string',
@@ -267,6 +316,10 @@ const TOOLS = [
           type: 'string',
           description: 'Default baseUrl variable value (e.g. http://localhost:3000)',
         },
+        force: {
+          type: 'boolean',
+          description: 'Only set when the Monarch explicitly requested Postman. Without it, the tool refuses if the project already uses Bruno/Insomnia/etc.',
+        },
       },
       required: ['specPath'],
     },
@@ -274,13 +327,17 @@ const TOOLS = [
   {
     name: 'validate_openapi_spec',
     description:
-      'Validate and audit an OpenAPI specification (and any modular files under docs/api/modules/), reporting layout mode (compact vs modular), modules, version, total paths/operations, and any missing summaries or response definitions.',
+      'Validate and audit an OpenAPI/Swagger specification (and any modular files under modules/, paths/, domains/, endpoints/, specs/), auto-resolving existing project spec paths when unambiguous.',
     inputSchema: {
       type: 'object',
       properties: {
         specPath: {
           type: 'string',
-          description: 'Absolute path to master openapi.yaml or openapi.json',
+          description: 'Absolute path to OpenAPI/Swagger spec (.yaml/.yml/.json)',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Optional explicit project root for discovering existing specs.',
         },
       },
       required: ['specPath'],
@@ -289,13 +346,17 @@ const TOOLS = [
   {
     name: 'run_api_collection',
     description:
-      'Run automated live HTTP smoke tests for all (or tag/module-filtered) endpoints defined in an openapi.yaml / openapi.json file against a target baseUrl.',
+      'Run automated live HTTP smoke tests for all (or tag/module-filtered) endpoints defined in an OpenAPI/Swagger file (.yaml/.yml/.json) against a target baseUrl.',
     inputSchema: {
       type: 'object',
       properties: {
         specPath: {
           type: 'string',
-          description: 'Absolute path to master openapi.yaml or openapi.json',
+          description: 'Absolute path to OpenAPI/Swagger spec (.yaml/.yml/.json)',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Optional explicit project root for discovering existing specs.',
         },
         baseUrl: {
           type: 'string',
@@ -385,12 +446,384 @@ function createEmptySpec(defaults = {}) {
   }
 }
 
+const IGNORED_SCAN_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'out',
+  '.next',
+  '.nuxt',
+  '.svelte-kit',
+  'vendor',
+  'venv',
+  '.venv',
+  '__pycache__',
+  'coverage',
+  'target',
+])
+const MODULAR_SUBDIR_NAMES = ['modules', 'paths', 'domains', 'endpoints', 'specs']
+const ROOT_MANIFEST_FILES = new Set([
+  'package.json',
+  'pyproject.toml',
+  'go.mod',
+  'composer.json',
+  'Cargo.toml',
+  'pom.xml',
+  'build.gradle',
+  'build.gradle.kts',
+  'bruno.json',
+])
+const SPEC_CONTAINER_DIR_NAMES = new Set([
+  'api',
+  'apis',
+  'docs',
+  'doc',
+  'openapi',
+  'swagger',
+  'specs',
+  'spec',
+  'contracts',
+  'contract',
+  'postman',
+  'bruno',
+  'collections',
+])
+const SKIP_SPEC_BASENAME_RE =
+  /^(?:package(?:-lock)?|pnpm-lock|yarn|tsconfig.*|jsconfig.*|composer|cargo|pyproject|bruno|eslint.*|prettier.*|jest\.config.*|vitest\.config.*|docker-compose.*|.*postman_(?:collection|environment))\.(?:json|ya?ml)$/i
+
+function isJsonPath(filePath) {
+  return String(filePath || '').trim().toLowerCase().endsWith('.json')
+}
+
+function getSpecExtension(filePath) {
+  const lower = String(filePath || '').trim().toLowerCase()
+  if (lower.endsWith('.json')) return '.json'
+  if (lower.endsWith('.yml')) return '.yml'
+  return '.yaml'
+}
+
+function safeReadText(filePath, maxBytes = 8 * 1024 * 1024) {
+  try {
+    const stat = fs.statSync(filePath)
+    if (!stat.isFile() || stat.size > maxBytes) return null
+    return fs.readFileSync(filePath, 'utf8')
+  } catch {
+    return null
+  }
+}
+
+function parseOpenApiCandidate(filePath) {
+  const base = path.basename(filePath)
+  const lower = base.toLowerCase()
+  if (!lower.endsWith('.yaml') && !lower.endsWith('.yml') && !lower.endsWith('.json')) return null
+  if (SKIP_SPEC_BASENAME_RE.test(lower)) return null
+  const raw = safeReadText(filePath)
+  if (!raw) return null
+  try {
+    const parsed = lower.endsWith('.json') ? JSON.parse(raw) : YAML.parse(raw)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
+    if (parsed.info && typeof parsed.info === 'object' && typeof parsed.info.schema === 'string' && parsed.info.schema.includes('postman')) {
+      return null
+    }
+    const specVersion =
+      typeof parsed.openapi === 'string'
+        ? parsed.openapi
+        : typeof parsed.swagger === 'string'
+          ? parsed.swagger
+          : null
+    const isMaster = Boolean(specVersion)
+    const isFragment = !isMaster && (Boolean(parsed.paths) || Boolean(parsed.components) || /\.openapi\.(?:ya?ml|json)$/i.test(lower))
+    if (!isMaster && !isFragment) return null
+    return {
+      parsed,
+      specVersion,
+      isMaster,
+      isFragment,
+      format: lower.endsWith('.json') ? 'json' : lower.endsWith('.yml') ? 'yml' : 'yaml',
+    }
+  } catch {
+    return null
+  }
+}
+
+function findProjectRoot(startPath, explicitRoot) {
+  if (explicitRoot) return path.resolve(explicitRoot)
+  const resolved = path.resolve(startPath)
+  let startDir = resolved
+  try {
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+      startDir = path.dirname(resolved)
+    } else if (!fs.existsSync(resolved)) {
+      startDir = path.dirname(resolved)
+    }
+  } catch {
+    startDir = path.dirname(resolved)
+  }
+
+  const tmpRoot = path.resolve(os.tmpdir()).toLowerCase()
+  const homeRoot = path.resolve(os.homedir()).toLowerCase()
+  const ancestors = []
+  let curr = startDir
+  for (let i = 0; i < 7; i++) {
+    const lowerCurr = curr.toLowerCase()
+    if (lowerCurr === tmpRoot || lowerCurr === homeRoot) break
+    ancestors.push(curr)
+    const parent = path.dirname(curr)
+    if (parent === curr) break
+    curr = parent
+  }
+
+  for (const dir of ancestors) {
+    if (fs.existsSync(path.join(dir, '.git'))) return dir
+  }
+  for (const dir of ancestors) {
+    try {
+      const names = fs.readdirSync(dir)
+      if (names.some((n) => ROOT_MANIFEST_FILES.has(n) || /\.sln$/i.test(n))) return dir
+    } catch {
+      // ignore unreadable parent
+    }
+  }
+  let stripped = startDir
+  for (let i = 0; i < 4; i++) {
+    const base = path.basename(stripped).toLowerCase()
+    const parent = path.dirname(stripped)
+    if (parent === stripped) break
+    const lowerParent = parent.toLowerCase()
+    if (lowerParent === tmpRoot || lowerParent === homeRoot || path.dirname(parent) === parent) break
+    if (!SPEC_CONTAINER_DIR_NAMES.has(base)) break
+    stripped = parent
+  }
+  return stripped
+}
+
+function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
+  const projectRoot = findProjectRoot(targetPathOrRoot, explicitRoot)
+  const openApiSpecs = []
+  const modularFragments = []
+  const collections = {
+    bruno: [],
+    postman: [],
+    postmanEnvironments: [],
+    insomnia: [],
+    hoppscotch: [],
+    thunderClient: [],
+    httpFiles: [],
+  }
+
+  if (!fs.existsSync(projectRoot)) {
+    return {
+      projectRoot,
+      openApiSpecs,
+      modularFragments,
+      openApiFolders: [],
+      collections,
+      detectedFormats: [],
+      detectedCollectionFormat: 'none',
+      primaryCollection: null,
+    }
+  }
+
+  const queue = [{ dir: projectRoot, depth: 0 }]
+  let scannedFiles = 0
+  const MAX_DEPTH = 5
+  const MAX_FILES = 2500
+
+  while (queue.length > 0 && scannedFiles < MAX_FILES) {
+    const { dir, depth } = queue.shift()
+    let entries = []
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name)
+      const lower = entry.name.toLowerCase()
+
+      if (entry.isDirectory()) {
+        if (IGNORED_SCAN_DIRS.has(entry.name)) continue
+        if (lower === '.insomnia') {
+          collections.insomnia.push(fullPath)
+          continue
+        }
+        if (lower === 'thunder-tests') {
+          collections.thunderClient.push(fullPath)
+          continue
+        }
+        if (entry.name.startsWith('.') && lower !== '.bruno' && lower !== '.vscode') continue
+        if (depth < MAX_DEPTH) queue.push({ dir: fullPath, depth: depth + 1 })
+        continue
+      }
+
+      if (!entry.isFile()) continue
+      scannedFiles++
+
+      if (lower === 'bruno.json' || (lower.endsWith('.bru') && path.basename(dir).toLowerCase() !== 'environments')) {
+        if (lower === 'bruno.json') {
+          collections.bruno.push({ type: 'bruno.json', root: dir, path: fullPath })
+        } else if (!collections.bruno.some((b) => fullPath.startsWith(b.root + path.sep) || b.root === dir)) {
+          collections.bruno.push({ type: '*.bru', root: dir, path: fullPath })
+        }
+        continue
+      }
+      if (/postman_collection\.json$/i.test(lower)) {
+        collections.postman.push(fullPath)
+        continue
+      }
+      if (/postman_environment\.json$/i.test(lower)) {
+        collections.postmanEnvironments.push(fullPath)
+        continue
+      }
+      if (/insomnia.*\.(?:json|ya?ml)$/i.test(lower)) {
+        collections.insomnia.push(fullPath)
+        continue
+      }
+      if (/hoppscotch.*\.json$/i.test(lower)) {
+        collections.hoppscotch.push(fullPath)
+        continue
+      }
+      if (/thundercollection.*\.json$/i.test(lower)) {
+        collections.thunderClient.push(fullPath)
+        continue
+      }
+      if (lower.endsWith('.http') || lower.endsWith('.rest')) {
+        collections.httpFiles.push(fullPath)
+        continue
+      }
+
+      const candidate = parseOpenApiCandidate(fullPath)
+      if (!candidate) continue
+
+      const rel = path.relative(projectRoot, fullPath).replace(/\\/g, '/')
+      const parentName = path.basename(dir).toLowerCase()
+      const inModularDir = MODULAR_SUBDIR_NAMES.includes(parentName) || parentName === 'components' || parentName === 'schemas'
+      if (candidate.isMaster && !inModularDir) {
+        const modFiles = listModuleSpecFiles(fullPath)
+        openApiSpecs.push({
+          path: fullPath,
+          relativePath: rel,
+          format: candidate.format,
+          specVersion: candidate.specVersion,
+          layoutMode: modFiles.length > 0 ? 'modular' : 'compact',
+          moduleCount: modFiles.length,
+        })
+      } else {
+        modularFragments.push({
+          path: fullPath,
+          relativePath: rel,
+          format: candidate.format,
+          isMasterHeader: candidate.isMaster,
+        })
+      }
+    }
+  }
+
+  openApiSpecs.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
+  const folderSet = new Set([
+    ...openApiSpecs.map((s) => path.dirname(s.path)),
+    ...modularFragments.map((f) => path.dirname(f.path)),
+  ])
+  const openApiFolders = Array.from(folderSet).sort()
+
+  const detectedFormats = []
+  if (collections.bruno.length > 0) detectedFormats.push('bruno')
+  if (collections.postman.length > 0) detectedFormats.push('postman')
+  if (collections.insomnia.length > 0) detectedFormats.push('insomnia')
+  if (collections.hoppscotch.length > 0) detectedFormats.push('hoppscotch')
+  if (collections.thunderClient.length > 0) detectedFormats.push('thunder-client')
+  if (collections.httpFiles.length > 0) detectedFormats.push('http-client')
+
+  let detectedCollectionFormat = 'none'
+  let primaryCollection = null
+  if (detectedFormats.length === 1) {
+    detectedCollectionFormat = detectedFormats[0]
+  } else if (detectedFormats.length > 1) {
+    detectedCollectionFormat = detectedFormats.includes('bruno') ? 'multiple_with_bruno' : 'multiple'
+  }
+
+  if (collections.bruno.length > 0) {
+    const b = collections.bruno.find((x) => x.type === 'bruno.json') || collections.bruno[0]
+    primaryCollection = { format: 'bruno', root: b.root, marker: path.relative(projectRoot, b.path).replace(/\\/g, '/') }
+  } else if (collections.postman.length > 0) {
+    const sortedPm = [...collections.postman].sort()
+    const pmPath = sortedPm[0]
+    const pmDir = path.dirname(pmPath)
+    const matchingEnv = collections.postmanEnvironments.find((e) => path.dirname(e) === pmDir) || collections.postmanEnvironments[0] || null
+    primaryCollection = {
+      format: 'postman',
+      root: pmDir,
+      marker: path.relative(projectRoot, pmPath).replace(/\\/g, '/'),
+      collectionPath: pmPath,
+      environmentPath: matchingEnv,
+    }
+  } else if (collections.insomnia.length > 0) {
+    primaryCollection = { format: 'insomnia', root: path.dirname(collections.insomnia[0]), marker: path.basename(collections.insomnia[0]) }
+  } else if (collections.hoppscotch.length > 0) {
+    primaryCollection = { format: 'hoppscotch', root: path.dirname(collections.hoppscotch[0]), marker: path.basename(collections.hoppscotch[0]) }
+  } else if (collections.thunderClient.length > 0) {
+    primaryCollection = { format: 'thunder-client', root: path.dirname(collections.thunderClient[0]), marker: path.basename(collections.thunderClient[0]) }
+  } else if (collections.httpFiles.length > 0) {
+    primaryCollection = { format: 'http-client', root: path.dirname(collections.httpFiles[0]), marker: path.basename(collections.httpFiles[0]) }
+  }
+
+  return {
+    projectRoot,
+    openApiSpecs,
+    modularFragments,
+    openApiFolders,
+    collections,
+    detectedFormats,
+    detectedCollectionFormat,
+    primaryCollection,
+  }
+}
+
+function resolveTargetSpecPath(requestedSpecPath, options = {}) {
+  const absRequested = path.resolve(requestedSpecPath)
+  const artifacts = discoverProjectApiArtifacts(absRequested, options.projectRoot)
+  if (fs.existsSync(absRequested)) {
+    return {
+      specPath: absRequested,
+      requestedSpecPath: absRequested,
+      resolvedFromExisting: false,
+      artifacts,
+    }
+  }
+  if (!options.allowNewSpec && artifacts.openApiSpecs.length === 1) {
+    return {
+      specPath: artifacts.openApiSpecs[0].path,
+      requestedSpecPath: absRequested,
+      resolvedFromExisting: true,
+      artifacts,
+    }
+  }
+  if (!options.allowNewSpec && artifacts.openApiSpecs.length > 1) {
+    const listStr = artifacts.openApiSpecs.map((s) => s.relativePath).join(', ')
+    throw new Error(
+      `Multiple OpenAPI specs exist under ${artifacts.projectRoot} (${listStr}), and requested path ${requestedSpecPath} was not found. ` +
+        'Pass the exact existing specPath you want to update (or allowNewSpec=true to create another spec).',
+    )
+  }
+  if (options.mustExist) {
+    throw new Error(`OpenAPI file not found at ${requestedSpecPath} (and none discovered under ${artifacts.projectRoot})`)
+  }
+  return {
+    specPath: absRequested,
+    requestedSpecPath: absRequested,
+    resolvedFromExisting: false,
+    artifacts,
+  }
+}
+
 function loadOpenApiSpec(specPath, defaults = {}) {
   if (!fs.existsSync(specPath)) {
     return createEmptySpec(defaults)
   }
   const raw = fs.readFileSync(specPath, 'utf8')
-  const parsed = specPath.endsWith('.json') ? JSON.parse(raw) : YAML.parse(raw)
+  const parsed = isJsonPath(specPath) ? JSON.parse(raw) : YAML.parse(raw)
   return parsed || createEmptySpec(defaults)
 }
 
@@ -437,7 +870,7 @@ function sortSpecDeterministically(spec) {
 function saveOpenApiSpec(specPath, spec) {
   sortSpecDeterministically(spec)
   fs.mkdirSync(path.dirname(specPath), { recursive: true })
-  if (specPath.endsWith('.json')) {
+  if (isJsonPath(specPath)) {
     fs.writeFileSync(specPath, JSON.stringify(spec, null, 2) + '\n', 'utf8')
   } else {
     fs.writeFileSync(specPath, YAML.stringify(spec, { indent: 2, lineWidth: 0 }), 'utf8')
@@ -445,17 +878,49 @@ function saveOpenApiSpec(specPath, spec) {
 }
 
 function getModulesDir(masterSpecPath) {
-  return path.join(path.dirname(masterSpecPath), 'modules')
+  const parent = path.dirname(masterSpecPath)
+  for (const dirName of MODULAR_SUBDIR_NAMES) {
+    const candidate = path.join(parent, dirName)
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+      const files = fs.readdirSync(candidate).filter((f) => /\.(?:ya?ml|json)$/i.test(f) && !f.startsWith('.'))
+      if (files.length > 0) return candidate
+    }
+  }
+  return path.join(parent, 'modules')
 }
 
 function listModuleSpecFiles(masterSpecPath) {
-  const modulesDir = getModulesDir(masterSpecPath)
-  if (!fs.existsSync(modulesDir)) return []
-  return fs
-    .readdirSync(modulesDir)
-    .filter((f) => f.endsWith('.openapi.yaml') || f.endsWith('.openapi.json'))
-    .sort()
-    .map((f) => path.join(modulesDir, f))
+  const parent = path.dirname(masterSpecPath)
+  const found = []
+  for (const dirName of MODULAR_SUBDIR_NAMES) {
+    const candidateDir = path.join(parent, dirName)
+    if (!fs.existsSync(candidateDir) || !fs.statSync(candidateDir).isDirectory()) continue
+    const files = fs
+      .readdirSync(candidateDir)
+      .filter((f) => {
+        const lower = f.toLowerCase()
+        if (lower.startsWith('.') || SKIP_SPEC_BASENAME_RE.test(lower)) return false
+        return lower.endsWith('.yaml') || lower.endsWith('.yml') || lower.endsWith('.json')
+      })
+      .sort()
+      .map((f) => path.join(candidateDir, f))
+    found.push(...files)
+  }
+  return found
+}
+
+function detectModuleFilename(modulesDir, slug, masterSpecPath) {
+  if (fs.existsSync(modulesDir)) {
+    const files = fs.readdirSync(modulesDir).filter((f) => /\.(?:ya?ml|json)$/i.test(f))
+    if (files.some((f) => f.toLowerCase().endsWith('.openapi.yml'))) return `${slug}.openapi.yml`
+    if (files.some((f) => f.toLowerCase().endsWith('.openapi.json'))) return `${slug}.openapi.json`
+    if (files.some((f) => f.toLowerCase().endsWith('.openapi.yaml'))) return `${slug}.openapi.yaml`
+    if (files.some((f) => f.toLowerCase().endsWith('.yml'))) return `${slug}.yml`
+    if (files.some((f) => f.toLowerCase().endsWith('.json'))) return `${slug}.json`
+    if (files.some((f) => f.toLowerCase().endsWith('.yaml'))) return `${slug}.yaml`
+  }
+  const ext = getSpecExtension(masterSpecPath)
+  return `${slug}.openapi${ext}`
 }
 
 function bundleModulesIntoMaster(masterSpecPath, defaults = {}) {
@@ -463,23 +928,31 @@ function bundleModulesIntoMaster(masterSpecPath, defaults = {}) {
   const moduleFiles = listModuleSpecFiles(masterSpecPath)
   if (moduleFiles.length === 0) return masterSpec
 
-  const mergedPaths = {}
-  const mergedSchemas = { ...((masterSpec.components && masterSpec.components.schemas) || {}) }
+  const mergedPaths = { ...(masterSpec.paths || {}) }
+  const mergedComponents = { ...(masterSpec.components || {}) }
+  const compBuckets = ['schemas', 'parameters', 'responses', 'requestBodies', 'headers', 'securitySchemes', 'examples']
+  for (const bucket of compBuckets) {
+    mergedComponents[bucket] = { ...(mergedComponents[bucket] || {}) }
+  }
 
   for (const modFile of moduleFiles) {
     const modSpec = loadOpenApiSpec(modFile)
     for (const [routePath, pathItem] of Object.entries(modSpec.paths || {})) {
+      if (mergedPaths[routePath] && typeof mergedPaths[routePath].$ref === 'string') continue
       if (!mergedPaths[routePath]) mergedPaths[routePath] = {}
       Object.assign(mergedPaths[routePath], pathItem)
     }
-    if (modSpec.components && modSpec.components.schemas) {
-      Object.assign(mergedSchemas, modSpec.components.schemas)
+    if (modSpec.components) {
+      for (const bucket of compBuckets) {
+        if (modSpec.components[bucket]) {
+          Object.assign(mergedComponents[bucket], modSpec.components[bucket])
+        }
+      }
     }
   }
 
   masterSpec.paths = mergedPaths
-  if (!masterSpec.components) masterSpec.components = {}
-  masterSpec.components.schemas = mergedSchemas
+  masterSpec.components = mergedComponents
   saveOpenApiSpec(masterSpecPath, masterSpec)
   return masterSpec
 }
@@ -515,7 +988,7 @@ function splitMasterIntoModules(masterSpecPath) {
 
   const writtenFiles = []
   for (const [slug, modSpec] of byModule.entries()) {
-    const modPath = path.join(modulesDir, `${slug}.openapi.yaml`)
+    const modPath = path.join(modulesDir, detectModuleFilename(modulesDir, slug, masterSpecPath))
     saveOpenApiSpec(modPath, modSpec)
     writtenFiles.push(modPath)
   }
@@ -627,7 +1100,12 @@ function upsertOperationInSpec(spec, params) {
 }
 
 function handleUpsertOpenApiEndpoint(args) {
-  const masterSpecPath = args.specPath
+  const resolution = resolveTargetSpecPath(args.specPath, {
+    projectRoot: args.projectRoot,
+    allowNewSpec: args.allowNewSpec,
+  })
+  const masterSpecPath = resolution.specPath
+  const specExistedBefore = fs.existsSync(masterSpecPath)
   const existingModules = listModuleSpecFiles(masterSpecPath)
   const autoThreshold =
     args.autoModularThreshold !== undefined ? args.autoModularThreshold : 4
@@ -637,9 +1115,11 @@ function handleUpsertOpenApiEndpoint(args) {
   if (isAlreadyModular) {
     const primaryTag = (args.tags && args.tags[0]) || 'General'
     const slug = sanitizeSlug(args.moduleName || primaryTag.split('/')[0])
-    const moduleSpecPath = path.join(getModulesDir(masterSpecPath), `${slug}.openapi.yaml`)
+    const modulesDir = getModulesDir(masterSpecPath)
+    const moduleFilename = detectModuleFilename(modulesDir, slug, masterSpecPath)
+    const moduleSpecPath = path.join(modulesDir, moduleFilename)
 
-    if (existingModules.length === 0 && fs.existsSync(masterSpecPath)) {
+    if (existingModules.length === 0 && specExistedBefore) {
       splitMasterIntoModules(masterSpecPath)
     }
 
@@ -660,6 +1140,9 @@ function handleUpsertOpenApiEndpoint(args) {
       layoutMode: 'modular',
       masterSpecPath,
       moduleSpecPath,
+      ...(resolution.resolvedFromExisting
+        ? { resolvedFromExisting: true, requestedSpecPath: resolution.requestedSpecPath }
+        : {}),
       routePath: args.routePath,
       method: args.method.toUpperCase(),
       operationId: operation.operationId,
@@ -667,7 +1150,7 @@ function handleUpsertOpenApiEndpoint(args) {
     }
   }
 
-  // Compact mode first
+  // Compact mode first; never split an already-existing brownfield single-file spec unless allowAutoSplit=true
   const spec = loadOpenApiSpec(masterSpecPath, {
     title: args.title,
     serverUrl: args.serverUrl,
@@ -675,8 +1158,11 @@ function handleUpsertOpenApiEndpoint(args) {
   const operation = upsertOperationInSpec(spec, args)
   saveOpenApiSpec(masterSpecPath, spec)
 
-  // Check if project has grown past the autoModularThreshold
-  if (autoThreshold > 0 && (spec.tags || []).length > autoThreshold) {
+  if (
+    autoThreshold > 0 &&
+    (spec.tags || []).length > autoThreshold &&
+    (!specExistedBefore || args.allowAutoSplit === true)
+  ) {
     const moduleFiles = splitMasterIntoModules(masterSpecPath)
     bundleModulesIntoMaster(masterSpecPath, {
       title: args.title,
@@ -686,6 +1172,9 @@ function handleUpsertOpenApiEndpoint(args) {
       status: 'updated_and_promoted_to_modular',
       layoutMode: 'modular',
       masterSpecPath,
+      ...(resolution.resolvedFromExisting
+        ? { resolvedFromExisting: true, requestedSpecPath: resolution.requestedSpecPath }
+        : {}),
       moduleFilesCreated: moduleFiles.length,
       routePath: args.routePath,
       method: args.method.toUpperCase(),
@@ -698,6 +1187,9 @@ function handleUpsertOpenApiEndpoint(args) {
     status: 'updated',
     layoutMode: 'compact',
     specPath: masterSpecPath,
+    ...(resolution.resolvedFromExisting
+      ? { resolvedFromExisting: true, requestedSpecPath: resolution.requestedSpecPath }
+      : {}),
     routePath: args.routePath,
     method: args.method.toUpperCase(),
     operationId: operation.operationId,
@@ -706,12 +1198,20 @@ function handleUpsertOpenApiEndpoint(args) {
 }
 
 function handleBulkUpsertOpenApiEndpoints(args) {
+  const resolution = resolveTargetSpecPath(args.specPath, {
+    projectRoot: args.projectRoot,
+    allowNewSpec: args.allowNewSpec,
+  })
+  const resolvedSpecPath = resolution.specPath
   const endpoints = args.endpoints || []
   const results = []
   for (const ep of endpoints) {
     const res = handleUpsertOpenApiEndpoint({
       ...ep,
-      specPath: args.specPath,
+      specPath: resolvedSpecPath,
+      projectRoot: args.projectRoot,
+      allowNewSpec: true,
+      allowAutoSplit: args.allowAutoSplit,
       title: args.title,
       serverUrl: args.serverUrl,
       autoModularThreshold: args.autoModularThreshold,
@@ -723,21 +1223,47 @@ function handleBulkUpsertOpenApiEndpoints(args) {
     })
   }
 
+  // Collection format: auto (default) discovers all collections across the project and avoids imposing Postman.
+  const requestedFormat = args.collectionFormat || (args.autoSyncPostman === false ? 'none' : 'auto')
+  const detected = detectApiCollectionFormat(resolvedSpecPath, args.projectRoot)
+  const effectiveFormat = requestedFormat === 'auto' ? detected.format : requestedFormat
   let postmanResult = null
-  if (args.autoSyncPostman !== false && endpoints.length > 0) {
-    postmanResult = handleSyncPostmanCollection({
-      specPath: args.specPath,
-      baseUrl: args.serverUrl,
-    })
+  let collectionNote = null
+  if (endpoints.length > 0) {
+    if (effectiveFormat === 'postman') {
+      postmanResult = handleSyncPostmanCollection({
+        specPath: resolvedSpecPath,
+        projectRoot: args.projectRoot,
+        baseUrl: args.serverUrl,
+        force: requestedFormat === 'postman',
+      })
+    } else if (effectiveFormat === 'bruno') {
+      collectionNote = `Bruno detected (${detected.marker} at ${detected.root}); no Postman files generated. Add/update .bru requests following the existing collection's structure, naming, and environments.`
+    } else if (effectiveFormat === 'multiple' || effectiveFormat === 'multiple_with_bruno') {
+      collectionNote = `Multiple API client formats detected (${detected.detectedFormats.join(', ')}); skipped automatic Postman write to avoid overwriting/conflicting with existing collections.`
+    } else if (effectiveFormat === 'none' && requestedFormat === 'auto') {
+      collectionNote = 'No existing API client collection detected; generated OpenAPI only. Ask the Monarch which format to use (Bruno/Postman) or pass collectionFormat explicitly.'
+    } else if (effectiveFormat === 'none') {
+      collectionNote = 'collectionFormat=none; OpenAPI only.'
+    } else {
+      collectionNote = `Detected ${effectiveFormat} (${detected.marker || ''}); no automatic collection generator available. Update the existing collection manually.`
+    }
   }
 
-  const validation = handleValidateOpenApiSpec({ specPath: args.specPath })
+  const validation = handleValidateOpenApiSpec({ specPath: resolvedSpecPath, projectRoot: args.projectRoot })
   return {
     status: 'bulk_updated',
     totalUpserted: results.length,
     layoutMode: validation.layoutMode,
     modules: validation.modules,
-    masterSpecPath: args.specPath,
+    masterSpecPath: resolvedSpecPath,
+    ...(resolution.resolvedFromExisting
+      ? { resolvedFromExisting: true, requestedSpecPath: resolution.requestedSpecPath }
+      : {}),
+    detectedCollectionFormat: detected.format,
+    detectedCollectionFormats: detected.detectedFormats,
+    effectiveCollectionFormat: effectiveFormat,
+    ...(collectionNote ? { collectionNote } : {}),
     ...(postmanResult
       ? {
           postmanCollectionPath: postmanResult.collectionPath,
@@ -962,18 +1488,52 @@ function buildPostmanItem(routePath, method, op) {
   }
 }
 
+/**
+ * Detects the API client collection format already used by the project so generated artifacts
+ * follow the existing convention (Bruno / Postman) instead of imposing Postman.
+ * Walks up from the spec directory (max 6 levels) and stops at the first directory with a marker.
+ */
+function detectApiCollectionFormat(specPath, explicitRoot) {
+  const artifacts = discoverProjectApiArtifacts(specPath, explicitRoot)
+  const primary = artifacts.primaryCollection
+  return {
+    format: artifacts.detectedCollectionFormat,
+    detectedFormats: artifacts.detectedFormats,
+    root: primary ? primary.root : null,
+    marker: primary ? primary.marker : null,
+    primaryCollection: primary,
+    artifacts,
+  }
+}
+
+function handleDiscoverApiArtifacts(args) {
+  return discoverProjectApiArtifacts(args.projectRoot, args.projectRoot)
+}
+
 function handleSyncPostmanCollection(args) {
-  if (!fs.existsSync(args.specPath)) {
-    throw new Error(`OpenAPI file not found at ${args.specPath}`)
+  const resolution = resolveTargetSpecPath(args.specPath, {
+    mustExist: true,
+    projectRoot: args.projectRoot,
+  })
+  const resolvedSpecPath = resolution.specPath
+  const detected = detectApiCollectionFormat(resolvedSpecPath, args.projectRoot)
+
+  if (args.force !== true) {
+    if (detected.format !== 'postman' && detected.format !== 'none') {
+      throw new Error(
+        `Existing project uses ${detected.format} (${detected.marker} at ${detected.root}). Refusing to create Postman files; ` +
+          'author/update requests in the existing format, or pass force=true only if the Monarch explicitly requested Postman.',
+      )
+    }
   }
 
-  const moduleFiles = listModuleSpecFiles(args.specPath)
+  const moduleFiles = listModuleSpecFiles(resolvedSpecPath)
   const isModular = moduleFiles.length > 0
   if (isModular) {
-    bundleModulesIntoMaster(args.specPath)
+    bundleModulesIntoMaster(resolvedSpecPath)
   }
 
-  const spec = loadOpenApiSpec(args.specPath)
+  const spec = loadOpenApiSpec(resolvedSpecPath)
   sortSpecDeterministically(spec)
 
   const baseUrl =
@@ -1011,12 +1571,20 @@ function handleSyncPostmanCollection(args) {
     item: rootItems,
   }
 
-  const specDir = path.dirname(args.specPath)
+  const specDir = path.dirname(resolvedSpecPath)
+  const existingPm =
+    detected.primaryCollection && detected.primaryCollection.format === 'postman'
+      ? detected.primaryCollection
+      : null
   const defaultOutDir = isModular ? path.join(specDir, 'postman') : specDir
   const collectionPath =
-    args.collectionOutputPath || path.join(defaultOutDir, 'postman_collection.json')
+    args.collectionOutputPath ||
+    (existingPm && existingPm.collectionPath) ||
+    path.join(defaultOutDir, 'postman_collection.json')
   const envPath =
-    args.environmentOutputPath || path.join(defaultOutDir, 'postman_environment.json')
+    args.environmentOutputPath ||
+    (existingPm && existingPm.environmentPath) ||
+    path.join(path.dirname(collectionPath), 'postman_environment.json')
 
   fs.mkdirSync(path.dirname(collectionPath), { recursive: true })
   fs.writeFileSync(collectionPath, JSON.stringify(collection, null, 2) + '\n', 'utf8')
@@ -1035,6 +1603,7 @@ function handleSyncPostmanCollection(args) {
   return {
     status: 'synced',
     layoutMode: isModular ? 'modular' : 'compact',
+    specPath: resolvedSpecPath,
     collectionPath,
     environmentPath: envPath,
     topLevelFolders: rootItems.map((i) => i.name),
@@ -1062,20 +1631,23 @@ function buildSampleFromSchema(schema) {
 }
 
 function handleValidateOpenApiSpec(args) {
-  if (!fs.existsSync(args.specPath)) {
-    throw new Error(`OpenAPI file not found at ${args.specPath}`)
-  }
-  const moduleFiles = listModuleSpecFiles(args.specPath)
+  const resolution = resolveTargetSpecPath(args.specPath, {
+    mustExist: true,
+    projectRoot: args.projectRoot,
+  })
+  const resolvedSpecPath = resolution.specPath
+  const moduleFiles = listModuleSpecFiles(resolvedSpecPath)
   if (moduleFiles.length > 0) {
-    bundleModulesIntoMaster(args.specPath)
+    bundleModulesIntoMaster(resolvedSpecPath)
   }
 
-  const spec = loadOpenApiSpec(args.specPath)
+  const spec = loadOpenApiSpec(resolvedSpecPath)
   const issues = []
   const endpoints = []
 
-  if (!spec.openapi || !String(spec.openapi).startsWith('3.')) {
-    issues.push('Missing or non-3.x `openapi` version field.')
+  const specVersion = spec.openapi || spec.swagger
+  if (!specVersion || (!String(spec.openapi || '').startsWith('3.') && String(spec.swagger || '') !== '2.0')) {
+    issues.push('Missing or unsupported `openapi` (3.x) / `swagger` (2.0) version field.')
   }
   if (!spec.info || !spec.info.title || !spec.info.version) {
     issues.push('Missing `info.title` or `info.version`.')
@@ -1104,9 +1676,13 @@ function handleValidateOpenApiSpec(args) {
   return {
     valid: issues.length === 0,
     layoutMode: moduleFiles.length > 0 ? 'modular' : 'compact',
+    modulesDir: moduleFiles.length > 0 ? path.dirname(moduleFiles[0]) : null,
     modules: moduleFiles.map((f) => path.basename(f)),
-    specPath: args.specPath,
-    openapiVersion: spec.openapi,
+    specPath: resolvedSpecPath,
+    ...(resolution.resolvedFromExisting
+      ? { resolvedFromExisting: true, requestedSpecPath: resolution.requestedSpecPath }
+      : {}),
+    openapiVersion: specVersion,
     title: spec.info && spec.info.title,
     totalPaths: Object.keys(spec.paths || {}).length,
     totalOperations: endpoints.length,
@@ -1116,17 +1692,31 @@ function handleValidateOpenApiSpec(args) {
 }
 
 async function handleRunApiCollection(args) {
-  if (!fs.existsSync(args.specPath)) {
-    throw new Error(`OpenAPI file not found at ${args.specPath}`)
+  const resolution = resolveTargetSpecPath(args.specPath, {
+    mustExist: true,
+    projectRoot: args.projectRoot,
+  })
+  const resolvedSpecPath = resolution.specPath
+  const spec = loadOpenApiSpec(resolvedSpecPath)
+  const moduleFiles = listModuleSpecFiles(resolvedSpecPath)
+  const effectivePaths = { ...(spec.paths || {}) }
+  for (const modFile of moduleFiles) {
+    const modSpec = loadOpenApiSpec(modFile)
+    for (const [rPath, pItem] of Object.entries(modSpec.paths || {})) {
+      if (!effectivePaths[rPath] || typeof effectivePaths[rPath].$ref === 'string') {
+        effectivePaths[rPath] = pItem
+      } else {
+        Object.assign(effectivePaths[rPath], pItem)
+      }
+    }
   }
-  const spec = loadOpenApiSpec(args.specPath)
   const baseUrl = args.baseUrl.replace(/\/+$/, '')
   const httpMethods = args.onlyGetRequests
     ? ['get']
     : ['get', 'post', 'put', 'patch', 'delete']
 
   const results = []
-  for (const [routePath, pathItem] of Object.entries(spec.paths || {})) {
+  for (const [routePath, pathItem] of Object.entries(effectivePaths)) {
     for (const method of httpMethods) {
       const op = pathItem[method]
       if (!op) continue
@@ -1253,7 +1843,10 @@ rl.on('line', async (line) => {
     const toolName = params && params.name
     const toolArgs = (params && params.arguments) || {}
     try {
-      if (toolName === 'test_api_endpoint') {
+      if (toolName === 'discover_api_artifacts') {
+        const out = handleDiscoverApiArtifacts(toolArgs)
+        sendToolText(id, out)
+      } else if (toolName === 'test_api_endpoint') {
         const out = await handleTestApiEndpoint(toolArgs)
         sendToolText(id, out)
       } else if (toolName === 'upsert_openapi_endpoint') {

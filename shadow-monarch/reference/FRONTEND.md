@@ -84,4 +84,5 @@ session expired (redirect or refresh flow) · double submit (disable or dedupe) 
 
 Concerns separated · server state via a proper library · no duplicated sources of truth · effects cleaned up ·
 API responses validated · no secrets in bundle · no unsanitized HTML · accessible and keyboard-usable ·
-responsive and tolerant of long content · all async states designed · measured before optimized.
+responsive and tolerant of long content · all async states designed · measured before optimized ·
+new projects scaffolded via verified official CLI generators with pre-verified dependencies (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`).

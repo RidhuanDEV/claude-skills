@@ -47,3 +47,5 @@ Use this skill whenever the **Monarch** asks to containerize, deploy, harden, co
    - Support dual-key overlap windows for zero-downtime secret/JWT rotation; require `/shadow-supplychain` pinned image SHA-256 digests and pinned CI action commit SHAs.
 5. **Execution Approval & Environment Boundary (`L0` vs `L4`)**:
    - Log/config inspection and read-only dry-run previews are `L0_READ_ONLY`. Unknown target environments fail closed conservatively, and any live/staging/prod infra mutation, secret/permission change, or deploy is **`L4: HIGH_IMPACT`** requiring explicit 7-part Monarch approval and verified rollback (`shadow-monarch/scripts/execution_approval_gate.py`).
+6. **Minimal Infrastructure & Local SDK Portability (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**:
+   - Do not introduce unrequested Docker, Redis, Kafka, or microservice infrastructure; when containerizing/deploying projects referencing local file dependencies (e.g. `file:../sdk/sso-client`), report build/runtime portability caveats explicitly rather than substituting an unverified registry package.
