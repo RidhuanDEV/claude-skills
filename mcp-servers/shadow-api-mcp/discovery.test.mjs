@@ -224,12 +224,22 @@ test('AsyncAPI, GraphQL, gRPC and REST are isolated by protocol', (t) => {
   assert.equal(f.discover({ targetProtocol: 'REST' }).decision, 'ASK_FOR_DOCUMENTATION_CHOICE')
 })
 
-test('Markdown-only workflow is preserved and a viewer alone requires investigation', (t) => {
+test('README summary leaves format open while dedicated references require ownership verification', (t) => {
   const f = fixture(t, { 'README.md': '## Public API\n\n`GET /items` returns items.' })
   const result = f.discover()
-  assert.equal(result.decision, 'REUSE_MARKDOWN')
+  assert.equal(result.decision, 'ASK_FOR_DOCUMENTATION_CHOICE')
+  assert.equal(result.requiresUserDecision, true)
+  assert.equal(result.architecture, 'UNVERIFIED')
+  assert.equal(result.sourceOfTruth, null)
+  assert.deepEqual(fs.readdirSync(f.root), ['README.md'])
   assert.equal(result.systems[0].role, 'SUPPLEMENTARY_DOCUMENTATION')
-  f.upsert('docs/api/openapi.yaml', { allowNewSpec: true }, /competing REST documentation/)
+  f.upsert('docs/api/openapi.yaml', {}, /explicit user selection/)
+  const selection = { protocol: 'REST', format: 'OpenAPI 3.1', approach: 'contract-first', location: 'docs/api/openapi.yaml' }
+  assert.equal(f.discover({ selection }).decision, 'USE_EXPLICIT_SELECTION')
+  f.upsert(selection.location, { allowNewSpec: true })
+  const dedicated = fixture(t, { 'docs/api-reference.md': '## API reference\nGET /items' })
+  assert.equal(dedicated.discover().decision, 'VERIFY_OWNERSHIP')
+  dedicated.upsert(selection.location, { allowNewSpec: true }, /competing REST documentation/)
   const viewer = fixture(t, { 'docs/index.html': '<redoc spec-url="https://example.test/schema.json"></redoc>' })
   assert.equal(viewer.discover().decision, 'VERIFY_OWNERSHIP')
 })

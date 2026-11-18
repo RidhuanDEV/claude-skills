@@ -16,7 +16,7 @@ import path from 'node:path'
 import readline from 'node:readline'
 import YAML from 'yaml'
 import { isDeepStrictEqual } from 'node:util'
-import { assertProjectPath, describeDocumentation, isSamplePath, relativePath } from './discovery.mjs'
+import { isReadme, assertProjectPath, describeDocumentation, isSamplePath, relativePath } from './discovery.mjs'
 
 const PROTOCOL_VERSION = '2024-11-05'
 const SERVER_INFO = {
@@ -905,7 +905,8 @@ function resolveTargetSpecPath(requestedSpecPath, options = {}) {
   if (options.write) {
     const file = relativePath(root, specPath)
     const authority = artifacts.systems.find((item) => item.role === 'AUTHORITATIVE_SOURCE' && ['OPENAPI', 'SWAGGER'].includes(item.type) && item.paths[0] === file)
-    const restSystems = [...artifacts.systems, ...artifacts.generatedArtifacts, ...artifacts.presentation].filter((item) => item.protocol === 'REST')
+    const restSystems = [...artifacts.systems, ...artifacts.generatedArtifacts, ...artifacts.presentation].filter((item) => item.protocol === 'REST' &&
+      !(item.type === 'MARKDOWN_API_REFERENCE' && item.paths.every(isReadme)))
     if (artifacts.coverage.incomplete || artifacts.conflicts.some(({ protocol }) => protocol === 'REST')) {
       throw new Error('OpenAPI write requires complete discovery and resolved REST ownership.')
     }

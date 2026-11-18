@@ -164,6 +164,10 @@ function buildSystems(records, commands) {
   return { systems, dependencyHints }
 }
 
+export function isReadme(file) {
+  return path.posix.basename(file).toLowerCase() === 'readme.md'
+}
+
 function otherDocumentation(records) {
   const documents = []
   for (const { file, code, raw } of records) {
@@ -175,7 +179,7 @@ function otherDocumentation(records) {
     } else if (/\.proto$/i.test(file) && /\bservice\s+\w+\s*\{[\s\S]*?\brpc\s+\w+\s*\(/.test(code)) {
       documents.push(artifact(GENERATED.test(raw) ? 'GENERATED_ARTIFACT' : 'AUTHORITATIVE_SOURCE', 'GRPC', 'PROTOBUF_SERVICE', [file], ['Protobuf service and RPC declarations'], { architecture: 'CONTRACT_FIRST' }))
     } else if (/\.md$/i.test(file) && /^(?:#{1,4}\s+.*\b(?:API|endpoints?)\b)/im.test(raw) && /\b(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\//.test(raw)) {
-      documents.push(artifact('SUPPLEMENTARY_DOCUMENTATION', 'REST', 'MARKDOWN_API_REFERENCE', [file], ['API heading and HTTP endpoint example'], { architecture: 'DOCUMENTATION_FIRST' }))
+      documents.push(artifact('SUPPLEMENTARY_DOCUMENTATION', 'REST', 'MARKDOWN_API_REFERENCE', [file], ['API heading and HTTP endpoint example'], { architecture: 'UNVERIFIED' }))
     } else if (/\b(?:ApolloServer|createYoga|GraphQLModule\.forRoot)\b/.test(code) && /\bintrospection\s*:/.test(code) && SOURCE_EXTENSIONS.test(file)) {
       documents.push(artifact('UNKNOWN', 'GRAPHQL', 'GRAPHQL_INTROSPECTION_CONFIG', [file], ['GraphQL server and introspection setting']))
     }
@@ -203,11 +207,10 @@ function selectionCompatibility(root, selection) {
   return 'UNKNOWN'
 }
 
-function documentationDecision({ ambiguous, authorities, markdownOnly, selection, status, compatibility }) {
+function documentationDecision({ ambiguous, authorities, readmeSummaryOnly, selection, status, compatibility }) {
   if (ambiguous) return 'VERIFY_OWNERSHIP'
   if (authorities.length) return 'REUSE_EXISTING'
-  if (markdownOnly && !selection) return 'REUSE_MARKDOWN'
-  if (status !== 'NOT_FOUND') return 'VERIFY_OWNERSHIP'
+  if (!readmeSummaryOnly && status !== 'NOT_FOUND') return 'VERIFY_OWNERSHIP'
   if (compatibility === 'INCOMPATIBLE') return 'REVIEW_INCOMPATIBLE_SELECTION'
   if (compatibility === 'COMPATIBLE') return 'USE_EXPLICIT_SELECTION'
   return selection ? 'VERIFY_SELECTION_COMPATIBILITY' : 'ASK_FOR_DOCUMENTATION_CHOICE'
@@ -337,13 +340,13 @@ export function describeDocumentation(root, files, specs, collections, coverage,
     specs.some(({ protocol, file }) => applies({ protocol }) && unresolvedReferences.includes(file))
   const status = [...scoped, ...presentation.filter(applies), ...generatedArtifacts.filter(applies)].length
     ? 'FOUND' : coverage.incomplete ? 'INCOMPLETE' : 'NOT_FOUND'
-  const markdownOnly = scoped.some(({ type }) => type === 'MARKDOWN_API_REFERENCE')
-    && scoped.every(({ type }) => type === 'MARKDOWN_API_REFERENCE')
+  const readmeSummaryOnly = scoped.some(({ type }) => type === 'MARKDOWN_API_REFERENCE')
+    && scoped.every(({ type, paths }) => type === 'MARKDOWN_API_REFERENCE' && paths.every(isReadme))
     && ![...presentation, ...generatedArtifacts].some(applies)
   const explicit = selection && ['protocol', 'format', 'location', 'approach'].every((key) => typeof selection[key] === 'string' && selection[key].trim())
   const proposedCompatibility = selectionCompatibility(root, selection)
-  const decision = documentationDecision({ ambiguous, authorities, markdownOnly, selection: explicit, status, compatibility: proposedCompatibility })
-  const architecture = authorities.length > 1 ? 'HYBRID' : authorities[0]?.architecture || (markdownOnly ? 'DOCUMENTATION_FIRST' : 'UNVERIFIED')
+  const decision = documentationDecision({ ambiguous, authorities, readmeSummaryOnly, selection: explicit, status, compatibility: proposedCompatibility })
+  const architecture = authorities.length > 1 ? 'HYBRID' : authorities[0]?.architecture || 'UNVERIFIED'
   const sourceOfTruth = authorities.length === 1 && !ambiguous ? {
     type: authorities[0].type, paths: authorities[0].paths,
     verified: authorities[0].confidence === 'SUPPORTED_BY_REPOSITORY',
@@ -353,7 +356,7 @@ export function describeDocumentation(root, files, specs, collections, coverage,
     targetProtocol: requestedProtocol || null,
     systems: discovered, presentation, generatedArtifacts, clientCollections, dependencyHints, conflicts, unresolvedReferences,
     compatibility: scopedConflicts.length ? 'CONFLICT_REQUIRES_DECISION'
-      : status === 'NOT_FOUND' ? proposedCompatibility : coverage.incomplete || decision === 'VERIFY_OWNERSHIP' ? 'UNKNOWN' : 'PARTIALLY_COMPATIBLE',
+      : (status === 'NOT_FOUND' || decision === 'USE_EXPLICIT_SELECTION' || decision === 'REVIEW_INCOMPATIBLE_SELECTION') ? proposedCompatibility : coverage.incomplete || decision === 'VERIFY_OWNERSHIP' ? 'UNKNOWN' : 'PARTIALLY_COMPATIBLE',
     decision, requiresUserDecision: ['ASK_FOR_DOCUMENTATION_CHOICE', 'REVIEW_INCOMPATIBLE_SELECTION'].includes(decision) || scopedConflicts.length > 0,
     coverage,
   }
