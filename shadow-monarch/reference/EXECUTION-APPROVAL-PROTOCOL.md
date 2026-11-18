@@ -32,7 +32,7 @@ Before executing any command, script, tool call, test, or file/infra modificatio
 
 ## 3. Explicit 7-Part Approval Contract
 
-Whenever an action requires approval (`L2`, `L3`, `L4`), stop before execution and present:
+Whenever an action requires approval (`L2`, `L3`, `L4`), ask immediately through the host's interactive approval mechanism and wait for an explicit answer before executing the dependent action. If the host provides no suitable approval mechanism, present a standalone permission request and wait. Keep the decision out of final summaries. Present these details:
 1. **Proposed action** (exact command/operation and bounds).
 2. **Why it is necessary** (evidence or hypothesis it resolves).
 3. **Exact target / environment** (`local`, `staging`, `production`, exact paths/DBs).

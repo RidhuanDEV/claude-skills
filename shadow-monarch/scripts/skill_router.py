@@ -26,6 +26,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKIP_ROOT_DIRS = {"evals", "mcp-servers", "reports"}
 
 USE_WHEN_RE = re.compile(r"\buse\s+(?:only\s+)?when\b", re.IGNORECASE)
+CODE_REVIEW_RE = re.compile(
+    r"\b(?:code\s+review|PR\s+review|review\s+(?:(?:this|the)\s+)?(?:PR|code|diff|changes|kode)|(?:audit|tinjau)\s+kode)\b",
+    re.IGNORECASE,
+)
 
 # Ordered by domain specificity so primary ownership resolves cleanly before general helpers.
 ROUTING_RULES: list[dict[str, Any]] = [
@@ -322,7 +326,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["CODE-REVIEW.md", "CROSS-MODEL-PARITY.md"],
         "include": re.compile(
-            r"\b(?:static\s+analysis|lint|typecheck|dead\s+code|cyclomatic\s+complexity|shadow_gate|code\s+review|PR\s+review|pure\s+formatting\s+refactor|formatting[- ]only)\b",
+            r"\b(?:static\s+analysis|lint|typecheck|dead\s+code|cyclomatic\s+complexity|shadow_gate|pure\s+formatting\s+refactor|formatting[- ]only)\b",
             re.IGNORECASE,
         ),
     },
@@ -544,8 +548,13 @@ def route_prompt(
     stripped = prompt.strip()
     known_skills = get_known_skill_names()
 
-    raw_slashes = re.findall(r"(?:^|\s)/([a-z][a-z0-9-]+)", stripped.lower())
-    explicit_slashes = [sl for sl in raw_slashes if sl in known_skills]
+    mentions = re.findall(r"(?<![\w/.:])[/\$]([a-z][a-z0-9-]+)(?![\w/-])", stripped.lower())
+    explicit_skills = [skill for skill in mentions if skill in known_skills]
+    is_code_review = bool(CODE_REVIEW_RE.search(stripped))
+    is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", stripped, re.IGNORECASE))
+    blocked_by_scope = (
+        {"shadow-browser", "shadow-perf"} if is_code_review or is_unit_test_only else set()
+    )
 
     matched_ordered: list[str] = []
     matched_task: list[str] = []
@@ -553,10 +562,12 @@ def route_prompt(
     matched_refs: list[str] = []
     excluded_records: list[dict[str, str]] = []
 
-    is_typo_only = bool(TYPO_ONLY_RE.search(stripped)) and len(explicit_slashes) == 0
-    is_trivial_fact = bool(TRIVIAL_FACT_RE.match(stripped)) and len(explicit_slashes) == 0
+    is_typo_only = bool(TYPO_ONLY_RE.search(stripped)) and not explicit_skills
+    is_trivial_fact = bool(TRIVIAL_FACT_RE.match(stripped)) and not explicit_skills
 
-    for sl in explicit_slashes:
+    for sl in explicit_skills:
+        if sl in blocked_by_scope:
+            continue
         if sl not in matched_ordered:
             matched_ordered.append(sl)
         if sl not in matched_task:
@@ -565,9 +576,9 @@ def route_prompt(
     if not is_typo_only:
         for rule in ROUTING_RULES:
             sname = rule["skill"]
-            if sname not in known_skills:
+            if sname not in known_skills or sname in blocked_by_scope:
                 continue
-            if rule["include"].search(stripped):
+            if rule["include"].search(stripped) or (sname == "shadow-quality" and is_code_review):
                 excl = rule.get("exclude")
                 if excl and excl.search(stripped):
                     excluded_records.append(
@@ -579,16 +590,13 @@ def route_prompt(
                     matched_ordered.append(sname)
                 if sname not in matched_task and sname not in matched_risk:
                     target_bucket.append(sname)
-                for ref in rule.get("references", []):
-                    if ref not in matched_refs:
-                        matched_refs.append(ref)
 
     always_on_ui: list[str] = []
     if not is_typo_only and UI_ANTISLOP_RE.search(stripped):
         always_on_ui = ["antislop", "antislop-ui", "antislop-layoutmobile"]
 
     # Guard against accidental shadow-perf loading during routine implementation
-    if "shadow-perf" not in matched_ordered and re.search(r"\b(?:build|implement|create|buat|tambah)\b", stripped, re.IGNORECASE):
+    if "shadow-perf" not in matched_ordered and "shadow-perf" not in blocked_by_scope and re.search(r"\b(?:build|implement|create|buat|tambah)\b", stripped, re.IGNORECASE):
         excluded_records.append(
             {"skill": "shadow-perf", "reason": "Strict Pre-UAT gate only; excluded during routine implementation."}
         )
@@ -601,8 +609,10 @@ def route_prompt(
 
     primary_skill = matched_ordered[0] if matched_ordered else "shadow-monarch"
 
-    # Add deterministic §5.1 co-activation support/risk hints only when primary came from CO_ACTIVATION_MAP and not excluded
-    excluded_names = {e["skill"] for e in excluded_records}
+    for skill in sorted(blocked_by_scope):
+        excluded_records.append({"skill": skill, "reason": "Execution skill is outside the code-review or unit-test scope."})
+
+    excluded_names = {entry["skill"] for entry in excluded_records}
     if primary_skill in CO_ACTIVATION_MAP and not is_trivial:
         bundle = CO_ACTIVATION_MAP[primary_skill]
         for sup in bundle["supporting"]:
@@ -614,9 +624,23 @@ def route_prompt(
                 matched_ordered.append(rsk)
                 matched_risk.append(rsk)
 
-    supporting_skills = [s for s in matched_task if s != primary_skill][:3]
-    risk_review_skills = [s for s in matched_risk if s != primary_skill][:3]
-    companion_skills = matched_ordered[:max_companion_skills]
+    if not is_trivial and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
+        if "shadow-auth" in known_skills and primary_skill != "shadow-auth":
+            if "shadow-auth" in matched_ordered:
+                matched_ordered.remove("shadow-auth")
+            matched_ordered.insert(1 if matched_ordered else 0, "shadow-auth")
+            if "shadow-auth" not in matched_task:
+                matched_task.append("shadow-auth")
+
+    companion_skills = matched_ordered[:max(1, max_companion_skills)]
+    supporting_skills = [skill for skill in companion_skills if skill != primary_skill and skill in matched_task]
+    risk_review_skills = [skill for skill in companion_skills if skill != primary_skill and skill in matched_risk]
+    for skill in companion_skills:
+        for rule in ROUTING_RULES:
+            if rule["skill"] == skill:
+                for reference in rule.get("references", []):
+                    if reference not in matched_refs:
+                        matched_refs.append(reference)
 
     if not is_trivial and not matched_refs and companion_skills:
         matched_refs.append("CORE.md")
@@ -632,21 +656,12 @@ def route_prompt(
     )
     if not is_trivial and is_official_first_task and "OFFICIAL-FIRST-DEPENDENCY-POLICY.md" not in matched_refs:
         matched_refs.insert(0, "OFFICIAL-FIRST-DEPENDENCY-POLICY.md")
-    if not is_trivial and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
-        if "shadow-auth" not in companion_skills and "shadow-auth" in known_skills:
-            companion_skills.append("shadow-auth")
-        if "shadow-auth" not in supporting_skills and primary_skill != "shadow-auth":
-            supporting_skills.append("shadow-auth")
-
     unauth_prod = bool(PROD_ACCESS_UNAUTH_RE.search(stripped))
-    required_perms = ["read_repository", "run_local_tests"]
+    required_perms = ["read_repository"]
+    if not is_code_review and not is_trivial:
+        required_perms.append("run_local_tests")
     if unauth_prod:
         required_perms.append("explicit_prod_read_approval_missing_stop_at_safe_plan")
-
-    # Classify user intent boundary & permission policy (§1-§5 Execution Approval Protocol)
-    is_code_review = bool(re.search(r"\b(?:code\s+review|PR\s+review|review\s+(?:this\s+)?(?:PR|code|diff|changes|kode))\b", stripped, re.IGNORECASE))
-    is_explicit_e2e_or_load = bool(re.search(r"\b(?:Playwright|E2E|k6|load\s+test|stress\s+test|soak\s+test|EXPLAIN\s+ANALYZE)\b", stripped, re.IGNORECASE))
-    is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", stripped, re.IGNORECASE)) and not is_explicit_e2e_or_load
 
     if is_code_review:
         intent_mode = "code_review"
@@ -672,21 +687,6 @@ def route_prompt(
     else:
         intent_mode = "general"
         max_auto_level = "L0_READ_ONLY" if is_trivial else "L1_SAFE_VERIFICATION"
-
-    # Enforce testing boundaries on companion outputs for unit_test & code_review intents
-    if intent_mode == "unit_test":
-        for blk, rsn in (
-            ("shadow-browser", "Intent boundary: unit_test request does not auto-authorize broad E2E."),
-            ("shadow-perf", "Intent boundary: unit_test request does not auto-authorize L3 load/stress testing."),
-        ):
-            if blk in companion_skills:
-                companion_skills = [s for s in companion_skills if s != blk]
-            if blk in supporting_skills:
-                supporting_skills = [s for s in supporting_skills if s != blk]
-            if blk in risk_review_skills:
-                risk_review_skills = [s for s in risk_review_skills if s != blk]
-            if not any(e["skill"] == blk for e in excluded_records):
-                excluded_records.append({"skill": blk, "reason": rsn})
 
     prohibited_actions = [
         "write_production_db",
@@ -726,6 +726,12 @@ def route_prompt(
             "max_auto_level": max_auto_level,
             "approval_required_levels": ["L2_SCOPE_EXPANSION", "L3_RESOURCE_INTENSIVE", "L4_HIGH_IMPACT"],
             "unknown_environment_policy": "FAIL_CLOSED",
+        },
+        "user_input_policy": {
+            "channel": "INTERACTIVE_IF_AVAILABLE",
+            "trigger": "MATERIAL_UNRESOLVED_DECISION_OR_REQUIRED_APPROVAL",
+            "wait_before_dependent_work": True,
+            "repeat_resolved_questions": False,
         },
         "subagent_policy": {
             "inherit_parent_scope": True,
@@ -1034,6 +1040,34 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-api"],
             None,
         ),
+        (
+            "SCOPE-1: Unit tests mentioning excluded E2E and load checks stay in scope",
+            "Write unit tests for the helper with pytest. Skip Playwright E2E and Pre-UAT k6 load tests.",
+            ["shadow-test"],
+            ["shadow-browser", "shadow-perf"],
+            "shadow-test",
+        ),
+        (
+            "SCOPE-2: Code review referencing performance reports stays read-only",
+            "Review the code diff for the changes linked to the Pre-UAT k6 load test and Playwright E2E report.",
+            ["shadow-quality"],
+            ["shadow-browser", "shadow-perf"],
+            "shadow-quality",
+        ),
+        (
+            "SCOPE-3: A backticked dollar-prefixed skill is an explicit selection",
+            "Gunakan `$shadow-api` untuk audit ini.",
+            ["shadow-api"],
+            ["shadow-perf"],
+            "shadow-api",
+        ),
+        (
+            "SCOPE-4: URL path is not an explicit skill selection",
+            "Check the literal URL /shadow-api/status in this note.",
+            [],
+            ["shadow-api"],
+            "shadow-monarch",
+        ),
     ]
 
     required_dr_keys = {
@@ -1047,6 +1081,7 @@ def run_self_test() -> dict[str, Any]:
         "required_permissions",
         "prohibited_actions",
         "permission_policy",
+        "user_input_policy",
         "subagent_policy",
     }
 
@@ -1079,11 +1114,21 @@ def run_self_test() -> dict[str, Any]:
             ok_intent = dr.get("permission_policy", {}).get("intent_mode") == "debug" and dr.get("subagent_policy", {}).get("inherit_parent_scope") is True
         elif name.startswith("OFFICIAL-"):
             ok_intent = "OFFICIAL-FIRST-DEPENDENCY-POLICY.md" in routed["reference_modules"]
+        elif name.startswith("SCOPE-2"):
+            ok_intent = dr["permission_policy"]["max_auto_level"] == "L0_READ_ONLY" and "run_local_tests" not in dr["required_permissions"]
+
+        input_policy = dr["user_input_policy"]
+        load_list = set(routed["companion_skills"])
+        recorded_skills = set(dr["supporting_skills"]) | set(dr["risk_review_skills"])
+        if dr["primary_skill"] != "shadow-monarch":
+            recorded_skills.add(dr["primary_skill"])
+        ok_policy = input_policy["channel"] == "INTERACTIVE_IF_AVAILABLE" and input_policy["wait_before_dependent_work"] and not input_policy["repeat_resolved_questions"]
+        ok_budget = load_list == recorded_skills and len(load_list) <= 4 and len(routed["reference_modules"]) <= 4
 
         results.append(
             {
                 "probe": name,
-                "passed": has_dr and only_valid and ok_in and ok_out and ok_primary and ok_trivial and ok_neg5 and ok_intent,
+                "passed": has_dr and only_valid and ok_in and ok_out and ok_primary and ok_trivial and ok_neg5 and ok_intent and ok_policy and ok_budget,
                 "primary_skill": dr.get("primary_skill"),
                 "supporting_skills": dr.get("supporting_skills"),
                 "risk_review_skills": dr.get("risk_review_skills"),

@@ -67,6 +67,8 @@ Principle: control complexity instead of being controlled by it.
     emit the 8-field Decision Record (`Technology | Source | Version | Trust status | Compatibility | Existing alternative | Decision | Approval`);
     and NEVER silently replace internal/local SSO SDKs (such as `ridhuan-sso` / `file:../sdk/sso-client`) with unverified npm packages or trust frontend `username` without verified server claims.
 
+27. Interactive Decisions and Automatic Skill Routing. When a material decision, missing input, or required approval needs the Monarch, ask immediately using the host's interactive question or approval tool. Give the question, relevant options or exact scope, and wait for an explicit answer before dependent work. If the host has no interactive tool for the request, ask one direct standalone question and wait. Keep pending questions out of final summaries. Use prior answers and resolve routine in-scope choices independently. For non-trivial work, run the installed `shadow-monarch/scripts/skill_router.py` using the task and authorized phase. Use the skill catalog and repository evidence if the router is unavailable. Load the selected skills through the host skill loader or read their installed `SKILL.md` files directly without requiring a skill mention. Re-route when scope or phase materially changes. A skill selection grants no execution permission.
+
 Decision filter: correctness → security → maintainability → simplicity → reliability → performance → scalability → operability → cost/token-efficiency → team comprehension.
 
 Apply these defaults within the governing instruction hierarchy; my request and applicable project rules (AGENTS.md/CLAUDE.md, lint config, existing patterns) take priority.
