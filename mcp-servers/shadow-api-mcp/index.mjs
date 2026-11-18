@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Shadow API & OpenAPI MCP Server (shadow-api-mcp v1.1.0)
+ * Shadow API & OpenAPI MCP Server
  * Cross-agent (Antigravity, Claude Code, Codex, Gemini CLI) MCP server for:
  * 1. Real HTTP API testing against live local/remote backends (test_api_endpoint)
  * 2. Adaptive OpenAPI 3.1.0 architecture:
@@ -15,11 +15,13 @@ import os from 'node:os'
 import path from 'node:path'
 import readline from 'node:readline'
 import YAML from 'yaml'
+import { isDeepStrictEqual } from 'node:util'
+import { assertProjectPath, describeDocumentation, isSamplePath, relativePath } from './discovery.mjs'
 
 const PROTOCOL_VERSION = '2024-11-05'
 const SERVER_INFO = {
   name: 'shadow-api-mcp',
-  version: '1.2.0',
+  version: '1.3.0',
 }
 
 const METHOD_SORT_ORDER = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
@@ -69,8 +71,9 @@ const TOOLS = [
         recordToOpenApiPath: {
           type: 'string',
           description:
-            'Optional path to master openapi.yaml (e.g. <project>/docs/api/openapi.yaml). Automatically records this endpoint and real response.',
+            'Optional path to an existing writable authoritative OpenAPI document. Validated before sending the request.',
         },
+        projectRoot: { type: 'string', description: 'Owning project directory for a recording.' },
         moduleName: {
           type: 'string',
           description:
@@ -97,22 +100,52 @@ const TOOLS = [
   {
     name: 'discover_api_artifacts',
     description:
-      'Read-only discovery of all existing OpenAPI/Swagger files, modular spec folders (modules/, paths/, domains/, specs/), and API client collections (Bruno, Postman, Insomnia, Hoppscotch, Thunder Client, .http/.rest) anywhere in the project before reading, updating, or generating files.',
+      'Read-only inventory of API documentation, ownership evidence, generators, viewers, protocols, collections, and conflicts. Review coverage and ownership before modifying an API contract.',
     inputSchema: {
       type: 'object',
       properties: {
         projectRoot: {
           type: 'string',
-          description: 'Absolute path to the project root (or any path inside the project).',
+          description: 'Absolute path to the owning service or project directory.',
+        },
+        targetProtocol: { type: 'string', enum: ['REST', 'GRAPHQL', 'GRPC', 'ASYNCAPI'] },
+        selection: {
+          type: 'object',
+          description: 'Documentation choice already made by the user. Discovery records a decision only and does not initialize anything.',
+          properties: {
+            protocol: { type: 'string' },
+            format: { type: 'string' },
+            location: { type: 'string' },
+            approach: { type: 'string' },
+          },
+          required: ['protocol', 'format', 'location', 'approach'],
         },
       },
       required: ['projectRoot'],
     },
   },
   {
+    name: 'compare_openapi_drift',
+    description: 'Compare two existing local OpenAPI snapshots for operation and schema drift. Read-only. Does not run generators or fetch remote references.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectRoot: { type: 'string' },
+        expectedPath: { type: 'string', description: 'Absolute path to an authoritative contract or freshly generated baseline.' },
+        actualPath: { type: 'string', description: 'Absolute path to the existing generated artifact.' },
+        internalOperations: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Explicitly verified exclusions such as GET /internal/health.',
+        },
+      },
+      required: ['projectRoot', 'expectedPath', 'actualPath'],
+    },
+  },
+  {
     name: 'upsert_openapi_endpoint',
     description:
-      'Create or update an endpoint definition in the project OpenAPI specification. Auto-discovers existing OpenAPI/Swagger files (.yaml/.yml/.json) and modular folders (modules/, paths/, domains/, specs/) to avoid duplicates, and preserves single-file layouts unless allowAutoSplit or moduleName is passed.',
+      'Update an operation in a writable authoritative OpenAPI 3.x file. Requires explicit authorization to create a new contract.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -127,7 +160,7 @@ const TOOLS = [
         },
         allowNewSpec: {
           type: 'boolean',
-          description: 'Set true only when intentionally creating an additional spec file alongside existing ones.',
+          description: 'Set true only for an explicitly authorized new OpenAPI 3.1 file with no competing REST documentation.',
         },
         moduleName: {
           type: 'string',
@@ -137,7 +170,7 @@ const TOOLS = [
         autoModularThreshold: {
           type: 'number',
           description:
-            'Tag count threshold for splitting new compact specs (default: 4; set 0 to disable). Existing single-file specs are NOT split unless allowAutoSplit=true.',
+            'Tag threshold for optional splitting when allowAutoSplit is explicitly enabled. Set 0 to disable.',
         },
         allowAutoSplit: {
           type: 'boolean',
@@ -225,7 +258,7 @@ const TOOLS = [
   {
     name: 'bulk_upsert_openapi_endpoints',
     description:
-      'Batch-create or update multiple endpoints in OpenAPI (.yaml/.yml/.json). Auto-discovers existing OpenAPI specs/folders and existing API client collections (Bruno, Postman, Insomnia, Hoppscotch, .http) across the project; only generates/updates Postman when Postman is the project convention or collectionFormat="postman".',
+      'Update operations in an authoritative compact OpenAPI file. Reports existing collection formats for separate synchronization.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -239,11 +272,15 @@ const TOOLS = [
         },
         allowNewSpec: {
           type: 'boolean',
-          description: 'Set true only when intentionally creating a new spec file alongside existing ones.',
+          description: 'Set true only for an explicitly authorized new OpenAPI 3.1 file with no competing REST documentation.',
         },
         allowAutoSplit: {
           type: 'boolean',
           description: 'Allow auto-splitting an existing single-file spec when tags exceed threshold (default: false).',
+        },
+        autoModularThreshold: {
+          type: 'integer',
+          description: 'Optional tag threshold when the user explicitly authorizes splitting.',
         },
         title: {
           type: 'string',
@@ -260,7 +297,7 @@ const TOOLS = [
         collectionFormat: {
           type: 'string',
           enum: ['auto', 'postman', 'bruno', 'none'],
-          description: 'API client collection handling. "auto" (default) detects existing collections anywhere in the project and only updates Postman when Postman is already used; "postman" forces Postman; "bruno"/"none" generate no Postman files.',
+          description: 'Collection format for reporting only. The tool leaves collection and environment files intact.',
         },
         endpoints: {
           type: 'array',
@@ -291,7 +328,7 @@ const TOOLS = [
   {
     name: 'sync_postman_collection',
     description:
-      'Generate or update a Postman Collection v2.1.0 and Environment from an OpenAPI/Swagger spec. Detects existing Postman collections anywhere in the project to update in-place, and refuses on Bruno/Insomnia/etc. projects unless force=true.',
+      'Initialize a new Postman collection and environment only for an explicit Postman request. Existing collections and environments are protected.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -306,7 +343,7 @@ const TOOLS = [
         collectionOutputPath: {
           type: 'string',
           description:
-            'Optional output path (defaults to existing detected Postman collection path, or next to specPath)',
+            'Optional new output path (defaults to next to specPath).',
         },
         environmentOutputPath: {
           type: 'string',
@@ -318,7 +355,7 @@ const TOOLS = [
         },
         force: {
           type: 'boolean',
-          description: 'Only set when the Monarch explicitly requested Postman. Without it, the tool refuses if the project already uses Bruno/Insomnia/etc.',
+          description: 'Set true only for an explicitly authorized Postman initialization. Existing collection protection still applies.',
         },
       },
       required: ['specPath'],
@@ -519,24 +556,29 @@ function parseOpenApiCandidate(filePath) {
   if (!lower.endsWith('.yaml') && !lower.endsWith('.yml') && !lower.endsWith('.json')) return null
   if (SKIP_SPEC_BASENAME_RE.test(lower)) return null
   const raw = safeReadText(filePath)
-  if (!raw) return null
+  if (!raw || !/\b(?:openapi|swagger|asyncapi|paths|components|get|post|put|patch|delete)\b|\$ref/.test(raw)) return null
   try {
     const parsed = lower.endsWith('.json') ? JSON.parse(raw) : YAML.parse(raw)
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
     if (parsed.info && typeof parsed.info === 'object' && typeof parsed.info.schema === 'string' && parsed.info.schema.includes('postman')) {
       return null
     }
-    const specVersion =
-      typeof parsed.openapi === 'string'
-        ? parsed.openapi
-        : typeof parsed.swagger === 'string'
-          ? parsed.swagger
-          : null
+    const specVersion = /^3\.\d+\.\d+$/.test(String(parsed.openapi || '')) ? parsed.openapi
+      : parsed.swagger === '2.0' ? parsed.swagger : null
+    const asyncVersion = /^\d+\.\d+\.\d+$/.test(String(parsed.asyncapi || '')) ? parsed.asyncapi : null
+    const hasInfo = typeof parsed.info?.title === 'string' && typeof parsed.info?.version === 'string'
+    const isRecord = (value) => Boolean(value && typeof value === 'object' && !Array.isArray(value))
+    if (asyncVersion && hasInfo && [parsed.channels, parsed.operations].some(isRecord)) {
+      return { raw, parsed, protocol: 'ASYNCAPI', specVersion: asyncVersion, isMaster: true, format: 'ASYNCAPI' }
+    }
+    if (specVersion && (!hasInfo || ![parsed.paths, parsed.webhooks, parsed.components].some(isRecord))) return null
     const isMaster = Boolean(specVersion)
-    const isFragment = !isMaster && (Boolean(parsed.paths) || Boolean(parsed.components) || /\.openapi\.(?:ya?ml|json)$/i.test(lower))
+    const isFragment = !isMaster && (Object.keys(parsed.paths || {}).some((route) => route.startsWith('/'))
+      || MODULAR_SUBDIR_NAMES.includes(path.basename(path.dirname(filePath)).toLowerCase())
+        && ['get', 'post', 'put', 'patch', 'delete', 'components', '$ref'].some((key) => isRecord(parsed[key]) || key === '$ref' && typeof parsed[key] === 'string'))
     if (!isMaster && !isFragment) return null
     return {
-      parsed,
+      raw, parsed, protocol: 'REST',
       specVersion,
       isMaster,
       isFragment,
@@ -544,6 +586,34 @@ function parseOpenApiCandidate(filePath) {
     }
   } catch {
     return null
+  }
+}
+
+function externalReferences(spec) {
+  const references = new Set()
+  const visited = new WeakSet()
+  const pending = [spec]
+  while (pending.length) {
+    const value = pending.pop()
+    if (!value || typeof value !== 'object' || visited.has(value)) continue
+    visited.add(value)
+    if (typeof value.$ref === 'string' && !value.$ref.startsWith('#')) references.add(value.$ref.split('#')[0])
+    pending.push(...Object.values(value))
+  }
+  return [...references]
+}
+
+function hasGeneratedFlag(parsed) {
+  return [parsed['x-generated'], parsed['x-generated-by']].some((value) => value === true || typeof value === 'string' && Boolean(value.trim()))
+}
+
+function isDeclaredOpenApiOutputPresent(root, file) {
+  try {
+    const absolute = assertProjectPath(root, path.resolve(root, file))
+    const candidate = parseOpenApiCandidate(absolute)
+    return candidate?.protocol === 'REST' && candidate.isMaster === true
+  } catch {
+    return false
   }
 }
 
@@ -598,8 +668,9 @@ function findProjectRoot(startPath, explicitRoot) {
   return stripped
 }
 
-function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
+function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot, selection, targetProtocol) {
   const projectRoot = findProjectRoot(targetPathOrRoot, explicitRoot)
+  assertProjectPath(projectRoot, projectRoot)
   const openApiSpecs = []
   const modularFragments = []
   const collections = {
@@ -612,30 +683,24 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
     httpFiles: [],
   }
 
-  if (!fs.existsSync(projectRoot)) {
-    return {
-      projectRoot,
-      openApiSpecs,
-      modularFragments,
-      openApiFolders: [],
-      collections,
-      detectedFormats: [],
-      detectedCollectionFormat: 'none',
-      primaryCollection: null,
-    }
-  }
-
+  const files = []
+  const contractRoots = []
+  const coverage = { incomplete: false, reasons: [], scannedFiles: 0 }
+  const limits = new Set()
   const queue = [{ dir: projectRoot, depth: 0 }]
   let scannedFiles = 0
-  const MAX_DEPTH = 5
-  const MAX_FILES = 2500
+  let inspectedBytes = 0
+  const MAX_DEPTH = 12
+  const MAX_FILES = 12000
+  const MAX_EVIDENCE_BYTES = 32 * 1024 * 1024
 
   while (queue.length > 0 && scannedFiles < MAX_FILES) {
     const { dir, depth } = queue.shift()
     let entries = []
     try {
-      entries = fs.readdirSync(dir, { withFileTypes: true })
+      entries = fs.readdirSync(dir, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))
     } catch {
+      limits.add('Directory could not be read')
       continue
     }
 
@@ -644,7 +709,7 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
       const lower = entry.name.toLowerCase()
 
       if (entry.isDirectory()) {
-        if (IGNORED_SCAN_DIRS.has(entry.name)) continue
+        if (IGNORED_SCAN_DIRS.has(lower) || fs.existsSync(path.join(fullPath, '.git'))) continue
         if (lower === '.insomnia') {
           collections.insomnia.push(fullPath)
           continue
@@ -653,13 +718,33 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
           collections.thunderClient.push(fullPath)
           continue
         }
-        if (entry.name.startsWith('.') && lower !== '.bruno' && lower !== '.vscode') continue
+        if (entry.name.startsWith('.') && !['.bruno', '.vscode', '.github', '.config'].includes(lower)) continue
         if (depth < MAX_DEPTH) queue.push({ dir: fullPath, depth: depth + 1 })
+        else limits.add('Directory depth limit reached')
         continue
       }
 
       if (!entry.isFile()) continue
+      if (scannedFiles >= MAX_FILES) {
+        limits.add('File count limit reached')
+        break
+      }
       scannedFiles++
+      const rel = relativePath(projectRoot, fullPath)
+      const inspect = /\.(?:[cm]?[jt]sx?|py|php|go|java|kt|cs|html|md|tsp|graphqls?|gql|proto|json|toml|txt|xml|kts|gradle|csproj|properties|ps1|sh|ya?ml)$/i.test(lower)
+        || ['pipfile', 'makefile', 'go.mod'].includes(lower)
+      let raw = null
+      if (inspect && !/(?:^|[-.])lock\.(?:json|ya?ml|toml)$/.test(lower) && !isSamplePath(rel)) {
+        if (inspectedBytes >= MAX_EVIDENCE_BYTES) limits.add('Text evidence limit reached')
+        else {
+          raw = safeReadText(fullPath, 256 * 1024)
+          if (raw) inspectedBytes += Buffer.byteLength(raw)
+          else if (raw === null && /\.(?:[cm]?[jt]sx?|py|php|go|java|kt|cs|tsp)$/i.test(lower)) {
+            limits.add('A source file exceeded the evidence limit or could not be read')
+          }
+        }
+      }
+      files.push({ file: rel, raw })
 
       if (lower === 'bruno.json' || (lower.endsWith('.bru') && path.basename(dir).toLowerCase() !== 'environments')) {
         if (lower === 'bruno.json') {
@@ -694,23 +779,28 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
         continue
       }
 
-      const candidate = parseOpenApiCandidate(fullPath)
+      const candidate = isSamplePath(rel) ? null : parseOpenApiCandidate(fullPath)
       if (!candidate) continue
+      const references = externalReferences(candidate.parsed)
+      if (candidate.protocol === 'ASYNCAPI') {
+        contractRoots.push({ file: rel, raw: candidate.raw, generated: hasGeneratedFlag(candidate.parsed), protocol: 'ASYNCAPI', format: candidate.format, references })
+        continue
+      }
 
-      const rel = path.relative(projectRoot, fullPath).replace(/\\/g, '/')
       const parentName = path.basename(dir).toLowerCase()
       const inModularDir = MODULAR_SUBDIR_NAMES.includes(parentName) || parentName === 'components' || parentName === 'schemas'
-      if (candidate.isMaster && !inModularDir) {
+      if (candidate.isMaster) {
         const modFiles = listModuleSpecFiles(fullPath)
+        contractRoots.push({ file: rel, raw: candidate.raw, generated: hasGeneratedFlag(candidate.parsed), protocol: 'REST', format: candidate.specVersion === '2.0' ? 'SWAGGER' : 'OPENAPI', references })
         openApiSpecs.push({
           path: fullPath,
           relativePath: rel,
           format: candidate.format,
           specVersion: candidate.specVersion,
-          layoutMode: modFiles.length > 0 ? 'modular' : 'compact',
+          layoutMode: modFiles.length > 0 || references.length > 0 ? 'modular' : 'compact',
           moduleCount: modFiles.length,
         })
-      } else {
+      } else if (inModularDir || candidate.isFragment) {
         modularFragments.push({
           path: fullPath,
           relativePath: rel,
@@ -719,6 +809,18 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
         })
       }
     }
+  }
+
+  const modulePaths = new Set(contractRoots.filter(({ protocol }) => protocol === 'REST')
+    .flatMap(({ file, references }) => references.filter((ref) => !/^[\w+.-]+:/.test(ref))
+      .map((ref) => path.resolve(projectRoot, path.dirname(file), ref))))
+  for (let index = openApiSpecs.length - 1; index >= 0; index--) {
+    const spec = openApiSpecs[index]
+    if (!modulePaths.has(spec.path)) continue
+    openApiSpecs.splice(index, 1)
+    modularFragments.push({ path: spec.path, relativePath: spec.relativePath, format: spec.format, isMasterHeader: true })
+    const contractIndex = contractRoots.findIndex(({ file }) => file === spec.relativePath)
+    contractRoots.splice(contractIndex, 1)
   }
 
   openApiSpecs.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
@@ -769,6 +871,10 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
     primaryCollection = { format: 'http-client', root: path.dirname(collections.httpFiles[0]), marker: path.basename(collections.httpFiles[0]) }
   }
 
+  if (queue.length) limits.add('File count limit reached')
+  coverage.reasons = [...limits]
+  coverage.incomplete = limits.size > 0
+  coverage.scannedFiles = scannedFiles
   return {
     projectRoot,
     openApiSpecs,
@@ -778,44 +884,43 @@ function discoverProjectApiArtifacts(targetPathOrRoot, explicitRoot) {
     detectedFormats,
     detectedCollectionFormat,
     primaryCollection,
+    ...describeDocumentation(projectRoot, files, contractRoots, collections, coverage, selection, targetProtocol, isDeclaredOpenApiOutputPresent),
   }
 }
 
 function resolveTargetSpecPath(requestedSpecPath, options = {}) {
   const absRequested = path.resolve(requestedSpecPath)
   const artifacts = discoverProjectApiArtifacts(absRequested, options.projectRoot)
-  if (fs.existsSync(absRequested)) {
-    return {
-      specPath: absRequested,
-      requestedSpecPath: absRequested,
-      resolvedFromExisting: false,
-      artifacts,
+  const root = artifacts.projectRoot
+  assertProjectPath(root, absRequested)
+  const exists = fs.existsSync(absRequested)
+  const specPath = !exists && options.allowNewSpec !== true && artifacts.openApiSpecs.length === 1
+    ? artifacts.openApiSpecs[0].path : absRequested
+  assertProjectPath(root, specPath)
+  const candidate = parseOpenApiCandidate(specPath)
+  if (fs.existsSync(specPath) && (!candidate?.isMaster || candidate.protocol !== 'REST')) {
+    throw new Error('The target is not a recognized OpenAPI or Swagger document.')
+  }
+  if (options.mustExist && !candidate) throw new Error('OpenAPI document not found. Pass its exact path.')
+  if (options.write) {
+    const file = relativePath(root, specPath)
+    const authority = artifacts.systems.find((item) => item.role === 'AUTHORITATIVE_SOURCE' && ['OPENAPI', 'SWAGGER'].includes(item.type) && item.paths[0] === file)
+    const restSystems = [...artifacts.systems, ...artifacts.generatedArtifacts, ...artifacts.presentation].filter((item) => item.protocol === 'REST')
+    if (artifacts.coverage.incomplete || artifacts.conflicts.some(({ protocol }) => protocol === 'REST')) {
+      throw new Error('OpenAPI write requires complete discovery and resolved REST ownership.')
     }
-  }
-  if (!options.allowNewSpec && artifacts.openApiSpecs.length === 1) {
-    return {
-      specPath: artifacts.openApiSpecs[0].path,
-      requestedSpecPath: absRequested,
-      resolvedFromExisting: true,
-      artifacts,
+    if (candidate && (!authority || artifacts.unresolvedReferences.includes(file))) {
+      throw new Error('Use the established authoritative source. Generated or unresolved OpenAPI cannot be edited directly.')
     }
+    if (candidate && (externalReferences(candidate.parsed).length > 0 || candidate.specVersion === '2.0')) {
+      throw new Error('Use the existing workflow for split references or Swagger 2.0 to preserve document semantics.')
+    }
+    if (!candidate && (options.allowNewSpec !== true || restSystems.length > 0 || artifacts.modularFragments.length > 0)) {
+      throw new Error('Creating OpenAPI requires an explicit user selection (allowNewSpec=true) and no competing REST documentation.')
+    }
+    if (!/\.(?:json|ya?ml)$/i.test(specPath)) throw new Error('OpenAPI writes require a YAML or JSON destination.')
   }
-  if (!options.allowNewSpec && artifacts.openApiSpecs.length > 1) {
-    const listStr = artifacts.openApiSpecs.map((s) => s.relativePath).join(', ')
-    throw new Error(
-      `Multiple OpenAPI specs exist under ${artifacts.projectRoot} (${listStr}), and requested path ${requestedSpecPath} was not found. ` +
-        'Pass the exact existing specPath you want to update (or allowNewSpec=true to create another spec).',
-    )
-  }
-  if (options.mustExist) {
-    throw new Error(`OpenAPI file not found at ${requestedSpecPath} (and none discovered under ${artifacts.projectRoot})`)
-  }
-  return {
-    specPath: absRequested,
-    requestedSpecPath: absRequested,
-    resolvedFromExisting: false,
-    artifacts,
-  }
+  return { specPath, requestedSpecPath: absRequested, resolvedFromExisting: specPath !== absRequested, artifacts }
 }
 
 function loadOpenApiSpec(specPath, defaults = {}) {
@@ -894,9 +999,11 @@ function listModuleSpecFiles(masterSpecPath) {
   const found = []
   for (const dirName of MODULAR_SUBDIR_NAMES) {
     const candidateDir = path.join(parent, dirName)
-    if (!fs.existsSync(candidateDir) || !fs.statSync(candidateDir).isDirectory()) continue
+    if (!fs.existsSync(candidateDir) || !fs.lstatSync(candidateDir).isDirectory()) continue
     const files = fs
-      .readdirSync(candidateDir)
+      .readdirSync(candidateDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name)
       .filter((f) => {
         const lower = f.toLowerCase()
         if (lower.startsWith('.') || SKIP_SPEC_BASENAME_RE.test(lower)) return false
@@ -959,7 +1066,7 @@ function bundleModulesIntoMaster(masterSpecPath, defaults = {}) {
 
 function splitMasterIntoModules(masterSpecPath) {
   const masterSpec = loadOpenApiSpec(masterSpecPath)
-  const modulesDir = getModulesDir(masterSpecPath)
+  const modulesDir = assertProjectPath(path.dirname(masterSpecPath), getModulesDir(masterSpecPath))
   fs.mkdirSync(modulesDir, { recursive: true })
 
   const byModule = new Map()
@@ -989,6 +1096,7 @@ function splitMasterIntoModules(masterSpecPath) {
   const writtenFiles = []
   for (const [slug, modSpec] of byModule.entries()) {
     const modPath = path.join(modulesDir, detectModuleFilename(modulesDir, slug, masterSpecPath))
+    assertProjectPath(path.dirname(masterSpecPath), modPath)
     saveOpenApiSpec(modPath, modSpec)
     writtenFiles.push(modPath)
   }
@@ -1027,6 +1135,7 @@ function upsertOperationInSpec(spec, params) {
   }
 
   const operation = {
+    ...existing,
     summary: params.summary || existing.summary || `${params.method.toUpperCase()} ${routePath}`,
     ...(params.description || existing.description
       ? { description: params.description || existing.description }
@@ -1074,7 +1183,9 @@ function upsertOperationInSpec(spec, params) {
   if (params.responses) {
     for (const [statusCode, respDef] of Object.entries(params.responses)) {
       const hasBody = respDef.example !== undefined || respDef.schema !== undefined
+      const previous = mergedResponses[statusCode] || {}
       mergedResponses[String(statusCode)] = {
+        ...previous,
         description: respDef.description || `HTTP ${statusCode} response`,
         ...(hasBody
           ? {
@@ -1103,6 +1214,7 @@ function handleUpsertOpenApiEndpoint(args) {
   const resolution = resolveTargetSpecPath(args.specPath, {
     projectRoot: args.projectRoot,
     allowNewSpec: args.allowNewSpec,
+    write: true,
   })
   const masterSpecPath = resolution.specPath
   const specExistedBefore = fs.existsSync(masterSpecPath)
@@ -1110,7 +1222,13 @@ function handleUpsertOpenApiEndpoint(args) {
   const autoThreshold =
     args.autoModularThreshold !== undefined ? args.autoModularThreshold : 4
 
-  const isAlreadyModular = Boolean(args.moduleName) || existingModules.length > 0
+  if (existingModules.length > 0) {
+    throw new Error('Use the project modular workflow to edit the authoritative fragments.')
+  }
+  if (args.moduleName && specExistedBefore && args.allowAutoSplit !== true) {
+    throw new Error('Changing the layout of an existing document requires an explicit layout decision.')
+  }
+  const isAlreadyModular = Boolean(args.moduleName)
 
   if (isAlreadyModular) {
     const primaryTag = (args.tags && args.tags[0]) || 'General'
@@ -1118,6 +1236,7 @@ function handleUpsertOpenApiEndpoint(args) {
     const modulesDir = getModulesDir(masterSpecPath)
     const moduleFilename = detectModuleFilename(modulesDir, slug, masterSpecPath)
     const moduleSpecPath = path.join(modulesDir, moduleFilename)
+    assertProjectPath(resolution.artifacts.projectRoot, moduleSpecPath)
 
     if (existingModules.length === 0 && specExistedBefore) {
       splitMasterIntoModules(masterSpecPath)
@@ -1161,7 +1280,7 @@ function handleUpsertOpenApiEndpoint(args) {
   if (
     autoThreshold > 0 &&
     (spec.tags || []).length > autoThreshold &&
-    (!specExistedBefore || args.allowAutoSplit === true)
+    args.allowAutoSplit === true
   ) {
     const moduleFiles = splitMasterIntoModules(masterSpecPath)
     bundleModulesIntoMaster(masterSpecPath, {
@@ -1201,48 +1320,36 @@ function handleBulkUpsertOpenApiEndpoints(args) {
   const resolution = resolveTargetSpecPath(args.specPath, {
     projectRoot: args.projectRoot,
     allowNewSpec: args.allowNewSpec,
+    write: true,
   })
   const resolvedSpecPath = resolution.specPath
   const endpoints = args.endpoints || []
-  const results = []
-  for (const ep of endpoints) {
-    const res = handleUpsertOpenApiEndpoint({
-      ...ep,
-      specPath: resolvedSpecPath,
-      projectRoot: args.projectRoot,
-      allowNewSpec: true,
-      allowAutoSplit: args.allowAutoSplit,
-      title: args.title,
-      serverUrl: args.serverUrl,
-      autoModularThreshold: args.autoModularThreshold,
-    })
-    results.push({
-      method: res.method,
-      routePath: res.routePath,
-      layoutMode: res.layoutMode,
-    })
+  if (!endpoints.length) throw new Error('Provide at least one endpoint.')
+  if (endpoints.some(({ moduleName }) => moduleName) || listModuleSpecFiles(resolvedSpecPath).length) {
+    throw new Error('Use the established modular workflow to update the authoritative fragments.')
+  }
+  const spec = loadOpenApiSpec(resolvedSpecPath, { title: args.title, serverUrl: args.serverUrl })
+  for (const endpoint of endpoints) upsertOperationInSpec(spec, endpoint)
+  saveOpenApiSpec(resolvedSpecPath, spec)
+  if (args.allowAutoSplit === true && args.autoModularThreshold > 0 && spec.tags.length > args.autoModularThreshold) {
+    splitMasterIntoModules(resolvedSpecPath)
+    bundleModulesIntoMaster(resolvedSpecPath)
   }
 
   // Collection format: auto (default) discovers all collections across the project and avoids imposing Postman.
   const requestedFormat = args.collectionFormat || (args.autoSyncPostman === false ? 'none' : 'auto')
   const detected = detectApiCollectionFormat(resolvedSpecPath, args.projectRoot)
   const effectiveFormat = requestedFormat === 'auto' ? detected.format : requestedFormat
-  let postmanResult = null
   let collectionNote = null
   if (endpoints.length > 0) {
     if (effectiveFormat === 'postman') {
-      postmanResult = handleSyncPostmanCollection({
-        specPath: resolvedSpecPath,
-        projectRoot: args.projectRoot,
-        baseUrl: args.serverUrl,
-        force: requestedFormat === 'postman',
-      })
+      collectionNote = 'Review the source-to-collection mapping and use the established collection workflow separately.'
     } else if (effectiveFormat === 'bruno') {
       collectionNote = `Bruno detected (${detected.marker} at ${detected.root}); no Postman files generated. Add/update .bru requests following the existing collection's structure, naming, and environments.`
     } else if (effectiveFormat === 'multiple' || effectiveFormat === 'multiple_with_bruno') {
       collectionNote = `Multiple API client formats detected (${detected.detectedFormats.join(', ')}); skipped automatic Postman write to avoid overwriting/conflicting with existing collections.`
     } else if (effectiveFormat === 'none' && requestedFormat === 'auto') {
-      collectionNote = 'No existing API client collection detected; generated OpenAPI only. Ask the Monarch which format to use (Bruno/Postman) or pass collectionFormat explicitly.'
+      collectionNote = 'No existing API client collection detected. Choose a collection format only when the task needs one.'
     } else if (effectiveFormat === 'none') {
       collectionNote = 'collectionFormat=none; OpenAPI only.'
     } else {
@@ -1253,7 +1360,7 @@ function handleBulkUpsertOpenApiEndpoints(args) {
   const validation = handleValidateOpenApiSpec({ specPath: resolvedSpecPath, projectRoot: args.projectRoot })
   return {
     status: 'bulk_updated',
-    totalUpserted: results.length,
+    totalUpserted: endpoints.length,
     layoutMode: validation.layoutMode,
     modules: validation.modules,
     masterSpecPath: resolvedSpecPath,
@@ -1264,16 +1371,18 @@ function handleBulkUpsertOpenApiEndpoints(args) {
     detectedCollectionFormats: detected.detectedFormats,
     effectiveCollectionFormat: effectiveFormat,
     ...(collectionNote ? { collectionNote } : {}),
-    ...(postmanResult
-      ? {
-          postmanCollectionPath: postmanResult.collectionPath,
-          postmanEnvironmentPath: postmanResult.environmentPath,
-        }
-      : {}),
   }
 }
 
 async function handleTestApiEndpoint(args) {
+  if (args.recordToOpenApiPath) {
+    const resolution = resolveTargetSpecPath(args.recordToOpenApiPath, {
+      mustExist: true, write: true, projectRoot: args.projectRoot,
+    })
+    if (args.moduleName || listModuleSpecFiles(resolution.specPath).length) {
+      throw new Error('Record responses through the established modular workflow.')
+    }
+  }
   const urlObj = new URL(args.url)
   if (args.queryParams) {
     for (const [k, v] of Object.entries(args.queryParams)) {
@@ -1337,6 +1446,7 @@ async function handleTestApiEndpoint(args) {
       })
       openApiRecorded = handleUpsertOpenApiEndpoint({
         specPath: args.recordToOpenApiPath,
+        projectRoot: args.projectRoot,
         moduleName: args.moduleName,
         serverUrl: `${urlObj.protocol}//${urlObj.host}`,
         routePath,
@@ -1507,7 +1617,7 @@ function detectApiCollectionFormat(specPath, explicitRoot) {
 }
 
 function handleDiscoverApiArtifacts(args) {
-  return discoverProjectApiArtifacts(args.projectRoot, args.projectRoot)
+  return discoverProjectApiArtifacts(args.projectRoot, args.projectRoot, args.selection, args.targetProtocol)
 }
 
 function handleSyncPostmanCollection(args) {
@@ -1518,22 +1628,17 @@ function handleSyncPostmanCollection(args) {
   const resolvedSpecPath = resolution.specPath
   const detected = detectApiCollectionFormat(resolvedSpecPath, args.projectRoot)
 
-  if (args.force !== true) {
-    if (detected.format !== 'postman' && detected.format !== 'none') {
-      throw new Error(
-        `Existing project uses ${detected.format} (${detected.marker} at ${detected.root}). Refusing to create Postman files; ` +
-          'author/update requests in the existing format, or pass force=true only if the Monarch explicitly requested Postman.',
-      )
-    }
+  if (args.force !== true && detected.format !== 'postman') {
+    throw new Error('Only initialize Postman when the Monarch explicitly requests it (force=true).')
   }
-
-  const moduleFiles = listModuleSpecFiles(resolvedSpecPath)
-  const isModular = moduleFiles.length > 0
-  if (isModular) {
-    bundleModulesIntoMaster(resolvedSpecPath)
+  if (detected.artifacts.coverage.incomplete) throw new Error('Postman initialization requires complete project discovery.')
+  if (detected.artifacts.conflicts.some(({ protocol }) => protocol === 'REST')) {
+    throw new Error('Resolve REST documentation ownership before initializing a collection.')
   }
 
   const spec = loadOpenApiSpec(resolvedSpecPath)
+  const isModular = externalReferences(spec).length > 0 || listModuleSpecFiles(resolvedSpecPath).length > 0
+  if (isModular) throw new Error('Use the established collection workflow with a verified bundled contract.')
   sortSpecDeterministically(spec)
 
   const baseUrl =
@@ -1576,18 +1681,24 @@ function handleSyncPostmanCollection(args) {
     detected.primaryCollection && detected.primaryCollection.format === 'postman'
       ? detected.primaryCollection
       : null
-  const defaultOutDir = isModular ? path.join(specDir, 'postman') : specDir
-  const collectionPath =
+  const collectionPath = assertProjectPath(resolution.artifacts.projectRoot,
     args.collectionOutputPath ||
     (existingPm && existingPm.collectionPath) ||
-    path.join(defaultOutDir, 'postman_collection.json')
-  const envPath =
+    path.join(specDir, 'postman_collection.json'))
+  const envPath = assertProjectPath(resolution.artifacts.projectRoot,
     args.environmentOutputPath ||
     (existingPm && existingPm.environmentPath) ||
-    path.join(path.dirname(collectionPath), 'postman_environment.json')
-
-  fs.mkdirSync(path.dirname(collectionPath), { recursive: true })
-  fs.writeFileSync(collectionPath, JSON.stringify(collection, null, 2) + '\n', 'utf8')
+    path.join(path.dirname(collectionPath), 'postman_environment.json'))
+  if (new Set([collectionPath, envPath, resolvedSpecPath].map((file) => file.toLowerCase())).size < 3) {
+    throw new Error('Collection, environment and specification must use distinct paths.')
+  }
+  if (![collectionPath, envPath].every(isJsonPath)) throw new Error('Postman output paths must be JSON files.')
+  if (fs.existsSync(collectionPath) || fs.existsSync(envPath)) {
+    throw new Error('Existing collection or environment is protected. Update the relevant requests using the existing collection workflow.')
+  }
+  if (detected.artifacts.collections.postman.length || detected.artifacts.collections.postmanEnvironments.length) {
+    throw new Error('An existing Postman workflow was found. Use it to avoid creating a competing collection.')
+  }
 
   const environment = {
     name: `${(spec.info && spec.info.title) || 'Project API'} - Local Environment`,
@@ -1597,12 +1708,19 @@ function handleSyncPostmanCollection(args) {
     ],
     _postman_variable_scope: 'environment',
   }
+  fs.mkdirSync(path.dirname(collectionPath), { recursive: true })
   fs.mkdirSync(path.dirname(envPath), { recursive: true })
-  fs.writeFileSync(envPath, JSON.stringify(environment, null, 2) + '\n', 'utf8')
+  fs.writeFileSync(collectionPath, JSON.stringify(collection, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' })
+  try {
+    fs.writeFileSync(envPath, JSON.stringify(environment, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' })
+  } catch (error) {
+    fs.unlinkSync(collectionPath)
+    throw error
+  }
 
   return {
     status: 'synced',
-    layoutMode: isModular ? 'modular' : 'compact',
+    layoutMode: 'compact',
     specPath: resolvedSpecPath,
     collectionPath,
     environmentPath: envPath,
@@ -1637,13 +1755,11 @@ function handleValidateOpenApiSpec(args) {
   })
   const resolvedSpecPath = resolution.specPath
   const moduleFiles = listModuleSpecFiles(resolvedSpecPath)
-  if (moduleFiles.length > 0) {
-    bundleModulesIntoMaster(resolvedSpecPath)
-  }
-
   const spec = loadOpenApiSpec(resolvedSpecPath)
   const issues = []
   const endpoints = []
+  const { paths, unresolved } = inspectOpenApiReferences(spec, resolvedSpecPath, resolution.artifacts.projectRoot)
+  issues.push(...unresolved.map((reference) => `Unverified reference: ${reference}`))
 
   const specVersion = spec.openapi || spec.swagger
   if (!specVersion || (!String(spec.openapi || '').startsWith('3.') && String(spec.swagger || '') !== '2.0')) {
@@ -1653,7 +1769,7 @@ function handleValidateOpenApiSpec(args) {
     issues.push('Missing `info.title` or `info.version`.')
   }
 
-  for (const [routePath, pathItem] of Object.entries(spec.paths || {})) {
+  for (const [routePath, pathItem] of Object.entries(paths)) {
     for (const method of METHOD_SORT_ORDER) {
       const op = pathItem[method]
       if (!op) continue
@@ -1675,7 +1791,7 @@ function handleValidateOpenApiSpec(args) {
 
   return {
     valid: issues.length === 0,
-    layoutMode: moduleFiles.length > 0 ? 'modular' : 'compact',
+    layoutMode: moduleFiles.length > 0 || externalReferences(spec).length > 0 ? 'modular' : 'compact',
     modulesDir: moduleFiles.length > 0 ? path.dirname(moduleFiles[0]) : null,
     modules: moduleFiles.map((f) => path.basename(f)),
     specPath: resolvedSpecPath,
@@ -1684,11 +1800,109 @@ function handleValidateOpenApiSpec(args) {
       : {}),
     openapiVersion: specVersion,
     title: spec.info && spec.info.title,
-    totalPaths: Object.keys(spec.paths || {}).length,
+    totalPaths: Object.keys(paths).length,
     totalOperations: endpoints.length,
     issues,
     endpoints,
   }
+}
+
+function inspectOpenApiReferences(spec, specPath, root) {
+  const documents = new Map([[specPath, spec]])
+  const unresolved = new Set()
+  function resolve(reference, origin) {
+    const [file, pointer] = reference.split('#')
+    try {
+      if (file && (/^[\w+.-]+:/.test(file) || path.isAbsolute(file))) throw new Error('Non-local reference')
+      const absolute = file ? assertProjectPath(root, path.resolve(path.dirname(origin), decodeURIComponent(file))) : origin
+      if (!/\.(?:json|ya?ml)$/i.test(absolute)) throw new Error('Unsupported reference file format')
+      if (!documents.has(absolute)) {
+        const raw = safeReadText(absolute)
+        if (!raw) throw new Error('Missing or unreadable document')
+        documents.set(absolute, isJsonPath(absolute) ? JSON.parse(raw) : YAML.parse(raw))
+      }
+      let value = documents.get(absolute)
+      if (pointer) {
+        const decoded = decodeURIComponent(pointer)
+        if (!decoded.startsWith('/')) throw new Error('Unsupported reference pointer')
+        for (const segment of decoded.slice(1).split('/')) {
+          const key = segment.replace(/~1/g, '/').replace(/~0/g, '~')
+          if (!value || typeof value !== 'object' || !Object.hasOwn(value, key)) throw new Error('Missing reference pointer')
+          value = value[key]
+        }
+      }
+      return { value, origin: absolute }
+    } catch {
+      // Report location without returning a potentially sensitive remote URL.
+      unresolved.add(relativePath(root, origin))
+      return null
+    }
+  }
+  const visited = new WeakSet()
+  const pending = [{ value: spec, origin: specPath }]
+  while (pending.length) {
+    const { value, origin } = pending.pop()
+    if (!value || typeof value !== 'object' || visited.has(value)) continue
+    visited.add(value)
+    if (typeof value.$ref === 'string') {
+      const target = resolve(value.$ref, origin)
+      if (target) pending.push(target)
+    }
+    for (const child of Object.values(value)) pending.push({ value: child, origin })
+  }
+  const paths = Object.fromEntries(Object.entries(spec.paths || {}).filter(([route]) => route.startsWith('/')).map(([route, item]) => {
+    let current = { value: item, origin: specPath }
+    const chain = new Set()
+    while (typeof current?.value?.$ref === 'string' && !chain.has(current.value)) {
+      chain.add(current.value)
+      current = resolve(current.value.$ref, current.origin)
+    }
+    if (typeof current?.value?.$ref === 'string') unresolved.add(relativePath(root, current.origin))
+    return [route, current?.value || {}]
+  }))
+  return { paths, unresolved: [...unresolved], resolve }
+}
+
+function handleCompareOpenApiDrift({ projectRoot, expectedPath, actualPath, internalOperations = [] }) {
+  const root = path.resolve(projectRoot)
+  function snapshot(file) {
+    const absolute = assertProjectPath(root, file)
+    const candidate = parseOpenApiCandidate(absolute)
+    if (!candidate?.isMaster || candidate.protocol !== 'REST') throw new Error('Drift comparison needs two OpenAPI or Swagger snapshots.')
+    const spec = candidate.parsed
+    const { paths, unresolved, resolve } = inspectOpenApiReferences(spec, absolute, root)
+    const operations = new Map()
+    for (const [route, item] of Object.entries(paths)) {
+      for (const method of [...METHOD_SORT_ORDER, 'trace']) {
+        const operation = item[method]
+        const key = `${method.toUpperCase()} ${route}`
+        if (operation && !internalOperations.includes(key) && operation['x-internal'] !== true) {
+          operations.set(key, {
+            operationId: operation.operationId, pathParameters: item.parameters, parameters: operation.parameters,
+            requestBody: operation.requestBody, responses: operation.responses, security: operation.security ?? spec.security,
+          })
+        }
+      }
+    }
+    const schemas = new Map(Object.entries(spec.components?.schemas || spec.definitions || {}).map(([name, schema]) =>
+      [name, schema?.$ref ? resolve(schema.$ref, absolute)?.value : schema]))
+    return { operations, schemas, unresolved, version: candidate.specVersion }
+  }
+  const expected = snapshot(expectedPath)
+  const actual = snapshot(actualPath)
+  function changes(before, after) {
+    return {
+      missing: [...before.keys()].filter((key) => !after.has(key)),
+      unexpected: [...after.keys()].filter((key) => !before.has(key)),
+      changed: [...before.keys()].filter((key) => after.has(key) && !isDeepStrictEqual(before.get(key), after.get(key))),
+    }
+  }
+  const operations = changes(expected.operations, actual.operations)
+  const schemas = changes(expected.schemas, actual.schemas)
+  const unresolved = [...new Set([...expected.unresolved, ...actual.unresolved])]
+  const versionChanged = expected.version !== actual.version
+  const drift = versionChanged || [operations, schemas].some((group) => Object.values(group).some((entries) => entries.length))
+  return { status: unresolved.length ? 'UNVERIFIED' : drift ? 'DRIFT_FOUND' : 'MATCH', operations, schemas, versionChanged, unresolved }
 }
 
 async function handleRunApiCollection(args) {
@@ -1846,6 +2060,8 @@ rl.on('line', async (line) => {
       if (toolName === 'discover_api_artifacts') {
         const out = handleDiscoverApiArtifacts(toolArgs)
         sendToolText(id, out)
+      } else if (toolName === 'compare_openapi_drift') {
+        sendToolText(id, handleCompareOpenApiDrift(toolArgs))
       } else if (toolName === 'test_api_endpoint') {
         const out = await handleTestApiEndpoint(toolArgs)
         sendToolText(id, out)

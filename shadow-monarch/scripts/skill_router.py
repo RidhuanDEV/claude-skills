@@ -223,7 +223,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["BACKEND.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
-            r"\b(?:REST\s+API|API\s+endpoint|backend\s+endpoint|OpenAPI|openapi\.yaml|Swagger|Postman|HTTP\s+(?:route|controller)|gRPC\s+contract|RFC\s*9457)\b",
+            r"\b(?:REST\s+API|API\s+(?:endpoint|documentation)|dokumentasi\s+API|backend\s+endpoint|OpenAPI|openapi\.yaml|Swagger|Postman|HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457)\b",
             re.IGNORECASE,
         ),
     },
@@ -1018,6 +1018,20 @@ def run_self_test() -> dict[str, Any]:
             "Audit ISO 27001 controls and export the GRC assessment report to docx and html using our document generator.",
             ["shadow-doc", "shadow-grc"],
             ["shadow-perf"],
+            None,
+        ),
+        (
+            "API-DISCOVERY-1: API documentation ownership routes to shadow-api",
+            "Temukan source of truth dokumentasi API dan identifikasi generator yang dipakai.",
+            ["shadow-api"],
+            ["shadow-perf", "shadow-bootstrap"],
+            "shadow-api",
+        ),
+        (
+            "API-DISCOVERY-2: Generic source of truth question avoids API discovery",
+            "What does source of truth mean?",
+            [],
+            ["shadow-api"],
             None,
         ),
     ]

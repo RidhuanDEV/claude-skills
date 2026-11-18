@@ -68,12 +68,11 @@ contracts, strict types, clean dead-code elimination, **sovereign token efficien
   accessibility, copywriting, or code comments, automatically enforce the installed `antislop` skills (`antislop`,
   `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `antislop-copywriting`, `antislop-code`) in `during` mode
   (from global preference) without waiting for the Monarch to tag `@antislop`.
-- **Mandatory Backend OpenAPI + Existing-Collection Sync & Live API Testing (`shadow_api` & `context7` MCP)**:
-  - Whenever creating or modifying any backend API endpoint, call `discover_api_artifacts` first so you update the project's **existing OpenAPI/Swagger spec** (any folder, `.yaml`/`.yml`/`.json` filename, or modular `modules/`/`paths/`/`domains/`/`endpoints/`/`specs/` layout; never create a duplicate `docs/api/openapi.yaml` when another spec already exists) — or create `docs/api/openapi.yaml` on greenfield — and validate it via `validate_openapi_spec`.
-  - Keep the project's **existing API client collection** in sync without imposing Postman:
-    Bruno (`bruno.json`/`.bru`) -> update `.bru` files; Postman -> `sync_postman_collection`; Insomnia/Hoppscotch/Thunder/`.http` -> update that format; none found -> OpenAPI only and ask the Monarch before creating any collection.
-  - Whenever a local or staging server is running, test the real HTTP endpoint via `test_api_endpoint` / `run_api_collection`
-    and record actual status codes and response payloads into the OpenAPI spec and the existing collection.
+- **API Documentation Ownership, Existing Collections & Bounded Verification (`shadow_api` & `context7` MCP)**:
+  - Before changing a backend endpoint, use `discover_api_artifacts` and the owning service's repository evidence to identify the protocol, authoritative source, generator, downstream outputs and collection workflow. Update code-first declarations or contract-first source as appropriate. Treat generated artifacts and viewers as downstream. Use the existing tools and protocol to regenerate and validate.
+  - If no compatible workflow exists, follow the Monarch's explicit compatible choice. Ask before initializing a documentation stack when that choice is unresolved. Escalate conflicting ownership only if it affects the requested change and repository evidence cannot resolve it.
+  - Update existing collections through their established workflow after verifying the mapping. Preserve tests, examples, authentication and environment values. Create a collection only with explicit intent.
+  - When a verified local server is running, test only relevant operations in scope using `test_api_endpoint` or a bounded `run_api_collection` request. Apply the User Intent Boundary & Execution Approval Protocol before broader execution.
   - Use the `context7` MCP (`resolve-library-id`, `query-docs`) to fetch up-to-date official framework/library docs.
 - **Task-Based Research & Standards Source Routing (`reference/RESEARCH-SOURCE-POLICY.md`)**:
   - Do NOT default to `arXiv` (unreviewed preprints) for software engineering, SDLC documentation, architecture, testing, or security.
