@@ -196,11 +196,47 @@ def run_self_test() -> dict[str, Any]:
     }
 
 
+def assess_erasure(plan):
+    """Compare redacted system inventory with receipts for one synthetic request."""
+    if not isinstance(plan, dict) or plan.get("synthetic") is not True:
+        raise ValueError("Expected synthetic request")
+    stores = plan.get("expected_stores")
+    receipts = plan.get("receipts")
+    if not isinstance(stores, list) or not stores or not all(isinstance(s, str) and s.strip() for s in stores):
+        raise ValueError("Expected nonempty store inventory")
+    if len(set(stores)) != len(stores) or not isinstance(receipts, dict) or set(receipts) - set(stores):
+        raise ValueError("Receipt inventory conflicts with expected stores")
+    results = {}
+    for store in stores:
+        evidence = receipts.get(store, {})
+        if not isinstance(evidence, dict):
+            raise ValueError("Invalid receipt")
+        state = evidence.get("action")
+        if not evidence.get("owner_decision_ref"):
+            status = "NEEDS_RETENTION_DECISION"
+        elif state == "retained" and evidence.get("retention_ref") and evidence.get("review_date"):
+            status = "RETAINED_PENDING_REVIEW"
+        elif state in ("deleted", "invalidated") and evidence.get("verification_ref"):
+            status = "RECEIPT_RECORDED"
+        else:
+            status = "AWAITING_RECEIPT"
+        results[store] = status
+    return {"stores": results, "all_removal_receipts_present": all(status == "RECEIPT_RECORDED" for status in results.values())}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Shadow Privacy (UU PDP / GDPR) Static Auditor")
     parser.add_argument("--scan", default=None, help="File or directory path to scan")
     parser.add_argument("--self-test", action="store_true", help="Run precision & recall probes")
+    parser.add_argument("--assess-erasure", type=Path, help="Review a redacted synthetic erasure receipt manifest")
     args = parser.parse_args()
+    if args.assess_erasure:
+        try:
+            result = assess_erasure(json.loads(args.assess_erasure.read_text(encoding="utf-8-sig")))
+        except (OSError, ValueError) as exc:
+            parser.error(str(exc))
+        print(json.dumps(result, indent=2))
+        return 0 if result["all_removal_receipts_present"] else 1
 
     if args.self_test:
         res = run_self_test()

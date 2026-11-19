@@ -12,7 +12,8 @@ Use this skill whenever the **Monarch** asks to create, import, selectively upda
 ## 1. Non-Negotiable Golden Laws (v2.0 + v1.0 Hybrid)
 
 1. **NEVER Edit Binary Outputs Directly (`.docx`, `.xlsx`, `.pdf`)**:
-   - All text, tables, diagrams, and metadata changes MUST be applied to the Canonical JSON AST (`.json`) or Markdown source (`.md`) and regenerated via `scripts/doc_scaffold.py`.
+   - Trace the requested output to its maintained source and generator command. If different generators own different outputs, record each relationship. Edit the owning source and regenerate through that command. Use `scripts/doc_scaffold.py` for documents owned by the global engine. Compare required identifiers, owners, exceptions, versions and table rows in the rendered output with their source before delivery.
+   - The AST, state transitions and CLI guarantees below describe the global engine. For a project renderer, verify each required capability from its workflow.
 2. **Zero Fabricated Facts & Evidence-Backed Claims (`DOC-FR-012`, `DOC-FR-020`, `AT-09`)**:
    - Never invent dates, ticket IDs, metrics, stakeholder names, test results, or deployment topologies. Unknown facts MUST remain explicit placeholders (`[ISI ...]`, `[TBD]`, `UNVERIFIED`).
    - Any block claiming `PASS`, `APPROVED`, `DEPLOYED`, or `CLOSED` MUST cite a verified `source_refs` entry. Strict validation (`validate --strict`) blocks release if unresolved placeholders or unverified claims exist.
@@ -89,52 +90,53 @@ Before invoking the Global Engine directly on any project, run **`doc_orchestrat
 
 ```powershell
 # 1. Create a canonical v2.0 JSON document from any of the 20 templates
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" create `
+# Set $ShadowDocRoot to the directory containing the installed shadow-doc SKILL.md.
+python "$ShadowDocRoot/scripts/doc_scaffold.py" create `
   --type SRS --project-id PRJ-2026 --doc-id DOC-SRS-001 `
   --lang id-ID --style corporate --owner "System Analyst" --out docs/SRS.json
 
 # 2. Import existing .md, .docx, .pdf (reference), or legacy v1 .json into v2.0 AST
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" import `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" import `
   --in draft.md --project-id PRJ-2026 --type SRS --doc-id DOC-SRS-001 --out docs/SRS.json
 
 # 3. Selectively update a single block (auto-forks new DRAFT if document is APPROVED)
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" update `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" update `
   --doc docs/SRS.json --scope-id FR-001 `
   --content "Sistem wajib mendukung OAuth2/OIDC dengan FIDO2 Passkey." `
   --author "Security Architect" --change-ref CR-001
 
 # 4. Validate schema, secrets, traceability, and release gates (--strict for release)
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" validate --doc docs/SRS.json --strict
+python "$ShadowDocRoot/scripts/doc_scaffold.py" validate --doc docs/SRS.json --strict
 
 # 5. Bidirectional traceability & change-impact analysis
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" impact `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" impact `
   --doc docs/SRS.json docs/RTM.json --changed-id FR-001
 
 # 6. Controlled approval transition (enforces owner != actor & evidence_ref)
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" approve `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" approve `
   --doc docs/SRS.json --status APPROVED --actor "VP Engineering" `
   --role "Approver" --evidence-ref "MINUTES-2026-11-10"
 
 # 7. Export to DOCX, PDF, XLSX, CSV, and Markdown with automated cross-format QA
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" export `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" export `
   --doc docs/SRS.json --format all --out-dir docs/output
 
 # 8. Build stage handover ZIP bundle with SHA-256 manifest.json
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" package `
+python "$ShadowDocRoot/scripts/doc_scaffold.py" package `
   --source-dir docs/output --project-id PRJ-2026 --stage handover --out docs/Handover_Bundle.zip
 
 # 9. Run v1.0 backward-compatibility self-test & v2.0 15-test acceptance suite
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" --selftest
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" --acceptance-suite
+python "$ShadowDocRoot/scripts/doc_scaffold.py" --selftest
+python "$ShadowDocRoot/scripts/doc_scaffold.py" --acceptance-suite
 
 # 10. Download a reference to local PC, verify 7-Point File Safety, and update references_manifest.json
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" fetch `
+python "$ShadowDocRoot/scripts/reference_verifier.py" fetch `
   --url "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf" `
   --dest-dir docs/references --title "NIST SSDF SP 800-218" --venue "NIST" --year "2022" --doi "10.6028/NIST.SP.800-218"
 
 # 11. Scan local reference folder and auto-delete any disguised/dangerous file
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" scan docs/references --quarantine-delete
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\reference_verifier.py" --self-test
+python "$ShadowDocRoot/scripts/reference_verifier.py" scan docs/references --quarantine-delete
+python "$ShadowDocRoot/scripts/reference_verifier.py" --self-test
 ```
 
 - **Word TOC Field Note**: When opening generated `.docx` files in Microsoft Word, press `Ctrl+A` then `F9` to populate dynamic page numbers in the native Word Table of Contents (`TOC`) field.

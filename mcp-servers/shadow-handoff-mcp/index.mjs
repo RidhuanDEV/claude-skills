@@ -25,14 +25,19 @@ import os from 'node:os'
 import path from 'node:path'
 import readline from 'node:readline'
 import { execFileSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
 const PROTOCOL_VERSION = '2024-11-05'
 const SERVER_INFO = {
   name: 'shadow-handoff-mcp',
-  version: '1.1.0',
+  version: '1.2.0',
 }
 
-const HANDOFF_ROOT = path.join(os.homedir(), '.shadow-handoff')
+function getHandoffRoot() {
+  return process.env.SHADOW_HANDOFF_ROOT
+    ? path.resolve(process.env.SHADOW_HANDOFF_ROOT)
+    : path.join(os.homedir(), '.shadow-handoff')
+}
 const MAX_HISTORY_PER_PROJECT = 15
 // PLANNED covers sessions that produced only a plan; the remaining levels follow the Rigor Protocol.
 const READINESS_LEVELS = ['PLANNED', 'IMPLEMENTED', 'VERIFIED-LOCAL', 'REVIEWED', 'READY-TO-MERGE']
@@ -122,6 +127,18 @@ const TOOLS = [
             required: ['claim', 'evidence'],
           },
           description: 'Claim -> evidence -> what is not measured, for every readiness claim made.',
+        },
+        authorizationScope: {
+          type: 'object',
+          description:
+            'Optional active authorization scope (resource, host, phase, operations, explicitDecisions) carried across sessions so resumed agents do not re-ask answered decisions or exceed approved scope.',
+          properties: {
+            resource: { type: 'string' },
+            host: { type: 'string' },
+            phase: { type: 'string' },
+            operations: { type: 'array', items: { type: 'string' } },
+            explicitDecisions: { type: 'array', items: { type: 'string' } },
+          },
         },
       },
       required: ['projectPath', 'title', 'currentGoal', 'completedWork', 'nextSteps', 'readinessLevel', 'untestedSurfaces'],
@@ -312,19 +329,102 @@ function listSessionLabels(projectDir) {
     .sort()
 }
 
+function parseAuthorizationScope(value) {
+  if (value === undefined || value === null) return null
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('authorizationScope must be an object')
+  }
+  const clean = {}
+  for (const key of ['resource', 'host', 'phase']) {
+    if (value[key] !== undefined && value[key] !== null) {
+      if (typeof value[key] !== 'string') {
+        throw new Error(`authorizationScope.${key} must be a string`)
+      }
+      if (value[key].trim()) clean[key] = value[key].trim()
+    }
+  }
+  if (value.operations !== undefined) {
+    clean.operations = toStringArray(value.operations, 'authorizationScope.operations')
+  }
+  if (value.explicitDecisions !== undefined) {
+    clean.explicitDecisions = toStringArray(value.explicitDecisions, 'authorizationScope.explicitDecisions')
+  }
+  return Object.keys(clean).length > 0 ? clean : null
+}
+
+function checkGitDrift(projectPath, savedGit) {
+  if (!savedGit || !projectPath) return null
+  const currentGit = captureGitSnapshot(projectPath)
+  if (!currentGit) return null
+  const branchChanged = Boolean(savedGit.branch && currentGit.branch && savedGit.branch !== currentGit.branch)
+  const headChanged = Boolean(
+    savedGit.headSha && currentGit.headSha
+      ? savedGit.headSha !== currentGit.headSha
+      : savedGit.lastCommit && currentGit.lastCommit && savedGit.lastCommit !== currentGit.lastCommit,
+  )
+  const detected = branchChanged || headChanged
+  if (!detected) {
+    return {
+      detected: false,
+      branchChanged: false,
+      headChanged: false,
+      savedBranch: savedGit.branch || null,
+      currentBranch: currentGit.branch || null,
+      savedHeadSha: savedGit.headSha || null,
+      currentHeadSha: currentGit.headSha || null,
+    }
+  }
+  const reasons = []
+  if (branchChanged) reasons.push(`branch moved from "${savedGit.branch}" to "${currentGit.branch}"`)
+  if (headChanged) {
+    reasons.push(
+      `HEAD moved from "${savedGit.headSha || savedGit.lastCommit}" to "${currentGit.headSha || currentGit.lastCommit}"`,
+    )
+  }
+  return {
+    detected: true,
+    branchChanged,
+    headChanged,
+    savedBranch: savedGit.branch || null,
+    currentBranch: currentGit.branch || null,
+    savedHeadSha: savedGit.headSha || null,
+    currentHeadSha: currentGit.headSha || null,
+    warning: `Checkout drift detected since handoff save (${reasons.join('; ')}). Re-verify git state and file diffs before applying edits.`,
+  }
+}
+
 // Verification state stored next to a latest.md, so loaders see readiness and gaps without parsing markdown.
-function readVerificationState(latestMdPath) {
+function readVerificationState(latestMdPath, liveProjectPath = null) {
   const jsonPath = path.join(path.dirname(latestMdPath), 'latest.json')
-  if (!fs.existsSync(jsonPath)) return {}
+  if (!fs.existsSync(jsonPath)) {
+    return {
+      legacyStatus: 'UNVERIFIED_LEGACY_SNAPSHOT',
+      reviewGate:
+        'Legacy handoff snapshot has no latest.json verification metadata. Treat readiness as unverified and re-check git state before acting.',
+    }
+  }
   try {
     const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'))
-    if (!meta.readinessLevel) return {}
     const pending = listSessionLabels(path.dirname(latestMdPath))
+    const targetProjectPath = liveProjectPath || meta.projectPath || null
+    const gitDrift = checkGitDrift(targetProjectPath, meta.git || null)
+    if (!meta.readinessLevel) {
+      return {
+        legacyStatus: 'UNVERIFIED_LEGACY_SNAPSHOT',
+        untestedSurfaces: Array.isArray(meta.untestedSurfaces) ? meta.untestedSurfaces : [],
+        reviewGate:
+          'Legacy handoff snapshot predates readinessLevel enforcement. Treat verification as incomplete until re-checked.',
+        ...(meta.authorizationScope ? { authorizationScope: meta.authorizationScope } : {}),
+        ...(gitDrift ? { gitDrift } : {}),
+      }
+    }
     return {
       readinessLevel: meta.readinessLevel,
       untestedSurfaces: Array.isArray(meta.untestedSurfaces) ? meta.untestedSurfaces : [],
       reviewGate:
         'Read untestedSurfaces before writing any review conclusion or readiness claim. Surfaces listed there are unverified.',
+      ...(meta.authorizationScope ? { authorizationScope: meta.authorizationScope } : {}),
+      ...(gitDrift ? { gitDrift } : {}),
       ...(pending.length >= 2
         ? {
             unmergedSessions: pending,
@@ -333,7 +433,11 @@ function readVerificationState(latestMdPath) {
         : {}),
     }
   } catch {
-    return {}
+    return {
+      legacyStatus: 'UNVERIFIED_LEGACY_SNAPSHOT',
+      reviewGate:
+        'Could not parse latest.json verification metadata. Treat readiness as unverified and re-check git state before acting.',
+    }
   }
 }
 
@@ -341,6 +445,11 @@ function captureGitSnapshot(projectPath) {
   try {
     if (!fs.existsSync(projectPath)) return null
     const branch = execFileSync('git', ['-C', projectPath, 'rev-parse', '--abbrev-ref', 'HEAD'], {
+      encoding: 'utf8',
+      timeout: 3000,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+    const headSha = execFileSync('git', ['-C', projectPath, 'rev-parse', 'HEAD'], {
       encoding: 'utf8',
       timeout: 3000,
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -360,7 +469,7 @@ function captureGitSnapshot(projectPath) {
       timeout: 3000,
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
-    return { branch, lastCommit, status, diffStat }
+    return { branch, headSha, lastCommit, status, diffStat }
   } catch {
     return null
   }
@@ -435,6 +544,26 @@ function formatMarkdownHandoff(meta, gitInfo) {
     )
   }
 
+  if (meta.authorizationScope) {
+    lines.push(`## 4b. Active Authorization Scope (Carry Forward)`)
+    if (meta.authorizationScope.resource) lines.push(`- **Resource**: \`${meta.authorizationScope.resource}\``)
+    if (meta.authorizationScope.host) lines.push(`- **Host**: \`${meta.authorizationScope.host}\``)
+    if (meta.authorizationScope.phase) lines.push(`- **Phase**: \`${meta.authorizationScope.phase}\``)
+    if (Array.isArray(meta.authorizationScope.operations) && meta.authorizationScope.operations.length > 0) {
+      lines.push(`- **Approved Operations**: ${meta.authorizationScope.operations.map((o) => `\`${o}\``).join(', ')}`)
+    }
+    if (
+      Array.isArray(meta.authorizationScope.explicitDecisions) &&
+      meta.authorizationScope.explicitDecisions.length > 0
+    ) {
+      lines.push(`- **Explicit Decisions (Do Not Re-Ask)**:`)
+      for (const dec of meta.authorizationScope.explicitDecisions) {
+        lines.push(`  - ${dec}`)
+      }
+    }
+    lines.push(``)
+  }
+
   if (meta.blockersOrBugs && meta.blockersOrBugs.length > 0) {
     lines.push(
       `## 5. Open Blockers / Bugs`,
@@ -473,11 +602,12 @@ function handleSaveHandoff(args) {
   const projectPathArg = requireString(args.projectPath, 'projectPath')
   const resolvedProjectPath = resolveCanonicalProjectRoot(projectPathArg)
   const slug = projectSlugFromPath(resolvedProjectPath)
-  const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+  const projectDir = path.join(getHandoffRoot(), 'projects', slug)
   const sessionLabel = sanitizeSessionLabel(args.sessionLabel)
   const iso = new Date().toISOString()
 
   const gitInfo = captureGitSnapshot(resolvedProjectPath)
+  const authorizationScope = parseAuthorizationScope(args.authorizationScope)
   const meta = {
     handoffId: buildHandoffId(iso, sessionLabel),
     projectSlug: slug,
@@ -500,6 +630,7 @@ function handleSaveHandoff(args) {
       return toStringArray(args.untestedSurfaces, 'untestedSurfaces')
     })(),
     claimEvidenceMap: parseClaimEvidenceMap(args.claimEvidenceMap),
+    ...(authorizationScope ? { authorizationScope } : {}),
     createdAt: iso,
     git: gitInfo,
   }
@@ -537,7 +668,7 @@ function handleSaveHandoff(args) {
 }
 
 function writeHandoffFiles(meta, gitInfo, alsoWriteToProjectFolder) {
-  const projectDir = path.join(HANDOFF_ROOT, 'projects', meta.projectSlug)
+  const projectDir = path.join(getHandoffRoot(), 'projects', meta.projectSlug)
   const historyDir = path.join(projectDir, 'history')
   fs.mkdirSync(historyDir, { recursive: true })
   const handoffId = meta.handoffId
@@ -569,7 +700,7 @@ function writeHandoffFiles(meta, gitInfo, alsoWriteToProjectFolder) {
   }
 
   // Update global index.json
-  const indexPath = path.join(HANDOFF_ROOT, 'index.json')
+  const indexPath = path.join(getHandoffRoot(), 'index.json')
   let indexData = { projects: {} }
   if (fs.existsSync(indexPath)) {
     try {
@@ -621,7 +752,7 @@ function unionTagged(sessions, field) {
 function handleMergeHandoffs(args = {}) {
   const resolvedProjectPath = resolveCanonicalProjectRoot(requireString(args.projectPath, 'projectPath'))
   const slug = projectSlugFromPath(resolvedProjectPath)
-  const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+  const projectDir = path.join(getHandoffRoot(), 'projects', slug)
   const sessionsDir = path.join(projectDir, 'sessions')
   const available = listSessionLabels(projectDir)
 
@@ -670,6 +801,30 @@ function handleMergeHandoffs(args = {}) {
   })
   warnings.push('Decisions and steps from different sessions are listed side by side, not reconciled. Check them for contradictions before acting.')
 
+  const scopes = sessions.filter((s) => s.authorizationScope)
+  let mergedScope = null
+  if (scopes.length > 0) {
+    const scopeResources = [...new Set(scopes.map((s) => s.authorizationScope.resource).filter(Boolean))]
+    const scopeHosts = [...new Set(scopes.map((s) => s.authorizationScope.host).filter(Boolean))]
+    const scopePhases = [...new Set(scopes.map((s) => s.authorizationScope.phase).filter(Boolean))]
+    if (scopeResources.length > 1 || scopeHosts.length > 1) {
+      warnings.push(
+        `Sessions have differing authorizationScope targets (resources: ${scopeResources.join(', ') || 'none'}; hosts: ${scopeHosts.join(', ') || 'none'}). Re-confirm scope before running mutations.`,
+      )
+    }
+    const mergedOps = [...new Set(scopes.flatMap((s) => s.authorizationScope.operations || []))]
+    const mergedDecisions = scopes.flatMap((s) =>
+      (s.authorizationScope.explicitDecisions || []).map((d) => `[${s.sessionLabel}] ${d}`),
+    )
+    mergedScope = {
+      ...(scopeResources.length === 1 ? { resource: scopeResources[0] } : {}),
+      ...(scopeHosts.length === 1 ? { host: scopeHosts[0] } : {}),
+      ...(scopePhases.length === 1 ? { phase: scopePhases[0] } : {}),
+      ...(mergedOps.length > 0 ? { operations: mergedOps } : {}),
+      ...(mergedDecisions.length > 0 ? { explicitDecisions: mergedDecisions } : {}),
+    }
+  }
+
   const labels = sessions.map((s) => s.sessionLabel)
   const iso = new Date().toISOString()
   const gitInfo = captureGitSnapshot(resolvedProjectPath)
@@ -701,6 +856,7 @@ function handleMergeHandoffs(args = {}) {
         claim: `[${s.sessionLabel}] ${row.claim}`,
       })),
     ),
+    ...(mergedScope && Object.keys(mergedScope).length > 0 ? { authorizationScope: mergedScope } : {}),
     mergeWarnings: warnings,
     createdAt: iso,
     git: gitInfo,
@@ -736,11 +892,11 @@ function handleMergeHandoffs(args = {}) {
 }
 
 function handleLoadHandoff(args = {}) {
-  const indexPath = path.join(HANDOFF_ROOT, 'index.json')
+  const indexPath = path.join(getHandoffRoot(), 'index.json')
   if (args.projectPath) {
     const resolvedProjectPath = resolveCanonicalProjectRoot(args.projectPath)
     const slug = projectSlugFromPath(resolvedProjectPath)
-    const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+    const projectDir = path.join(getHandoffRoot(), 'projects', slug)
 
     if (args.handoffId) {
       const cleanId = args.handoffId.replace(/\.md$/, '')
@@ -764,7 +920,7 @@ function handleLoadHandoff(args = {}) {
         matchedBy: 'exact_git_root_or_path',
         projectPath: resolvedProjectPath,
         latestMdPath,
-        ...readVerificationState(latestMdPath),
+        ...readVerificationState(latestMdPath, resolvedProjectPath),
         markdown: fs.readFileSync(latestMdPath, 'utf8'),
       }
     }
@@ -791,7 +947,7 @@ function handleLoadHandoff(args = {}) {
             requestedPath: resolvedProjectPath,
             projectPath: parentOrChildMatch.projectPath,
             latestMdPath: parentOrChildMatch.latestMdPath,
-            ...readVerificationState(parentOrChildMatch.latestMdPath),
+            ...readVerificationState(parentOrChildMatch.latestMdPath, parentOrChildMatch.projectPath),
             markdown: fs.readFileSync(parentOrChildMatch.latestMdPath, 'utf8'),
           }
         }
@@ -806,6 +962,7 @@ function handleLoadHandoff(args = {}) {
         matchedBy: 'local_handoff_file',
         projectPath: resolvedProjectPath,
         latestMdPath: localHandoff,
+        ...readVerificationState(localHandoff, resolvedProjectPath),
         markdown: fs.readFileSync(localHandoff, 'utf8'),
       }
     }
@@ -830,7 +987,7 @@ function handleLoadHandoff(args = {}) {
     projectPath: latestEntry.projectPath,
     updatedAt: latestEntry.updatedAt,
     latestMdPath: latestEntry.latestMdPath,
-    ...readVerificationState(latestEntry.latestMdPath),
+    ...readVerificationState(latestEntry.latestMdPath, latestEntry.projectPath),
     markdown: fs.readFileSync(latestEntry.latestMdPath, 'utf8'),
   }
 }
@@ -839,7 +996,7 @@ function handleListHandoffs(args = {}) {
   if (args.projectPath) {
     const resolvedProjectPath = resolveCanonicalProjectRoot(args.projectPath)
     const slug = projectSlugFromPath(resolvedProjectPath)
-    const projectDir = path.join(HANDOFF_ROOT, 'projects', slug)
+    const projectDir = path.join(getHandoffRoot(), 'projects', slug)
     const historyDir = path.join(projectDir, 'history')
     const sessions = listSessionLabels(projectDir)
     if (!fs.existsSync(historyDir)) {
@@ -858,7 +1015,7 @@ function handleListHandoffs(args = {}) {
     }
   }
 
-  const indexPath = path.join(HANDOFF_ROOT, 'index.json')
+  const indexPath = path.join(getHandoffRoot(), 'index.json')
   if (!fs.existsSync(indexPath)) {
     return { projects: [] }
   }
@@ -889,77 +1046,93 @@ function sendToolText(id, data, isError = false) {
   })
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  terminal: false,
-})
+export {
+  handleSaveHandoff,
+  handleLoadHandoff,
+  handleMergeHandoffs,
+  handleListHandoffs,
+  checkGitDrift,
+  readVerificationState,
+  getHandoffRoot,
+}
 
-rl.on('line', async (line) => {
-  const trimmed = line.trim()
-  if (!trimmed) return
+const isMainModule =
+  Boolean(process.argv[1]) &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
 
-  let msg
-  try {
-    msg = JSON.parse(trimmed)
-  } catch {
-    return
-  }
+if (isMainModule) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    terminal: false,
+  })
 
-  const { id, method, params } = msg
+  rl.on('line', async (line) => {
+    const trimmed = line.trim()
+    if (!trimmed) return
 
-  if (method === 'initialize') {
-    sendResult(id, {
-      protocolVersion: PROTOCOL_VERSION,
-      capabilities: { tools: {} },
-      serverInfo: SERVER_INFO,
-    })
-    return
-  }
-
-  if (method === 'notifications/initialized') {
-    return
-  }
-
-  if (method === 'ping') {
-    sendResult(id, {})
-    return
-  }
-
-  if (method === 'tools/list') {
-    sendResult(id, { tools: TOOLS })
-    return
-  }
-
-  if (method === 'tools/call') {
-    const toolName = params && params.name
-    const toolArgs = (params && params.arguments) || {}
+    let msg
     try {
-      if (toolName === 'save_handoff') {
-        const out = handleSaveHandoff(toolArgs)
-        sendToolText(id, out)
-      } else if (toolName === 'load_handoff') {
-        const out = handleLoadHandoff(toolArgs)
-        sendToolText(id, out)
-      } else if (toolName === 'list_handoffs') {
-        const out = handleListHandoffs(toolArgs)
-        sendToolText(id, out)
-      } else if (toolName === 'merge_handoffs') {
-        const out = handleMergeHandoffs(toolArgs)
-        sendToolText(id, out)
-      } else {
-        sendToolText(id, `Unknown tool: ${toolName}`, true)
-      }
-    } catch (error) {
-      sendToolText(
-        id,
-        `Error in ${toolName}: ${error instanceof Error ? error.message : String(error)}`,
-        true,
-      )
+      msg = JSON.parse(trimmed)
+    } catch {
+      return
     }
-    return
-  }
 
-  if (id !== undefined && id !== null) {
-    sendResult(id, {})
-  }
-})
+    const { id, method, params } = msg
+
+    if (method === 'initialize') {
+      sendResult(id, {
+        protocolVersion: PROTOCOL_VERSION,
+        capabilities: { tools: {} },
+        serverInfo: SERVER_INFO,
+      })
+      return
+    }
+
+    if (method === 'notifications/initialized') {
+      return
+    }
+
+    if (method === 'ping') {
+      sendResult(id, {})
+      return
+    }
+
+    if (method === 'tools/list') {
+      sendResult(id, { tools: TOOLS })
+      return
+    }
+
+    if (method === 'tools/call') {
+      const toolName = params && params.name
+      const toolArgs = (params && params.arguments) || {}
+      try {
+        if (toolName === 'save_handoff') {
+          const out = handleSaveHandoff(toolArgs)
+          sendToolText(id, out)
+        } else if (toolName === 'load_handoff') {
+          const out = handleLoadHandoff(toolArgs)
+          sendToolText(id, out)
+        } else if (toolName === 'list_handoffs') {
+          const out = handleListHandoffs(toolArgs)
+          sendToolText(id, out)
+        } else if (toolName === 'merge_handoffs') {
+          const out = handleMergeHandoffs(toolArgs)
+          sendToolText(id, out)
+        } else {
+          sendToolText(id, `Unknown tool: ${toolName}`, true)
+        }
+      } catch (error) {
+        sendToolText(
+          id,
+          `Error in ${toolName}: ${error instanceof Error ? error.message : String(error)}`,
+          true,
+        )
+      }
+      return
+    }
+
+    if (id !== undefined && id !== null) {
+      sendResult(id, {})
+    }
+  })
+}

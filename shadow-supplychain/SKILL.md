@@ -24,5 +24,16 @@ Read [`methodologies/SBOM-SLSA-PROVENANCE-AND-LOCKFILE-INTEGRITY.md`](methodolog
 
 ```powershell
 python "shadow-supplychain/scripts/supplychain_sbom_gate.py" --self-test
-python "shadow-supplychain/scripts/supplychain_sbom_gate.py" --verify path/to/supplychain_manifest.json
+python "shadow-supplychain/scripts/supplychain_sbom_gate.py" --verify manifest.json --policy consumer-policy.json --artifact release.bin --receipt verifier-result.json --as-of-date 2026-11-19
 ```
+
+## Artifact-specific release decision
+
+Separate the producer's inventory from the consumer's trust policy and CI verification receipt. Inspect the repository's existing signer verification step, confirm which identity checks it actually ran, and normalize only its observed output. Read the receipt from a consumer-controlled CI channel. A receipt supplied by the artifact author, an editable PR file or a failed verifier cannot establish signer trust. Keep the original signature, upstream output, verifier version, CI run identity and policy revision for the reviewer. This gate hashes the artifact bytes locally and reconciles evidence; cryptographic signature verification remains with that independent verifier.
+
+- Provide an ordered CLI handoff: normalized manifest, actual release artifact, consumer policy, verifier receipt, and the evaluation date for any vulnerability waiver. The manifest can contain historical `provenance.signer_verified`; this declaration alone yields `INCOMPLETE`.
+- In the consumer policy, `trusted_builds` is an array of allowed **tuples** of `issuer`, `builder_id`, `build_type` and `verifier`. An optional `platform` describes the release profile. The verifier receipt contains those four values, `status: VERIFIED` and a lowercase hex `subject_sha256`. The local artifact hash must match that subject. For offline or unavailable verification, record `OFFLINE` or `NOT_RUN`; never synthesize a successful receipt. The verified dimension is labeled `VERIFIED_RECEIPT`. Any SLSA level, builder isolation, external build parameters and vulnerability reachability need their own evidence.
+- Reconcile component identity by ecosystem, name, version and scope (runtime, dev or optional). For heterogeneous lockfiles, adapters must supply ecosystem on every record. Legacy name/version records use an unspecified ecosystem and default runtime scope. A known optional package may be excluded only when its declared platform list excludes the selected consumer platform. Review the returned exclusion inventory. For ambiguous aliases, variant IDs or multiple packages with identical normalized coordinates, reconcile source/package identifiers before producing the manifest.
+- If waivers exist, compare each expiry with the independently supplied assessment date (expiry day inclusive). Expiry validation alone grants no exception: obtain the organization's signed exception record and validate its subject, scope and owner separately.
+
+[Executable release and rollback scenarios](tests/test_supplychain_cli.py) distinguish a correctly bound fixture, identical name with changed bytes, untrusted issuer/builder pairing, missing receipt, offline verification and expired waiver. Apply the consumer trust model in [SLSA v1.2, Verifying artifacts](https://slsa.dev/spec/v1.2/verifying-artifacts).

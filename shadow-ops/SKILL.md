@@ -33,7 +33,7 @@ Use this skill whenever the **Monarch** asks to containerize, deploy, harden, co
 1. **Immutable Deployments & Release Provenance**:
    - Build the container image or release artifact **once**, tag it with the exact Git commit SHA and SemVer version (`v1.2.0-sha26acae3`), and promote that exact artifact from Staging to Production (`/shadow-release`). Never run manual hot-edits (`vim` / `nano`) inside running production containers.
 2. **Strict Dev / Staging / Production Environment Parity**:
-   - Keep OS base image, database engine major/minor version, Redis version, and reverse proxy topology identical across `docker-compose.dev.yml`, Staging, and Production — only environment variables and resource sizing differ.
+   - Compare application-visible capabilities across environments (database features and collation, proxy headers, TLS termination, connection limits). For each relevant difference record owner, affected workflow and a target-specific smoke check. On managed hosting identify which settings the provider controls.
 3. **7 Non-Negotiable Production Hardening Rules**:
    - **Never run containers or `systemd` services as `root`**.
    - **Never bind internal database/Redis ports (`5432`, `3306`, `6379`, `27017`) to `0.0.0.0` in Docker Compose** — bind to `127.0.0.1` or keep on an `internal: true` network because Docker bypasses `ufw` iptables rules!

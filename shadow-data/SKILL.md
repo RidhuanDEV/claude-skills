@@ -13,12 +13,12 @@ While `/shadow-db` handles live database introspection, ERDs, and Data Warehouse
 
 Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, adding `NOT NULL` without default on huge tables) in a single deployment while old application instances are still serving traffic.
 
-| Phase | Action | Compatibility Guarantee |
-| :--- | :--- | :--- |
-| **1. Expand** | Add new nullable column/table; add indexes concurrently (`CREATE INDEX CONCURRENTLY` in Postgres); deploy code that dual-writes to both old and new columns. | Old and new code versions both run safely; instant code rollback is 100% safe. |
-| **2. Backfill** | Run a batched, throttled backfill script (`LIMIT 1000` per transaction with short sleep) to populate historical rows without locking the table or blowing up WAL replication lag. | Zero table lock; zero impact on live OLTP latency. |
-| **3. Switch & Validate** | Enforce `NOT NULL` (using `CHECK (...) NOT VALID` then `VALIDATE CONSTRAINT`), switch reads to the new column. | Verified 100% data completeness before switching. |
-| **4. Contract** | Remove dual-write code and drop the obsolete column in a subsequent release. | Clean schema with zero downtime. |
+| Phase | Action | Evidence before proceeding |
+| --- | --- | --- |
+| Expand | Inspect engine/version, DDL locking and mixed-version writers. Add compatible structures first. | Exercise current and previous application versions and verify rollback with both writing. |
+| Backfill | Use resumable batches with stable keys. Set size and pause thresholds against observed lock wait, replica lag and latency budgets. | Interrupt and resume one batch. Reconcile row counts and values, including writes concurrent with backfill. |
+| Switch | Enable the new read path within the authorized rollout and compare results. | Record parity, monitored window, owner and tested read fallback. |
+| Contract | Inventory old readers, writers, jobs and rollback versions. Retire the old representation only after the retention window, owner decision and separate destructive-change authorization. | Missing telemetry or an external consumer with unknown status holds the contract phase. |
 
 - **Ephemeral Migration Verification Container Cleanup**: Whenever verifying migrations against an ephemeral Docker database (`*-migration-verification` / `*-test-*`), always launch with `docker run --rm --label shadow.ephemeral=true` and wrap the run in `try / finally` (`trap EXIT`) executing `docker rm -f -v <container>` (or `docker compose -p <project>-migtest down -v --rmi local --remove-orphans`) so zero stopped containers, volumes, or temporary images remain after verification passes.
 
@@ -60,3 +60,5 @@ Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, addi
 
 ## 5. Execution Approval & Migration Boundary (`L1` vs `L4`)
 - Authoring additive Expand-only migrations locally is `L1_SAFE_VERIFICATION`. Running destructive DDL (`DROP`, `TRUNCATE`, `RENAME`, `migrate reset`) or executing migrations against staging/production/unknown databases is **`L4: HIGH_IMPACT`** and NEVER authorized by a bug fix without explicit Monarch approval and verified backup/rollback (`shadow-monarch/scripts/execution_approval_gate.py`).
+
+Run the isolated SQLite example with `python -m unittest discover -s tests` from this skill directory. It shows how a legacy writer can invalidate rows behind a completed cursor and how to detect it. Production lock behavior, replicas and independent consumers require evidence from the owning environment.

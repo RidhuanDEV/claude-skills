@@ -23,7 +23,7 @@ Use this skill after go-live during the warranty or **Pemeliharaan & Perawatan (
 ## 2. Production Hotfix Protocol (Zero-Regression Emergency Fix)
 
 When a `P0` or `P1` bug requires an urgent production fix:
-1. **Stabilize First**: If caused by the latest deploy, roll back immediately (`/shadow-release`) before debugging code.
+1. **Stabilize**. Timestamp impact and preserve evidence. Check whether the last known good artifact can read current writes, schema and queued events. With incident commander approval, select a tested rollback if compatible, otherwise contain via an existing flag or pause the affected writer and plan a forward fix. Record owner, abort condition and customer recovery signal.
 2. **Reproduce & Pinpoint Root Cause**: Trace using `requestId` logs (`/shadow-observe`) and hand off causal diagnosis, minimal reproduction, and red-before/green-after hypothesis falsification to **`/shadow-debug`** (never treat a single log line as proven root cause).
 3. **Minimal Surgical Patch + Regression Test**:
    - Write the smallest possible fix on a clean hotfix branch (`fix/hotfix-<issue>`).

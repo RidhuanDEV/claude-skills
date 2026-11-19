@@ -11,7 +11,7 @@ This skill connects directly to the **`shadow_handoff` MCP server** (`save_hando
 ## How to Execute
 
 1. **Default (`/handoff` with no arguments, or `/handoff save`) — Save & Compact Current Session**:
-   - Immediately call the `save_handoff` tool on the `shadow_handoff` MCP server (`d:/Ridhuan Ngoding Moment/SKILL/mcp-servers/shadow-handoff-mcp/index.mjs` if MCP is not yet reloaded in the current window) with:
+   - Immediately call the `save_handoff` tool on the `shadow_handoff` MCP server (resolve the entry point from host registration when the MCP is unavailable) with:
      - `projectPath`: the active workspace directory path
      - `sourceAgent`: current agent name (`Antigravity`, `Claude Code`, `Codex`, or `Gemini CLI`)
      - `title`: short milestone title
@@ -31,7 +31,7 @@ This skill connects directly to the **`shadow_handoff` MCP server** (`save_hando
    - Immediately call the `load_handoff` tool on the `shadow_handoff` MCP server for the current `projectPath` (or globally if no project is open).
    - **Read `untestedSurfaces` and `readinessLevel` before writing any review conclusion or readiness claim.** Treat listed surfaces as unverified; do not upgrade the readiness level without new evidence.
    - If the result contains `unmergedSessions`, the snapshot shows only one parallel session. Tell the Monarch and offer `/handoff merge` before continuing.
-   - Present a brief 3-bullet summary of the loaded state to the **Monarch** and immediately proceed with Step 1 of `nextSteps`.
+   - Present a brief 3-bullet summary of the loaded state to the **Monarch** and compare the saved repository, branch and base SHA with the current checkout. Recheck affected paths and decisions when revisions diverge. For older records without identity, mark continuity unverified and independently establish scope before writing. Resume the first still-valid step.
 
 3. **Merge (`/handoff merge` or `"gabung handoff"`) — Combine Parallel Sessions Into One Agent**:
    - Typical case: session A saved with `sessionLabel: "plan"`, session B with `sessionLabel: "review"`; the Monarch wants one agent to continue.

@@ -10,6 +10,7 @@ Deterministic evaluator for:
 
 from __future__ import annotations
 
+from datetime import date
 import argparse
 import json
 import re
@@ -132,7 +133,7 @@ def validate_iso27001_soa(soa: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENERAL_ENTERPRISE", as_of_date: str = "2026-11-16") -> dict[str, Any]:
+def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENERAL_ENTERPRISE", as_of_date: str | None = None) -> dict[str, Any]:
     """Validate 6-part defensible findings and regulatory applicability."""
     required_parts = ("criteria", "condition", "cause", "effect", "recommendation", "evidence_ref")
     errors: list[dict[str, Any]] = []
@@ -146,6 +147,13 @@ def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENER
         for reg_id in f.get("regulation_ids", []):
             cited_regs.append(str(reg_id))
 
+    try:
+        if not as_of_date or date.fromisoformat(as_of_date).isoformat() != as_of_date:
+            raise ValueError
+    except (ValueError, TypeError):
+        errors.append({"finding_id": "REGULATORY_GATE", "error": "Supply assessment date as YYYY-MM-DD."})
+        return {"sector": sector, "as_of_date": as_of_date, "finding_count": len(findings), "valid": False, "errors": errors}
+
     reg_check = check_regulations(sector, cited_regs, as_of_date=as_of_date)
     for rerr in reg_check["errors"]:
         errors.append({"finding_id": "REGULATORY_GATE", "error": rerr["reason"], "gate": rerr["gate"]})
@@ -154,6 +162,7 @@ def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENER
         "sector": sector,
         "as_of_date": as_of_date,
         "finding_count": len(findings),
+        "applicability_warnings": reg_check["warnings"],
         "valid": len(errors) == 0,
         "errors": errors,
     }
@@ -238,6 +247,10 @@ def run_self_test() -> dict[str, Any]:
     ])
     results.append({"probe": "RECALL-4: Rejects findings missing cause/effect/evidence_ref", "passed": not f_incomplete["valid"]})
 
+    for missing in (None, "2026-02-30"):
+        result = validate_audit_findings([], as_of_date=missing)
+        results.append({"probe": f"Reject missing or invalid assessment date {missing}", "passed": not result["valid"]})
+
     # Precision-4: Unauthorized ISO certification overclaim in SoA blocked
     soa_overclaim = validate_iso27001_soa({
         "management_clauses_covered": ["4", "5", "6", "7", "8", "9", "10"],
@@ -262,6 +275,7 @@ def main() -> int:
     parser.add_argument("--assess-cobit", default=None)
     parser.add_argument("--validate-soa", default=None)
     parser.add_argument("--validate-findings", default=None)
+    parser.add_argument("--as-of-date", help="Assessment date (YYYY-MM-DD) for regulatory applicability")
     parser.add_argument("--sector", default="GENERAL_ENTERPRISE")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -281,7 +295,7 @@ def main() -> int:
         return 0 if res["valid"] else 1
     if args.validate_findings:
         payload = json.loads(Path(args.validate_findings).read_text(encoding="utf-8"))
-        res = validate_audit_findings(payload if isinstance(payload, list) else payload.get("findings", []), sector=args.sector)
+        res = validate_audit_findings(payload if isinstance(payload, list) else payload.get("findings", []), sector=args.sector, as_of_date=args.as_of_date or (payload.get("as_of_date") if isinstance(payload, dict) else None))
         print(json.dumps(res, indent=2))
         return 0 if res["valid"] else 1
 

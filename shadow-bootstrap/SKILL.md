@@ -1,52 +1,14 @@
 ---
 name: shadow-bootstrap
-description: "Greenfield Project Scaffolder. Use when initializing or scaffolding a new project repository from zero (TypeScript/lint, env validation, DB/ORM, Docker dev, CI, seed). Do NOT use on existing brownfield codebases."
+description: "Greenfield Project Scaffolder. Use when initializing a CLI, static site, worker, service or library in a new target using the chosen stack and verified generator."
 ---
 
-# Shadow Bootstrap (`/shadow-bootstrap`) — Project Foundation & Zero-to-Runnable Scaffold
+# Shadow Bootstrap — first runnable product slice
 
-Use this skill **after** architectural decisions (`/shadow-architect`) are confirmed to initialize a clean, reproducible project foundation from scratch. Never pick a tech stack arbitrarily — follow the approved ADR or the **Monarch**'s stack instruction.
+Read the requested deliverable, runtime, platform and team constraints. In a monorepo inspect workspace manifests, sibling projects, package manager, SDKs, generator presets and CI at the parent before deciding whether the target is new. An explicit choice of stack or output settles that decision. If the product type or an architectural choice is still material and unresolved, use the host question tool before generating files.
 
----
-
-## 1. The 8 Mandatory Bootstrap Pillars + Official CLI Generator First (`Pillar 0`)
-
-- **Pillar 0 — Official-First Generator & Token Conservation (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Before writing starter config or boilerplate from scratch, inspect existing repo files/SDKs and check `/context7` for the chosen framework's official non-interactive CLI generator (e.g., `npm create vite@latest`, `npx create-next-app`, `@angular/cli`, `create-vue`, `@nestjs/cli`, `composer create-project`) so output tokens are never wasted hand-authoring boilerplate. Pin resolved approved versions in regulated/production environments, inspect new dependencies non-destructively (`npm view ...`) before install, emit the 8-field Decision Record, and verify via `shadow-monarch/scripts/official_first_verifier.py`.
-
-When scaffolding a new repository (Monorepo or Single-Service), `/shadow-bootstrap` MUST set up and verify all 8 pillars:
-
-### 1. Repository & Directory Structure
-- Clean separation of concerns:
-  - **Backend**: `src/config/`, `src/modules/<domain>/{controller,service,repository,dto,entities}`, `src/common/{middleware,errors,guards,logger}`, `tests/`.
-  - **Frontend**: `src/app/` (or `pages/`), `src/components/ui/`, `src/features/<domain>/`, `src/lib/`, `src/types/`.
-  - **Documentation & Specs**: `docs/{adr,api,db,uat,handover}/`, `openapi.yaml`, and an API client collection only in the format the Monarch/project uses (Bruno `bruno/` or Postman).
-- Standard `.gitignore`, `.gitattributes` (enforcing LF line endings for scripts), and `.editorconfig`.
-
-### 2. Strict Compiler, Linter & Formatter Configuration
-- **TypeScript**: `tsconfig.json` with `"strict": true`, `"noImplicitAny": true`, `"noUncheckedIndexedAccess": true`, `"exactOptionalPropertyTypes": true`, and clean path aliases (`@/*`).
-- **Python**: `pyproject.toml` with `ruff` + `mypy --strict` / `pyright`.
-- **Go**: `.golangci.yml` with `govet`, `errcheck`, `staticcheck`.
-- **PHP/Laravel**: `pint.json` + `phpstan.neon` (Larastan level 6+).
-
-### 3. Fail-Fast Startup Environment Validation
-- Create `src/config/env.ts` (or `config.py` / `config.go`) that validates all required environment variables at process boot using a schema validator (`zod`, `pydantic-settings`, etc.) and fails fast with a clear human-readable error if any variable is missing or malformed.
-- Create a complete, well-commented `.env.example` (never commit real secrets in `.env`).
-
-### 4. Standard Error Envelope, Structured Logger & Health Probes
-- Global error handler returning a deterministic JSON error envelope (`statusCode`, `errorCode`, `message`, `details`, `requestId`).
-- Correlation `X-Request-Id` middleware + structured JSON logger (`pino` / `structlog` / `zap`).
-- Built-in `/healthz` (liveness: process up) and `/readyz` (readiness: DB + Redis ping) endpoints.
-
-### 5. Database, ORM, Migration & Deterministic Seed Setup
-- Configure the chosen ORM/query builder (`Prisma`, `Drizzle`, `TypeORM`, `SQLAlchemy`/`Alembic`, `GORM`/`sqlc`, `Eloquent`).
-- Create the initial migration and an idempotent `seed` script (`npm run db:seed`) so a fresh developer machine gets working reference data immediately.
-
-### 6. Local Development `docker-compose.dev.yml`
-- Provide a one-command local infrastructure file (`docker compose -f docker-compose.dev.yml up -d`) spinning up local PostgreSQL/MySQL, Redis, Mailpit (local SMTP testing UI), and MinIO (if object storage is needed) with healthchecks and named volumes.
-
-### 7. Testing Framework & Initial Smoke Spec
-- Wire up the test runner (`Vitest`/`Jest`, `Pytest`, `Go test`, `Pest`) with a passing initial test (`GET /healthz -> 200 OK`) so `npm test` / `pytest` works out of the box from commit #1.
-
-### 8. Developer `README.md` & Fresh-Clone Verification
-- Write a crisp `README.md` covering Prerequisites, 5-step Quick Start (`cp .env.example .env`, `docker compose up -d`, `npm install`, `npm run db:migrate && npm run db:seed`, `npm run dev`), and available scripts.
-- **Verification Gate**: Execute install, typecheck, lint, build, and the healthcheck test before declaring bootstrap complete.
+1. **Preview.** From this skill directory run `python scripts/preview_scaffold.py TARGET --profile cli` (choices: cli, static, worker, http, library). Add one `--capability` for each requirement established by the brief or repository. The command reads target names and prints deliverables. A nonempty destination returns REVIEW_EXISTING. Inspect its contents and provenance; handle a requested addition through the owning project's conventions. On a retry after a partial generator run, preserve all existing work, compare against the preview and resume only attributable missing steps.
+2. **Select the generator.** Inspect official version-specific documentation, package identity and compatibility, and local trusted alternatives. Use the existing [official-first policy](../shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md) and [decision verifier](../shadow-monarch/scripts/official_first_verifier.py). Preview records product capabilities. Also capture exact generator version, arguments, package manager, expected files and installation side effects before invoking it. Check target again immediately before execution; isolate into a new sibling staging directory when a generator can overwrite or install implicitly. Adopt the result only after inspecting its diff against the current destination.
+3. **Build one vertical slice.** An offline CLI needs a command, documented input/exit status and one executable example. A static site needs a page and reproducible build. A worker needs one job, failure semantics and a duplicate-delivery test. An HTTP service needs one request/response contract and its matching smoke test. A library needs one importable export exercised by a consumer. Use idiomatic compiler, lint and test settings available for the chosen language.
+4. **Add conditional infrastructure.** Persistence calls for an established migration path, isolated test data and replay verification. A queue needs acknowledgment and retry ownership; a cache needs invalidation and isolation. Add a health endpoint only when the service/runtime can serve it and a consumer requires it. A DB dependency may affect readiness; an independent optional cache outage need not make a healthy service unavailable. Create Compose, client collections, OpenAPI, cloud CI or telemetry only when selected or established. Send an unsettled docs choice to shadow-api before writing a persistent spec.
+5. **Verify and hand off.** Run the selected build, test and smoke commands from a clean working directory. Compare actual created and modified paths to the preview; document prerequisites and unresolved side effects. On a failure, record last successful action and proposed retry. Shared infrastructure, remote publication and cleanup of user files require separate authority.

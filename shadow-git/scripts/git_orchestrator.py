@@ -59,7 +59,7 @@ def run_git(
         encoding="utf-8",
         errors="replace",
     )
-    out = redact_secrets(proc.stdout.strip())
+    out = redact_secrets(proc.stdout.rstrip("\r\n"))
     err = redact_secrets(proc.stderr.strip())
     if check and proc.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed (code {proc.returncode}): {err or out}")
@@ -165,7 +165,7 @@ def inspect_worktree_status(wt_path: Path) -> dict[str, Any]:
     if not wt_path.exists():
         return {"exists": False, "dirty": False, "staged": 0, "unstaged": 0, "untracked": 0, "conflicted": 0, "modified_files": []}
 
-    _, status_out, _ = run_git(wt_path, ["status", "--porcelain"])
+    _, status_out, _ = run_git(wt_path, ["status", "--porcelain"], check=True)
     staged = 0
     unstaged = 0
     untracked = 0
@@ -462,7 +462,14 @@ def predict_conflicts_and_risks(
     Predict both Git-level merge conflicts (via git merge-tree --write-tree)
     AND semantic integration risks (migrations, API specs, shared config, lockfiles) (FR-06).
     """
-    code, mt_out, mt_err = run_git(repo_dir, ["merge-tree", "--write-tree", target_ref, source_ref])
+    refs = []
+    for ref in (source_ref, target_ref):
+        status, sha, _ = run_git(repo_dir, ["rev-parse", "--verify", "--end-of-options", ref + "^{commit}"])
+        if status:
+            raise ValueError(f"Could not resolve commit for {ref!r}")
+        refs.append(sha.strip())
+    source_sha, target_sha = refs
+    code, mt_out, mt_err = run_git(repo_dir, ["merge-tree", "--write-tree", target_sha, source_sha])
     has_git_conflict = code != 0
     combined_mt = f"{mt_out}\n{mt_err}"
 
@@ -480,14 +487,14 @@ def predict_conflicts_and_risks(
             mode_conflicts.append(line.strip())
 
     # Inspect files changed on both sides since merge-base for semantic risks
-    _, mb_out, _ = run_git(repo_dir, ["merge-base", target_ref, source_ref])
+    _, mb_out, _ = run_git(repo_dir, ["merge-base", target_sha, source_sha])
     merge_base = mb_out.strip()
 
     target_changed: set[str] = set()
     source_changed: set[str] = set()
     if merge_base:
-        _, t_diff, _ = run_git(repo_dir, ["diff", "--name-only", f"{merge_base}..{target_ref}"])
-        _, s_diff, _ = run_git(repo_dir, ["diff", "--name-only", f"{merge_base}..{source_ref}"])
+        _, t_diff, _ = run_git(repo_dir, ["diff", "--name-only", f"{merge_base}..{target_sha}"])
+        _, s_diff, _ = run_git(repo_dir, ["diff", "--name-only", f"{merge_base}..{source_sha}"])
         target_changed = {f.strip() for f in t_diff.splitlines() if f.strip()}
         source_changed = {f.strip() for f in s_diff.splitlines() if f.strip()}
 
@@ -495,7 +502,7 @@ def predict_conflicts_and_risks(
     both_touched = target_changed & source_changed
 
     # Detect file mode changes explicitly
-    _, mode_diff, _ = run_git(repo_dir, ["diff", "--summary", f"{target_ref}...{source_ref}"])
+    _, mode_diff, _ = run_git(repo_dir, ["diff", "--summary", f"{target_sha}...{source_sha}"])
     for mline in mode_diff.splitlines():
         if "mode change" in mline:
             mode_conflicts.append(mline.strip())
@@ -561,10 +568,12 @@ def predict_conflicts_and_risks(
             "recommendation": "Never hand-edit lockfile conflict markers; merge manifest file first and regenerate lockfile via package manager.",
         })
 
-    ahead, behind = get_ahead_behind(repo_dir, source_ref, target_ref)
+    ahead, behind = get_ahead_behind(repo_dir, source_sha, target_sha)
     return {
         "source_ref": source_ref,
         "target_ref": target_ref,
+        "source_sha": source_sha,
+        "target_sha": target_sha,
         "merge_base": merge_base,
         "divergent_history": ahead > 0 and behind > 0,
         "source_ahead_of_target": ahead,
@@ -578,7 +587,7 @@ def predict_conflicts_and_risks(
         "both_modified_files": sorted(list(both_touched)),
         "has_semantic_risks": len(semantic_risks) > 0,
         "semantic_risks": semantic_risks,
-        "safe_to_merge_automatically": (not has_git_conflict) and ahead > 0,
+        "safe_to_merge_automatically": (not has_git_conflict) and not semantic_risks and ahead > 0,
     }
 
 

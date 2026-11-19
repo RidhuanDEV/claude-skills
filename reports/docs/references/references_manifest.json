@@ -1,0 +1,177 @@
+{
+  "references": [
+    {
+      "title": "Agent Skills specification",
+      "doi_or_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/specification.mdx",
+      "venue": "Agent Skills official documentation",
+      "year": "Git revision 83021e2 (snapshot 2026-11-18)",
+      "source_type": "OFFICIAL_DOCS",
+      "peer_reviewed": false,
+      "citation_badge": "[OFFICIAL_DOCS]",
+      "download_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/specification.mdx",
+      "verified_at": "2026-11-18T10:04:57Z",
+      "safety": {
+        "file": "agent-skills-specification.md",
+        "filename": "agent-skills-specification.md",
+        "size_bytes": 7166,
+        "sha256": "b9079c0c10b7930e8c6a20ff2bc10cda2a3343c55185120e3f1116a1a529b220",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      }
+    },
+    {
+      "title": "Evaluating skill output quality",
+      "doi_or_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/skill-creation/evaluating-skills.mdx",
+      "venue": "Agent Skills official documentation",
+      "year": "Git revision 83021e2 (snapshot 2026-11-18)",
+      "source_type": "OFFICIAL_DOCS",
+      "peer_reviewed": false,
+      "citation_badge": "[OFFICIAL_DOCS]",
+      "download_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/skill-creation/evaluating-skills.mdx",
+      "verified_at": "2026-11-18T10:04:58Z",
+      "safety": {
+        "file": "evaluating-skills.md",
+        "filename": "evaluating-skills.md",
+        "size_bytes": 16755,
+        "sha256": "20e53ee9085966bb25345fc4c431bcf24f1f1b410b687605dc870c76f8579a49",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      }
+    },
+    {
+      "title": "License for Agent Skills documentation",
+      "doi_or_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/LICENSE",
+      "venue": "Agent Skills",
+      "year": "83021e2",
+      "source_type": "LICENSE",
+      "peer_reviewed": false,
+      "citation_badge": "[LICENSE]",
+      "download_url": "https://raw.githubusercontent.com/agentskills/agentskills/83021e2be457a9b6679148719c1f6074f0ad975e/docs/LICENSE",
+      "verified_at": "2026-11-18T10:05:28Z",
+      "safety": {
+        "file": "agent-skills-LICENSE.txt",
+        "filename": "agent-skills-LICENSE.txt",
+        "size_bytes": 18656,
+        "sha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      }
+    },
+    {
+      "title": "HTTP Caching",
+      "doi_or_url": "RFC 9111",
+      "venue": "IETF",
+      "year": "2022",
+      "source_type": "STANDARD",
+      "peer_reviewed": false,
+      "citation_badge": "[STANDARD]",
+      "download_url": "https://www.rfc-editor.org/rfc/rfc9111.txt",
+      "verified_at": "2026-11-18T10:22:09Z",
+      "safety": {
+        "file": "rfc9111.txt",
+        "filename": "rfc9111.txt",
+        "size_bytes": 84477,
+        "sha256": "aeb52adb3279d5f23dae34f68af11bd5cef0a0aff7ffcd014c9ca93c5302cf3e",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      },
+      "review_context": "IETF standards-track review"
+    },
+    {
+      "title": "Secure Software Development Framework v1.1",
+      "doi_or_url": "10.6028/NIST.SP.800-218",
+      "venue": "NIST",
+      "year": "2022",
+      "source_type": "OFFICIAL_DOCS",
+      "peer_reviewed": false,
+      "citation_badge": "[OFFICIAL_DOCS]",
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf",
+      "verified_at": "2026-11-18T10:22:11Z",
+      "safety": {
+        "file": "nist-sp800-218.pdf",
+        "filename": "nist-sp800-218.pdf",
+        "size_bytes": 739891,
+        "sha256": "617746e553a9e2da49bfbd4eef0dfc3094758a39b869314e4173ac36605cde22",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      },
+      "review_context": "Publisher guidance or license; no journal peer-review claim"
+    },
+    {
+      "title": "SLSA Build verifying artifacts",
+      "doi_or_url": "https://raw.githubusercontent.com/slsa-framework/slsa/19e4e2f005f871270c4f555fc47afecfb37f3efe/docs/spec/v1.2/verifying-artifacts.md",
+      "venue": "OpenSSF",
+      "year": "v1.2",
+      "source_type": "STANDARD",
+      "peer_reviewed": false,
+      "citation_badge": "[STANDARD]",
+      "download_url": "https://raw.githubusercontent.com/slsa-framework/slsa/19e4e2f005f871270c4f555fc47afecfb37f3efe/docs/spec/v1.2/verifying-artifacts.md",
+      "verified_at": "2026-11-18T10:22:35Z",
+      "safety": {
+        "file": "slsa-v1.2-verifying.md",
+        "filename": "slsa-v1.2-verifying.md",
+        "size_bytes": 15053,
+        "sha256": "acdfe8f67f1f6ebc66094304491dde776fde01e9f5c14568e1f71e199de2c263",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      },
+      "review_context": "Project-approved specification"
+    },
+    {
+      "title": "Involving Users in Evaluating Web Accessibility",
+      "doi_or_url": "https://raw.githubusercontent.com/w3c/wai-website/3f29100497312b12f85d34d6da1eedf03e8ef123/pages/test-evaluate/involving-users/index.md",
+      "venue": "W3C",
+      "year": "3f29100497312b12f85d34d6da1eedf03e8ef123",
+      "source_type": "OFFICIAL_DOCS",
+      "peer_reviewed": false,
+      "citation_badge": "[OFFICIAL_DOCS]",
+      "download_url": "https://raw.githubusercontent.com/w3c/wai-website/3f29100497312b12f85d34d6da1eedf03e8ef123/pages/test-evaluate/involving-users/index.md",
+      "verified_at": "2026-11-18T10:22:50Z",
+      "safety": {
+        "file": "wai-involving-users.md",
+        "filename": "wai-involving-users.md",
+        "size_bytes": 19070,
+        "sha256": "46758cd84022da9c5043b333b70e7b935415f6553e5482a9f760a6c81cb4e1aa",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      },
+      "review_context": "Publisher guidance or license; no journal peer-review claim"
+    },
+    {
+      "title": "SLSA documentation license",
+      "doi_or_url": "https://raw.githubusercontent.com/slsa-framework/slsa/19e4e2f005f871270c4f555fc47afecfb37f3efe/LICENSE.md",
+      "venue": "OpenSSF",
+      "year": "v1.2",
+      "source_type": "LICENSE",
+      "peer_reviewed": false,
+      "citation_badge": "[LICENSE]",
+      "download_url": "https://raw.githubusercontent.com/slsa-framework/slsa/19e4e2f005f871270c4f555fc47afecfb37f3efe/LICENSE.md",
+      "verified_at": "2026-11-18T10:22:51Z",
+      "safety": {
+        "file": "slsa-license.md",
+        "filename": "slsa-license.md",
+        "size_bytes": 16129,
+        "sha256": "f40b1d00369c21b963293189b4617b5de439a11858541c07c620984634fb63b7",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      },
+      "review_context": "Publisher guidance or license; no journal peer-review claim"
+    }
+  ]
+}

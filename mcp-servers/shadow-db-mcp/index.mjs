@@ -865,6 +865,10 @@ async function handleGenerateCrossDbEtlAndWarehouse(args) {
   })
   const schema = await introspectSchema(srcDsn)
   const targetEngine = args.targetEngine
+  if (!schema.tables.length) throw new Error('No source tables found for ETL design')
+  if (!['postgres', 'mysql', 'mssql', 'bigquery', 'clickhouse'].includes(targetEngine)) {
+    throw new Error('Unsupported ETL target engine')
+  }
 
   const ddlLines = [
     `-- Target DDL translated from ${schema.engine.toUpperCase()} to ${targetEngine.toUpperCase()}`,
@@ -973,10 +977,7 @@ async function handleGenerateCrossDbEtlAndWarehouse(args) {
   const pentahoKjbPath = path.join(outDir, `05_pentaho_master_job.kjb`)
   const cronAirflowPath = path.join(outDir, `06_cron_and_airflow_orchestrator.py`)
 
-  const primaryTable = schema.tables[0] || {
-    name: 'sample_table',
-    columns: [{ name: 'id', type: 'integer', primaryKey: true }],
-  }
+  const primaryTable = schema.tables[0]
   const pkCol = (primaryTable.columns.find((c) => c.primaryKey) || primaryTable.columns[0] || { name: 'id' }).name
   const wmCol = (
     primaryTable.columns.find((c) => /updated_at|modified_at|created_at|timestamp/i.test(c.name)) || {
@@ -1143,6 +1144,23 @@ if __name__ == "__main__":
 
   return {
     status: 'generated',
+    verification: {
+      sourceIntrospection: 'PASS',
+      fileGeneration: 'PASS',
+      targetSyntax: 'NOT_RUN',
+      targetExecution: 'NOT_RUN',
+      checkpointRecovery: 'NOT_RUN',
+      reconciliation: 'NOT_RUN',
+    },
+    transformationTable: primaryTable.name,
+    reviewRequired: {
+      typeMappings: schema.tables.flatMap(t => t.columns.map(c => ({
+        table: t.name, column: c.name, source: c.type, target: mapTypeToTargetEngine(c.type, targetEngine),
+      }))),
+      compositeKeys: schema.tables.filter(t => t.columns.filter(c => c.primaryKey).length > 1).map(t => t.name),
+      missingKeys: schema.tables.filter(t => !t.columns.some(c => c.primaryKey)).map(t => t.name),
+      foreignKeysOmittedFromTargetDdl: schema.foreignKeys.length,
+    },
     sourceEngine: schema.engine,
     targetEngine,
     totalTablesProcessed: schema.totalTables,

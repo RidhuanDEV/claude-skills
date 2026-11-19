@@ -8,9 +8,9 @@ description: "Fetch real-time, version-accurate official documentation and code 
 Use this skill whenever the **Monarch** invokes `/context7` or when verifying latest framework/library syntax (Next.js, React, Tailwind CSS, NestJS, Prisma, Go, FastAPI, etc.).
 This skill connects directly to the **`context7` MCP server** (`resolve-library-id`, `query-docs`).
 
-## Workflow
+## Version-matched workflow
 
-1. Call `resolve-library-id` on the `context7` MCP server with the library/package name and query to get the exact Context7-compatible library ID.
-2. Call `query-docs` with that `libraryId` and the specific technical question or API symbol to retrieve current official documentation and code examples.
-3. Apply the verified official syntax directly to the **Monarch's** codebase without guessing from outdated training weights.
-4. **Official-First Project Initialization (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Always check `/context7` for the chosen framework's current official CLI generator command, supported runtime versions, and authentic SDK exports before scaffolding or adopting new packages.
+1. Identify the workspace owning the import, its resolved lockfile or installed package metadata, the symbol, and runtime. A manifest range alone leaves the exact version unresolved. For local forks inspect the fork's exports, declarations and tests.
+2. Resolve the maintainer's library ID and query the version matching the consumer. Record publisher, version or tagged revision, symbol and source URL. For a migration, compare old and target contracts and the migration guide.
+3. Reproduce the call using the existing typecheck or a local fixture. If only another major is documented, restrict claims to what the installed code establishes and seek a tagged source. A question about an old version does not authorize an upgrade.
+4. When the connector is unavailable, use installed docs, exported types or a pinned maintainer source. Mark unresolved runtime behavior. Hand off the evidence, affected caller and repeatable check.

@@ -202,51 +202,93 @@ def check_docker_test_cleanup(file_path: Path, rel_path: str) -> list[dict[str, 
     return violations
 
 
-def inspect_or_cleanup_docker_leaks(cleanup: bool = False) -> dict[str, Any]:
-    """Detect (and optionally remove) leftover stopped ephemeral test/migration/drill containers."""
-    try:
-        proc = subprocess.run(
-            ["docker", "ps", "-a", "--format", "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Label \"shadow.ephemeral\"}}"],
-            capture_output=True,
-            text=True,
-            timeout=8,
-            check=False,
-        )
-        if proc.returncode != 0:
-            return {"docker_available": False, "leaked_containers": [], "cleaned_containers": []}
-    except Exception:
-        return {"docker_available": False, "leaked_containers": [], "cleaned_containers": []}
+DOCKER_INSPECT_FORMAT = (
+    '{"id":{{json .Id}},"name":{{json .Name}},"image":{{json .Config.Image}},'
+    '"status":{{json .State.Status}},"ephemeral":{{json (index .Config.Labels "shadow.ephemeral")}},'
+    '"repo":{{json (index .Config.Labels "shadow.repo")}},"run":{{json (index .Config.Labels "shadow.run")}}}'
+)
 
+
+def docker_command(*args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=8, check=False)
+
+
+def inspect_owned_container(cid: str, repo_label: str, run_id: str) -> dict[str, str] | None:
+    proc = docker_command("container", "inspect", "--format", DOCKER_INSPECT_FORMAT, cid)
+    if proc.returncode:
+        error = proc.stderr.strip().lower().removeprefix("error response from daemon: ").removeprefix("error: ")
+        if error in {f"no such container: {cid}", f"no such object: {cid}"}:
+            return None
+        raise ValueError(f"Cannot inspect container {cid}.")
+    row = json.loads(proc.stdout)
+    if (not isinstance(row, dict) or row.get("id") != cid or row.get("repo") != repo_label
+            or row.get("run") != run_id or row.get("ephemeral") != "true"):
+        raise ValueError(f"Ownership mismatch for container {cid}.")
+    if not all(isinstance(row.get(k), str) and row[k] for k in ("name", "image", "status")):
+        raise ValueError(f"Incomplete inspection of container {cid}.")
+    return {"id": cid, "name": row["name"].lstrip("/"), "image": row["image"], "status": row["status"]}
+
+
+def inspect_or_cleanup_docker_leaks(
+    cleanup: bool = False, *, repo_root: Path | None = None,
+    run_id: str | None = None, ledger_path: Path | None = None,
+) -> dict[str, Any]:
+    """Check resources recorded by the selected job against immutable Docker IDs and labels."""
     leaked: list[dict[str, str]] = []
     cleaned: list[str] = []
-
-    for line in proc.stdout.splitlines():
-        parts = line.split("\t")
-        if len(parts) < 4:
-            continue
-        cid, cname, cimage, cstatus = parts[0].strip(), parts[1].strip(), parts[2].strip(), parts[3].strip()
-        ephemeral_label = parts[4].strip() if len(parts) >= 5 else ""
-
-        if EPHEMERAL_CONTAINER_RE.search(cname) or ephemeral_label.lower() == "true":
-            leaked.append({"id": cid, "name": cname, "image": cimage, "status": cstatus})
-            if cleanup and cstatus.lower().startswith(("exited", "created", "dead")):
-                rm_proc = subprocess.run(
-                    ["docker", "rm", "-v", cid],
-                    capture_output=True,
-                    text=True,
-                    timeout=8,
-                    check=False,
-                )
-                if rm_proc.returncode == 0:
-                    cleaned.append(cname)
-
-    return {
-        "docker_available": True,
-        "leaked_count": len(leaked),
-        "leaked_containers": leaked,
-        "cleaned_count": len(cleaned),
-        "cleaned_containers": cleaned,
-    }
+    report: dict[str, Any] = {"status": "BLOCKED", "docker_available": None, "leaked_count": 0,
+              "leaked_containers": leaked, "cleaned_count": 0, "cleaned_containers": cleaned,
+              "remaining_count": 0, "errors": []}
+    if run_id is None and ledger_path is None and not cleanup:
+        report.update(status="NOT_RUN", reason="No Docker run selected; container ownership was not measured.")
+        return report
+    try:
+        if repo_root is None or ledger_path is None or not run_id or not re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", run_id):
+            raise ValueError("Provide a repository, run ID and trusted ledger for this job.")
+        repo_label = repo_root.resolve(strict=True).as_posix()
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8-sig"))
+        if (not isinstance(ledger, dict) or type(ledger.get("version")) is not int
+                or ledger["version"] != 1 or ledger.get("repo") != repo_label or ledger.get("run_id") != run_id):
+            raise ValueError("Ledger version, canonical repository or run ID mismatch.")
+        ids = ledger.get("container_ids")
+        if not isinstance(ids, list) or not all(isinstance(cid, str) and re.fullmatch(r"[0-9a-f]{64}", cid) for cid in ids):
+            raise ValueError("Ledger must contain a list of full lowercase Docker container IDs.")
+        report["docker_available"] = False
+        proc = docker_command("ps", "-a", "--no-trunc", "--filter", f"label=shadow.repo={repo_label}",
+                              "--filter", f"label=shadow.run={run_id}", "--format", "{{.ID}}")
+        if proc.returncode:
+            raise ValueError("Docker inventory unavailable.")
+        report["docker_available"] = True
+        unregistered = set(proc.stdout.splitlines()) - set(ids)
+        if unregistered:
+            raise ValueError("Run inventory has containers missing from its ledger; reconcile ownership before cleanup.")
+        for cid in sorted(set(ids)):
+            row = inspect_owned_container(cid, repo_label, run_id)
+            if row is not None:
+                leaked.append(row)
+                report["remaining_count"] = len(leaked)
+        remaining = {row["id"] for row in leaked}
+        report["remaining_count"] = len(remaining)
+        if cleanup:
+            for row in leaked:
+                if row["status"] not in {"exited", "dead"}:
+                    continue
+                cid = row["id"]
+                current = inspect_owned_container(cid, repo_label, run_id)
+                if current is None:
+                    remaining.discard(cid)
+                elif current["status"] in {"exited", "dead"}:
+                    # Non-forced removal refuses a container restarted since the final inspection.
+                    if docker_command("rm", cid).returncode:
+                        raise ValueError(f"Removal of {cid} was not confirmed; inspect the same run again.")
+                    cleaned.append(row["name"])
+                    remaining.discard(cid)
+                report["remaining_count"] = len(remaining)
+        report["status"] = "FAIL" if remaining else "PASS"
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        report["errors"].append(str(exc))
+    report.update(leaked_count=len(leaked), cleaned_count=len(cleaned))
+    return report
 
 
 def run_shadow_gate(
@@ -574,7 +616,9 @@ def main() -> int:
     parser.add_argument("--files", "--changed-files", dest="files", nargs="*", default=None, help="Explicit changed files to check")
     parser.add_argument("--probes-verified", action="store_true", help="Confirm Rigor Protocol precision/recall probes were executed")
     parser.add_argument("--check-docker-leaks", action="store_true", help="Check running/stopped Docker containers for leftover test/migration/drill containers")
-    parser.add_argument("--cleanup-docker-leaks", action="store_true", help="Remove stopped/exited ephemeral test/migration/drill Docker containers and their anonymous volumes")
+    parser.add_argument("--cleanup-docker-leaks", action="store_true", help="Remove only ledger-owned terminal containers")
+    parser.add_argument("--docker-run-id", help="Job identifier recorded on the container and in its ledger")
+    parser.add_argument("--docker-ledger", type=Path, help="Trusted provisioning ledger for the selected Docker job")
     parser.add_argument("--install-hook", action="store_true", help="Install git pre-commit hook in target repository")
     parser.add_argument("--self-test", action="store_true", help="Run precision & recall probe suite on shadow_gate.py")
     args = parser.parse_args()
@@ -594,20 +638,31 @@ def main() -> int:
     report = run_shadow_gate(repo_root, changed, probes_verified=args.probes_verified)
 
     if args.check_docker_leaks or args.cleanup_docker_leaks:
-        docker_report = inspect_or_cleanup_docker_leaks(cleanup=args.cleanup_docker_leaks)
+        docker_report = inspect_or_cleanup_docker_leaks(
+            cleanup=args.cleanup_docker_leaks, repo_root=repo_root,
+            run_id=args.docker_run_id, ledger_path=args.docker_ledger)
         report["docker_leaks"] = docker_report
-        remaining = docker_report["leaked_count"] - docker_report["cleaned_count"]
-        if remaining > 0:
+        if docker_report["status"] == "NOT_RUN":
+            report["warnings"].append({
+                "code": "DOCKER_OWNERSHIP_NOT_MEASURED", "severity": "INFO",
+                "message": docker_report["reason"],
+            })
+            report["warnings_count"] += 1
+            if report["recommended_max_readiness"] == "VERIFIED-LOCAL":
+                report["recommended_max_readiness"] = "IMPLEMENTED"
+        elif docker_report["status"] in {"FAIL", "BLOCKED"}:
             report["passed"] = False
             report["recommended_max_readiness"] = "BLOCKED"
             report["blocking_violations_count"] += 1
             report["total_violations_count"] += 1
             report["violations"].append({
                 "severity": "HIGH",
-                "code": "DOCKER_EPHEMERAL_CONTAINER_LEAK",
+                "code": ("DOCKER_EPHEMERAL_CONTAINER_LEAK" if docker_report["status"] == "FAIL"
+                         else "DOCKER_OWNERSHIP_CHECK_BLOCKED"),
                 "file": "docker-daemon",
-                "message": f"{remaining} leftover ephemeral test/migration/drill Docker container(s) detected: {[c['name'] for c in docker_report['leaked_containers']]}",
-                "corrective_action": "Run `python shadow-quality/scripts/shadow_gate.py --cleanup-docker-leaks` or remove with `docker rm -f -v <container>`.",
+                "message": ("; ".join(docker_report["errors"]) or
+                            f"{docker_report['remaining_count']} container(s) remain for the selected run."),
+                "corrective_action": "Verify run ownership and terminal state using the trusted provisioning ledger.",
             })
 
     print(json.dumps(report, indent=2, ensure_ascii=False))

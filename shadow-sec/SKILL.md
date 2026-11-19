@@ -34,7 +34,7 @@ Evaluate affected components against the 6 STRIDE threat categories:
 - **Multi-Hop AuthZ & Attack-Surface Diff Review**: Audit every diff/PR for newly exposed routes, auth middleware bypasses, trust-boundary crossings, and **multi-hop authorization gaps** (e.g., Gateway -> Internal Service -> Batch Query / Indirect IDOR / Confused Deputy across background workers via `/shadow-auth`).
 
 ### Pillar 4: Verifiable OWASP ASVS 5.0 Control Audit (`SAST` Code Inspection)
-Read [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP-ASVS-5.md) and verify:
+Read [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP-ASVS-5.md) and identify the audit's adopted release and level. Resolve each cited requirement against the versioned official control catalog, then record its exact ID, requirement text, affected trust boundary, evidence and observed result. When the mapping is unavailable, report the finding and leave the control mapping unverified. Inspect the applicable areas below.
 - **V1 Architecture & Tenant Isolation**: Zero cross-tenant data leakage (`tenant_id` scoped on all queries).
 - **V2 & V3 AuthN & Session**: Argon2id/bcrypt hashing, `HttpOnly`/`Secure`/`SameSite` cookies, refresh token rotation.
 - **V4 Access Control**: Zero BOLA/IDOR; server-side permission checks on every route.
@@ -44,7 +44,7 @@ Read [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP
 
 ### Pillar 5: Actionable Security Report Format
 Deliver findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with:
-- **ASVS / NIST SSDF Control ID** (e.g., `ASVS V4.2.1 — IDOR`, `NIST PW.8`)
+- **ASVS / NIST SSDF Control ID** with release and catalog locator
 - **Exact Location** (`file:line` or endpoint route)
 - **Exploit Scenario & Business Impact**
 - **Concrete Remediation Patch**

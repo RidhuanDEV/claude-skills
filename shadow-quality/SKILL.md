@@ -40,12 +40,15 @@ Verify strict directional dependencies and architectural fitness checks:
 For brownfield codebases, run the unified deterministic quality, drift & Docker leak gate before completing the task:
 ```powershell
 python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks
-# To automatically clean stopped/exited test/migration/drill containers:
-python "shadow-quality/scripts/shadow_gate.py" --repo . --cleanup-docker-leaks
+# For a job with a trusted provisioning ledger, preview the owned containers:
+python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks --docker-run-id $jobId --docker-ledger $ledger
+# With explicit cleanup authorization, repeat with --cleanup-docker-leaks in place of --check-docker-leaks.
 # Or run convention drift standalone:
 python "shadow-quality/scripts/codebase_intelligence.py" audit-drift --repo-dir . [--changed-files ...]
 ```
-Verify zero unapproved drift or test-container leaks across the following violation categories:
+A bare check reports Docker as NOT_RUN. For a measured container check, the provisioning job records a version-1 JSON ledger with `repo` (canonical absolute repo path using forward slashes), `run_id`, and `container_ids` (full IDs). Label provisioned containers with `shadow.repo`, `shadow.run` and `shadow.ephemeral=true`. Protect the ledger from untrusted repo inputs. Preview uses IDs plus labels; cleanup rechecks identity and terminal state. Keep volumes and images under the provisioning job's separate lifecycle. A missing ledger cannot establish zero leaks.
+
+Review the following violation categories:
 - `DOCKER_TEST_MISSING_CLEANUP` / `DOCKER_TEST_IMAGE_MISSING_CLEANUP` / `DOCKER_EPHEMERAL_CONTAINER_LEAK`: Test, migration-verification, or restore-drill scripts running `docker run` without `--rm` + `docker rm -f -v`, running `docker compose up` without `down -v --rmi local --remove-orphans`, building temporary test images without removing them, or leaving exited `*-test-*` / `*-migration-verification*` containers in Docker.
 - `UNEXPECTED_ARCHITECTURAL_LAYER`: Unsolicited new folder/layer (e.g. `domain/` or `usecases/` in simple MVC apps).
 - `MODULE_SYSTEM_DRIFT`: CommonJS `require` vs ESM `import` mismatch with package convention.

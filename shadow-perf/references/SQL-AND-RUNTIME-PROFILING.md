@@ -1,30 +1,16 @@
-# SQL-AND-RUNTIME-PROFILING — Pre-UAT Bottleneck Diagnosis
+# Database and runtime profiling for a suspected bottleneck
 
----
+Start from one degraded journey, one healthy control and an aligned time window. Record arrival/completion rate, sampled request timing, pool wait time, query fingerprint and service revision. Use existing traces and read-only plans before requesting new experiments. Redact data values, tokens and query arguments from shared evidence.
 
-## 1. Database Query Profiling (`EXPLAIN ANALYZE`) via `shadow_db` MCP
+| Observation | Plausible explanations | Discriminating evidence and decision |
+| --- | --- | --- |
+| Sequential scan / MySQL ALL | Small relation, low-selectivity predicate, stale statistics, missing or unusable index | Compare actual row distribution, selected fraction and projected columns. A broad scan may be cheaper than many random lookups. On a representative isolated copy, compare latency, I/O and write cost before proposing an index. |
+| Large estimated vs actual row count | Skewed tenant distribution, correlated filters, recently changed data or stale stats | Inspect distribution by tenant and query parameter, plan choice and stats freshness. Compare small and large tenant fixtures before recommending statistics or index changes. |
+| Sort spills to disk | Large working set, wide projection, insufficient memory or missing ordering support | Gather sort size and concurrency. Giving each worker more memory can exhaust the host under shared load. Compare a smaller projection and a suitable index under the same dataset. |
+| Repeated inner-loop work | Valid nested loop for small outer row count, inefficient join, missing lookup index or application N+1 | Separate SQL plan loops from ORM round trips. Count SQL requests per business operation and compare batch, join or eager strategies with the same semantics and memory budget. |
+| Pool timeouts while DB CPU is low | Locks, long transactions, slow network, undersized pool or leaked connections | Correlate acquisition/release, lock wait, query duration and total connections across replicas. Raising per-instance pools can push queueing to the DB. Prefer a controlled comparison under the actual connection budget. |
+| Slow export or deep pagination | Connection held across slow client reads, repeated offset scans, materialization or serialization overhead | Examine rows/bytes, order stability and concurrency with inserts. Consider streaming, async jobs, keyset pagination or keeping existing semantics according to client contract. |
 
-Before UAT sign-off, inspect the top 5–10 queries executed by dashboards, reports, and list endpoints.
+PostgreSQL EXPLAIN ANALYZE executes the statement, including side effects. Inspect static plans first. Restrict new measurements to an approved target and query, use read-only roles and bounded duration where appropriate, and account for locks and side effects that rollback cannot undo. Use vendor/version-specific plans for MySQL and other engines. Schema/index changes require a separate reversible change plan with owner and regression evidence.
 
-### A. PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)` Red Flags
-| Symptom in `EXPLAIN` Output | Root Cause | Concrete Fix |
-| :--- | :--- | :--- |
-| `Seq Scan on orders (cost=... rows=...)` with high `Rows Removed by Filter` | Missing index on `WHERE` / `JOIN` columns | Create composite B-Tree index matching equality columns first, then range/sort column: `CREATE INDEX CONCURRENTLY idx_orders_tenant_status_created ON orders (tenant_id, status, created_at DESC);` |
-| `Sort Method: external merge Disk: 24500kB` | Sort exceeds `work_mem` and spills to disk | Add index matching `ORDER BY ... LIMIT` or increase session `work_mem`. |
-| `Nested Loop` with `loops=5000` | N+1 or unindexed foreign key on inner table | Add index on foreign key column (`order_items.order_id`) or rewrite as batch query / `JOIN`. |
-| `Filter: (lower(email) = '...')` bypassing index on `email` | Function call on indexed column prevents index usage | Create expression index `CREATE INDEX ON users (lower(email))` or use `citext`. |
-
-### B. MySQL / MariaDB `EXPLAIN FORMAT=JSON` Red Flags
-- `type: ALL` -> Full table scan! Must be `ref`, `eq_ref`, `range`, or `const`.
-- `Using filesort` + `Using temporary` on large pagination queries -> Add composite covering index `(status, created_at, id)` and use keyset/cursor pagination (`WHERE created_at < ?`) instead of `OFFSET 50000`.
-
----
-
-## 2. Backend & Connection Pool Checklist for Pre-UAT
-
-1. **DB Connection Pool Sizing**:
-   - Never leave pool size unbounded or tiny (default `5` in some ORMs). Set pool max to `(CPU cores * 2) + effective_spindle_count` per instance (typically `10–25` per Node/Python worker) and configure a connection timeout (`5000ms`).
-2. **N+1 Query Elimination**:
-   - Check ORM debug logs during a single list request: if fetching 20 items executes 21+ SQL queries, replace lazy loading with eager batch loading (`include` / `select_related` / `prefetch_related` / `With()`).
-3. **Unbounded Export / Report Endpoints**:
-   - Ensure Excel/CSV/PDF export endpoints stream rows in batches or run asynchronously via a background worker if row count exceeds `5,000`.
+For runtime memory, compare a steady workload and post-drain behavior across repeated intervals. Growing heap may be an expanding cache, delayed collection, fixture retention or a leak. Verify with allocation profiles before recommending an eviction policy. For CPU, reconcile event-loop or thread-pool delay with service time and generator pressure. Include timeouts and failed requests in the report so an apparent speedup from rejecting work remains visible.

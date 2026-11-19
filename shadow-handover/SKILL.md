@@ -20,7 +20,7 @@ When preparing a project for final client handover / **BAST (Berita Acara Serah 
 - Formal handover document mapping every contract scope item (KAK/TOR/SPK) to its verified deliverable artifact, UAT sign-off reference (`/shadow-uat`), and repository/archive location.
 
 ### 2. Source Code & Technical Asset Inventory
-- Clean repository state (`git status` clean, release tag `v1.0.0` created, zero dead files or temporary debug scripts).
+- Identify the contracted release by immutable commit and artifact digest. Record agreed scope, warranty owner, sender, recipient, acceptance criteria and exceptions per item. A missing signature, mismatched digest or inaccessible vault item leaves that item pending. Ask the receiving operator to demonstrate restore from the supplied runbook and record the outcome. Creating tags requires release authorization.
 - Complete inventory table of:
   - Source code repositories (Frontend, Backend, Mobile, ETL/Warehouse scripts, Infrastructure/Docker configs).
   - Database schema (`schema.dbml`, `ERD.md`, migration files, and reference seed scripts from `/shadow-db` & `/shadow-data`).
@@ -55,3 +55,5 @@ Task-oriented guide grouped by **User Role** (`Operator`, `Verifikator`, `Pimpin
 
 - Never embed custom `.docx`/`.pdf`/`.html` generation scripts inside `/shadow-handover`.
 - Always resolve the repository's existing document generator first via `shadow-doc/scripts/doc_orchestrator.py resolve --repo . --outputs docx,pdf,md`; only fall back to the Global Document Engine (`shadow-doc/scripts/domain_adapters.py::adapt_handover_payload`) when no compatible project generator exists and authorization permits.
+
+For a contracted operator handover with a local release artifact, run `python scripts/check_receipt.py ARTIFACT RECEIPT.json` from this skill directory. Include release, contract_ref, sender, recipient, criteria, warranty_owner, contract_sha256 and references signed_receipt_ref, operator_demo_ref and access_receipt_ref. A reviewer must open the evidence, verify recipient authority and confirm the walkthrough. The helper checks the digest and reference presence only.

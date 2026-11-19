@@ -1,259 +1,186 @@
 #!/usr/bin/env node
-/**
- * Shadow Perf — OpenAPI 3.1 to Grafana k6 Pre-UAT Test Suite Generator
- * Reads openapi.yaml or openapi.json and generates:
- *   - 01-smoke.k6.js
- *   - 02-load-pre-uat.k6.js
- *   - 03-stress-spike.k6.js
- */
-
+/** Compile an explicit OpenAPI journey. Dry runs use supplied fixture responses only. */
 import fs from 'node:fs'
 import path from 'node:path'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 
-function parseEndpointsFromSpecText(rawText, filePath) {
-  const endpoints = []
-  let baseUrl = 'http://localhost:3000'
+const ownFile = fileURLToPath(import.meta.url)
+const methods = new Set(['get', 'head', 'post', 'put', 'patch', 'delete', 'options', 'trace'])
+const profiles = ['01-smoke', '02-load-pre-uat', '03-stress-spike']
+const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
 
-  if (filePath.endsWith('.json')) {
-    const spec = JSON.parse(rawText)
-    if (spec.servers && spec.servers[0] && spec.servers[0].url) {
-      baseUrl = spec.servers[0].url
-    }
-    const pathsObj = spec.paths || {}
-    for (const [routePath, methodsObj] of Object.entries(pathsObj)) {
-      for (const method of ['get', 'post', 'put', 'patch', 'delete']) {
-        if (methodsObj && methodsObj[method]) {
-          endpoints.push({
-            method: method.toUpperCase(),
-            path: routePath,
-            summary: methodsObj[method].summary || `${method.toUpperCase()} ${routePath}`,
-          })
-        }
-      }
-    }
-    return { baseUrl, endpoints }
+function readSpec(file) {
+  const text = fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '')
+  if (file.toLowerCase().endsWith('.json')) return JSON.parse(text)
+  // Resolve existing parsers relative to the service or the source checkout.
+  for (const owner of [file, path.resolve(path.dirname(ownFile), '../../mcp-servers/package.json')]) {
+    const require = createRequire(owner)
+    let module
+    try { module = require.resolve('yaml') } catch { continue }
+    return require(module).parse(text)
   }
-
-  // Lightweight YAML parser for servers & paths block
-  const lines = rawText.split(/\r?\n/)
-  let inPaths = false
-  let currentPath = null
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const srvMatch = line.match(/^\s*-\s*url:\s*["']?([^"'\s#]+)["']?/)
-    if (srvMatch && baseUrl === 'http://localhost:3000') {
-      baseUrl = srvMatch[1]
-    }
-    if (/^paths:\s*$/.test(line)) {
-      inPaths = true
-      continue
-    }
-    if (inPaths && /^[a-zA-Z0-9_-]+:\s*$/.test(line)) {
-      inPaths = false
-      currentPath = null
-      continue
-    }
-    if (inPaths) {
-      const pathMatch = line.match(/^\s{2}(\/[^\s:]+):\s*$/)
-      if (pathMatch) {
-        currentPath = pathMatch[1]
-        continue
-      }
-      const methodMatch = line.match(/^\s{4}(get|post|put|patch|delete):\s*$/i)
-      if (methodMatch && currentPath) {
-        const m = methodMatch[1].toUpperCase()
-        let summary = `${m} ${currentPath}`
-        for (let j = i + 1; j < Math.min(i + 8, lines.length); j++) {
-          const sumMatch = lines[j].match(/^\s{6}summary:\s*["']?(.+?)["']?\s*$/)
-          if (sumMatch) {
-            summary = sumMatch[1]
-            break
-          }
-        }
-        endpoints.push({ method: m, path: currentPath, summary })
-      }
-    }
-  }
-  return { baseUrl, endpoints }
+  throw Error('YAML parser unavailable. Supply the project-generated OpenAPI JSON or use the repository dependency.')
 }
 
-function buildK6Script({ profileName, stagesJson, baseUrl, endpoints }) {
-  const getEndpoints = endpoints.filter((e) => e.method === 'GET')
-  const writeEndpoints = endpoints.filter((e) => e.method !== 'GET')
-  const sampleGet =
-    getEndpoints.length > 0
-      ? getEndpoints
-      : [{ method: 'GET', path: '/healthz', summary: 'Healthcheck' }]
+function inventory(spec) {
+  if (!/^3\.(0|1)\.\d+$/.test(spec?.openapi) || !record(spec.paths)) throw Error('Expected OpenAPI 3.0/3.1 paths.')
+  const operations = new Map()
+  const unsupported = []
+  for (const [route, item] of Object.entries(spec.paths)) {
+    if (!record(item)) throw Error('Invalid path item: ' + route)
+    if (item.$ref) { unsupported.push(route + ': resolve path item in project first'); continue }
+    for (const [method, op] of Object.entries(item)) {
+      if (!methods.has(method)) continue
+      if (!record(op)) throw Error('Invalid operation: ' + method + ' ' + route)
+      operations.set(method.toUpperCase() + ' ' + route, {route, method, item, op})
+    }
+  }
+  return {operations, unsupported}
+}
 
-  const getCalls = sampleGet
-    .slice(0, 8)
-    .map((e) => {
-      const resolvedPath = e.path.replace(/\{[^}]+\}/g, '1')
-      return `    {
-      const res = http.get(\`\${BASE_URL}${resolvedPath}\`, { headers, tags: { name: '${e.method} ${e.path}' } });
-      check(res, { '${e.method} ${e.path} status < 500': (r) => r.status < 500 });
-    }`
+function compile(spec, operations, journey) {
+  if (!record(journey) || !Array.isArray(journey.steps) || !journey.steps.length) throw Error('Select a nonempty ordered list of steps.')
+  const captured = new Set()
+  return journey.steps.map(step => {
+    if (!record(step) || !operations.has(step.operation)) throw Error('Unknown selected operation: ' + step?.operation)
+    const {route, method, item, op} = operations.get(step.operation)
+    if (!/^\/(?!\/)/.test(route) || /[?#\\\s]/.test(route) || method === 'trace') throw Error('Unsupported target: ' + step.operation)
+    if (!Number.isInteger(step.expect) || step.expect < 200 || step.expect > 299 ||
+        !(Object.hasOwn(op.responses || {}, String(step.expect)) || Object.hasOwn(op.responses || {}, '2XX'))) {
+      throw Error('Select a documented exact success status: ' + step.operation)
+    }
+    const parameters = [...(item.parameters || []), ...(op.parameters || [])]
+    if (parameters.some(p => !record(p) || p.$ref || (p.required && p.in !== 'path'))) {
+      throw Error('Resolve references and implement required query/header/cookie parameters before compiling ' + step.operation)
+    }
+    const security = op.security ?? spec.security ?? []
+    if (!Array.isArray(security) || security.length) throw Error('Authentication requires project-specific setup: ' + step.operation)
+    const bindings = step.path ?? {}
+    if (!record(bindings)) throw Error('Invalid path bindings')
+    const placeholders = [...route.matchAll(/\{([^}]+)\}/g)].map(match => match[1])
+    if (Object.keys(bindings).some(key => !placeholders.includes(key))) throw Error('Unexpected path binding')
+    for (const key of placeholders) {
+      const binding = bindings[key]
+      if (typeof binding !== 'string' || !binding.trim() || (binding.startsWith('$') && !captured.has(binding.slice(1)))) {
+        throw Error('Missing path fixture or earlier capture: ' + key)
+      }
+    }
+    if (op.requestBody?.$ref || (op.requestBody?.required && step.body === undefined)) throw Error('Supply a resolved body fixture: ' + step.operation)
+    if (step.body !== undefined && !op.requestBody?.content?.['application/json']) throw Error('No JSON request body declared: ' + step.operation)
+    if (step.capture !== undefined) {
+      if (!record(step.capture) || !/^[A-Za-z][A-Za-z0-9_]*$/.test(step.capture.name) || captured.has(step.capture.name) ||
+          typeof step.capture.field !== 'string' || !step.capture.field.length) throw Error('Invalid or duplicate capture')
+      captured.add(step.capture.name)
+    }
+    return {method: method.toUpperCase(), route, expect: step.expect, path: bindings, body: step.body, capture: step.capture}
+  })
+}
+
+// Shared by the dry-run adapter and the generated k6 module.
+function runJourney(steps, request) {
+  const captures = Object.create(null)
+  for (const step of steps) {
+    const pathname = step.route.replace(/\{([^}]+)\}/g, (_, key) => {
+      const value = step.path[key]
+      const resolved = String(value.startsWith('$') ? captures[value.slice(1)] : value)
+      if (!resolved || resolved === '.' || resolved === '..') throw Error('Invalid path segment: ' + key)
+      return encodeURIComponent(resolved)
     })
-    .join('\n')
+    const response = request(step.method, pathname, step.body, step.route)
+    if (response.status !== step.expect) throw Error(step.method + ' ' + step.route + ': unexpected HTTP ' + response.status)
+    if (step.capture) {
+      const data = response.json()
+      const value = data && Object.hasOwn(data, step.capture.field) ? data[step.capture.field] : undefined
+      if (!(typeof value === 'string' && value.length) && !Number.isSafeInteger(value)) throw Error('Missing captured value: ' + step.capture.name)
+      captures[step.capture.name] = value
+    }
+  }
+}
 
-  const writeComment =
-    writeEndpoints.length > 0
-      ? `  // Write endpoints detected in OpenAPI (${writeEndpoints.map((w) => `${w.method} ${w.path}`).join(', ')})\n  // Customize payload correlation below before running against Staging/Pre-UAT:`
-      : `  // Add write (POST/PUT) journey checks here if applicable`
+function simulate(steps, fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length !== steps.length) throw Error('One mock exchange per step required.')
+  const observed = []
+  runJourney(steps, (method, pathname, body) => {
+    const sample = fixtures[observed.length]
+    if (sample.method !== method || sample.path !== pathname) throw Error('Mock exchange does not match ' + method + ' ' + pathname)
+    observed.push({method, path: pathname, body})
+    return {status: sample.status, json: () => sample.response}
+  })
+  return observed
+}
 
-  return `// Auto-generated by Shadow Perf (/shadow-perf) — ${profileName}
-// Phase: PRE-UAT / STAGING VERIFICATION ONLY
-import http from 'k6/http';
-import { check, group, sleep } from 'k6';
+function script(steps, profile) {
+  // Templates carry no inherited OpenAPI target, reusable credential or default load schedule.
+  return `import http from 'k6/http'
+import { check, fail } from 'k6'
 
-const BASE_URL = __ENV.BASE_URL || '${baseUrl}';
-const AUTH_TOKEN = __ENV.AUTH_TOKEN || '';
+const steps = ${JSON.stringify(steps)}
+const profile = ${JSON.stringify(profile)}
+export const options = { vus: 1, iterations: 1, maxRedirects: 0, thresholds: { checks: ['rate==1'] } }
 
-export const options = {
-  stages: ${stagesJson},
-  thresholds: {
-    http_req_failed: ['rate<0.01'],              // Error rate must be < 1%
-    http_req_duration: ['p(95)<400', 'p(99)<900'], // p95 < 400ms, p99 < 900ms
-  },
-};
+${runJourney.toString()}
 
 export default function () {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(AUTH_TOKEN ? { Authorization: \`Bearer \${AUTH_TOKEN}\` } : {}),
-  };
-
-  group('Read_Endpoints_Journey', () => {
-${getCalls}
-  });
-
-${writeComment}
-
-  sleep(Math.random() * 1.5 + 0.5);
+  if (!steps.length) fail('Draft: select and dry-run a journey first')
+  const target = __ENV.BASE_URL
+  if (!/^https?:\\/\\/(?:127\\.0\\.0\\.1|localhost|\\[::1\\])(?::[0-9]+)?$/.test(target || '')) fail('Supply an explicit loopback mock origin')
+  if (__ENV.APPROVED_PROFILE !== profile) fail('Select the approved profile and fixture')
+  try {
+    runJourney(steps, (method, route, body, template) => http.request(method, target + route,
+      body === undefined ? null : JSON.stringify(body), {redirects: 0, headers: {'Content-Type':'application/json'}, tags: {name:method + ' ' + template}}))
+    check(true, {'journey satisfied contract': v => v})
+  } catch (error) {
+    check(false, {'journey satisfied contract': v => v})
+    fail(String(error))
+  }
 }
 `
 }
 
-function generateSuite(specPath, outDir) {
-  const raw = fs.readFileSync(specPath, 'utf8')
-  const { baseUrl, endpoints } = parseEndpointsFromSpecText(raw, specPath)
-  fs.mkdirSync(outDir, { recursive: true })
-
-  const smokePath = path.join(outDir, '01-smoke.k6.js')
-  const loadPath = path.join(outDir, '02-load-pre-uat.k6.js')
-  const stressPath = path.join(outDir, '03-stress-spike.k6.js')
-
-  fs.writeFileSync(
-    smokePath,
-    buildK6Script({
-      profileName: '01 Smoke Test (1-3 VUs)',
-      stagesJson: JSON.stringify(
-        [
-          { duration: '30s', target: 3 },
-          { duration: '30s', target: 0 },
-        ],
-        null,
-        2,
-      ),
-      baseUrl,
-      endpoints,
-    }),
-    'utf8',
-  )
-
-  fs.writeFileSync(
-    loadPath,
-    buildK6Script({
-      profileName: '02 Pre-UAT Load Test (50 VUs)',
-      stagesJson: JSON.stringify(
-        [
-          { duration: '1m', target: 20 },
-          { duration: '3m', target: 50 },
-          { duration: '1m', target: 0 },
-        ],
-        null,
-        2,
-      ),
-      baseUrl,
-      endpoints,
-    }),
-    'utf8',
-  )
-
-  fs.writeFileSync(
-    stressPath,
-    buildK6Script({
-      profileName: '03 Pre-UAT Stress & Spike Test (150 VUs)',
-      stagesJson: JSON.stringify(
-        [
-          { duration: '1m', target: 50 },
-          { duration: '2m', target: 150 },
-          { duration: '1m', target: 0 },
-        ],
-        null,
-        2,
-      ),
-      baseUrl,
-      endpoints,
-    }),
-    'utf8',
-  )
-
-  return {
-    status: 'GENERATED',
-    baseUrl,
-    detectedEndpoints: endpoints.length,
-    files: [smokePath, loadPath, stressPath],
+function main(args) {
+  const option = name => {
+    const i = args.indexOf(name)
+    if (i < 0) return undefined
+    if (!args[i + 1] || args[i + 1].startsWith('--')) throw Error('Missing value for ' + name)
+    return args[i + 1]
   }
-}
-
-function runSelftest() {
-  const tmpDir = fs.mkdtempSync(path.join(process.env.TEMP || '/tmp', 'shadow-perf-test-'))
-  const sampleSpec = path.join(tmpDir, 'openapi.yaml')
-  fs.writeFileSync(
-    sampleSpec,
-    [
-      'openapi: 3.1.0',
-      'info:',
-      '  title: Sample API',
-      '  version: 1.0.0',
-      'servers:',
-      '  - url: http://localhost:4000',
-      'paths:',
-      '  /api/v1/orders:',
-      '    get:',
-      '      summary: List orders',
-      '    post:',
-      '      summary: Create order',
-      '  /api/v1/orders/{id}:',
-      '    get:',
-      '      summary: Get order detail',
-    ].join('\n'),
-    'utf8',
-  )
-  const outDir = path.join(tmpDir, 'perf')
-  const res = generateSuite(sampleSpec, outDir)
-  if (res.detectedEndpoints !== 3 || res.files.length !== 3) {
-    throw new Error(`Selftest failed: ${JSON.stringify(res)}`)
+  if (args.includes('--selftest')) {
+    const fixture = {openapi:'3.1.0', paths:{'/sample':{get:{responses:{200:{description:'OK'}}}}}}
+    const steps = compile(fixture, inventory(fixture).operations, {steps:[{operation:'GET /sample',expect:200}]})
+    simulate(steps, [{method:'GET',path:'/sample',status:200}])
+    return {status:'SELFTEST_OK', detectedEndpoints:1}
   }
-  fs.rmSync(tmpDir, { recursive: true, force: true })
-  console.log(JSON.stringify({ status: 'SELFTEST_OK', detectedEndpoints: res.detectedEndpoints }))
+  const input = option('--spec')
+  if (!input) throw Error('Usage: --spec FILE [--journey FILE] [--out DIR | --dry-run] or --selftest')
+  const spec = readSpec(path.resolve(input))
+  const {operations, unsupported} = inventory(spec)
+  const selection = option('--journey')
+  const journey = selection && JSON.parse(fs.readFileSync(selection, 'utf8').replace(/^\uFEFF/, ''))
+  const steps = journey ? compile(spec, operations, journey) : []
+  const result = {status: 'DRAFT', detectedEndpoints: operations.size, operations: [...operations.keys()], unsupported, selected: steps.length, files: []}
+  if (args.includes('--dry-run')) {
+    if (!journey || option('--out')) throw Error('Dry-run needs --journey with mock exchanges and no --out.')
+    return {...result, status:'MOCK_VERIFIED', exchanges:simulate(steps, journey.mock)}
+  }
+  const directory = path.resolve(option('--out') || 'tests/perf')
+  const files = profiles.map(profile => path.join(directory, profile + '.k6.js'))
+  if (files.some(file => fs.existsSync(file))) throw Error('Output exists; choose a new directory or review the existing suite.')
+  if (journey) simulate(steps, journey.mock)
+  fs.mkdirSync(directory, {recursive:true})
+  const created = []
+  try {
+    for (const [i, file] of files.entries()) {
+      const fd = fs.openSync(file, 'wx')
+      created.push(file)
+      try { fs.writeFileSync(fd, script(steps, profiles[i])) } finally { fs.closeSync(fd) }
+    }
+  } catch (error) {
+    for (const file of created) fs.unlinkSync(file)
+    throw error
+  }
+  return {...result, status: steps.length ? 'GENERATED' : 'DRAFT', files}
 }
 
-const args = process.argv.slice(2)
-if (args.includes('--selftest')) {
-  runSelftest()
-  process.exit(0)
-}
-
-const specIdx = args.indexOf('--spec')
-const outIdx = args.indexOf('--out')
-if (specIdx !== -1) {
-  const specFile = path.resolve(args[specIdx + 1])
-  const outFolder = path.resolve(outIdx !== -1 ? args[outIdx + 1] : 'tests/perf')
-  const result = generateSuite(specFile, outFolder)
-  console.log(JSON.stringify(result, null, 2))
-} else {
-  console.log('Usage: node openapi_to_k6_scaffold.mjs --spec <openapi.yaml> [--out <tests/perf>] | --selftest')
-}
+try { console.log(JSON.stringify(main(process.argv.slice(2)), null, 2)) }
+catch (error) { console.error(error.message); process.exitCode = 1 }

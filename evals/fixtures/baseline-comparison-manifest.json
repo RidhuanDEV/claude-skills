@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_id": "shadow-army-baseline-comparison-2026-11-19",
+  "baseline_revision": "bac8745",
+  "environment": {
+    "os": "windows",
+    "python_min": "3.11",
+    "node_min": "20.0.0",
+    "host_parity_mode": "local_deterministic_only",
+    "live_host_runs": {
+      "claude_code": "NOT_RUN",
+      "codex": "NOT_RUN",
+      "gemini_cli": "NOT_RUN",
+      "antigravity": "NOT_RUN"
+    }
+  },
+  "oracle_contract": {
+    "requires_executed_evidence": true,
+    "rejects_empty_evidence_as_verified": true,
+    "distinguishes_text_pattern_from_execution": true
+  },
+  "holdout_governance": {
+    "external_holdout_present": false,
+    "external_holdout_status": "NOT_AVAILABLE_IN_REPO",
+    "rule": "Never claim external holdout validation or cross-host parity until independent holdout artifacts and live host logs are executed and recorded."
+  },
+  "missing_data": [
+    "independent_external_reviewer_holdout_package",
+    "live_host_interactive_transcripts_across_codex_claude_gemini",
+    "live_production_or_staging_db_drills"
+  ]
+}

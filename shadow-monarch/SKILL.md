@@ -328,3 +328,7 @@ important decisions, dead code cleaned up, and verification boundary; link affec
 For reviews give actionable findings with location, impact, severity, and a concrete fix. For design or
 system analysis compare relevant options against the actual constraints. Avoid mandatory templates or
 production checklists that do not help the requested task.
+
+### Review-only pilot routing
+
+An endpoint or search review constrained to reading stays at L0 when the prompt mentions a prohibited load test. Keep explicit restrictions in the decision record and carry them into each delegated action. Inspect fixtures or prior results for evidence; a new execution phase requires an actual change in user intent.

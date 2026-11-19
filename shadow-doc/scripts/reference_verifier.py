@@ -175,23 +175,19 @@ def classify_source_metadata(
     year: str,
     peer_reviewed: bool | None = None,
 ) -> dict[str, Any]:
-    """Normalize source metadata and enforce PREPRINT tagging for arXiv."""
-    lower_id = doi_or_url.lower()
-    lower_venue = venue.lower()
-    is_arxiv = "arxiv.org" in lower_id or "arxiv" in lower_venue or "10.48550/arxiv" in lower_id
-
-    if is_arxiv and not peer_reviewed:
+    """Record publisher metadata; an unspecified peer review status stays unknown."""
+    parsed = urllib.parse.urlparse(doi_or_url)
+    is_arxiv = (parsed.hostname in {"arxiv.org", "www.arxiv.org"}
+                or doi_or_url.lower().startswith("10.48550/arxiv.")
+                or venue.strip().lower() == "arxiv")
+    if is_arxiv and peer_reviewed is not True:
         source_type = "PREPRINT"
-        effective_peer_reviewed = False
-        badge = "[PREPRINT]"
-    elif any(k in lower_venue for k in ("iso", "iec", "ieee std", "nist", "owasp", "ietf", "rfc", "w3c")):
-        source_type = "STANDARD"
-        effective_peer_reviewed = True
-        badge = "[STANDARD]"
+        peer_reviewed = False
+    elif peer_reviewed is True:
+        source_type = "PEER_REVIEWED"
     else:
-        source_type = "PEER_REVIEWED" if (peer_reviewed is not False) else "PREPRINT"
-        effective_peer_reviewed = bool(peer_reviewed is not False)
-        badge = "[PEER-REVIEWED]" if effective_peer_reviewed else "[PREPRINT]"
+        source_type = "UNCLASSIFIED"
+    badge = "[" + source_type.replace("_", "-") + "]"
 
     return {
         "title": title,
@@ -199,7 +195,7 @@ def classify_source_metadata(
         "venue": venue,
         "year": year,
         "source_type": source_type,
-        "peer_reviewed": effective_peer_reviewed,
+        "peer_reviewed": peer_reviewed,
         "citation_badge": badge,
     }
 
@@ -232,30 +228,37 @@ def download_and_verify_reference(
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
         data = resp.read(MAX_FILE_BYTES + 1)
-    target_path.write_bytes(data)
+    if safe_name.lower() in {".", "..", "manifest.tmp", "references_manifest.json"}:
+        raise ValueError("Reserved archive filename.")
+    with tempfile.TemporaryDirectory(dir=dest_dir) as staging:
+        candidate = Path(staging) / safe_name
+        candidate.write_bytes(data)
 
-    safety = verify_file_safety(target_path, quarantine_delete=True)
-    meta = classify_source_metadata(title=title, doi_or_url=doi or url, venue=venue, year=year, peer_reviewed=peer_reviewed)
+        safety = verify_file_safety(candidate, quarantine_delete=True)
+        safety['file'] = str(target_path) if safety['safe'] else safe_name
+        meta = classify_source_metadata(title=title, doi_or_url=doi or url, venue=venue, year=year, peer_reviewed=peer_reviewed)
 
-    record = {
-        **meta,
-        "download_url": url,
-        "verified_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "safety": safety,
-    }
+        record = {
+            **meta,
+            "download_url": url,
+            "verified_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "safety": safety,
+        }
 
-    if safety["safe"]:
-        manifest_path = dest_dir / "references_manifest.json"
-        manifest: dict[str, Any] = {"references": []}
-        if manifest_path.exists():
-            try:
-                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            except Exception:
-                manifest = {"references": []}
-        manifest["references"] = [r for r in manifest.get("references", []) if r.get("safety", {}).get("filename") != safe_name]
-        manifest["references"].append(record)
-        manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        if safety["safe"]:
+            manifest_path = dest_dir / "references_manifest.json"
+            manifest: dict[str, Any] = {"references": []}
+            if manifest_path.exists():
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+                if not isinstance(manifest.get("references"), list):
+                    raise ValueError("Existing manifest has no references list.")
+            manifest["references"] = [r for r in manifest.get("references", []) if r.get("safety", {}).get("filename") != safe_name]
+            manifest["references"].append(record)
+            receipt = Path(staging) / "manifest.tmp"
+            receipt.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
+            candidate.replace(target_path)
+            receipt.replace(manifest_path)
     return record
 
 
@@ -365,6 +368,34 @@ def run_self_test() -> dict[str, Any]:
     }
 
 
+def assess_reference(manifest_path: Path, filename: str, expected_version: str) -> dict:
+    """Check a pinned offline reference for one consumer version, without fetching or modifying it."""
+    if not filename or Path(filename).name != filename or not expected_version.strip():
+        raise ValueError("A plain archive filename and consumer version are required.")
+    data = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+    matches = []
+    for record in data["references"]:
+        artifact = record.get("archive") or record.get("safety") or {}
+        if (artifact.get("filename") or artifact.get("file")) == filename:
+            matches.append((record, artifact))
+    if len(matches) != 1:
+        return {"status": "UNKNOWN", "reason": "Missing or ambiguous source record."}
+    record, artifact = matches[0]
+    root = manifest_path.parent.resolve()
+    path = (root / filename).resolve()
+    if path.parent != root or not path.is_file():
+        return {"status": "UNKNOWN", "reason": "Local source unavailable or outside the archive."}
+    checked = verify_file_safety(path)
+    if not checked["safe"] or checked["sha256"] != artifact.get("sha256"):
+        return {"status": "BLOCKED", "reason": "Archive integrity or safety mismatch."}
+    version = record.get("version") or record.get("year")
+    if not version or str(version) != expected_version:
+        return {"status": "REVIEW_VERSION", "archived_version": version, "requested_version": expected_version}
+    return {"status": "PIN_MATCH", "source": record.get("download_url") or record.get("source"),
+            "version": version, "sha256": checked["sha256"], "verified_at": record.get("verified_at"),
+            "limitations": "Local pin matched; upstream freshness has not been checked."}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Shadow Army Reference Downloader & 7-Point File Safety Verifier")
     parser.add_argument("--self-test", action="store_true", help="Run precision & recall probes on the file safety verifier")
@@ -384,12 +415,25 @@ def main() -> int:
     p_fetch.add_argument("--peer-reviewed", choices=["true", "false"], default=None, help="Explicit peer-review status")
     p_fetch.add_argument("--filename", default=None, help="Optional local filename")
 
+    assess = sub.add_parser("assess", help="Check an archived reference against a pinned consumer version")
+    assess.add_argument("manifest", type=Path)
+    assess.add_argument("filename")
+    assess.add_argument("--version", required=True)
+
     args = parser.parse_args()
 
     if args.self_test:
         summary = run_self_test()
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         return 0 if summary["all_passed"] else 1
+
+    if args.cmd == "assess":
+        try:
+            result = assess_reference(args.manifest, args.filename, args.version)
+        except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+            result = {"status": "UNKNOWN", "reason": str(error)}
+        print(json.dumps(result, indent=2))
+        return 0 if result["status"] == "PIN_MATCH" else 1
 
     if args.cmd == "scan":
         target = Path(args.target).resolve()

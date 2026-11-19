@@ -35,8 +35,8 @@ EXPORTED_NON_LAUNCHER = re.compile(
 def audit_mobile_text(content: str, file_name: str = "<snippet>") -> list[dict[str, Any]]:
     """Audit a single mobile config/manifest/source text for MASVS & store release blockers."""
     findings: list[dict[str, Any]] = []
-    lower_name = file_name.lower()
-    is_debug_variant = "debug" in lower_name or "test" in lower_name
+    parts = file_name.replace("\\", "/").split("/")
+    is_debug_variant = len(parts) >= 3 and parts[-3] == "src" and parts[-2] in {"debug", "test", "androidTest"} and parts[-1] == "AndroidManifest.xml"
 
     if ANDROID_CLEARTEXT_TRUE.search(content) and not is_debug_variant:
         findings.append({
@@ -180,6 +180,12 @@ def run_self_test() -> dict[str, Any]:
         ),
     ]
     recall_cases = [
+        (
+            "RECALL: Release manifest in contest checkout remains in scope",
+            '<application android:debuggable="true" />',
+            r"contest\app\src\release\AndroidManifest.xml",
+            "MASVS_CODE_DEBUGGABLE_ENABLED",
+        ),
         (
             "RECALL-1: Production AndroidManifest with cleartext enabled",
             '<application android:usesCleartextTraffic="true" />',

@@ -1,0 +1,142 @@
+{
+  "references": [
+    {
+      "title": "Choosing the State Structure",
+      "publisher": "React",
+      "landing_page": "https://react.dev/learn/choosing-the-state-structure",
+      "source": "https://raw.githubusercontent.com/reactjs/react.dev/46a54e0592729712b7640308b53268e84fdc7c9f/src/content/learn/choosing-the-state-structure.md",
+      "version": "46a54e0592729712b7640308b53268e84fdc7c9f",
+      "publication_date": "Not reliably identified from snapshot",
+      "source_kind": "Official maintainer documentation at commit (may differ from live landing page); offline prose rendition, code and standalone markup omitted",
+      "peer_reviewed": false,
+      "source_sha256": "5ff72fcf9858ff2552aec6aac1354b459ba037578672212d792d754e783720a7",
+      "archive": {
+        "file": "react-state.txt",
+        "sha256": "5cfa4c8db2f71ee398a26d20cbaf619cbcd414422168b3b1360a29da37215ac7",
+        "size_bytes": 16201,
+        "safety": "SAFE"
+      },
+      "license_source": "https://raw.githubusercontent.com/reactjs/react.dev/46a54e0592729712b7640308b53268e84fdc7c9f/LICENSE-DOCS.md",
+      "license_archive": {
+        "file": "react-state-license.txt",
+        "sha256": "61b098d905d9799fc4f4625b476dac117630a1740a02e032594ff2fccbbb6206",
+        "size_bytes": 18525,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449584+00:00"
+    },
+    {
+      "title": "Query Cancellation",
+      "publisher": "TanStack",
+      "landing_page": "https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation",
+      "source": "https://raw.githubusercontent.com/TanStack/query/f138519975fd11703063883f864ee9a8b55486b9/docs/framework/react/guides/query-cancellation.md",
+      "version": "f138519975fd11703063883f864ee9a8b55486b9",
+      "publication_date": "Not reliably identified from snapshot",
+      "source_kind": "Official maintainer documentation at commit (may differ from live landing page); offline prose rendition, code and standalone markup omitted",
+      "peer_reviewed": false,
+      "source_sha256": "50a9b8d1a06e0df5bdde33da5db38c40e4ed6d1ff7256a52630962986e081724",
+      "archive": {
+        "file": "tanstack-cancellation.txt",
+        "sha256": "054260b3014bfb27404172ab2c5f0eb5cd891a8522c269a3a08a29d3db9eb93d",
+        "size_bytes": 3836,
+        "safety": "SAFE"
+      },
+      "license_source": "https://raw.githubusercontent.com/TanStack/query/f138519975fd11703063883f864ee9a8b55486b9/LICENSE",
+      "license_archive": {
+        "file": "tanstack-cancellation-license.txt",
+        "sha256": "a405ee70c632bb938acb7ac5f210e814409b3760ea9d2329d8ed8ffcfd11a0e7",
+        "size_bytes": 1079,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449599+00:00"
+    },
+    {
+      "title": "Trace Viewer introduction",
+      "publisher": "Microsoft Playwright",
+      "landing_page": "https://playwright.dev/docs/trace-viewer",
+      "source": "https://raw.githubusercontent.com/microsoft/playwright/8124fc39233c4c349b9dbebd4abc4103738eae81/docs/src/trace-viewer-intro-js.md",
+      "version": "8124fc39233c4c349b9dbebd4abc4103738eae81",
+      "publication_date": "Not reliably identified from snapshot",
+      "source_kind": "Official maintainer documentation at commit (may differ from live landing page)",
+      "peer_reviewed": false,
+      "source_sha256": "3558137fba5f44755041f0e6fb4be60a8598803cf32356d3a9bf903fd8256a12",
+      "archive": {
+        "file": "playwright-trace.txt",
+        "sha256": "3558137fba5f44755041f0e6fb4be60a8598803cf32356d3a9bf903fd8256a12",
+        "size_bytes": 3643,
+        "safety": "SAFE"
+      },
+      "license_source": "https://raw.githubusercontent.com/microsoft/playwright/8124fc39233c4c349b9dbebd4abc4103738eae81/LICENSE",
+      "license_archive": {
+        "file": "playwright-trace-license.txt",
+        "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb",
+        "size_bytes": 11601,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449602+00:00"
+    },
+    {
+      "title": "OWASP Top 10 2025 index",
+      "publisher": "OWASP",
+      "landing_page": "https://owasp.org/projects/top-ten",
+      "source": "https://raw.githubusercontent.com/OWASP/Top10/3a31f35346c3f4e90f350395124382fa53af2afe/2025/docs/en/index.md",
+      "version": "3a31f35346c3f4e90f350395124382fa53af2afe",
+      "publication_date": "Not reliably identified from snapshot",
+      "source_kind": "Official maintainer documentation at commit (may differ from live landing page)",
+      "peer_reviewed": false,
+      "source_sha256": "1453d2fdbd268031b13a9e89619fb044b5e92373c3e26c2fb9f633a22df26e65",
+      "archive": {
+        "file": "owasp-top10.txt",
+        "sha256": "1453d2fdbd268031b13a9e89619fb044b5e92373c3e26c2fb9f633a22df26e65",
+        "size_bytes": 1914,
+        "safety": "SAFE"
+      },
+      "license_source": "https://raw.githubusercontent.com/OWASP/Top10/3a31f35346c3f4e90f350395124382fa53af2afe/LICENSE",
+      "license_archive": {
+        "file": "owasp-top10-license.txt",
+        "sha256": "fd5524ce899b86f8a02c8de7005a6d22113f465a8262fd8b86e0e1d28c0f6f45",
+        "size_bytes": 15519,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449604+00:00"
+    },
+    {
+      "title": "Web Vitals",
+      "publisher": "Google web.dev",
+      "landing_page": "https://web.dev/articles/vitals",
+      "source": "https://web.dev/articles/vitals",
+      "version": "article revision displayed 2024-10-31",
+      "publication_date": "2020-05-04",
+      "source_kind": "Official published HTML, passive text rendition",
+      "peer_reviewed": false,
+      "source_sha256": "9d6084b394e0c62c0485296ef5de1bf0f98dcae6b305d82aef32a44dc920a668",
+      "license_source": "https://creativecommons.org/licenses/by/4.0/",
+      "archive": {
+        "file": "web-vitals.txt",
+        "sha256": "6b6dfed3b549cc26edb50a9e870c6a3ce248cb9e9cce4b460cd24ce78e5aabe7",
+        "size_bytes": 12903,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449606+00:00"
+    },
+    {
+      "title": "Web Content Accessibility Guidelines (WCAG) 2.2",
+      "publisher": "W3C",
+      "landing_page": "https://www.w3.org/TR/2024/REC-WCAG22-20241212/",
+      "source": "https://www.w3.org/TR/2024/REC-WCAG22-20241212/",
+      "version": "W3C Recommendation, 2024-12-12",
+      "publication_date": "2024-12-12",
+      "source_kind": "Official published HTML, passive text rendition",
+      "peer_reviewed": false,
+      "source_sha256": "6e3c5fe397257cae509a2fb4752b73062cf8cbeb92c2cec618989b17e4cf7057",
+      "license_source": "https://www.w3.org/copyright/document-license/",
+      "archive": {
+        "file": "wcag22.txt",
+        "sha256": "3716d7caf9605707392f3581c2c698dcea7a5931767ab3766253ee686e2deb0e",
+        "size_bytes": 154523,
+        "safety": "SAFE"
+      },
+      "retrieved_at_utc": "2026-11-18T15:16:35.449608+00:00"
+    }
+  ]
+}

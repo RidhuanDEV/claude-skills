@@ -58,4 +58,8 @@ python "shadow-privacy/scripts/privacy_pdp_auditor.py" --scan .
 python "shadow-privacy/scripts/privacy_pdp_auditor.py" --self-test
 ```
 
-Report findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with exact `UU PDP Pasal / GDPR Article`, `file:line`, exposed personal data category, and concrete technical fix.
+Treat scanner matches as leads. Trace a synthetic subject across primary data, downstream processors, caches, logs and backups. Record purpose, owner, retention and lawful-hold evidence per store. For erasure, verify identity and scope, distinguish live deletion from backup expiry, and require processor receipts or mark the affected stores pending. Exercise the workflow with synthetic data and explicit mutation authorization. Never put raw personal data into evidence.
+
+Report confirmed findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with exact `UU PDP Pasal / GDPR Article`, `file:line`, exposed personal data category, and concrete technical fix.
+
+Run `scripts/privacy_pdp_auditor.py --assess-erasure manifest.json` for synthetic rehearsals. Supply `synthetic: true`, an independently established `expected_stores` inventory of redacted system aliases, and a `receipts` object keyed by those aliases. Use evidence references only. A retained archive remains pending review and an absent processor receipt keeps the rehearsal open. Owners must independently inspect each referenced receipt.

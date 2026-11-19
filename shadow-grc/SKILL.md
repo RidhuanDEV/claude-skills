@@ -31,13 +31,15 @@ Integrates with [`shadow-monarch/reference/CONSULTING-INTELLIGENCE-CORE.md`](../
 
 ---
 
+Record assessment jurisdiction, date, control owner and evidence period. A policy can support design review. Operating effectiveness also needs a defined population, sample, workpaper and reviewer for that period. Mark missing evidence pending.
+
 ## 2. Deterministic Assurance Engine
 
 ```powershell
 python "shadow-grc/scripts/grc_assurance_engine.py" --self-test
 python "shadow-grc/scripts/grc_assurance_engine.py" --assess-cobit path/to/cobit_scores.json
 python "shadow-grc/scripts/grc_assurance_engine.py" --validate-soa path/to/iso27001_soa.json
-python "shadow-grc/scripts/grc_assurance_engine.py" --validate-findings path/to/findings.json --sector BANKING
+python "shadow-grc/scripts/grc_assurance_engine.py" --validate-findings path/to/findings.json --sector BANKING --as-of-date YYYY-MM-DD
 ```
 
 ## 3. Document Rendering Boundary (`SA-DOC-ENGINE-001`)

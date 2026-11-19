@@ -48,7 +48,7 @@ Every privileged or security-sensitive action (login success/failure, password r
 ---
 
 ## 4. Policy Test Matrix, Confused Deputy & Escalation Gates
-1. **Object/Tenant Policy Matrix Tests**: Every protected endpoint must include automated negative authorization tests asserting `403`/`404` for (a) unauthenticated caller, (b) authenticated Tenant A accessing Tenant B object (`IDOR`/`BOLA`), and (c) lower-role caller attempting privileged mutation.
+1. **Object/Tenant Policy Matrix Tests**: Derive anonymous, authenticated-but-denied and hidden-resource responses independently from the owning service. Test allowed access and denial after a role change as well as cross-tenant access. Preserve the established 401 challenge, 403 refusal or 404 concealment and corresponding headers for each case.
 2. **Confused Deputy & Privilege Escalation Prevention**: Never derive acting identity or tenant scope from request parameters when an authenticated session exists; reject mass-assignment of `role`, `permissions`, `tenant_id`, or `is_verified` via explicit DTO allowlists.
 3. **Revocation Propagation**: Session revocation, password rotation, or role downgrade must reject existing access/refresh tokens (and notify active `/shadow-realtime` connections) within bounded SLA.
 
@@ -58,3 +58,7 @@ Every privileged or security-sensitive action (login success/failure, password r
 1. **Inspect Existing SDK First:** Verify exports, version, supported flow, and session/token model of any existing internal/local SSO SDK before writing auth code (`official_first_verifier.py --check-auth-sdk`). Never rewrite login flows or replace an existing auth SDK without explicit Monarch approval.
 2. **Preserve `ridhuan-sso` (`file:../sdk/sso-client`):** Treat inspected local SDKs as authoritative; verify publisher ownership before considering any registry migration; NEVER replace `file:../sdk/sso-client` with an unverified similarly named npm package; report deployment/build portability caveats separately.
 3. **Never Trust Frontend Claims Alone:** Never treat frontend-supplied `username` values as authentication proof — require server-verified authenticated claims before mapping local users.
+
+## Search and generated-answer handoff
+
+For a retrieval comparison, obtain the current policy revision from the authorized policy owner independently of the candidate trace. Freeze tenant, principal-specific permitted document IDs and revocations for each query at that revision. Compare corpus and label revisions on both runs. Inspect ranked results and the actual generation context separately, including entries below the metric cutoff. Missing or stale authorization evidence requires a hold. Returned-result checks only establish what the trace contained; verify enforcement before top-K in the serving implementation independently.

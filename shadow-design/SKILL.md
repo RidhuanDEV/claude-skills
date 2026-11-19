@@ -7,7 +7,7 @@ description: "Product UI/UX & Design Systems. Use when designing design tokens, 
 
 Use this skill before or during frontend/mobile/AI product implementation to establish an **Evidence-Disciplined Product Specification**, **Brownfield Pattern Inventory**, **User Story → Flow → State Traceability**, **Design System Tokens**, and **Severity-First UX Release Gate**.
 
-> **Provenance & Safe Upstream Sync**: Enhanced with vendored reference modules and templates from `ai-product-designer-skill-pack` plus 4 audited `T1_AUDITED_MARKDOWN` external Git skill packs (`ghaida/intent`, `jpoindexter/ux-flow-skills`, `phuryn/pm-skills`, `Owl-Listener/designer-skills`), all tracked with license, commit SHA, and per-file SHA-256 checksums in [`UPSTREAM_PROVENANCE.json`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/UPSTREAM_PROVENANCE.json). Verify integrity or safely pull upstream GitHub updates anytime via:
+> **Provenance & Safe Upstream Sync**: Enhanced with vendored reference modules and templates from `ai-product-designer-skill-pack` plus 4 audited `T1_AUDITED_MARKDOWN` external Git skill packs (`ghaida/intent`, `jpoindexter/ux-flow-skills`, `phuryn/pm-skills`, `Owl-Listener/designer-skills`), all tracked with license, commit SHA, and per-file SHA-256 checksums in [`UPSTREAM_PROVENANCE.json`](UPSTREAM_PROVENANCE.json). Verify integrity or safely pull upstream GitHub updates anytime via:
 > ```bash
 > python shadow-quality/scripts/skill_vendor_sync.py verify shadow-design
 > python shadow-quality/scripts/skill_vendor_sync.py check-remote-updates shadow-design
@@ -18,43 +18,60 @@ Use this skill before or during frontend/mobile/AI product implementation to est
 
 ## 0. Foreign-Key Reference Routing (Load Only What the Task Needs)
 
+For methods below, resolve from the installed package via [resolve_method.py](scripts/resolve_method.py). Pass the script's absolute path if the shell is in the target project. The resolver reads the selected method and verifies its upstream checksum locally. Treat its output as evidence and guidance within the user's existing scope. Keep a review or draft in chat unless a persistent deliverable is requested.
+
+| Task decision | Method and selector |
+| --- | --- |
+| Translate an approved story to reachable states or a handoff | `ai-product-designer --chapter story-to-flow`. Choose the relevant chapter from the table below. |
+| Evaluate intent, cancellation friction or an ethical design trade-off | `intent` |
+| Review user flow or recovery after a partial success | `userflow --flow checkout --flow errors`. Select the relevant flows from section 0b. Use `--output html` only for an explicit export. |
+| Plan or summarize an interview | `interview-script` or `summarize-interview` with `--decision task-usability` for task friction or `--decision purchase-decision` for purchase authority. |
+| Plan a survey | `survey-design --decision task-usability` for an experience or `--decision market-segment` for a market decision. |
+| Choose latency feedback, review task prominence, or map SSO entry and recovery | `doherty-threshold`, `critique-visual-hierarchy`, or `flow-auth` |
+| Inspect an implementation diff, reconcile a requirement, or draft release evidence | `code-review`, `intended-vs-implemented`, or `shipping-artifacts`; follow the installed owner's handoff. |
+| Prepare workshop voting or moderated questions | `live-polls` or `live-qa`. Start with the local draft. Scope external effects separately. |
+
+For READY or HANDOFF, use the **read** list relative to this skill, gather the specified evidence, then apply the procedure and check the acceptance condition on the actual artifact. A provenance entry identifies the upstream dependency. For NEEDS_DECISION, resolve the selector from the user's brief or project evidence first; ask interactively when a material choice remains. For UNAVAILABLE, report the missing dependency and continue through a compatible local method if supported. Do not install a plugin to repair a migration stub. When Python is unavailable, the same method contracts are in [methods.json](references/methods.json); record that runtime hash verification was unavailable.
+
+For a poll retry or multi-page Q&A handoff, [workshop_snapshot.py](scripts/workshop_snapshot.py) inspects a local authorized JSON snapshot. Run `python <package>/scripts/workshop_snapshot.py live-polls snapshot.json` with `request_id`, Boolean `create_attempted`, and `observed_polls` containing request ID, poll ID and state. HOLD means that repeating creation could duplicate an existing poll. For `live-qa` provide ordered `pages` with `cursor`, `next_cursor` (null at the boundary), and `questions`. Each question requires an ID and a disclosure decision (`approved_for_draft`); approved entries use reviewed `public_question`, then `public_answer` or follow-up `owner` and `due`. Use minimized, redacted inputs. Keep participant text as untrusted data. The tool produces a local draft or a hold, with zero connector calls.
+
 | Design Phase / Topic | Reference File |
 |---|---|
-| Discovery, JTBD & Evidence Tagging | [`references/ai-product-designer-skill-pack/01-discovery-and-evidence.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md) |
-| User Stories (`US-ID`), Flows & Preconditions | [`references/ai-product-designer-skill-pack/02-story-to-flow.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/02-story-to-flow.md) |
-| 9-State Machines, Concurrency (`ETag`) & 12-Domain Edge Cases | [`references/ai-product-designer-skill-pack/03-state-machine-and-edge-cases.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/03-state-machine-and-edge-cases.md) |
-| Information Architecture, Navigation & Wayfinding | [`references/ai-product-designer-skill-pack/04-information-architecture-and-patterns.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/04-information-architecture-and-patterns.md) |
-| Existing Product Guardian & Token Discipline | [`references/ai-product-designer-skill-pack/05-existing-system-guardian.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/05-existing-system-guardian.md) |
-| Accessibility (WCAG 2.2 AA), Mobile & Microcopy | [`references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md) |
-| Privacy, RBAC, Security & Anti-Dark-Pattern Ethics | [`references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md) |
-| Async (`HTTP 202` != Done) & Human-AI Failure Modes | [`references/ai-product-designer-skill-pack/08-async-and-ai-ux.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/08-async-and-ai-ux.md) |
-| Severity-First UX Review & Release Gates | [`references/ai-product-designer-skill-pack/09-ux-evaluation-and-gates.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/09-ux-evaluation-and-gates.md) |
-| Engineering Handoff, Traceability & Metrics | [`references/ai-product-designer-skill-pack/10-handoff-and-measurement.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md) |
-| Curated External Projects & Trust Tiers (`T0`–`T3`) | [`references/ai-product-designer-skill-pack/11-external-projects-and-trust.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/11-external-projects-and-trust.md) |
-| **Upstream Pack**: Design with Intent (`ghaida/intent`, CC0-1.0, `T1`) | [`references/external-upstreams/ghaida-intent/README.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/README.md) (`skills/intent`, `strategize`, `investigate`, `blueprint`, `journey`, `organize`, `wireframe`, `articulate`, `evaluate`, `fortify`, `include`, `transpose`, `localize`, `measure`, `philosopher`, `storytelling`, `specify`, `present`) |
-| **Upstream Pack**: UX Flow Skills (`jpoindexter/ux-flow-skills`, MIT, `T1`) | [`references/external-upstreams/ux-flow-skills/README.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/README.md) (15 production flow blueprints + `userflow` dispatcher — see §0b below) |
-| **Upstream Pack**: PM Skills (`phuryn/pm-skills`, MIT, `T1`) | [`references/external-upstreams/pm-skills/README.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/README.md) (`pm-product-discovery`, `pm-product-strategy`, `pm-execution`, `pm-market-research`, `pm-data-analytics`, `pm-go-to-market`, `pm-ai-shipping`) |
-| **Upstream Pack**: Designer Skills (`Owl-Listener/designer-skills`, MIT, `T1`) | [`references/external-upstreams/designer-skills/README.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/designer-skills/README.md) (`design-research`, `ux-strategy`, `interaction-design`, `ui-design`, `design-systems`, `visual-critique`, `prototyping-testing`, `design-ops`, `designer-toolkit`) |
-| Feature Design Spec Template | [`templates/FEATURE-DESIGN.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/templates/FEATURE-DESIGN.md) |
-| UX Review & Release Gate Template | [`templates/UX-REVIEW.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/templates/UX-REVIEW.md) |
+| Discovery, JTBD & Evidence Tagging | [`references/ai-product-designer-skill-pack/01-discovery-and-evidence.md`](references/ai-product-designer-skill-pack/01-discovery-and-evidence.md) |
+| User Stories (`US-ID`), Flows & Preconditions | [`references/ai-product-designer-skill-pack/02-story-to-flow.md`](references/ai-product-designer-skill-pack/02-story-to-flow.md) |
+| 9-State Machines, Concurrency (`ETag`) & 12-Domain Edge Cases | [`references/ai-product-designer-skill-pack/03-state-machine-and-edge-cases.md`](references/ai-product-designer-skill-pack/03-state-machine-and-edge-cases.md) |
+| Information Architecture, Navigation & Wayfinding | [`references/ai-product-designer-skill-pack/04-information-architecture-and-patterns.md`](references/ai-product-designer-skill-pack/04-information-architecture-and-patterns.md) |
+| Existing Product Guardian & Token Discipline | [`references/ai-product-designer-skill-pack/05-existing-system-guardian.md`](references/ai-product-designer-skill-pack/05-existing-system-guardian.md) |
+| Accessibility (WCAG 2.2 AA), Mobile & Microcopy | [`references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md`](references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md) |
+| Privacy, RBAC, Security & Anti-Dark-Pattern Ethics | [`references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md`](references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md) |
+| Async (`HTTP 202` != Done) & Human-AI Failure Modes | [`references/ai-product-designer-skill-pack/08-async-and-ai-ux.md`](references/ai-product-designer-skill-pack/08-async-and-ai-ux.md) |
+| Severity-First UX Review & Release Gates | [`references/ai-product-designer-skill-pack/09-ux-evaluation-and-gates.md`](references/ai-product-designer-skill-pack/09-ux-evaluation-and-gates.md) |
+| Engineering Handoff, Traceability & Metrics | [`references/ai-product-designer-skill-pack/10-handoff-and-measurement.md`](references/ai-product-designer-skill-pack/10-handoff-and-measurement.md) |
+| Curated External Projects & Trust Tiers (`T0`–`T3`) | [`references/ai-product-designer-skill-pack/11-external-projects-and-trust.md`](references/ai-product-designer-skill-pack/11-external-projects-and-trust.md) |
+| **Upstream Pack**: Design with Intent (`ghaida/intent`, CC0-1.0, `T1`) | [`references/external-upstreams/ghaida-intent/README.md`](references/external-upstreams/ghaida-intent/README.md) (`skills/intent`, `strategize`, `investigate`, `blueprint`, `journey`, `organize`, `wireframe`, `articulate`, `evaluate`, `fortify`, `include`, `transpose`, `localize`, `measure`, `philosopher`, `storytelling`, `specify`, `present`) |
+| **Upstream Pack**: UX Flow Skills (`jpoindexter/ux-flow-skills`, MIT, `T1`) | [`references/external-upstreams/ux-flow-skills/README.md`](references/external-upstreams/ux-flow-skills/README.md) (15 production flow blueprints + `userflow` dispatcher — see §0b below) |
+| **Upstream Pack**: PM Skills (`phuryn/pm-skills`, MIT, `T1`) | [`references/external-upstreams/pm-skills/README.md`](references/external-upstreams/pm-skills/README.md) (`pm-product-discovery`, `pm-product-strategy`, `pm-execution`, `pm-market-research`, `pm-data-analytics`, `pm-go-to-market`, `pm-ai-shipping`) |
+| **Upstream Pack**: Designer Skills (`Owl-Listener/designer-skills`, MIT, `T1`) | [`references/external-upstreams/designer-skills/README.md`](references/external-upstreams/designer-skills/README.md) (`design-research`, `ux-strategy`, `interaction-design`, `ui-design`, `design-systems`, `visual-critique`, `prototyping-testing`, `design-ops`, `designer-toolkit`) |
+| Feature Design Spec Template | [`templates/FEATURE-DESIGN.md`](templates/FEATURE-DESIGN.md) |
+| UX Review & Release Gate Template | [`templates/UX-REVIEW.md`](templates/UX-REVIEW.md) |
 
 ### 0b. 15-Domain Battle-Tested UX Flow Routing (`ux-flow-skills`)
 When designing or implementing any of these 15 core product flows, load the corresponding `T1` reference before writing UI code:
-- **Onboarding & First-Run Activation**: [`skills/flow-onboarding/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-onboarding/SKILL.md)
-- **Authentication, Passkeys, Magic Links, SSO & 2FA**: [`skills/flow-auth/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-auth/SKILL.md)
-- **Empty States, Skeletons & Perceived Speed**: [`skills/flow-empty-states/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-empty-states/SKILL.md)
-- **Permission Priming & Just-in-Time Prompts**: [`skills/flow-permissions/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-permissions/SKILL.md)
-- **Checkout, Cart, Express Pay & Confirmation**: [`skills/flow-checkout/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-checkout/SKILL.md)
-- **Pricing, Trials, Paywalls & Honest Cancellation**: [`skills/flow-paywall/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-paywall/SKILL.md)
-- **Settings IA, Account Management & Danger Zones**: [`skills/flow-settings/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-settings/SKILL.md)
-- **Sharing Links, Invites & Collaboration Cues**: [`skills/flow-sharing/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-sharing/SKILL.md)
-- **Navigation (Tab Bar vs Sidebar vs Command Palette)**: [`skills/flow-navigation/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-navigation/SKILL.md)
-- **App Shell (Sidebar+Main, 3-Pane, Master-Detail Collapse)**: [`skills/flow-app-shell/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-app-shell/SKILL.md)
-- **Enterprise Data Tables, Bulk Actions & Pagination**: [`skills/flow-tables/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-tables/SKILL.md)
-- **Search, Faceted Filters & Zero-Results Recovery**: [`skills/flow-search/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-search/SKILL.md)
-- **Forms, Validation Timing, Wizards & Save-and-Resume**: [`skills/flow-forms/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-forms/SKILL.md)
-- **Error Anatomy, Undo-over-Confirm, Offline & Work Preservation**: [`skills/flow-errors/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-errors/SKILL.md)
-- **AI / Chat UX, Streaming, Tool-Use Display & Human-in-the-Loop**: [`skills/flow-ai-chat/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ux-flow-skills/skills/flow-ai-chat/SKILL.md)
+- **Onboarding & First-Run Activation**: [`skills/flow-onboarding/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-onboarding/SKILL.md)
+- **Authentication, Passkeys, Magic Links, SSO & 2FA**: [`skills/flow-auth/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-auth/SKILL.md)
+- **Empty States, Skeletons & Perceived Speed**: [`skills/flow-empty-states/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-empty-states/SKILL.md)
+- **Permission Priming & Just-in-Time Prompts**: [`skills/flow-permissions/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-permissions/SKILL.md)
+- **Checkout, Cart, Express Pay & Confirmation**: [`skills/flow-checkout/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-checkout/SKILL.md)
+- **Pricing, Trials, Paywalls & Honest Cancellation**: [`skills/flow-paywall/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-paywall/SKILL.md)
+- **Settings IA, Account Management & Danger Zones**: [`skills/flow-settings/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-settings/SKILL.md)
+- **Sharing Links, Invites & Collaboration Cues**: [`skills/flow-sharing/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-sharing/SKILL.md)
+- **Navigation (Tab Bar vs Sidebar vs Command Palette)**: [`skills/flow-navigation/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-navigation/SKILL.md)
+- **App Shell (Sidebar+Main, 3-Pane, Master-Detail Collapse)**: [`skills/flow-app-shell/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-app-shell/SKILL.md)
+- **Enterprise Data Tables, Bulk Actions & Pagination**: [`skills/flow-tables/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-tables/SKILL.md)
+- **Search, Faceted Filters & Zero-Results Recovery**: [`skills/flow-search/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-search/SKILL.md)
+- **Forms, Validation Timing, Wizards & Save-and-Resume**: [`skills/flow-forms/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-forms/SKILL.md)
+- **Error Anatomy, Undo-over-Confirm, Offline & Work Preservation**: [`skills/flow-errors/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-errors/SKILL.md)
+- **AI / Chat UX, Streaming, Tool-Use Display & Human-in-the-Loop**: [`skills/flow-ai-chat/SKILL.md`](references/external-upstreams/ux-flow-skills/skills/flow-ai-chat/SKILL.md)
 
 ---
 
@@ -101,9 +118,9 @@ For every feature module, maintain stable IDs across revisions (`CONFIRMED | PRO
 
 ---
 
-## 4. Mandatory 9-State Component & Transition Contract
+## 4. Reachable component states and transitions
 
-Model interactive screens and components as explicit state transitions (`State + Event + Guard -> Next State / Side Effect / Visible Feedback`). Every data-driven or transactional view MUST account for all **9 states**:
+Derive transitions from the actual UI and service contracts. Record the actor/owner, event, guard, next domain state, visible feedback, persisted effect, and recovery. Separate network status from business completion (a queued request can remain pending after a successful HTTP response). Use the nine states below to inspect coverage. For each material omission, record the invariant that makes the state unreachable; an isolated copy edit only needs checks for the affected interaction.
 
 1. **Initial / Pre-Action State**: Clear entry affordance, preconditions, and default focus/selection.
 2. **Loading / Pending State**: Skeleton placeholders matching final geometry (zero CLS spikes); step/queue progress for operations `>3s`.
@@ -134,13 +151,13 @@ Model interactive screens and components as explicit state transitions (`State +
 
 ## 6. 12-Domain Adversarial UX Walkthrough & Severity-First Release Gate
 
-Before signing off on any feature design ([`templates/FEATURE-DESIGN.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/templates/FEATURE-DESIGN.md)) or UX review ([`templates/UX-REVIEW.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/templates/UX-REVIEW.md)):
+Before signing off on any feature design ([`templates/FEATURE-DESIGN.md`](templates/FEATURE-DESIGN.md)) or UX review ([`templates/UX-REVIEW.md`](templates/UX-REVIEW.md)):
 1. **Run the 12-Domain Adversarial Walkthrough**:
    Test the flow against: *(1) Input extremes/paste/Unicode, (2) Validation recovery, (3) Double-click/back-button/refresh mid-submit, (4) Deep-link/logged-out entry, (5) Multi-tab/concurrent edit (`ETag`), (6) Slow/offline/partial API, (7) Empty vs no-results vs error, (8) Role/permission revocation mid-session, (9) Destructive action undo/confirmation, (10) Long lists/pagination/bulk selection, (11) Keyboard-only/screen-reader/zoom, and (12) Locale/timezone/DST boundaries*.
 2. **Severity-First UX Quality Gate**:
    Heuristic scores (0–100) are internal expert estimates (`NOT TESTED` with real users unless empirical testing was executed). **Any unmitigated CRITICAL blocker** (irreversible data loss, deceptive `HTTP 202` success, broken keyboard/screen-reader core path, or permission leak) forces a **`REJECT / REVISE`** decision regardless of numeric score.
 3. **Ethical & Anti-Dark-Pattern Gate (72+ Catalog)**:
-   Cross-check flows against [`ghaida-intent/skills/intent/references/ethical-design.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/ethical-design.md) and [`07-privacy-security-and-ethics.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md). Strictly prohibit:
+   Cross-check flows against [`ghaida-intent/skills/intent/references/ethical-design.md`](references/external-upstreams/ghaida-intent/skills/intent/references/ethical-design.md) and [`07-privacy-security-and-ethics.md`](references/ai-product-designer-skill-pack/07-privacy-security-and-ethics.md). Strictly prohibit:
    - *Roach Motels / Asymmetric Friction*: Unsubscribing, cancelling a trial, revoking consent, or deleting an account must be as direct as signing up.
    - *Confirmshaming, Fake Urgency & Pre-checked Opt-ins*: Never pre-check marketing/telemetry consent or fabricate countdown timers.
    - *AI-Specific Dark Patterns*: Never disguise AI-generated estimates as verified human/legal truth, hide model errors, or silently train on private tenant inputs without explicit opt-in (UU PDP / GDPR / EU DSA compliance).

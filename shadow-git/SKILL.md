@@ -16,14 +16,14 @@ Use this skill whenever the **Monarch** asks to manage branches, create/inspect/
 
 | Monarch Natural-Language Intent | Orchestrator Command (`python ".../shadow-git/scripts/git_orchestrator.py" ...`) |
 | :--- | :--- |
-| *"Cek strategi branch repo ini"* | `detect-strategy --repo <path>` |
-| *"Cek semua worktree dan branch aktif"* / *"Health report"* | `health --repo <path> --stale-days 14` |
-| *"Buat worktree baru untuk fitur RAG"* | `worktree-create --repo <path> --branch feature-rag --path ../feature-rag --base main --agent Agent-RAG --task TASK-01 --allowed-paths rag/` |
-| *"Kerjakan fitur A dan B secara paralel"* | `worktree-create` for each branch + `check-parallel-scope --repo <path> --base main` |
-| *"Prediksi conflict sebelum merge"* | `predict-conflicts --repo <path> --source <feature-branch> --target main` |
-| *"Branch C sudah selesai, cek apakah aman merge ke main"* | `integrate-feature --repo <path> --branch <branch-C> --target main` *(add `--approve` only after Monarch confirmation)* |
-| *"Sync branch A dan B dengan main terbaru"* | `sync-from-main --repo <path> --branch <branch-A> --main main --strategy merge` *(add `--approve` to execute)* |
-| *"Bersihkan worktree yang sudah selesai"* | `safe-cleanup --repo <path> --branch <branch-C> --target main --release-agent-lock` *(add `--approve` to execute)* |
+| *"Cek strategi branch repo ini"* | `--repo <path> detect-strategy` |
+| *"Cek semua worktree dan branch aktif"* / *"Health report"* | `--repo <path> health --stale-days 14` |
+| *"Buat worktree baru untuk fitur RAG"* | `--repo <path> worktree-create --branch feature-rag --path ../feature-rag --base main --agent Agent-RAG --task TASK-01 --allowed-paths rag/` |
+| *"Kerjakan fitur A dan B secara paralel"* | `worktree-create` for each branch + `--repo <path> check-parallel-scope --base main` |
+| *"Prediksi conflict sebelum merge"* | `--repo <path> predict-conflicts --source <feature-branch> --target main` |
+| *"Branch C sudah selesai, cek apakah aman merge ke main"* | `--repo <path> integrate-feature --branch <branch-C> --target main` *(add `--approve` only after Monarch confirmation)* |
+| *"Sync branch A dan B dengan main terbaru"* | `--repo <path> sync-from-main --branch <branch-A> --main main --strategy merge` *(add `--approve` to execute)* |
+| *"Bersihkan worktree yang sudah selesai"* | `--repo <path> safe-cleanup --branch <branch-C> --target main --release-agent-lock` *(add `--approve` to execute)* |
 
 ---
 
@@ -121,5 +121,6 @@ git merge-tree --write-tree HEAD origin/<target-branch>
 ## 5. Parallel Worktree Path-Ownership & Reconciliation Protocol
 
 - **Explicit Path-Ownership Invariant**: Before spawning parallel worktrees or swarm workers, partition modified file paths so each worktree owns a disjoint set of directories/files. Shared contracts (`openapi.yaml`, `schema.prisma`, `package.json`, shared types/router indexes) MUST NOT be edited concurrently by multiple feature branches; assign shared contracts to a serialized coordinator gate or prerequisite base branch first.
+- Record both commit SHAs and the merge base with each preview. Re-resolve both refs immediately before integration. When either moves, repeat preview and contract checks against the new pair. Include producer/consumer contract tests even when the touched paths are disjoint.
 - **Deterministic Post-Merge Reconciliation**: After integrating worktrees sequentially into an integration branch, run cross-boundary checks (`typecheck`, `openapi` validation, integration tests, and `/shadow-quality` drift checks) on the combined tree before cleanup. Conflict resolution MUST merge both worktrees' semantic invariants rather than taking `--ours`/`--theirs` blindly.
 - **Execution Approval Boundary (`L0` vs `L4`)**: Read-only `status`/`diff`/`merge-tree` diagnostics are `L0_READ_ONLY`, whereas `--approve` branch integration, rebase, force cleanup, or `git push` are **`L4: HIGH_IMPACT`** requiring explicit Monarch authorization (`shadow-monarch/scripts/execution_approval_gate.py`).

@@ -27,7 +27,34 @@ SKIP_ROOT_DIRS = {"evals", "mcp-servers", "reports"}
 
 USE_WHEN_RE = re.compile(r"\buse\s+(?:only\s+)?when\b", re.IGNORECASE)
 CODE_REVIEW_RE = re.compile(
-    r"\b(?:code\s+review|PR\s+review|review\s+(?:(?:this|the)\s+)?(?:PR|code|diff|changes|kode)|(?:audit|tinjau)\s+kode)\b",
+    r"\b(?:(?:only\s+review|hanya\s+(?:review|tinjau))\s+(?:(?:this|the)\s+)?(?:API|endpoint|webhook|handler|kode|code|diff|PR)\b|"
+    r"code\s+review|PR\s+review|review\s+(?:(?:this|the)\s+)?(?:PR|code|diff|changes|kode|webhook(?:\s+handler)?|endpoint(?:\s+handler)?)|(?:audit|tinjau)\s+kode)\b",
+    re.IGNORECASE,
+)
+READ_ONLY_SCOPE_RE = re.compile(
+    r"\b(?:secara\s+read[- ]only|read[- ]only\s*\(\s*jangan\s+ubah\s+file|"
+    r"only\s+(?:inspect|review)\b[^\n]*\bread[- ]only)\b",
+    re.IGNORECASE,
+)
+LOAD_TEST_DENIAL_RE = re.compile(
+    r"\b(?:tidak\s+menyetujui|do\s+not\s+approve|(?:jangan|do\s+not)\s+(?:jalankan|run))\s+"
+    r"(?:k6|(?:a\s+)?(?:load|stress|soak)\s+test)\b",
+    re.IGNORECASE,
+)
+QUOTED_LOG_RE = re.compile(r"```[\s\S]*?```|\"[^\"]{12,}\"|'[^']{12,}'")
+NEGATED_CLAUSE_RE = re.compile(
+    r"\b(?:jangan|tidak\s+perlu|tanpa|do\s+not|don't|without|skip|no)\s+"
+    r"(?:jalankan\s+|run\s+|lakukan\s+|do\s+)?(?:load\s*test(?:ing)?|stress\s*test(?:ing)?|soak\s*test(?:ing)?|"
+    r"k6|playwright|e2e|benchmark|mutat\w*|edit\w*|write\w*)\b",
+    re.IGNORECASE,
+)
+API_DOCS_GENERIC_RE = re.compile(
+    r"\b(?:buat(?:kan)?|create|add|tambahkan|document|dokumentasi(?:kan)?|update|sync)\s+"
+    r"(?:the\s+)?(?:API\s+doc(?:s|umentation)?|dokumentasi\s+API)\b",
+    re.IGNORECASE,
+)
+API_DOCS_EXPLICIT_FORMAT_RE = re.compile(
+    r"\b(?:openapi|swagger|postman|bruno|scalar|redoc|insomnia|asyncapi|graphql\s+sdl|protobuf)\b",
     re.IGNORECASE,
 )
 
@@ -106,7 +133,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DEBUGGING.md", "CODEBASE-INTELLIGENCE.md"],
         "include": re.compile(
-            r"\b(?:returns?\s+500|HTTP\s*500|500\s+errors?|random\s+500|diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|database\s+deadlock|deadlock|root\s+cause|stack\s+trace|memory\s+leak|heap\s+leak|flaky\s+test|git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug)\b",
+            r"\b(?:returns?\s+500|HTTP\s*500|500\s+errors?|random\s+500|diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|flaky\s+test|git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:typo[- ]only|only\s+typo|README\s+typo|pure\s+formatting)\b", re.IGNORECASE),
@@ -125,7 +152,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["REFACTORING.md", "CODEBASE-INTELLIGENCE.md"],
         "include": re.compile(
-            r"\b(?:refactor\s+(?:old|legacy|module|feature)|behavior\s+unchanged|characterization\s+test|branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|extract\s+seam)\b",
+            r"\b(?:refactor\s+(?:old|legacy|module|feature)|behavior\s+unchanged|characterization\s+test|branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -151,7 +178,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["sub-RAG-VECTOR-KNOWLEDGE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
-            r"\b(?:search\s+relevance|relevansi\s+pencarian|BM25|lexical\s+search|vector\s+ANN|hybrid\s+RRF|reciprocal\s+rank\s+fusion|cross[- ]encoder\s+rerank|NDCG@|MRR@|Recall@\d+|zero[- ]downtime\s+alias|Indonesian\s+analyzer|search_after|PIT\s+pagination|retrieval\s+ACL\s+prefilter)\b",
+            r"\b(?:search\s+relevance|relevansi\s+pencarian|BM25|lexical\s+search|vector\s+ANN|hybrid\s+RRF|reciprocal\s+rank\s+fusion|cross[- ]encoder\s+rerank|NDCG@|MRR@|Recall@\d+|zero[- ]downtime\s+alias|Indonesian\s+analyzer|search_after|PIT\s+pagination|retrieval\s+ACL\s+prefilter|tenant\s+ACL\s+pre[- ]filter|searchDocumentsForTenant)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Context\s+Recall\s*,?\s*(?:dan|and)\s*.*prompt\s+injection)\b", re.IGNORECASE),
@@ -181,7 +208,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["SECURITY.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
-            r"\b(?:UU\s*PDP|UU\s*(?:No\.?\s*)?27\s*(?:Tahun\s*)?2022|GDPR|DPIA|ROPA|DSAR|data\s+(?:spesifik|pribadi)|cross[- ]border\s+transfer|PII\s+(?:redaction|masking)|NIK\s+log|kebocoran\s+data|3\s*x\s*24)\b",
+            r"\b(?:UU\s*PDP|UU\s*(?:No\.?\s*)?27\s*(?:Tahun\s*)?2022|GDPR|DPIA|ROPA|DSAR|data\s+(?:spesifik|pribadi)|cross[- ]border\s+transfer|PII\s+(?:redaction|masking)|NIK\s+log|kebocoran\s+data|erasure[-_]tombstones|legal[-_ ]?hold|3\s*x\s*24)\b",
             re.IGNORECASE,
         ),
     },
@@ -245,7 +272,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
-            r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|read[- ]only\s+query|MVCC\s+bloat|query\s+planner|database\s+deadlock)\b",
+            r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|read[- ]only\s+query|MVCC\s+bloat|query\s+planner|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock)\b",
             re.IGNORECASE,
         ),
     },
@@ -254,7 +281,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:database\s+migration|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock)\b",
+            r"\b(?:database\s+migration|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock)\b",
             re.IGNORECASE,
         ),
     },
@@ -308,7 +335,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
-            r"\b(?:design\s+system|wireframe|UI/UX|user\s+flow|thumb\s+zone|design\s+token|komponen\s+UI|antarmuka)\b",
+            r"\b(?:design\s+system|wireframe|UI/UX|user\s+flow|thumb\s+zone|design\s+token|komponen\s+UI|antarmuka|interview-script|task[- ]usability)\b",
             re.IGNORECASE,
         ),
     },
@@ -344,7 +371,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DOCS-PIPELINE.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
-            r"\b(?:document\s+generator|document\s+engine|doc_orchestrator|export\s+(?:to\s+)?(?:docx|pdf|html|xlsx)|render\s+(?:handover|grc|presales|pmo|architecture)\s+(?:report|document|proposal)|build-manifest|\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
+            r"\b(?:document\s+generator|document\s+engine|doc_orchestrator|build_doc\.py|(?:regenerasi|regenerate)\s+(?:output\s+)?(?:dokumen|document)|export\s+(?:to\s+)?(?:docx|pdf|html|xlsx)|render\s+(?:handover|grc|presales|pmo|architecture)\s+(?:report|document|proposal)|build-manifest|\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
             re.IGNORECASE,
         ),
     },
@@ -380,7 +407,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["OFFICIAL-FIRST-DEPENDENCY-POLICY.md", "CORE.md", "DEVOPS.md"],
         "include": re.compile(
-            r"\b(?:scaffold\s+new\s+project|from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+project|buat\s+proyek\s+baru|(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
+            r"\b(?:scaffold\s+new\s+project|from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+(?:a\s+)?(?:new\s+)?project|buat\s+proyek\s+baru|(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:technical\s+due\s+diligence|legacy\s+(?:codebase|module|feature)|refactor)\b", re.IGNORECASE),
@@ -390,7 +417,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:Staging\s+UAT|UAT\s+scenario|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off)\b",
+            r"\b(?:Staging\s+UAT|UAT\s+scenario|tim\s+QA\s+melaporkan|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off)\b",
             re.IGNORECASE,
         ),
     },
@@ -399,7 +426,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["DEVOPS.md", "CLOUD-SRE.md"],
         "include": re.compile(
-            r"\b(?:production\s+(?:release|deploy)|SemVer|changelog|rollback\s+runbook|feature\s+flag\s+rollout)\b",
+            r"\b(?:production\s+(?:release|deploy)|SemVer|changelog|rollback\s+runbook|kriteria\s+rollback\s+aman|feature\s+flag\s+rollout)\b",
             re.IGNORECASE,
         ),
     },
@@ -475,7 +502,7 @@ UI_ANTISLOP_RE = re.compile(
     re.IGNORECASE,
 )
 TYPO_ONLY_RE = re.compile(
-    r"\b(?:typo[- ]only\s+README|fix\s+(?:a\s+)?typo\s+in\s+README|perbaiki\s+typo\s+README|only\s+typo)\b",
+    r"\b(?:typo[- ]only\s+README|fix\s+(?:a\s+)?(?:small\s+)?typo\s+in\s+README|perbaiki\s+typo\s+(?:di\s+)?README|only\s+typo)\b",
     re.IGNORECASE,
 )
 TRIVIAL_FACT_RE = re.compile(r"^\s*(?:apa\s+itu|what\s+is|berapa|bagi\s+benchmark|knp|kenapa)\b", re.IGNORECASE)
@@ -539,22 +566,63 @@ def get_known_skill_names(repo_root: Path = REPO_ROOT) -> set[str]:
     }
 
 
+def _strip_non_authoritative_signals(prompt: str) -> str:
+    """Remove fenced/quoted log snippets and explicit negated tool clauses before topic matching."""
+    cleaned = QUOTED_LOG_RE.sub(" ", prompt)
+    cleaned = NEGATED_CLAUSE_RE.sub(" ", cleaned)
+    return cleaned
+
+
+def _compute_disclosure_metrics(
+    companion_skills: list[str],
+    always_on_ui: list[str],
+    reference_modules: list[str],
+    is_trivial: bool,
+) -> dict[str, Any]:
+    loaded_paths: list[str] = []
+    total_bytes = 0
+    for skill in [*companion_skills, *always_on_ui]:
+        skill_file = REPO_ROOT / skill / "SKILL.md"
+        if skill_file.exists():
+            loaded_paths.append(f"{skill}/SKILL.md")
+            total_bytes += skill_file.stat().st_size
+    for ref in reference_modules:
+        ref_file = REPO_ROOT / "shadow-monarch" / "reference" / ref
+        if ref_file.exists():
+            loaded_paths.append(f"shadow-monarch/reference/{ref}")
+            total_bytes += ref_file.stat().st_size
+    return {
+        "trivial_fast_path": is_trivial,
+        "loaded_skill_count": len(companion_skills) + len(always_on_ui),
+        "loaded_ref_count": len(reference_modules),
+        "estimated_loaded_bytes": total_bytes,
+        "loaded_paths": loaded_paths,
+    }
+
+
 def route_prompt(
     prompt: str,
     max_companion_skills: int = 4,
     task_id: str = "TASK-AUTO",
+    repo_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Route a natural-language task prompt to required skills, references & §2.2 Decision Record."""
     stripped = prompt.strip()
+    signal_text = _strip_non_authoritative_signals(stripped)
     known_skills = get_known_skill_names()
 
-    mentions = re.findall(r"(?<![\w/.:])[/\$]([a-z][a-z0-9-]+)(?![\w/-])", stripped.lower())
+    mentions = re.findall(r"(?<![\w/.:])[/\$]([a-z][a-z0-9-]+)(?![\w/-])", signal_text.lower())
     explicit_skills = [skill for skill in mentions if skill in known_skills]
-    is_code_review = bool(CODE_REVIEW_RE.search(stripped))
-    is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", stripped, re.IGNORECASE))
+    unquoted = QUOTED_LOG_RE.sub(" ", stripped)
+    is_code_review = bool(CODE_REVIEW_RE.search(signal_text) or READ_ONLY_SCOPE_RE.search(unquoted))
+    is_load_test_denied = bool(LOAD_TEST_DENIAL_RE.search(unquoted))
+    is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", signal_text, re.IGNORECASE))
     blocked_by_scope = (
         {"shadow-browser", "shadow-perf"} if is_code_review or is_unit_test_only else set()
     )
+
+    if is_load_test_denied:
+        blocked_by_scope.add("shadow-perf")
 
     matched_ordered: list[str] = []
     matched_task: list[str] = []
@@ -562,8 +630,8 @@ def route_prompt(
     matched_refs: list[str] = []
     excluded_records: list[dict[str, str]] = []
 
-    is_typo_only = bool(TYPO_ONLY_RE.search(stripped)) and not explicit_skills
-    is_trivial_fact = bool(TRIVIAL_FACT_RE.match(stripped)) and not explicit_skills
+    is_typo_only = bool(TYPO_ONLY_RE.search(signal_text)) and not explicit_skills
+    is_trivial_fact = bool(TRIVIAL_FACT_RE.match(signal_text)) and not explicit_skills
 
     for sl in explicit_skills:
         if sl in blocked_by_scope:
@@ -578,9 +646,9 @@ def route_prompt(
             sname = rule["skill"]
             if sname not in known_skills or sname in blocked_by_scope:
                 continue
-            if rule["include"].search(stripped) or (sname == "shadow-quality" and is_code_review):
+            if rule["include"].search(signal_text) or (sname == "shadow-quality" and is_code_review):
                 excl = rule.get("exclude")
-                if excl and excl.search(stripped):
+                if excl and excl.search(signal_text):
                     excluded_records.append(
                         {"skill": sname, "reason": "Excluded by sibling disambiguation or negative trigger boundary."}
                     )
@@ -592,11 +660,11 @@ def route_prompt(
                     target_bucket.append(sname)
 
     always_on_ui: list[str] = []
-    if not is_typo_only and UI_ANTISLOP_RE.search(stripped):
+    if not is_typo_only and UI_ANTISLOP_RE.search(signal_text):
         always_on_ui = ["antislop", "antislop-ui", "antislop-layoutmobile"]
 
     # Guard against accidental shadow-perf loading during routine implementation
-    if "shadow-perf" not in matched_ordered and "shadow-perf" not in blocked_by_scope and re.search(r"\b(?:build|implement|create|buat|tambah)\b", stripped, re.IGNORECASE):
+    if "shadow-perf" not in matched_ordered and "shadow-perf" not in blocked_by_scope and re.search(r"\b(?:build|implement|create|buat|tambah)\b", signal_text, re.IGNORECASE):
         excluded_records.append(
             {"skill": "shadow-perf", "reason": "Strict Pre-UAT gate only; excluded during routine implementation."}
         )
@@ -610,7 +678,7 @@ def route_prompt(
     primary_skill = matched_ordered[0] if matched_ordered else "shadow-monarch"
 
     for skill in sorted(blocked_by_scope):
-        excluded_records.append({"skill": skill, "reason": "Execution skill is outside the code-review or unit-test scope."})
+        excluded_records.append({"skill": skill, "reason": "Execution skill is outside the requested scope."})
 
     excluded_names = {entry["skill"] for entry in excluded_records}
     if primary_skill in CO_ACTIVATION_MAP and not is_trivial:
@@ -697,6 +765,8 @@ def route_prompt(
     ]
     if intent_mode == "code_review":
         prohibited_actions.extend(["write_or_modify_source_files", "run_mutating_commands"])
+    if is_load_test_denied:
+        prohibited_actions.append("run_explicitly_denied_load_test")
     if intent_mode in {"debug", "unit_test", "ui_implementation"}:
         prohibited_actions.append("stress_or_load_test_without_l3_approval")
 
@@ -711,6 +781,21 @@ def route_prompt(
         )
     )
 
+    ctx = repo_context or {}
+    has_active_api_doc_gen = bool(ctx.get("has_active_generator", False))
+    readme_summary_only = bool(ctx.get("readme_summary_only", False))
+    asks_generic_api_docs = bool(API_DOCS_GENERIC_RE.search(signal_text)) and not bool(
+        API_DOCS_EXPLICIT_FORMAT_RE.search(signal_text)
+    )
+    requires_api_docs_decision = asks_generic_api_docs and readme_summary_only and not has_active_api_doc_gen
+
+    final_refs = [] if is_trivial else matched_refs[:4]
+    disclosure_metrics = _compute_disclosure_metrics(companion_skills, always_on_ui, final_refs, is_trivial)
+
+    denied_actions = ["load_test", "stress_test", "soak_test"] if is_code_review or is_load_test_denied else []
+    if is_code_review:
+        denied_actions.append("broad_e2e")
+
     decision_record = {
         "task_id": task_id,
         "intent": stripped,
@@ -721,6 +806,7 @@ def route_prompt(
         "excluded_skills": excluded_records,
         "required_permissions": required_perms,
         "prohibited_actions": prohibited_actions,
+        "disclosure_metrics": disclosure_metrics,
         "permission_policy": {
             "intent_mode": intent_mode,
             "max_auto_level": max_auto_level,
@@ -732,9 +818,14 @@ def route_prompt(
             "trigger": "MATERIAL_UNRESOLVED_DECISION_OR_REQUIRED_APPROVAL",
             "wait_before_dependent_work": True,
             "repeat_resolved_questions": False,
+            "requires_user_decision": requires_api_docs_decision,
+            "question_topic": "api_docs_format" if requires_api_docs_decision else None,
+            "stop_before_write": requires_api_docs_decision,
         },
         "subagent_policy": {
             "inherit_parent_scope": True,
+            "max_permission_level": max_auto_level,
+            "denied_actions": denied_actions,
             "allow_scope_expansion": False,
             "allow_level_upgrade": False,
             "orchestrator_recommendation_is_authorization": False,
@@ -747,8 +838,9 @@ def route_prompt(
         "core_orchestrator": "shadow-monarch",
         "companion_skills": companion_skills,
         "always_on_ui_skills": always_on_ui,
-        "reference_modules": [] if is_trivial else matched_refs[:4],
+        "reference_modules": final_refs,
         "excluded_skills": excluded_records,
+        "disclosure_metrics": disclosure_metrics,
         "routing_decision": decision_record,
     }
 
@@ -1012,6 +1104,8 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-perf"],
             "shadow-bootstrap",
         ),
+        ("Bootstrap plain request", "Bootstrap a new project for an offline CLI.", ["shadow-bootstrap"], ["shadow-perf"], "shadow-bootstrap"),
+        ("Bootstrap CSS existing project", "Adjust Bootstrap CSS spacing in existing project.", [], ["shadow-bootstrap"], None),
         (
             "OFFICIAL-2: ridhuan-sso SDK integration loads shadow-auth + OFFICIAL-FIRST-DEPENDENCY-POLICY.md",
             "Integrate existing ridhuan-sso (file:../sdk/sso-client) SDK into our backend app.",
@@ -1053,6 +1147,16 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-quality"],
             ["shadow-browser", "shadow-perf"],
             "shadow-quality",
+        ),
+        (
+            "SCOPE-2EN: Explicit endpoint review mentioning a forbidden load test",
+            "Only review this API endpoint; do not run a load test",
+            ["shadow-quality"], ["shadow-perf", "shadow-browser"], None,
+        ),
+        (
+            "SCOPE-2ID: Review-only endpoint in Indonesian",
+            "Hanya tinjau endpoint API ini, jangan jalankan load test",
+            ["shadow-quality"], ["shadow-perf", "shadow-browser"], None,
         ),
         (
             "SCOPE-3: A backticked dollar-prefixed skill is an explicit selection",

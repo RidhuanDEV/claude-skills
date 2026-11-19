@@ -22,7 +22,7 @@ Use this skill whenever the **Monarch** asks to write, expand, fix, or audit uni
 Prioritize testing effort where business and financial risk is highest:
 1. **Integration / Component Tests (Highest ROI for Backend APIs)**: Test the full route -> validation -> service -> database/transaction boundary using real test DB transactions or Testcontainers rather than brittle mocks of internal repositories.
 2. **Pure Domain Unit Tests**: Fast, exhaustive table-driven/parameterized tests for pricing formulas, tax/discount calculations, state machine transitions, and permission evaluators.
-3. **Consumer/Provider Contract Tests (Paired with `/shadow-api` & `/shadow-compat`)**: Verify HTTP status codes, response envelopes, required fields, and nullability match `openapi.yaml` so frontend/mobile consumers never break.
+3. **Consumer/Provider Contract Tests (Paired with `/shadow-api` & `/shadow-compat`)**: Verify HTTP status codes, response envelopes, required fields, and nullability match the verified contract in its owning service so frontend/mobile consumers never break.
 
 ### B. Regression Selection for Bug Fixes
 - Whenever fixing a bug or production incident (`/shadow-maintain`), write a targeted regression test that reproduces the exact failure first, then verify the fix turns it green.
@@ -67,9 +67,9 @@ Never leave exited test or migration-verification containers (`*-test-<timestamp
 
 ---
 
-## 3. Mandatory 8-Point Test Coverage Matrix
+## 3. Select coverage by failure surface
 
-For every module, service, or endpoint under test, cover:
+For a pure function, select representative inputs, boundary values and invariants. A discount calculation needs currency rounding and threshold cases. For a worker, exercise duplicate delivery, partial completion and retries where its contract requires them. For HTTP services, select applicable cases below using the actual status and authentication contract. Verify cleanup only for resources created by this run.
 1. **Happy Path (`200`/`201`)**: Assert observable output and persisted database/queue state.
 2. **Validation & Schema Failure (`400`/`422`)**: Missing required fields, invalid types, negative numbers.
 3. **Unauthenticated (`401`)**: Missing, malformed, or expired token.

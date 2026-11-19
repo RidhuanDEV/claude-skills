@@ -203,6 +203,10 @@ def _verify_approval(req: dict[str, Any], required_level: str, approval: dict[st
         errors.append("BLOCKED_APPROVAL_SCOPE_MISMATCH: `task_id` mismatch (approval cannot cross tasks).")
     if approval.get("project_path") and req.get("project_path") and str(approval["project_path"]) != str(req["project_path"]):
         errors.append("BLOCKED_APPROVAL_SCOPE_MISMATCH: `project_path` mismatch (approval cannot cross projects).")
+    if approval.get("repo_head_sha") and str(approval["repo_head_sha"]) != str(req.get("repo_head_sha") or ""):
+        errors.append("BLOCKED_STALE_APPROVAL: `repo_head_sha` is missing or changed after approval was granted; re-confirm scope before execution.")
+    if approval.get("host") and str(approval["host"]).lower() != str(req.get("host") or "").lower():
+        errors.append("BLOCKED_APPROVAL_SCOPE_MISMATCH: `host` missing or different from the approved host.")
 
     approved_lvl = str(approval.get("permission_level") or "L0_READ_ONLY")
     if LEVEL_ORDER.get(approved_lvl, -1) < LEVEL_ORDER.get(required_level, 99):
@@ -283,6 +287,8 @@ def evaluate_execution_request(req: dict[str, Any], approval: dict[str, Any] | N
     code = "BLOCKED_UNKNOWN_ENVIRONMENT" if env == "unknown" else "BLOCKED_REQUIRES_APPROVAL"
     if any("DENIED" in r for r in all_reasons):
         code = "BLOCKED_EXPLICITLY_DENIED"
+    elif any("BLOCKED_STALE_APPROVAL" in r for r in all_reasons):
+        code = "BLOCKED_STALE_APPROVAL"
     elif any("SCOPE_MISMATCH" in r for r in all_reasons):
         code = "BLOCKED_APPROVAL_SCOPE_MISMATCH"
     elif boundary_violation:

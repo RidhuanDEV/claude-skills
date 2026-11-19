@@ -24,7 +24,7 @@ Works alongside `antislop-human` to provide deep, verifiable accessibility engin
   - Return focus to the exact trigger button when the modal closes.
 
 ### 3. Form Labels, Instructions & Error Announcements
-- Every form input MUST have a programmatic `<label htmlFor="...">` (placeholder text is NOT a label replacement).
+- Inspect the rendered accessible name, role and state. Accept explicit associations, wrapping labels or a valid naming mechanism for a custom control. Test focus after validation and return focus when a modal closes. Record which assistive technology was actually exercised.
 - Required fields and format constraints (e.g., password rules, date format) must be associated via `aria-describedby`.
 - On validation failure:
   - Set `aria-invalid="true"` on the invalid input.
@@ -55,6 +55,6 @@ Works alongside `antislop-human` to provide deep, verifiable accessibility engin
 ---
 
 ## 2. Foreign-Key Reference Routing (`T1` Audited Packs)
-- **Inclusive Design & Screen Reader Flow Architecture**: [`ghaida-intent/skills/include/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/skills/include/SKILL.md) & [`accessibility-foundations.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md)
-- **Cultural, Linguistic & RTL/LTR Localization**: [`ghaida-intent/skills/localize/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/ghaida-intent/skills/localize/SKILL.md)
-- **Accessibility, Responsive & Microcopy Rules**: [`06-accessibility-responsive-content.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md)
+- **Inclusive Design & Screen Reader Flow Architecture**: [`ghaida-intent/skills/include/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/include/SKILL.md) & [`accessibility-foundations.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md)
+- **Cultural, Linguistic & RTL/LTR Localization**: [`ghaida-intent/skills/localize/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/localize/SKILL.md)
+- **Accessibility, Responsive & Microcopy Rules**: [`06-accessibility-responsive-content.md`](../shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md)

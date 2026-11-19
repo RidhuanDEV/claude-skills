@@ -1,0 +1,174 @@
+{
+  "corpus_revision": "corpus-v1",
+  "judgment_revision": "bilingual-labels-v1",
+  "acl_revision": "acl-7",
+  "min_queries_per_segment": 1,
+  "k": 3,
+  "min_ndcg": 0.7,
+  "documents": {
+    "A-policy": {
+      "tenant_id": "A",
+      "revoked": false,
+      "title": "Policy"
+    },
+    "A-other": {
+      "tenant_id": "A",
+      "revoked": false,
+      "title": "A-other"
+    },
+    "A-expired": {
+      "tenant_id": "A",
+      "revoked": true,
+      "title": "A-expired"
+    },
+    "B-policy": {
+      "tenant_id": "B",
+      "revoked": false,
+      "title": "Policy"
+    },
+    "B-other": {
+      "tenant_id": "B",
+      "revoked": false,
+      "title": "B-other"
+    },
+    "B-expired": {
+      "tenant_id": "B",
+      "revoked": true,
+      "title": "B-expired"
+    }
+  },
+  "queries": {
+    "refund-id": {
+      "tenant_id": "A",
+      "segment": "id",
+      "relevance_grades": {
+        "A-policy": 1
+      },
+      "allowed_document_ids": [
+        "A-policy",
+        "A-other"
+      ],
+      "reviewed_claims": {
+        "Batas refund 14 hari": [
+          "A-policy"
+        ]
+      }
+    },
+    "refund-en": {
+      "tenant_id": "B",
+      "segment": "en",
+      "relevance_grades": {
+        "B-policy": 1
+      },
+      "allowed_document_ids": [
+        "B-policy",
+        "B-other"
+      ],
+      "reviewed_claims": {
+        "Refund window is 14 days": [
+          "B-policy"
+        ]
+      }
+    }
+  },
+  "baseline": {
+    "revision": "index-v1",
+    "results": {
+      "refund-id": {
+        "ranking": [
+          "A-other",
+          "A-policy"
+        ],
+        "context": [
+          "A-policy"
+        ],
+        "citations": [
+          "A-policy"
+        ],
+        "abstained": false,
+        "claims": [
+          {
+            "claim": "Batas refund 14 hari",
+            "citations": [
+              "A-policy"
+            ]
+          }
+        ]
+      },
+      "refund-en": {
+        "ranking": [
+          "B-other",
+          "B-policy"
+        ],
+        "context": [
+          "B-policy"
+        ],
+        "citations": [
+          "B-policy"
+        ],
+        "abstained": false,
+        "claims": [
+          {
+            "claim": "Refund window is 14 days",
+            "citations": [
+              "B-policy"
+            ]
+          }
+        ]
+      }
+    },
+    "acl_revision": "acl-7",
+    "corpus_revision": "corpus-v1",
+    "judgment_revision": "bilingual-labels-v1"
+  },
+  "candidate": {
+    "revision": "index-v2",
+    "results": {
+      "refund-id": {
+        "ranking": [
+          "A-policy",
+          "A-other"
+        ],
+        "context": [
+          "A-policy"
+        ],
+        "citations": [
+          "A-policy"
+        ],
+        "abstained": false,
+        "claims": [
+          {
+            "claim": "Batas refund 14 hari",
+            "citations": [
+              "A-policy"
+            ]
+          }
+        ]
+      },
+      "refund-en": {
+        "ranking": [
+          "B-policy",
+          "B-other"
+        ],
+        "context": [
+          "B-policy"
+        ],
+        "citations": [
+          "B-policy"
+        ],
+        "abstained": false,
+        "claims": [
+          {
+            "claim": "Refund window is 14 days",
+            "citations": [
+              "B-policy"
+            ]
+          }
+        ]
+      }
+    },
+    "acl_revision": "acl-7",
+    "corpus_revision": "corpus-v1",
+    "judgment_revision": "bilingual-labels-v1"
+  }
+}

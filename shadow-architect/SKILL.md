@@ -22,7 +22,9 @@ Use this skill after `/shadow-discovery` (or when evaluating major structural ch
 
 ---
 
-## 2. Mandatory Architecture Deliverables
+## 2. Architecture deliverables by decision scope
+
+For a reversible module-local decision, identify the existing precedent, transaction boundary, coupling and rollback path. Answer inline. For a change to a shared contract, deployment boundary or data owner, compare coordination cost and failure isolation with the current design and record the decision and affected owners. Use the following artifacts only where they resolve a decision.
 
 ### A. C4 Model Diagrams (Strict Mermaid Syntax)
 1. **Level 1 — System Context Diagram**: The application, primary user personas, and external third-party systems (Payment Gateway, SSO, SMTP, Government APIs).
@@ -50,7 +52,7 @@ For every consequential choice (Database engine, Monolith vs Microservices, Auth
 When designing or extending an existing application (**Brownfield Project**):
 
 ### A. Brownfield vs Greenfield Project Routing
-- **Greenfield**: Zero/empty repository. Proceed with standard Shadow Army scaffolding (`/shadow-bootstrap`) and right-sized Modular Monolith baseline.
+- **Greenfield**: Zero/empty repository. When implementation is explicitly requested, evaluate scaffolding (`/shadow-bootstrap`) and right-sized Modular Monolith baseline.
 - **Brownfield**: Existing codebase present. **Preserve existing architectural patterns** (Layered MVC, Feature-based, Hexagonal, Clean, Minimalist). Do **NOT** impose unsolicited architectural migrations (e.g. converting a working MVC into Clean Architecture/DDD) solely because it is perceived as "cleaner" or "more modern".
 
 ### B. Mandatory Existing-Codebase Discovery & Convention Profile
@@ -87,10 +89,12 @@ Always resolve architectural decisions using this hierarchy:
 
 ---
 
-## 4. Stage 2 Exit Gate Checklist (To Unlock `/shadow-plan` & `/shadow-bootstrap`)
+## 4. Full-system planning checklist (apply only the affected rows)
 - [ ] C4 Context and Container diagrams validated in strict Mermaid syntax.
 - [ ] Core database ERD (`/shadow-db`) and API contract strategy (`/shadow-api`) aligned with functional requirements.
 - [ ] ADRs written for all critical stack and infrastructure choices.
 - [ ] Capacity sizing confirms infrastructure fits client budget and SLA targets.
 - [ ] For Brownfield projects: Project Convention Profile (`docs/engineering/CODEBASE_CONVENTIONS.md`) inspected and architectural preservation confirmed.
 - [ ] **Official-First & Technology Decision Record (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Selected technologies follow the 5-tier hierarchy (`Existing trusted -> Official SDK -> Verified mature package -> Justified small custom -> Approved replacement`), emit the 8-field Decision Record, and require explicit Monarch approval before introducing new frameworks or extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices).
+
+For reviewer calibration, use the [architecture decision trials](evals/decision-trials.md) to exercise local extraction, cross-team ownership and capacity uncertainty.

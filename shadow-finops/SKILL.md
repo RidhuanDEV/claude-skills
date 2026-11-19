@@ -16,7 +16,7 @@ Grounded in industry-canonical specifications documented in [`references/FINOPS-
 ## 1. The 4-Pillar FinOps Engineering Workflow
 
 ### Pillar 1: Inform — Cost Visibility & FOCUS Normalization
-- Enforce mandatory cost allocation tags/labels (`env`, `service`, `owner`, `tenant_tier`) across cloud resources, Kubernetes workloads, and LLM gateway requests.
+- Use the allocation dimensions present in the billing contract. Reconcile unattributed shared spend separately. Include tenant tier when the cost model and privacy boundary support it.
 - Normalize multi-cloud/SaaS billing datasets using **FOCUS** columns (`EffectiveCost` for amortized commitments, `BilledCost` for cash invoice, `ChargeCategory`, `PricingCategory`) and measure **Unit Economics** (e.g., cost per 1,000 API calls, cost per resolved customer ticket, cost per tenant/month).
 
 ### Pillar 2: Optimize — AI / LLM Token Economics
@@ -25,7 +25,7 @@ Grounded in industry-canonical specifications documented in [`references/FINOPS-
 - **Model Tier Routing & Batch APIs**: Route complex planning/architecture/root-cause tasks to frontier reasoning tiers, routine coding/extraction to efficient workhorse tiers, and asynchronous offline jobs (evals, bulk classification, doc indexing) to Batch APIs (typically 50% cheaper).
 
 ### Pillar 3: Optimize — Cloud, Kubernetes & Database Infrastructure
-- **Kubernetes Workloads**: Require `resources.requests` and `resources.limits` + bounded Horizontal Pod Autoscaler (`minReplicas`/`maxReplicas`) on every `Deployment`/`StatefulSet`; right-size over-provisioned CPU/RAM (>50% idle P95).
+- **Kubernetes Workloads**: Compare demand distribution, startup latency, queue lag, failover headroom and committed costs before choosing fixed capacity or autoscaling. Quantify cost per completed operation. A token-only estimate needs no cluster audit.
 - **Network & Egress**: Keep chatty app-to-DB/cache traffic inside the same region/AZ where possible; replace cross-NAT S3/GCS transfers with VPC gateway endpoints.
 - **Storage & Non-Prod Hygiene**: Enforce S3/GCS lifecycle rules (transition stale logs/backups to IA/Glacier or delete expired previews), pause/auto-sleep staging DBs off-hours, and eliminate orphaned unattached EBS/PD volumes and stale container images.
 

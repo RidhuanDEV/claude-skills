@@ -33,7 +33,7 @@ Connects to the **`shadow_db` MCP server** (`inspect_database_schema`, `run_read
 4. **Migration Safety & Restore Compatibility (Integrated with `/shadow-data`)**:
    - Audits pending migrations to prevent table-locking operations (`DROP COLUMN`, `RENAME COLUMN`, or unindexed foreign keys on large tables) and ensures backup restore compatibility with `/shadow-resilience`.
 5. **Cross-DB Migration, Data Warehouse Star Schema, Pentaho PDI & Cron (`generate_cross_db_etl_and_warehouse`)**:
-   - Generates 6 production-ready artifacts in `docs/db/etl/`:
+   - Generates 6 draft artifacts. Verify target type and precision, key and constraint semantics, identifier quoting and time zones before executing DDL. Syntax validation, target execution, restart from checkpoint and source-to-target reconciliation each require independent evidence. The generated job alone establishes file generation. Drafts are written in `docs/db/etl/`:
      1. `01_target_ddl_<engine>.sql` (translated DDL for `postgres`, `mysql`, `mssql`, `clickhouse`, or `bigquery`)
      2. `02_star_schema_warehouse_<engine>.sql` (`dim_*` & `fact_*` Star Schema with surrogate keys and audit timestamps)
      3. `03_etl_migration_blueprint.md` (batch chunking, watermark strategy, and idempotent upsert patterns)

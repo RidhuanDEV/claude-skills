@@ -59,3 +59,14 @@
 - Right files, wrong behavior → the rule is missing or unclear in that reference file; add the reason, not just the rule.
 
 The `assertions` field also works with Anthropic's skill-creator eval tooling for automated with/without-skill comparisons.
+
+## Paired search and RAG pilot
+
+Run from the repository root:
+
+```powershell
+python evals/compare_search_indexes.py evals/fixtures/search-index-pilot.json --acl-revision acl-7
+python evals/test_search_index_pilot.py
+```
+
+The fixture pins two index revisions, a shared corpus, per-query reviewer judgments and the authorization snapshot. Pass the current ACL revision separately from the policy owner. The CLI compares observed rankings and generated-answer context, returns exit 1 on HOLD and exit 0 on ELIGIBLE_FOR_REVIEW. The example has one query per language and illustrates the decision mechanics only. Set the minimum paired sample count and acceptance criteria before inspecting service results. The generic text scorer reports manual review required on cases without a dedicated oracle. Token overlap in those cases is a diagnostic only.

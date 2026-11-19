@@ -44,7 +44,7 @@ def verify_refactor_plan(plan: dict[str, Any]) -> dict[str, Any]:
 
     changed = {str(f) for f in plan.get("changed_files", [])}
     allowed = {str(f) for f in plan.get("allowed_scope_files", [])}
-    out_of_scope = sorted(changed - allowed) if allowed else []
+    out_of_scope = sorted(changed - allowed)
     if not changed:
         errors.append("'changed_files' cannot be empty.")
     if out_of_scope:
@@ -93,6 +93,10 @@ def run_self_test() -> dict[str, Any]:
     collateral = json.loads(json.dumps(golden))
     collateral["changed_files"].append("src/unrelated/users.ts")
     results.append({"probe": "RECALL-1: Blocks out-of-scope edits to unrelated files", "passed": not verify_refactor_plan(collateral)["valid"]})
+
+    missing_scope = dict(golden)
+    del missing_scope['allowed_scope_files']
+    results.append({'probe': 'Changed files require an explicit scope', 'passed': not verify_refactor_plan(missing_scope)['valid']})
 
     # Empty / failing characterization
     results.append({"probe": "BOUNDARY-1: Rejects empty payload gracefully", "passed": not verify_refactor_plan({})["valid"]})

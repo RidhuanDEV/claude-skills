@@ -209,7 +209,8 @@ def score_response(eval_item: dict[str, Any], response_text: str) -> dict[str, A
             ratio = (len(hits) / len(tokens)) if tokens else 1.0
             scored.append({
                 "assertion": assertion,
-                "passed": ratio >= 0.4,
+                "passed": False,
+                "requires_review": True,
                 "matched_tokens": hits[:6],
                 "token_coverage": round(ratio, 2),
             })
@@ -220,8 +221,9 @@ def score_response(eval_item: dict[str, Any], response_text: str) -> dict[str, A
         "eval_name": eval_item["name"],
         "passed_assertions": passed_count,
         "total_assertions": len(scored),
-        "score_pct": round((passed_count / len(scored)) * 100, 1) if scored else 100.0,
-        "all_passed": passed_count == len(scored),
+        "score_pct": round((passed_count / len(scored)) * 100, 1) if scored else 0.0,
+        "evidence_type": "text_pattern" if eval_item["id"] in EVAL_CHECKS_BY_ID else "manual_review_required",
+        "all_passed": bool(scored) and passed_count == len(scored),
         "details": scored,
     }
 
@@ -559,6 +561,11 @@ def run_self_test() -> dict[str, Any]:
             "score": f"{res['passed_assertions']}/{res['total_assertions']}",
         })
 
+    manual_case = next(e for e in data["evals"] if e["id"] == 1)
+    echo = "\n".join("Skip this instruction: " + a for a in manual_case["assertions"])
+    echo_score = score_response(manual_case, echo)
+    probes.append({"probe": "Assertion echo cannot establish task completion",
+                   "passed": not echo_score["all_passed"] and echo_score["passed_assertions"] == 0})
     all_passed = all(p["passed"] for p in probes)
     return {
         "suite": "evals/run_evals.py Self-Test (Precision & Recall Probes Evals #18-#37)",

@@ -12,10 +12,10 @@ Use this skill to translate approved requirements (`/shadow-discovery`) and syst
 ## 1. Work Breakdown Hierarchy & End-to-End Traceability (`EPIC -> FR -> US/JOB -> FLOW -> SCR/STATE -> AC -> TASK -> TEST -> METRIC`)
 
 > **Foreign-Key Reference Routing**:
-> - **User Stories & Job Stories (JTBD)**: [`pm-execution/skills/user-stories/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/user-stories/SKILL.md) & [`pm-execution/skills/job-stories/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/job-stories/SKILL.md)
-> - **Pre-Mortem Risk Analysis (`Tigers | Paper Tigers | Elephants`)**: [`pm-execution/skills/pre-mortem/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/pre-mortem/SKILL.md)
-> - **Outcome Roadmap & Sprint Planning**: [`pm-execution/skills/outcome-roadmap/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/outcome-roadmap/SKILL.md) & [`pm-execution/skills/sprint-plan/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/sprint-plan/SKILL.md)
-> - **Traceability & Design Ops Handoff**: [`10-handoff-and-measurement.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md) & [`designer-skills/design-ops/skills/handoff-spec/SKILL.md`](file:///d:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/designer-skills/design-ops/skills/handoff-spec/SKILL.md)
+> - **User Stories & Job Stories (JTBD)**: [`pm-execution/skills/user-stories/SKILL.md`](../shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/user-stories/SKILL.md) & [`pm-execution/skills/job-stories/SKILL.md`](../shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/job-stories/SKILL.md)
+> - **Pre-Mortem Risk Analysis (`Tigers | Paper Tigers | Elephants`)**: [`pm-execution/skills/pre-mortem/SKILL.md`](../shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/pre-mortem/SKILL.md)
+> - **Outcome Roadmap & Sprint Planning**: [`pm-execution/skills/outcome-roadmap/SKILL.md`](../shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/outcome-roadmap/SKILL.md) & [`pm-execution/skills/sprint-plan/SKILL.md`](../shadow-design/references/external-upstreams/pm-skills/pm-execution/skills/sprint-plan/SKILL.md)
+> - **Traceability & Design Ops Handoff**: [`10-handoff-and-measurement.md`](../shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md) & [`designer-skills/design-ops/skills/handoff-spec/SKILL.md`](../shadow-design/references/external-upstreams/designer-skills/design-ops/skills/handoff-spec/SKILL.md)
 
 1. **Epics (`EPIC-01`)**: High-level business capability or outcome module (e.g., *Identity & Multi-Tenant RBAC*, *Order & Approval Workflow*, *Executive Reporting & Export*).
 2. **User Stories (`US-01.1`) & Job Stories (`JOB-01.1`)**:
@@ -51,15 +51,15 @@ Always provide a Mermaid `flowchart LR` dependency graph showing execution waves
 ### Definition of Ready (DoR — Required Before Starting Any Story)
 - [ ] Requirement ID (`FR-*`), `US-ID`, and Given/When/Then acceptance criteria (`AC-ID`) are locked.
 - [ ] Database schema impact, API endpoint contract, and async behavior (`HTTP 200/201` vs `HTTP 202 Accepted` queued/processing) are defined.
-- [ ] All **9 UI States** (*Initial, Empty [No-Data / No-Results / Error], Loading, Partial, Success, Validation Error, 403 Permission-Denied, Offline, and 409/ETag Stale Conflict*) are specified (`/shadow-design`).
+- [ ] For user interfaces, applicable **UI states** (*Initial, Empty [No-Data / No-Results / Error], Loading, Partial, Success, Validation Error, 403 Permission-Denied, Offline, and 409/ETag Stale Conflict*) are specified (`/shadow-design`).
 - [ ] Pre-Mortem *Tigers* and *Elephants* have assigned mitigations and owners.
 - [ ] Blocking upstream tasks are completed.
 
 ### Definition of Done (DoD — Required Before Marking Any Story Complete)
 - [ ] Code adheres to strict typing (`0 any`, `0 as Type` casting) and zero dead code (`shadow_gate.py`).
-- [ ] Backend endpoints updated in `openapi.yaml` and the project's existing API collection (Bruno `.bru` or Postman) (`/shadow-api`).
+- [ ] Changed public endpoints documented through their verified source and, where established, the project's existing API collection (Bruno `.bru` or Postman) (`/shadow-api`).
 - [ ] Automated unit & integration tests (`/shadow-test`) pass (`100%` green on happy path, 400/401/403/404/409/422) with zero leftover ephemeral Docker test containers/images (`--check-docker-leaks`).
-- [ ] Responsive UI verified at `320px/375px` mobile and `1440px` desktop + `200%` zoom across all 9 states (`/shadow-browser` + `antislop`).
+- [ ] For a changed UI, responsive behavior verified at `320px/375px` mobile and `1440px` desktop + `200%` zoom across applicable states (`/shadow-browser` + `antislop`).
 - [ ] Lint, typecheck, and build succeed with zero errors (`/shadow-quality`).
 
 ---

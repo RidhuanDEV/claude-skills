@@ -47,8 +47,10 @@ Use this skill when designing or debugging data fetching, caching layers (`TanSt
 
 For payment, order creation, approval, or webhook endpoints:
 - Accept an `Idempotency-Key` header (or deterministic event ID).
-- Store `{ status: "PROCESSING" | "COMPLETED", statusCode, responseBody }` in Redis/DB with a 24-hour TTL using atomic `SET NX` / unique constraint.
-- If a duplicate request arrives while `"PROCESSING"`, return `409 Conflict`; if `"COMPLETED"`, return the stored response without re-executing the business transaction.
+- Scope the key to the authenticated principal, tenant and operation. Bind it to a canonical fingerprint of validated business inputs. A reused key with a different fingerprint must reject without disclosing the old result. Recheck authorization before replay.
+- Atomically reserve the scoped key. Use the established pending response for concurrent matching requests. Tie completion to the durable business commit or provider receipt. If the process dies between the remote effect and local acknowledgment, reconcile by stable operation ID before retrying. Derive retention from the business retry window and upstream deduplication guarantees. Exercise competing requests, lost acknowledgment, expired keys and revoked access.
 4. **Coherency Boundaries & Multi-Tier Invalidation**:
    - Separate public catalog caches from tenant/user-authorized keys (`user_id`/`tenant_id` in cache key mandatory to prevent cross-user leakage).
    - Define exact invalidation triggers across CDN/edge, Redis, and client `TanStack Query` caches so stale authorization or balance views never persist past security/mutation events.
+
+For a single transactional database, `python -m unittest discover -s tests` from the skill directory exercises competing connections, changed payload, tenant/principal isolation, revoked access, interrupted commit and lost reply. External side effects require a separate provider reconciliation test.
