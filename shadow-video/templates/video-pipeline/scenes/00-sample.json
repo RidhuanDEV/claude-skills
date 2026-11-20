@@ -1,0 +1,23 @@
+{
+  "title": "Smoke test: halaman login (tanpa login)",
+  "recordLogin": true,
+  "scenes": [
+    {
+      "id": "buka-login",
+      "narration": "Ini adalah uji coba singkat. Kita membuka halaman login aplikasi.",
+      "actions": [
+        { "type": "goto", "url": "/login" },
+        { "type": "waitFor", "selector": "body", "state": "visible" },
+        { "type": "hover", "selector": "body", "ms": 600 }
+      ]
+    },
+    {
+      "id": "diam",
+      "narration": "Kursor bergerak dengan halus, lalu berhenti sejenak.",
+      "actions": [
+        { "type": "pause", "ms": 800 },
+        { "type": "hover", "selector": "body", "ms": 400 }
+      ]
+    }
+  ]
+}

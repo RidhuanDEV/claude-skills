@@ -1,0 +1,35 @@
+{
+  "name": "shadow-video-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Video tutorial dan E2E GUI: Playwright (peragaan dengan kursor manusia) + Azure Speech (narasi) + ffmpeg (MP4 + SRT).",
+  "type": "module",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "doctor": "tsx src/cli.ts doctor",
+    "validate": "tsx src/cli.ts validate",
+    "snapshot": "tsx src/cli.ts snapshot",
+    "e2e": "tsx src/cli.ts e2e",
+    "tts": "tsx src/cli.ts tts",
+    "record": "tsx src/cli.ts record",
+    "merge": "tsx src/cli.ts merge",
+    "build:video": "tsx src/cli.ts build",
+    "verify": "tsx src/cli.ts verify",
+    "login": "tsx src/cli.ts login",
+    "selftest": "tsx src/cli.ts selftest",
+    "concat": "tsx src/cli.ts concat",
+    "final": "tsx src/cli.ts final",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "playwright": "1.63.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,18 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Session state (contains auth tokens)
+auth/
+
+# Generated artifacts
+output/
+cache/
+
+# Dependencies / local tooling
+node_modules/
+.venv/
+# portable binaries only (tools/*.ts is source)
+tools/bin/
+__pycache__/

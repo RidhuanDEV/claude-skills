@@ -1,0 +1,27 @@
+{
+  "appName": "Nama Aplikasi",
+  "outputPrefix": "APP-panduan",
+  "cardFooter": "Panduan Nama Aplikasi · Nama Instansi · Narasi menggunakan suara sintetis (AI)",
+  "chapterLabel": "MODUL",
+  "guideLabel": "PANDUAN LENGKAP",
+  "brand": {
+    "logoIcon": "assets/brand/logo-icon.png",
+    "logoFull": "assets/brand/logo-full.png",
+    "accent": "#f5b000",
+    "backgroundFrom": "#1e3a8a",
+    "backgroundTo": "#070d1a"
+  },
+  "login": {
+    "path": "/login",
+    "username": "#username",
+    "password": "#password",
+    "submit": "form button[type=\"submit\"]",
+    "alsoUnauthenticated": ["/register"],
+    "landing": "/dashboard"
+  },
+  "rolePrefixes": ["LOGIN", "ADMIN"],
+  "chapters": [
+    { "no": "01", "title": "Login & Orientasi", "subtitle": "Masuk ke aplikasi dan mengenal menu utama", "videos": ["01-login-orientasi"] }
+  ],
+  "guides": []
+}

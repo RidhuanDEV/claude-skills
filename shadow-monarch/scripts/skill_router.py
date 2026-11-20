@@ -322,6 +322,15 @@ ROUTING_RULES: list[dict[str, Any]] = [
         ),
     },
     {
+        "skill": "shadow-video",
+        "layer": "task",
+        "references": ["FRONTEND.md", "sub-QA-AUTOMATION.md", "sub-VISION-OCR-MEDIA.md"],
+        "include": re.compile(
+            r"\b(?:video\s+tutorial|tutorial\s+video|narasi\s+TTS|TTS\s+narration|narrated\s+video|video-pipeline|rekam(?:an)?\s+layar|screen\s+recording|Azure\s+(?:AI\s+)?Speech|kartu\s+judul|title\s+cards?|video\s+panduan)\b",
+            re.IGNORECASE,
+        ),
+    },
+    {
         "skill": "shadow-accessibility",
         "layer": "risk",
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
@@ -921,6 +930,20 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-mobile"],
             ["shadow-browser"],
             "shadow-mobile",
+        ),
+        (
+            "RECALL-VIDEO-1: Narrated tutorial video with Indonesian TTS (no slash)",
+            "Buat video tutorial modul pengajuan usulan dengan narasi TTS Bahasa Indonesia dan subtitle SRT dari aplikasi staging.",
+            ["shadow-video"],
+            ["shadow-mobile", "shadow-perf"],
+            "shadow-video",
+        ),
+        (
+            "NEG-VIDEO-1: 375px layout check stays with shadow-browser (no slash)",
+            "Jalankan Playwright browser E2E untuk cek mobile viewport overflow 375px di halaman checkout.",
+            ["shadow-browser"],
+            ["shadow-video"],
+            "shadow-browser",
         ),
         (
             "RECALL-10: Cloud & LLM Token FinOps spike (no slash)",
