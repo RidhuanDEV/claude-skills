@@ -16,6 +16,7 @@ if (-not (Test-Path (Join-Path $Source 'SKILL.md'))) {
 
 $SkillFolders = @(
     'shadow-monarch',
+    'shadow-illustration',
     'shadow-discovery',
     'shadow-architect',
     'shadow-plan',

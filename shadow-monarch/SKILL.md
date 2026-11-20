@@ -183,6 +183,7 @@ For non-trivial work, run `python "shadow-monarch/scripts/skill_router.py" --rou
 | Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` | `antislop` + `antislop-ui` + `antislop-layoutmobile`, `/shadow-cache`, `/shadow-browser` |
 | UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` | `/shadow-design`, `/shadow-accessibility`, `antislop-human` |
 | UI/UX, Visual Art Direction & Product Interface Knowledge Base v2 (ID): 43 bab panduan desain antarmuka, art direction, visual choreography, pola mobile/web, design system, audit rubrics & AI prompts | `reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md` | `/shadow-design`, `antislop-ui` |
+| Brand illustrations, mascot variants, status artwork and SVG/Lottie handoff | [Mobile design workflow](reference/MOBILE-DESIGN.md) | $shadow-illustration |
 | Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` | `/shadow-design`, `/shadow-mobile` |
 | Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` | `/shadow-mobile` |
 | Refactoring Specialist: behavior-preserving extraction, characterization & cleanup | `reference/REFACTORING.md` | `/shadow-refactor`, `/shadow-quality`, `/shadow-modernize` (M&A/TCO) |
