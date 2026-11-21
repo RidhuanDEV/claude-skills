@@ -341,4 +341,5 @@ Run these alongside the core Delivery Gate when the task is UI work. All answers
 - [ ] Do empty form fields and table cells stay empty or carry honest placeholders (Your Name, email@example.com) instead of fake-looking data (John Doe, johndoe@example.com)? (R-23, R-38)
 - [ ] Do the empty, loading, and error states name the cause and the next action instead of saying "No data"? (R-27)
 - [ ] Does the page hold up at every breakpoint, theme, and state, and pass keyboard-only use? (R-03, R-34, C-4)
+- [ ] Do all custom components consume the project's semantic theme/design tokens (no ad-hoc hardcoded colors or unstyled default widgets clashing with light/dark themes), and do all enabled buttons/controls show `cursor: pointer` + visible `hover`, `active`, `:focus-visible` (3:1), and `disabled` (`cursor: not-allowed`) states? (R-25, R-32, R-34, R-39)
 - [ ] Is every media element sized, the hero image in the HTML with `fetchpriority="high"` and not lazy, no third-party script blocking render, and every reported metric actually measured? (R-40, R-36)

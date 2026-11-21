@@ -1,5 +1,5 @@
-# Installs the full 54-skill Shadow Army suite (shadow-monarch + companion /shadow-* skills)
-# and updates %USERPROFILE%\.claude\CLAUDE.md between markers.
+# Installs all Shadow Army skills (auto-discovered */SKILL.md) across Antigravity, Gemini CLI,
+# Claude Code, and Codex, and syncs GLOBAL.md between markers in CLAUDE.md, AGENTS.md, and GEMINI.md.
 # Run with: powershell -ExecutionPolicy Bypass -File .\install.ps1
 $ErrorActionPreference = 'Stop'
 
@@ -15,61 +15,14 @@ if (-not (Test-Path (Join-Path $Source 'SKILL.md'))) {
 }
 
 $SkillFolders = @(
-    'shadow-monarch',
-    'shadow-illustration',
-    'shadow-video',
-    'shadow-discovery',
-    'shadow-architect',
-    'shadow-plan',
-    'shadow-bootstrap',
-    'shadow-design',
-    'shadow-auth',
-    'shadow-data',
-    'shadow-db',
-    'shadow-api',
-    'shadow-cache',
-    'shadow-integrate',
-    'shadow-accessibility',
-    'shadow-quality',
-    'shadow-test',
-    'shadow-debug',
-    'shadow-refactor',
-    'shadow-concurrency',
-    'shadow-domain',
-    'shadow-search',
-    'shadow-realtime',
-    'shadow-supplychain',
-    'shadow-eval',
-    'shadow-sec',
-    'shadow-privacy',
-    'shadow-perf',
-    'shadow-uat',
-    'shadow-release',
-    'shadow-compat',
-    'shadow-browser',
-    'shadow-mobile',
-    'shadow-ops',
-    'shadow-observe',
-    'shadow-finops',
-    'shadow-resilience',
-    'shadow-maintain',
-    'shadow-handover',
-    'shadow-doc',
-    'shadow-git',
-    'shadow-presales',
-    'shadow-grc',
-    'shadow-modernize',
-    'shadow-pmo',
-    'shadow-ea',
-    'handoff',
-    'context7',
-    'antislop',
-    'antislop-ui',
-    'antislop-layoutmobile',
-    'antislop-human',
-    'antislop-copywriting',
-    'antislop-code'
+    Get-ChildItem -LiteralPath $PSScriptRoot -Directory | Where-Object {
+        Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') -PathType Leaf
+    } | Sort-Object Name | ForEach-Object { $_.Name }
 )
+
+if ($SkillFolders.Count -eq 0) {
+    throw "No skill directories containing SKILL.md found under $PSScriptRoot."
+}
 
 $TargetRoots = @(
     (Join-Path $HOME '.gemini\config\skills'),
@@ -127,4 +80,10 @@ foreach ($InstructionFile in $GlobalInstructionFiles) {
     }
 }
 
-Write-Host 'Done. All 54 Shadow Army skills and global instruction files (CLAUDE.md, AGENTS.md, GEMINI.md) are synced across Antigravity, Gemini CLI, Claude Code, and Codex.'
+$McpDir = Join-Path $PSScriptRoot 'mcp-servers'
+if (Test-Path $McpDir) {
+    $McpServers = @(Get-ChildItem -LiteralPath $McpDir -Directory -Filter 'shadow-*-mcp' | Where-Object { Test-Path (Join-Path $_.FullName 'index.mjs') })
+    Write-Host "Verified $($McpServers.Count) local Shadow MCP servers under ${McpDir}: $(($McpServers.Name) -join ', ')"
+}
+
+Write-Host "Done. All $($SkillFolders.Count) Shadow Army skills and global instruction files (CLAUDE.md, AGENTS.md, GEMINI.md) are synced across Antigravity, Gemini CLI, Claude Code, and Codex."

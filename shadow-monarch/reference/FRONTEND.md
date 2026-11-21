@@ -75,6 +75,28 @@ Keyboard operable, visible focus, focus management for modals/route changes, lab
 `prefers-reduced-motion`. Test at mobile, tablet, desktop, large screens, 200% zoom, long text and localized strings.
 UI must tolerate unexpected content length.
 
+### Interactive controls, theme-bound custom components & modern web baseline
+
+- **Mandatory Interactive Affordances (Tailwind v4 Preflight Safe):** Tailwind v4 and modern CSS resets remove `cursor: pointer` from `<button>`. Every app MUST define base-layer affordances (`button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, select:not(:disabled), label[for] { cursor: pointer; }` and `:disabled, [aria-disabled="true"] { cursor: not-allowed; }`) AND give every enabled interactive control **5 complete visual states**: `default`, `hover` (visible contrast/surface shift on hover-capable devices), `active`/pressed, `:focus-visible` (high-contrast ring >= 3:1), and `disabled` (no enabled hover treatment). Never attach `cursor: pointer` to dead/non-interactive elements.
+- **Theme-Bound Custom Component Contract:** Before creating or modifying any UI component, inspect the application's theme tokens (`@theme`, `:root` CSS variables, `tailwind.config.*`, `DESIGN.md`, and existing `components/ui/*` primitives). Every custom component MUST bind colors, surfaces, borders, radius, spacing, shadows, typography, and focus rings to the application's semantic theme tokens — never hardcode ad-hoc hex colors or ship raw unstyled browser/library widgets that clash with the app theme or break light/dark modes.
+- **Modern Web Platform First (`/modern-web-guidance`):** Prefer Baseline native HTML/CSS capabilities — `<dialog>`, Popover API + CSS Anchor Positioning (with feature detection fallback), Container Queries (`@container`), `:has()`, `:user-valid`/`:user-invalid`, `oklch()`/`light-dark()`, `content-visibility: auto`, and `fetchpriority="high"` on hero LCP images — over heavy ad-hoc JS libraries. Gate all non-essential animations behind `prefers-reduced-motion`.
+- **Custom Scrollbars:** When custom scrollbars are requested, theme the native thumb and track using the project's color tokens and `scrollbar-color`. Keep the thumb distinguishable, retain usable native width, and fall back to the browser's scrollbar where styling is unsupported or forced colors are active. Preserve wheel, touch, keyboard, and thumb dragging. Use smooth scrolling only for intentional navigation or programmatic scroll and respect `prefers-reduced-motion`.
+
+### Field-level validation
+
+- Derive each field's rules from the authoritative contract. Show the applicable unit, minimum, maximum, and
+  step or format beside the field before submit. Mirror numeric rules with `min`, `max`, and `step` where supported
+  and with client validation for typed and pasted input. Keep server validation authoritative and preserve the
+  entered value so users can correct it.
+- Map client and server validation failures to their fields using the verified error contract. Name the field,
+  explain the failure, and state how to fix it. For an illustrative `1–120` minute range, show **Durasi terlalu
+  besar. Masukkan 1–120 menit.** for `23123123`. Use the actual product bounds in production. Connect field errors with
+  `aria-describedby` and `aria-invalid`. On failed submit, focus the first invalid field or an error summary that
+  links to the affected fields. Reserve form-level messages for failures without a specific field.
+- Verify mouse, keyboard, and touch scroll and control states. For numeric fields, exercise the exact boundaries,
+  one value outside each applicable bound, an oversized paste, and the server error path. Check that users can
+  locate the field and see the accepted value or range.
+
 ## 8. Every data-driven view handles
 
 loading · empty · error (with retry) · partial data · slow network · offline where relevant · permission denied ·

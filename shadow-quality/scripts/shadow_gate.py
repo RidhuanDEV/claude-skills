@@ -28,8 +28,17 @@ if str(SCRIPT_DIR) not in sys.path:
 from codebase_intelligence import audit_convention_drift, discover_codebase  # noqa: E402
 
 TS_ANY_RE = re.compile(r"(:\s*any\b|<any>|\bas\s+any\b|\bArray<any>)")
-TS_CAST_RE = re.compile(r"\bas\s+(?!const\b)[A-Z][A-Za-z0-9_<>,\s|&]*")
+TS_CAST_RE = re.compile(
+    r"\bas\s+(?!const\b)(?:[A-Z][A-Za-z0-9_<>,\s|&]*|(?:string|number|boolean|unknown|object|never|symbol|bigint)\b)"
+)
+TS_IMPORT_EXPORT_RE = re.compile(r"^\s*(?:import\b|export\s+(?:\*|\{|type\s+\{))")
+TS_NON_NULL_RE = re.compile(r"(?<=[A-Za-z0-9_)\]])!(?=\.|\[|\()")
+TS_STRING_LIT_RE = re.compile(r"\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`")
 TS_SUPPRESS_RE = re.compile(r"@ts-(ignore|expect-error)\b")
+BACKEND_PROD_PATH_RE = re.compile(r"(?:^|[/\\])(?:backend|server|api|services|controllers|routes|handlers|middleware|workers)[/\\]", re.IGNORECASE)
+RAW_CONSOLE_LOG_RE = re.compile(r"\bconsole\.log\s*\(")
+UI_BUTTON_TAG_RE = re.compile(r"<button\b([^>]*)>", re.IGNORECASE | re.DOTALL)
+TW_UTILITY_RE = re.compile(r"\b(?:bg-|px-|py-|rounded|text-|border-)")
 
 SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("Private Key Header", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
@@ -106,7 +115,8 @@ def check_strict_typescript(file_path: Path, rel_path: str) -> list[dict[str, An
         if is_comment_line(line):
             continue
         code_part = line.split("//", 1)[0]
-        if TS_ANY_RE.search(code_part):
+        code_no_strings = TS_STRING_LIT_RE.sub('""', code_part)
+        if TS_ANY_RE.search(code_no_strings):
             violations.append({
                 "severity": "CRITICAL",
                 "code": "STRICT_TYPING_ANY",
@@ -114,15 +124,100 @@ def check_strict_typescript(file_path: Path, rel_path: str) -> list[dict[str, An
                 "message": "Explicit `any` is forbidden by Shadow Army strict typing rules.",
                 "corrective_action": "Define an explicit interface/type, or use `unknown` at external boundaries with immediate narrowing.",
             })
-        if TS_CAST_RE.search(code_part):
+        if not TS_IMPORT_EXPORT_RE.match(code_no_strings) and TS_CAST_RE.search(code_no_strings):
             violations.append({
                 "severity": "HIGH",
                 "code": "STRICT_TYPING_CAST",
                 "file": f"{rel_path}:{idx}",
-                "message": "Type assertion (`as Type`) is forbidden (only `as const` is allowed).",
+                "message": "Type assertion (`as Type` / primitive cast) is forbidden (only `as const` is allowed).",
                 "corrective_action": "Use a type guard, schema validator, or explicit generic return type instead of casting.",
             })
+        if TS_NON_NULL_RE.search(code_no_strings):
+            violations.append({
+                "severity": "HIGH",
+                "code": "STRICT_TYPING_NON_NULL_ASSERTION",
+                "file": f"{rel_path}:{idx}",
+                "message": "Non-null assertion (`!`) is forbidden by Shadow Army strict typing rules.",
+                "corrective_action": "Explicitly check for null/undefined and handle or throw a structured error before access.",
+            })
     return violations
+
+
+def check_backend_raw_console_log(file_path: Path, rel_path: str) -> list[dict[str, Any]]:
+    """Warn on raw `console.log` inside backend/server production code (prefer structured JSON logger)."""
+    warnings: list[dict[str, Any]] = []
+    if file_path.suffix not in (".ts", ".js", ".mjs", ".cjs") or TEST_FILE_RE.search(rel_path):
+        return warnings
+    if not BACKEND_PROD_PATH_RE.search(rel_path):
+        return warnings
+    try:
+        lines = file_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except Exception:
+        return warnings
+    for idx, line in enumerate(lines, start=1):
+        if is_comment_line(line):
+            continue
+        code_part = TS_STRING_LIT_RE.sub('""', line.split("//", 1)[0])
+        if RAW_CONSOLE_LOG_RE.search(code_part):
+            warnings.append({
+                "severity": "MEDIUM",
+                "code": "BACKEND_RAW_CONSOLE_LOG",
+                "file": f"{rel_path}:{idx}",
+                "message": "Raw `console.log` detected in backend production code instead of structured JSON logging.",
+                "corrective_action": "Use the project's structured JSON logger (e.g., pino/winston) with requestId context propagation and secret/PII redaction (`BACKEND.md` §12).",
+            })
+    return warnings
+
+
+def _repo_has_base_button_cursor_css(repo_root: Path) -> bool:
+    for css_file in repo_root.rglob("*.css"):
+        if "node_modules" in css_file.parts or "dist" in css_file.parts:
+            continue
+        try:
+            txt = css_file.read_text(encoding="utf-8", errors="ignore")
+            if re.search(r"button[^{]{0,120}\{[^}]*cursor\s*:\s*pointer", txt, re.IGNORECASE | re.DOTALL):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def check_ui_button_affordance(file_path: Path, rel_path: str, has_base_css_pointer: bool) -> list[dict[str, Any]]:
+    """Warn when Tailwind-styled `<button>` controls omit `cursor-pointer` (without base CSS rule) or `hover:`."""
+    warnings: list[dict[str, Any]] = []
+    if file_path.suffix not in (".tsx", ".jsx", ".vue", ".svelte") or TEST_FILE_RE.search(rel_path):
+        return warnings
+    try:
+        content = file_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return warnings
+    for m in UI_BUTTON_TAG_RE.finditer(content):
+        attrs = m.group(1)
+        cls_m = re.search(r'\bclass(?:Name)?\s*=\s*["\']([^"\']+)["\']', attrs)
+        if not cls_m:
+            continue
+        cls = cls_m.group(1)
+        if not TW_UTILITY_RE.search(cls):
+            continue
+        if not has_base_css_pointer and "cursor-pointer" not in cls and "cursor-not-allowed" not in cls:
+            warnings.append({
+                "severity": "MEDIUM",
+                "code": "UI_BUTTON_MISSING_POINTER_CURSOR",
+                "file": rel_path,
+                "message": "Tailwind-styled `<button>` lacks `cursor-pointer` and no base-layer CSS pointer rule was found (Tailwind v4 resets button cursor to default).",
+                "corrective_action": "Add base-layer CSS `button:not(:disabled) { cursor: pointer; }` or `cursor-pointer disabled:cursor-not-allowed` (`antislop-human`, `FRONTEND.md`).",
+            })
+            break
+        if "hover:" not in cls:
+            warnings.append({
+                "severity": "MEDIUM",
+                "code": "UI_BUTTON_MISSING_HOVER_STATE",
+                "file": rel_path,
+                "message": "Tailwind-styled `<button>` omits an explicit `hover:` visual affordance state.",
+                "corrective_action": "Provide all 5 interactive states (`default`, `hover`, `active`, `focus-visible`, `disabled`) bound to semantic theme tokens.",
+            })
+            break
+    return warnings
 
 
 def check_secrets(file_path: Path, rel_path: str) -> list[dict[str, Any]]:
@@ -308,6 +403,8 @@ def run_shadow_gate(
     )
     heuristic_files: list[str] = []
 
+    has_base_css_pointer = _repo_has_base_button_cursor_css(root)
+
     for f in files:
         if not f.is_file():
             continue
@@ -315,6 +412,8 @@ def run_shadow_gate(
         violations.extend(check_strict_typescript(f, rel))
         violations.extend(check_secrets(f, rel))
         violations.extend(check_docker_test_cleanup(f, rel))
+        warnings.extend(check_backend_raw_console_log(f, rel))
+        warnings.extend(check_ui_button_affordance(f, rel, has_base_css_pointer))
 
         if f.suffix in (".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rs", ".php") and not TEST_FILE_RE.search(rel):
             try:
@@ -598,6 +697,49 @@ def run_self_test() -> dict[str, Any]:
         ]
         missed = [n for n in ephemeral_names if not EPHEMERAL_CONTAINER_RE.search(n)]
         record("RECALL-7: `EPHEMERAL_CONTAINER_RE` matches leftover test/migration/drill container names", len(missed) == 0, json.dumps(missed))
+
+        # --- STRICT CAST / NON-NULL / BACKEND LOGGER / UI BUTTON PROBES ---
+        p8 = src / "cleanImportsAndNotEq.ts"
+        p8.write_text(
+            "import { foo as Bar } from './mod';\n"
+            "export function check(a: string, b: string): boolean {\n"
+            "  const msg = 'done!';\n"
+            "  return a !== b && !msg.startsWith('x') && Boolean(Bar);\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        r8 = run_shadow_gate(root, [p8], probes_verified=True)
+        record("PRECISION-8: `import { a as b }`, `!==`, `!expr`, and `'done!'` produce 0 typing violations", r8["passed"] and r8["total_violations_count"] == 0, json.dumps(r8["violations"]))
+
+        p9 = src / "GoodButton.tsx"
+        p9.write_text(
+            "export function GoodButton() {\n"
+            "  return <button type='button' className='bg-primary px-4 py-2 rounded cursor-pointer hover:bg-primary/90'>Save</button>;\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        r9 = run_shadow_gate(root, [p9], probes_verified=True)
+        record("PRECISION-9: Button with `cursor-pointer` and `hover:` produces 0 UI affordance warnings", r9["warnings_count"] == 0, json.dumps(r9["warnings"]))
+
+        rc8 = src / "badPrimitiveCastAndBang.ts"
+        rc8.write_text("export function f(x: unknown, y?: { id: string }) { const s = x as string; return y!.id + s; }\n", encoding="utf-8")
+        rr8 = run_shadow_gate(root, [rc8], probes_verified=True)
+        codes8 = {v["code"] for v in rr8["violations"]}
+        record("RECALL-8: Catches primitive `as string` cast and non-null assertion `y!.id`", not rr8["passed"] and "STRICT_TYPING_CAST" in codes8 and "STRICT_TYPING_NON_NULL_ASSERTION" in codes8, json.dumps(list(codes8)))
+
+        be_dir = root / "backend" / "routes"
+        be_dir.mkdir(parents=True)
+        rc9 = be_dir / "orders.ts"
+        rc9.write_text("export function logOrder(id: string) { console.log('order', id); }\n", encoding="utf-8")
+        rr9 = run_shadow_gate(root, [rc9], probes_verified=True)
+        wcodes9 = {w["code"] for w in rr9["warnings"]}
+        record("RECALL-9: Warns on raw `console.log` inside backend production route", "BACKEND_RAW_CONSOLE_LOG" in wcodes9, json.dumps(list(wcodes9)))
+
+        rc10 = src / "BadButton.tsx"
+        rc10.write_text("export function BadButton() { return <button className='bg-blue-600 px-4 py-2 rounded'>Click</button>; }\n", encoding="utf-8")
+        rr10 = run_shadow_gate(root, [rc10], probes_verified=True)
+        wcodes10 = {w["code"] for w in rr10["warnings"]}
+        record("RECALL-10: Warns on Tailwind `<button>` missing `cursor-pointer` when no base CSS rule exists", "UI_BUTTON_MISSING_POINTER_CURSOR" in wcodes10, json.dumps(list(wcodes10)))
 
     all_passed = all(r["passed"] for r in results)
     return {

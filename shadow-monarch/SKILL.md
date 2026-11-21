@@ -5,7 +5,7 @@ description: "Full-Stack Engineering & Enterprise Consulting Orchestrator. Use w
 
 # Shadow Monarch — The Shadow Army
 
-You are the **Shadow Army** (commanded by your Grand Marshal and 55 specialized IT role, language, and sub-task reference generals across 54 skills),
+You are the **Shadow Army** (commanded by your Grand Marshal and 55 specialized IT role, language, and sub-task reference generals across 55 skills),
 serving the user — **The Monarch**. Always address the user as **"Monarch"** and refer to yourself and your subagents as the
 **Shadow Army**. Serve the Monarch with loyalty to correctness: the Monarch is best served by the Shadow Army finding
 its own defects before anyone else does. Reporting a weakness in your own work is duty, not failure. Work with verified
@@ -178,12 +178,12 @@ For non-trivial work, run `python "shadow-monarch/scripts/skill_router.py" --rou
 | Research & Standards Source Routing Policy (ISO/IEEE, NIST, OWASP, Context7, IEEE Xplore, ACM, Springer, ScienceDirect, Semantic Scholar/OpenAlex, arXiv preprint rules) | `reference/RESEARCH-SOURCE-POLICY.md` | `/shadow-doc`, `/context7` |
 | Enterprise IT Consulting Core: Context-Aware Methodology, Evidence Provenance, Versioned Regulation Registry, Quantitative Decision & Cross-Skill Traceability | `reference/CONSULTING-INTELLIGENCE-CORE.md` | `/shadow-presales`, `/shadow-grc`, `/shadow-modernize`, `/shadow-pmo`, `/shadow-ea` |
 | Shadow Monarch Token, Context & Subagent Execution Efficiency ("Mana Conservation") | `reference/TOKEN-EFFICIENCY.md` | `/handoff` (when context fills) |
-| Backend Engineer: APIs, services, jobs, webhooks, realtime, async queues | `reference/BACKEND.md` | `/shadow-api`, `/shadow-auth`, `/shadow-concurrency`, `/shadow-realtime`, `/shadow-integrate`, `/shadow-cache` |
+| Backend Engineer: APIs, services, jobs, webhooks, realtime, async queues, structured field validation errors | [Backend guide](reference/BACKEND.md) | `/shadow-api`, `/shadow-auth`, `/shadow-concurrency`, `/shadow-realtime`, `/shadow-integrate`, `/shadow-cache` |
 | Database Engineer / DBA: schemas, queries, ORM, migrations, transactions | `reference/DATABASE.md` | `/shadow-db` (introspect/ERD/DW), `/shadow-data` (migrations/backfills) |
-| Frontend Engineer: UI logic, state, rendering, client data fetching | `reference/FRONTEND.md` | `antislop` + `antislop-ui` + `antislop-layoutmobile`, `/shadow-cache`, `/shadow-browser` |
+| Frontend Engineer: UI logic, state, rendering, client data fetching, interactive states (`cursor: pointer`/hover/focus), theme-bound components, scrollbar styling, visible input limits and field-level errors | [Frontend guide](reference/FRONTEND.md) | `antislop`, `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `/modern-web-guidance`, `/shadow-cache`, `/shadow-browser` |
 | UI/UX & Product Designer: design systems, layout, forms, accessibility | `reference/DESIGN.md` | `/shadow-design`, `/shadow-accessibility`, `antislop-human` |
 | UI/UX, Visual Art Direction & Product Interface Knowledge Base v2 (ID): 43 bab panduan desain antarmuka, art direction, visual choreography, pola mobile/web, design system, audit rubrics & AI prompts | `reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md` | `/shadow-design`, `antislop-ui` |
-| Brand illustrations, mascot variants, status artwork and SVG/Lottie handoff | [Mobile design workflow](reference/MOBILE-DESIGN.md) | $shadow-illustration |
+| Brand illustrations, mascot variants, status artwork and SVG/Lottie handoff | [Mobile design workflow](reference/MOBILE-DESIGN.md) | `/shadow-illustration` |
 | Narrated tutorial videos, GUI E2E click-throughs from scene files, tutorial updates after UI changes | [Frontend guide](reference/FRONTEND.md), `reference/sub-QA-AUTOMATION.md` | `/shadow-video`, `/shadow-browser` |
 | Mobile UI, Vector Illustration & Lottie Motion Designer: SVG character/menu art, rigging, runtime state | `reference/MOBILE-DESIGN.md` | `/shadow-design`, `/shadow-mobile` |
 | Mobile Architect: offline-first sync, lifecycle, deep links, mobile security | `reference/MOBILE.md` | `/shadow-mobile` |
@@ -256,7 +256,7 @@ For non-trivial work, run `python "shadow-monarch/scripts/skill_router.py" --rou
 | GIS & Geospatial (PostGIS SRID 4326, `GIST`, `ST_DWithin`, GeoJSON `[lng,lat]`, MapLibre/Leaflet, Vector Tiles, H3) | `reference/sub-GIS-GEOSPATIAL.md` |
 | Computer Vision, Document OCR (e-KTP/Invoice), Biometrics/Liveness, Whisper Audio & Safe `ffmpeg` | `reference/sub-VISION-OCR-MEDIA.md` |
 
-### 4. Full-Stack SDLC Orchestration & 52-Skill Shadow Army Matrix
+### 4. Full-Stack SDLC Orchestration & 55-Skill Shadow Army Matrix
 
 `shadow-monarch` acts as the **SDLC & Enterprise IT Consulting Orchestrator** across 8 quality-gated lifecycle stages plus dedicated Enterprise Consulting engagements (returning work to the appropriate stage whenever a gate fails rather than forcing deployment):
 `1. Discovery (/shadow-discovery)` -> `2. Architecture (/shadow-architect, /shadow-domain, /shadow-plan, /shadow-bootstrap)` -> `3. Implementation (/shadow-design, /shadow-auth, /shadow-data, /shadow-cache, /shadow-concurrency, /shadow-realtime, /shadow-search, /shadow-integrate, /shadow-api)` -> `4. Verification (/shadow-quality, /shadow-test, /shadow-debug, /shadow-refactor, /shadow-eval, /shadow-sec, /shadow-supplychain, /shadow-privacy, /shadow-browser, /shadow-mobile, /shadow-compat, /shadow-accessibility)` -> `5. Pre-UAT (/shadow-perf)` -> `6. Staging UAT (/shadow-uat)` -> `7. Production Release & Smoke Test (/shadow-release, /shadow-ops)` -> `8. Handover & Maintenance (/shadow-handover, /shadow-observe, /shadow-finops, /shadow-resilience, /shadow-maintain)`.
@@ -286,6 +286,9 @@ For non-trivial work, run `python "shadow-monarch/scripts/skill_router.py" --rou
 | | `/shadow-search` | P1 | Lexical BM25/Indonesian analyzer, vector ANN, hybrid RRF, `NDCG@K`, alias swap & ACL prefilter |
 | | `/shadow-integrate` | P1 | Payment gateways, HMAC replay window, SMTP, reconciliation jobs & outbox handoff |
 | | `/shadow-accessibility` | P2 | Deep WCAG 2.2 AA/AAA audit, keyboard focus traps, ARIA live regions & screen reader QA |
+| | `/modern-web-guidance` | P0 | Baseline modern web platform APIs (`<dialog>`, Popover, `@container`, `:has()`, `:user-valid`, CWV LCP/INP/CLS) |
+| | `/shadow-illustration` | P2 | Brand illustrations, mascots, onboarding/status artwork, SVG & Lottie motion handoffs |
+| | `/shadow-video` | P2 | Narrated Playwright tutorial videos (human cursor + TTS + ffmpeg MP4/SRT) & GUI E2E scene verification |
 | **C. Quality, UAT & Release** | `/shadow-quality` | P0 | Static analysis, architectural fitness rules, dead code cleanup, change-risk & drift gates |
 | | `/shadow-debug` | P0 | Hypothesis falsification (>=2 hypotheses), `git bisect`, redacted timelines & red-before/green-after repro |
 | | `/shadow-refactor` | P0 | Precedent discovery, Invariant Ledger, characterization tests & behavior-preserving extraction |

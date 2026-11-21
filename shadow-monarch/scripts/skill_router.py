@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SKIP_ROOT_DIRS = {"evals", "mcp-servers", "reports"}
+SKIP_ROOT_DIRS = {"evals", "mcp-servers", "reports", "docs", "scripts", "node_modules"}
 
 USE_WHEN_RE = re.compile(r"\buse\s+(?:only\s+)?when\b", re.IGNORECASE)
 CODE_REVIEW_RE = re.compile(
@@ -41,7 +41,13 @@ LOAD_TEST_DENIAL_RE = re.compile(
     r"(?:k6|(?:a\s+)?(?:load|stress|soak)\s+test)\b",
     re.IGNORECASE,
 )
-QUOTED_LOG_RE = re.compile(r"```[\s\S]*?```|\"[^\"]{12,}\"|'[^']{12,}'")
+QUOTED_LOG_RE = re.compile(
+    r"```[\s\S]*?```|"
+    r"(?:\b(?:log|error|stderr|stdout|paste|output|stack\s*trace|traceback)\s*[:=]\s*)(?:\"[^\"]*\"|'[^']*')|"
+    r"\"[^\"]*(?:failed|timeout|exception|traceback|stack\s*trace|/shadow-[a-z-]+)[^\"]*\"|"
+    r"'[^']*(?:failed|timeout|exception|traceback|stack\s*trace|/shadow-[a-z-]+)[^']*'",
+    re.IGNORECASE,
+)
 NEGATED_CLAUSE_RE = re.compile(
     r"\b(?:jangan|tidak\s+perlu|tanpa|do\s+not|don't|without|skip|no)\s+"
     r"(?:jalankan\s+|run\s+|lakukan\s+|do\s+)?(?:load\s*test(?:ing)?|stress\s*test(?:ing)?|soak\s*test(?:ing)?|"
@@ -133,7 +139,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DEBUGGING.md", "CODEBASE-INTELLIGENCE.md"],
         "include": re.compile(
-            r"\b(?:returns?\s+500|HTTP\s*500|500\s+errors?|random\s+500|diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|flaky\s+test|git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug)\b",
+            r"\b(?:returns?\s+500|HTTP\s*500|500\s+errors?|random\s+500|\b500\b\s+(?:di|in|on)\s+\w+|"
+            r"diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|"
+            r"database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|flaky\s+test|"
+            r"git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug|"
+            r"(?:ada|fix|perbaiki)\s+bug\b|sering\s+timeout|tidak\s+(?:mengirim|berfungsi|bekerja)\s+\w+)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:typo[- ]only|only\s+typo|README\s+typo|pure\s+formatting)\b", re.IGNORECASE),
@@ -152,7 +162,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["REFACTORING.md", "CODEBASE-INTELLIGENCE.md"],
         "include": re.compile(
-            r"\b(?:refactor\s+(?:old|legacy|module|feature)|behavior\s+unchanged|characterization\s+test|branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam)\b",
+            r"\b(?:refactor\s+(?:old|legacy|module|feature|service|controller|handler|component|helper|function|kode|code|class|[a-z0-9_-]+\s+(?:service|module|handler|controller|component))|"
+            r"behavior\s+unchanged|characterization\s+test|branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -247,14 +258,20 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:pre[- ]UAT\s+(?:perf|load)|k6\s+load|load\s+test|stress\s+test|spike\s+test|EXPLAIN\s+ANALYZE|query\s+profiling|bottleneck\s+audit)\b",
             re.IGNORECASE,
         ),
-        "exclude": re.compile(r"\b(?:build|implement|create|buat|tambah)\b", re.IGNORECASE),
+        "exclude": re.compile(
+            r"^(?!.*\b(?:pre[- ]?UAT|k6|EXPLAIN\s+ANALYZE)\b).*\b(?:build|implement|create|buat|tambah)\b",
+            re.IGNORECASE | re.DOTALL,
+        ),
     },
     {
         "skill": "shadow-api",
         "layer": "task",
         "references": ["BACKEND.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
-            r"\b(?:REST\s+API|API\s+(?:endpoint|documentation)|dokumentasi\s+API|backend\s+endpoint|OpenAPI|openapi\.yaml|Swagger|Postman|HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457)\b",
+            r"\b(?:REST\s+API|API\s+(?:endpoint|documentation)|dokumentasi\s+API|backend\s+endpoint|endpoint\s+backend|"
+            r"endpoint\s+(?:Express|FastAPI|NestJS|Hono|Laravel|Go|REST)|\b(?:GET|POST|PUT|PATCH|DELETE)\s+/[a-z0-9_/:.-]+|"
+            r"OpenAPI|openapi\.yaml|Swagger|Postman|Bruno|\.bru\b|Scalar|Redoc|Insomnia|TypeSpec|"
+            r"HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457)\b",
             re.IGNORECASE,
         ),
     },
@@ -308,7 +325,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["SECURITY.md", "SECOPS-PENTEST.md"],
         "include": re.compile(
-            r"\b(?:STRIDE|threat\s+model|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|IDOR|SSRF|transitive\s+dependency|attack[- ]surface)\b",
+            r"\b(?:STRIDE|threat\s+model|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|"
+            r"IDOR|SSRF|XSS|CSRF|CSP|CORS|BOLA|broken\s+access|clickjacking|kerentanan|celah\s+keamanan|"
+            r"audit\s+keamanan|transitive\s+dependency|attack[- ]surface)\b",
             re.IGNORECASE,
         ),
     },
@@ -331,11 +350,35 @@ ROUTING_RULES: list[dict[str, Any]] = [
         ),
     },
     {
+        "skill": "shadow-illustration",
+        "layer": "task",
+        "references": ["MOBILE-DESIGN.md", "DESIGN.md"],
+        "include": re.compile(
+            r"\b(?:product\s+illustration|ilustrasi\s+(?:SVG|produk|maskot|onboarding|status)|mascot|maskot|"
+            r"onboarding\s+(?:art|illustration)|status\s+artwork|SVG\s+(?:character|mascot|illustration)|"
+            r"Lottie\s+(?:motion|handoff|animation))\b",
+            re.IGNORECASE,
+        ),
+    },
+    {
+        "skill": "modern-web-guidance",
+        "layer": "task",
+        "references": ["FRONTEND.md"],
+        "include": re.compile(
+            r"\b(?:modern[- ]web[- ]guidance|popover\s+API|anchor\s+positioning|container\s+quer(?:y|ies)|"
+            r"@container|:has\(|:user-valid|view\s+transitions?\s+API|scroll[- ]driven\s+animations?|"
+            r"content-visibility|fetchpriority|core\s+web\s+vitals|native\s+<dialog>)\b",
+            re.IGNORECASE,
+        ),
+        "exclude": re.compile(r"\b(?:SQL\s+query|Dockerfile|GitHub\s+Actions|CI/CD\s+pipeline)\b", re.IGNORECASE),
+    },
+    {
         "skill": "shadow-accessibility",
         "layer": "risk",
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
-            r"\b(?:WCAG|screen\s+reader|ARIA\s+live|focus\s+trap|keyboard\s+navigation|aksesibilitas|lansia\s+contrast)\b",
+            r"\b(?:WCAG|screen\s+reader|ARIA\s+live|aria-label|aria-describedby|focus\s+trap|"
+            r"keyboard\s+navigation|tab\s+order|kontras\s+warna|color\s+contrast|aksesibilitas|lansia\s+contrast)\b",
             re.IGNORECASE,
         ),
     },
@@ -463,7 +506,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["sub-OBSERVABILITY-PROFILING.md", "CLOUD-SRE.md"],
         "include": re.compile(
-            r"\b(?:SLI|SLO|error\s+budget|OpenTelemetry|OTel|Prometheus|PromQL|Loki|Grafana|distributed\s+tracing|traceparent|returns?\s+500|random\s+500)\b",
+            r"\b(?:SLI|SLO|error\s+budget|OpenTelemetry|OTel|Prometheus|PromQL|Loki|Grafana|distributed\s+tracing|"
+            r"traceparent|structured\s+log(?:ger|ging)?|pino|winston|structlog|log/slog|correlation\s+id|"
+            r"X-Request-Id|wide[- ]event\s+log|returns?\s+500|random\s+500)\b",
             re.IGNORECASE,
         ),
     },
@@ -506,15 +551,48 @@ CO_ACTIVATION_MAP: dict[str, dict[str, list[str]]] = {
     "shadow-architect": {"supporting": ["shadow-domain"], "risk": ["shadow-sec"]},
 }
 
+LANGUAGE_REF_RULES: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\b(?:TypeScript|Node\.js|Express|NestJS|Hono|Next\.js)\b", re.IGNORECASE), "lang-TYPESCRIPT-NODE.md"),
+    (re.compile(r"\b(?:Golang|\bGo\b\s+(?:service|API|backend|server|worker))\b", re.IGNORECASE), "lang-GO.md"),
+    (re.compile(r"\b(?:Python|FastAPI|Django|Flask|Pytest)\b", re.IGNORECASE), "lang-PYTHON.md"),
+    (re.compile(r"\b(?:Laravel|PHP|Pest|PHPUnit)\b", re.IGNORECASE), "lang-PHP-LARAVEL.md"),
+    (re.compile(r"\b(?:Spring\s+Boot|Kotlin|Java\b|JUnit)\b", re.IGNORECASE), "lang-JAVA-KOTLIN.md"),
+    (re.compile(r"\b(?:ASP\.NET|C#|EF\s+Core|\.NET\b)\b", re.IGNORECASE), "lang-DOTNET.md"),
+    (re.compile(r"\b(?:Rust|tokio|axum|cargo)\b", re.IGNORECASE), "lang-RUST.md"),
+    (re.compile(r"\b(?:Flutter|Dart\b)\b", re.IGNORECASE), "lang-DART-FLUTTER.md"),
+    (re.compile(r"\b(?:C\+\+|CMake|FreeRTOS|ESP32|STM32)\b", re.IGNORECASE), "lang-CPP-SYSTEMS.md"),
+    (re.compile(r"\b(?:MCP\s+server|subagent|multi[- ]agent)\b", re.IGNORECASE), "AGENTS-MCP.md"),
+    (re.compile(r"\b(?:PostGIS|GeoJSON|MapLibre|Leaflet|geospatial)\b", re.IGNORECASE), "sub-GIS-GEOSPATIAL.md"),
+    (re.compile(r"\b(?:LoRA|QLoRA|fine[- ]tun|Unsloth|Langfuse)\b", re.IGNORECASE), "sub-LLM-FINETUNING-LLMOps.md"),
+    (re.compile(r"\b(?:PowerShell|\.ps1|Makefile|Justfile|Taskfile)\b", re.IGNORECASE), "sub-SHELL-CLI-AUTOMATION.md"),
+]
+
 UI_ANTISLOP_RE = re.compile(
-    r"\b(?:UI|frontend|halaman|landing\s+page|CSS|Tailwind|React|Next\.js|Vue|form|modal|navbar|dashboard|tombol|button|layout|mobile\s+responsive|copywriting)\b",
+    r"\b(?:UI|frontend|halaman|landing\s+page|CSS|Tailwind|React|Next\.js|Vue|Svelte|Angular|shadcn|"
+    r"component|komponen|card|dropdown|dialog|drawer|table|tabel|tabs|sidebar|header|footer|input|select|"
+    r"badge|toast|popover|tooltip|accordion|theme|styling|form|modal|navbar|dashboard|tombol|button|layout|"
+    r"mobile\s+responsive)\b",
+    re.IGNORECASE,
+)
+COPYWRITING_RE = re.compile(
+    r"\b(?:copywriting|microcopy|headline|CTA|call[- ]to[- ]action|pesan\s+error|UX\s+writing|product\s+prose)\b",
+    re.IGNORECASE,
+)
+CODE_COMMENT_RE = re.compile(
+    r"\b(?:code\s+comments?|komentar\s+kode|clean(?:up)?\s+comments?|rapikan\s+(?:code\s+)?comments?)\b",
     re.IGNORECASE,
 )
 TYPO_ONLY_RE = re.compile(
-    r"\b(?:typo[- ]only\s+README|fix\s+(?:a\s+)?(?:small\s+)?typo\s+in\s+README|perbaiki\s+typo\s+(?:di\s+)?README|only\s+typo)\b",
+    r"\b(?:typo[- ]only\b|fix\s+(?:a\s+)?(?:small\s+)?typo\s+(?:in\s+)?[^\n]{0,40}(?:README|\.(?:md|txt))|"
+    r"perbaiki\s+typo\s+(?:di\s+)?[^\n]{0,40}(?:README|\.(?:md|txt))|only\s+typo)\b",
     re.IGNORECASE,
 )
 TRIVIAL_FACT_RE = re.compile(r"^\s*(?:apa\s+itu|what\s+is|berapa|bagi\s+benchmark|knp|kenapa)\b", re.IGNORECASE)
+NON_TRIVIAL_INCIDENT_RE = re.compile(
+    r"\b(?:API|error|500|40[0-9]|timeout|crash|bug|gagal|production|staging|DB|database|server|query|endpoint|"
+    r"slow|lambat|tagihan|cost|token|cloud|K8s)\b",
+    re.IGNORECASE,
+)
 PROD_ACCESS_UNAUTH_RE = re.compile(
     r"\b(?:production\s+data\s+access\s+required\s+but\s+not\s+authorized|no\s+prod(?:uction)?\s+(?:DB|data)\s+access|akses\s+produksi\s+belum\s+diizinkan)\b",
     re.IGNORECASE,
@@ -640,7 +718,12 @@ def route_prompt(
     excluded_records: list[dict[str, str]] = []
 
     is_typo_only = bool(TYPO_ONLY_RE.search(signal_text)) and not explicit_skills
-    is_trivial_fact = bool(TRIVIAL_FACT_RE.match(signal_text)) and not explicit_skills
+    is_definitional_query = bool(re.match(r"^\s*(?:apa\s+itu|what\s+is|what\s+does)\b", signal_text, re.IGNORECASE))
+    is_trivial_fact = (
+        bool(TRIVIAL_FACT_RE.match(signal_text))
+        and not explicit_skills
+        and (is_definitional_query or not NON_TRIVIAL_INCIDENT_RE.search(signal_text))
+    )
 
     for sl in explicit_skills:
         if sl in blocked_by_scope:
@@ -669,8 +752,19 @@ def route_prompt(
                     target_bucket.append(sname)
 
     always_on_ui: list[str] = []
-    if not is_typo_only and UI_ANTISLOP_RE.search(signal_text):
-        always_on_ui = ["antislop", "antislop-ui", "antislop-layoutmobile"]
+    if not is_typo_only:
+        if UI_ANTISLOP_RE.search(signal_text):
+            for ui_skill in ("antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "modern-web-guidance"):
+                if ui_skill in known_skills and ui_skill not in matched_ordered and ui_skill not in always_on_ui:
+                    always_on_ui.append(ui_skill)
+        if COPYWRITING_RE.search(signal_text) and "antislop-copywriting" in known_skills:
+            if "antislop" not in always_on_ui and "antislop" in known_skills:
+                always_on_ui.append("antislop")
+            if "antislop-copywriting" not in always_on_ui:
+                always_on_ui.append("antislop-copywriting")
+        if CODE_COMMENT_RE.search(signal_text) and "antislop-code" in known_skills:
+            if "antislop-code" not in always_on_ui:
+                always_on_ui.append("antislop-code")
 
     # Guard against accidental shadow-perf loading during routine implementation
     if "shadow-perf" not in matched_ordered and "shadow-perf" not in blocked_by_scope and re.search(r"\b(?:build|implement|create|buat|tambah)\b", signal_text, re.IGNORECASE):
@@ -719,6 +813,18 @@ def route_prompt(
                     if reference not in matched_refs:
                         matched_refs.append(reference)
 
+    if not is_trivial and any(s in always_on_ui for s in ("antislop-ui", "antislop-human", "modern-web-guidance")):
+        if "FRONTEND.md" not in matched_refs:
+            matched_refs.append("FRONTEND.md")
+
+    if not is_trivial and (companion_skills or always_on_ui):
+        for lang_re, lang_ref in LANGUAGE_REF_RULES:
+            if len(matched_refs) >= 4:
+                break
+            if lang_re.search(signal_text) and lang_ref not in matched_refs:
+                matched_refs.append(lang_ref)
+                break
+
     if not is_trivial and not matched_refs and companion_skills:
         matched_refs.append("CORE.md")
 
@@ -746,16 +852,18 @@ def route_prompt(
     elif is_unit_test_only:
         intent_mode = "unit_test"
         max_auto_level = "L1_SAFE_VERIFICATION"
-    elif "shadow-debug" in matched_ordered:
+    elif primary_skill == "shadow-debug":
         intent_mode = "debug"
         max_auto_level = "L1_SAFE_VERIFICATION"
-    elif "shadow-perf" in matched_ordered:
+    elif primary_skill == "shadow-perf":
         intent_mode = "perf_optimization"
         max_auto_level = "L1_SAFE_VERIFICATION"
-    elif "shadow-data" in matched_ordered or "shadow-db" in matched_ordered:
+    elif primary_skill in {"shadow-data", "shadow-db"}:
         intent_mode = "db_fix"
         max_auto_level = "L1_SAFE_VERIFICATION"
-    elif always_on_ui:
+    elif primary_skill in {"shadow-design", "shadow-accessibility", "modern-web-guidance", "shadow-illustration"} or (
+        primary_skill == "shadow-monarch" and always_on_ui
+    ):
         intent_mode = "ui_implementation"
         max_auto_level = "L1_SAFE_VERIFICATION"
     elif matched_ordered:
@@ -860,8 +968,8 @@ def run_self_test() -> dict[str, Any]:
     known_skills = get_known_skill_names()
     results: list[dict[str, Any]] = [
         {
-            "probe": "AUDIT-1: All 52 SKILL.md have 'Use when...' triggers & <=500 chars",
-            "passed": audit["all_passed"] and audit["total_skills"] >= 52,
+            "probe": "AUDIT-1: All 55 SKILL.md have 'Use when...' triggers & <=500 chars",
+            "passed": audit["all_passed"] and audit["total_skills"] >= 55,
             "details": audit,
         }
     ]
@@ -1194,6 +1302,76 @@ def run_self_test() -> dict[str, Any]:
             [],
             ["shadow-api"],
             "shadow-monarch",
+        ),
+        (
+            "UI-CRAFT-1: Component + button loads antislop-human, modern-web-guidance & FRONTEND.md",
+            "Tolong buatkan component card dan button primary sesuai theme aplikasi.",
+            ["antislop", "antislop-ui", "antislop-human", "modern-web-guidance"],
+            ["shadow-perf"],
+            "shadow-monarch",
+        ),
+        (
+            "UI-CRAFT-2: Indonesian dropdown/tabel component triggers UI bundle",
+            "Buatkan komponen dropdown filter dan tabel transaksi.",
+            ["antislop-human", "modern-web-guidance"],
+            ["shadow-perf"],
+            "shadow-monarch",
+        ),
+        (
+            "UI-CRAFT-3: SVG mascot illustration routes to shadow-illustration",
+            "Tolong buatkan ilustrasi SVG maskot onboarding untuk halaman welcome.",
+            ["shadow-illustration"],
+            ["shadow-perf"],
+            "shadow-illustration",
+        ),
+        (
+            "UI-CRAFT-4: Copywriting and code comments route antislop-copywriting & antislop-code",
+            "Perbaiki copywriting headline CTA dan rapikan code comments di halaman checkout.",
+            ["antislop-copywriting", "antislop-code"],
+            ["shadow-perf"],
+            "shadow-monarch",
+        ),
+        (
+            "DEBUG-ID-1: Indonesian 'Kenapa...' production 500/timeout routes shadow-debug (never trivial)",
+            "Kenapa API checkout kita sering timeout dan 500 di production?",
+            ["shadow-debug"],
+            ["shadow-perf"],
+            "shadow-debug",
+        ),
+        (
+            "QUOTE-1: Quoted user requirement is NOT stripped as log",
+            'User bilang "buatkan endpoint REST API login dengan RBAC"',
+            ["shadow-api", "shadow-auth"],
+            ["shadow-perf"],
+            "shadow-api",
+        ),
+        (
+            "PERF-PREUAT-1: Explicit 'Buat script k6 load test Pre-UAT' routes shadow-perf",
+            "Buat script k6 load test untuk Pre-UAT staging dari openapi.yaml.",
+            ["shadow-perf", "shadow-api"],
+            [],
+            "shadow-perf",
+        ),
+        (
+            "API-BRUNO-1: Bruno .bru update and Indonesian Express endpoint route shadow-api + shadow-observe",
+            "Update koleksi Bruno orders.bru dan buat endpoint Express POST /orders dengan structured logger pino.",
+            ["shadow-api", "shadow-observe"],
+            ["shadow-perf"],
+            "shadow-api",
+        ),
+        (
+            "SEC-WEB-1: XSS/CSRF/CSP/CORS audit routes shadow-sec",
+            "Audit celah XSS, CSRF, CSP, dan CORS pada aplikasi web ini.",
+            ["shadow-sec"],
+            ["shadow-perf"],
+            "shadow-sec",
+        ),
+        (
+            "REFACTOR-GEN-1: Normal service refactor routes shadow-refactor",
+            "Refactor checkout service untuk memisahkan kalkulasi pajak.",
+            ["shadow-refactor"],
+            ["shadow-perf"],
+            "shadow-refactor",
         ),
     ]
 

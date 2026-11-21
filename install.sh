@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs all 54 Shadow Army skills across Claude Code, Codex, Gemini CLI & Antigravity (macOS / Linux)
+# Installs all Shadow Army skills (auto-discovered */SKILL.md) across Claude Code, Codex, Gemini CLI & Antigravity (macOS / Linux)
 # and syncs GLOBAL.md between markers in ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, and ~/.gemini/GEMINI.md.
 set -euo pipefail
 
@@ -60,4 +60,11 @@ for INST_FILE in "${INSTRUCTION_FILES[@]}"; do
   fi
 done
 
-echo "Done. All 54 Shadow Army skills and global instruction files are synced."
+SKILL_COUNT=0
+for SKILL_MD in "$SCRIPT_DIR"/*/SKILL.md; do
+  [ -f "$SKILL_MD" ] && SKILL_COUNT=$((SKILL_COUNT + 1))
+done
+if [ -d "$SCRIPT_DIR/mcp-servers" ]; then
+  echo "Verified local Shadow MCP servers under: $SCRIPT_DIR/mcp-servers"
+fi
+echo "Done. All $SKILL_COUNT Shadow Army skills and global instruction files are synced."
