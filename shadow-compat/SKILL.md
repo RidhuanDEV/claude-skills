@@ -58,3 +58,11 @@ Watch for and eliminate common cross-platform pitfalls:
 - **Version Pinning & Decision Record (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Resolve peer/runtime `engines` compatibility first and pin approved concrete versions in production/regulated projects instead of leaving floating `latest` ranges.
 
 Run `python -m unittest discover -s tests` from this skill directory for examples of strict decoding, omitted cursors and ordering changes. Capture each real client's decoder/version and business expectations before treating a replay as representative.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| RFC 9745/8594 `Deprecation`/`Sunset`/`410 Gone`, Expand-Contract Compatibility & Semantic Diff Checks | [references/backward-compat-and-deprecation.md](references/backward-compat-and-deprecation.md) |
+
+Do not load unrelated references unnecessarily.

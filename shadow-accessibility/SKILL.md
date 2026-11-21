@@ -57,4 +57,5 @@ Works alongside `antislop-human` to provide deep, verifiable accessibility engin
 ## 2. Foreign-Key Reference Routing (`T1` Audited Packs)
 - **Inclusive Design & Screen Reader Flow Architecture**: [`ghaida-intent/skills/include/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/include/SKILL.md) & [`accessibility-foundations.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md)
 - **Cultural, Linguistic & RTL/LTR Localization**: [`ghaida-intent/skills/localize/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/localize/SKILL.md)
+- **i18n, ICU MessageFormat, `Intl.*`, CSS Logical RTL & Pseudo-Localization Engineering**: [i18n and RTL engineering playbook](references/i18n-and-rtl-engineering.md)
 - **Accessibility, Responsive & Microcopy Rules**: [`06-accessibility-responsive-content.md`](../shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md)

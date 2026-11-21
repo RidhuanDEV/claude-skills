@@ -36,3 +36,6 @@ Capture redacted events at broker, authorization and client boundaries. Give eac
 - Distinguish a behavioral violation (`FAIL`) from an absent observation (`INCOMPLETE`). The former flat session format remains readable as incomplete evidence. A passing trace is evidence for the supplied sequence only. Window duration, load, connection fairness, jitter distribution, graph-wide propagation and recovery latency require their own measurements.
 
 When handing off, attach the trace revision, service contract, emitter/consumer instrumentation, selected topology, recovery decision and uncovered conditions. Never reconstruct observed `applied` or `blocked` values from design intentions.
+
+## Deep Engineering Reference (Load On-Demand)
+- For SSE vs WebSocket vs WebTransport vs WebRTC (STUN/TURN/SFU) vs MQTT (QoS/LWT), collaborative editing (CRDT Yjs/Automerge vs OT), jittered reconnect storms, and zombie socket pruning -> read [Realtime protocols & collaborative sync](references/protocols-and-collaborative-sync.md).

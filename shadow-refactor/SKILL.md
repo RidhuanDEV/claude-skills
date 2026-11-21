@@ -37,3 +37,11 @@ python "shadow-refactor/scripts/refactor_characterization_gate.py" --verify-plan
 ## 4. Execution Approval & Intent Boundary (`L0`–`L2`)
 - Refactoring inside explicitly requested modules with passing characterization tests is `L1_SAFE_VERIFICATION`. Unrequested refactoring or editing files outside requested modules is **`L2: SCOPE_EXPANSION`** and requires explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
 - Preserve existing framework conventions, package managers, and trusted internal/SSO SDKs (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`); never introduce unsolicited dependency swaps during cleanup.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Choosing Seam Injection vs Branch-by-Abstraction vs Strangler, Characterization Tests & Side-Effect Ordering | [references/seam-extraction-and-characterization.md](references/seam-extraction-and-characterization.md) |
+
+Do not load unrelated references unnecessarily.

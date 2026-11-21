@@ -36,3 +36,6 @@ python "shadow-debug/scripts/debug_hypothesis_gate.py" --validate-report path/to
 
 ## 4. Execution Approval & Intent Boundary (`L0`–`L4`)
 - Log/config/code diagnosis is `L0_READ_ONLY`; minimal local reproduction tests are bounded `L1_SAFE_VERIFICATION` inside verified local/sandbox targets. Debugging NEVER authorizes `L3` stress/load testing or `L4` staging/production/unknown mutations without the 7-part approval contract (`shadow-monarch/scripts/execution_approval_gate.py`).
+
+## 5. Deep Forensics Reference (Load On-Demand)
+- For CPU flamegraphs & event-loop lag (`--cpu-prof`/`py-spy`/`pprof`), 3-snapshot memory leak diffing, PostgreSQL/InnoDB deadlock graph decoding, connection pool/DNS exhaustion, and flaky test elimination -> read [Production forensics playbook](references/production-forensics.md).

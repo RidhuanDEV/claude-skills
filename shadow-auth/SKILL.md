@@ -62,3 +62,6 @@ Every privileged or security-sensitive action (login success/failure, password r
 ## Search and generated-answer handoff
 
 For a retrieval comparison, obtain the current policy revision from the authorized policy owner independently of the candidate trace. Freeze tenant, principal-specific permitted document IDs and revocations for each query at that revision. Compare corpus and label revisions on both runs. Inspect ranked results and the actual generation context separately, including entries below the metric cutoff. Missing or stale authorization evidence requires a hold. Returned-result checks only establish what the trace contained; verify enforcement before top-K in the serving implementation independently.
+
+## Deep Engineering Reference (Load On-Demand)
+- For Passkeys/WebAuthn (FIDO2), MFA/TOTP, ReBAC (Zanzibar/OpenFGA/SpiceDB), M2M mTLS/OIDC Workload Identity, DPoP, and API key lifecycles -> read [Modern AuthN, ReBAC, M2M & API keys](references/modern-authn-authz.md).

@@ -1,0 +1,25 @@
+{
+  "references": [
+    {
+      "title": "Lottie Web v5.13.0 license",
+      "doi_or_url": "https://raw.githubusercontent.com/airbnb/lottie-web/v5.13.0/LICENSE.md",
+      "venue": "Airbnb Lottie Web",
+      "year": "v5.13.0",
+      "source_type": "PROJECT_ARTIFACT",
+      "peer_reviewed": null,
+      "citation_badge": "[PROJECT-ARTIFACT]",
+      "download_url": "https://raw.githubusercontent.com/airbnb/lottie-web/v5.13.0/LICENSE.md",
+      "verified_at": "2026-11-20T03:58:57Z",
+      "safety": {
+        "file": "lottie-web-v5.13.0-license.md",
+        "filename": "lottie-web-v5.13.0-license.md",
+        "size_bytes": 1075,
+        "sha256": "9d8d4d8b4bb99572ee8b51025a30b8493d949798cac465c6c15b1b29420bcb06",
+        "safe": true,
+        "status": "SAFE",
+        "reasons": [],
+        "quarantine_action": "NONE"
+      }
+    }
+  ]
+}

@@ -98,3 +98,11 @@ Always resolve architectural decisions using this hierarchy:
 - [ ] **Official-First & Technology Decision Record (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Selected technologies follow the 5-tier hierarchy (`Existing trusted -> Official SDK -> Verified mature package -> Justified small custom -> Approved replacement`), emit the 8-field Decision Record, and require explicit Monarch approval before introducing new frameworks or extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices).
 
 For reviewer calibration, use the [architecture decision trials](evals/decision-trials.md) to exercise local extraction, cross-team ownership and capacity uncertainty.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Choosing Monolith vs Modular Monolith vs Worker vs Microservices, C4 Mermaid, Module Public Facades, or ADRs | [references/topology-selection-and-module-boundaries.md](references/topology-selection-and-module-boundaries.md) |
+
+Do not load unrelated references unnecessarily.

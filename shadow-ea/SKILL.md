@@ -36,3 +36,11 @@ python "shadow-ea/scripts/ea_portfolio_engine.py" --analyze-portfolio path/to/po
 
 - `/shadow-ea` owns TOGAF 10, 6-Domain SPBE, TIME rationalization, and ABB/SBB modeling; NEVER duplicate document renderers.
 - Route formal `ARCHITECTURE_REPORT` blueprints through `shadow-doc/scripts/doc_orchestrator.py` (existing repo generator first, or Global Engine via `domain_adapters.py::adapt_pmo_or_ea_payload`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| 6-Domain SPBE (`Perpres 95/2018 & 132/2022`), Satu Data (`Perpres 39/2019`), TOGAF 10, TIME Matrix & ABB/SBB Separation | [references/spbe-togaf-and-time-rationalization.md](references/spbe-togaf-and-time-rationalization.md) |
+
+Do not load unrelated references unnecessarily.

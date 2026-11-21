@@ -1,6 +1,6 @@
 ---
 name: shadow-video
-description: "Use when producing narrated video tutorials of a web app (Playwright demo with a human-like cursor + TTS narration + ffmpeg MP4/SRT), running a scene file as a click-through GUI E2E test, or updating tutorials after a UI change. Covers scaffolding the engine, code-traced scripts, recording safety, verification and final title cards."
+description: "Flexible Video Production & GUI E2E Recording. Use when producing narrated web tutorials (Playwright + TTS + ffmpeg MP4/SRT), programmatic/motion product videos (Remotion/Canvas/Lottie), mobile app demo captures, lightweight docs GIF/WebM clips, or GUI E2E click-through verification."
 ---
 
 # Shadow Video
@@ -35,6 +35,7 @@ Never skip E2E before recording: a failed recording costs minutes and TTS quota;
 
 | Task | Read |
 |---|---|
+| Choosing non-tutorial video modes (Remotion/Canvas motion, mobile capture, docs GIF/WebM, multi-language/LUFS audio) | [Multi-mode video workflows](references/multi-mode-video-workflows.md) |
 | New project or engine refresh | [Host capabilities](references/host-capabilities.md), template `README.md` |
 | Writing or reviewing narration | [Narration style](references/narration-style.md) |
 | Writing scenes, choosing selectors | [Scene authoring](references/scene-authoring.md) |

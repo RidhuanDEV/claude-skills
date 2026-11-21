@@ -1,32 +1,54 @@
 ---
 name: shadow-illustration
-description: "Use when creating branded illustrations for mobile apps, including mascots, onboarding scenes, banners, status artwork, pose variants, and SVG or Lottie handoff. Works across agents with the image tools available on each host."
+description: "Full-Spectrum Visual, Illustration & Graphics Engineering. Use when creating, revising, or reviewing product illustrations, mascots, icons, technical diagrams, OG cards, HTML5 Canvas/WebGL/procedural art, raster/PNG/WebP/AVIF or SVG pipelines, print artwork, or Lottie/Rive motion handoffs."
 ---
 
 # Shadow Illustration
 
-Produce an illustration family that matches the app and its approved artwork. Establish the visual direction before expanding to multiple poses.
+## Start with the requested deliverable
 
-## Choose the deliverable
+1. Inspect screens, existing artwork and its source of truth, brand conventions, tools, actual renderer versions, asset registry, and verification paths. For an enhancement, compare what already exists against the requested capabilities before editing. Keep the approved master and existing integration contracts.
+2. Record intended use, format, static versus animated versus interactive behavior, editability, target sizes, and available host capabilities. Apply [capability and format routing](references/cross-agent-capability-routing.md). Respect an explicit format and clarify only a consequential unresolved choice.
+3. Establish a master and review one representative asset before expanding. Read only the applicable playbooks below. Include a reference comparison, contact sheet, or timeline frames when they help verify the requested work.
+4. Deliver the requested sources and exports. Record provenance, runtime paths, and separate verification results using [export and handoff](references/asset-export-and-optimization.md).
 
-| Request | Deliverable |
+| Task | Load |
 |---|---|
-| Art direction, mascot exploration, static onboarding or banner | Raster concept or approved PNG/WebP sized for its placement |
-| Transparent character or object | RGBA PNG with clean edges, checked on light and dark surfaces |
-| Editable illustration, recoloring, or independent motion | Authored SVG with named parts and, when requested, Lottie through the project's existing pipeline |
+| Define a style or review a visual family | [Art direction](references/art-direction.md), [composition and color](references/composition-and-color.md) |
+| Create or revise a mascot or pose | [Character design](references/character-design.md) and the selected production method |
+| Generate, edit, or export raster artwork | [Raster production](references/raster-production.md) |
+| Draw editable SVG or fix path geometry | [Vector geometry](references/vector-geometry.md), [SVG authoring and rendering](references/svg-authoring-and-rendering.md) |
+| Build HTML5 `<canvas>`, WebGL, GLSL shaders, particles, or procedural hero visuals | [Canvas, WebGL & procedural hub](references/canvas-webgl-procedural.md) (routes to 10 focused engineering modules + 5 strict-TS examples — load only the task-relevant modules) |
+| Batch-generate OG cards, responsive `srcset`, favicons, PWA icons, or spritesheets via code | [Programmatic image pipelines](references/programmatic-image-pipelines.md) |
+| Design UI icon systems, custom architecture diagrams, or annotated screenshots | [Iconography and diagrams](references/iconography-and-diagrams.md) |
+| Manage sRGB/P3/CMYK print specs, alpha anti-halo, or safe SVGO optimization | [Color, print and optimization](references/color-print-and-optimization.md) |
+| Animate a pose, transition, or frame sequence | [Motion design](references/motion-design-principles.md) and the target format reference |
+| Export or debug Lottie JSON or dotLottie | [Lottie and dotLottie](references/lottie-and-dotlottie.md) |
+| Design or deliver interactive motion for Rive | [Rive interactive animation](references/rive-interactive-animation.md) |
+| Evaluate a new dependency or source | [Source register](references/open-source-source-register.md) |
+| Validate the skill or a technical fixture | [Evaluation cases and evidence](evaluations.md) |
 
-Use the host's built-in or explicitly configured image generator for raster generation or reference-guided edits. In Codex, load the installed imagegen skill when available. Discover the equivalent capability on other hosts before promising a generated image. When raster generation is unavailable, deliver the visual brief and prompt, or continue with SVG if it meets the request. Keep proprietary references within approved tools and destinations.
+## Canvas, WebGL, Shaders & Procedural Visuals Reference Guide
 
-## Build the illustration family
+Load the relevant reference documents when implementing or modifying visual rendering systems:
 
-1. Inspect the product screen, existing assets and brand palette. Record the artwork role, canvas ratio, focal point, crop, background, and smallest display size. Use a character or visual asset the user has supplied or approved.
-2. Select one master image. Record proportions, facial features, hair, clothing, palette, outline and shading. Supply that same reference for variants if the host supports reference inputs. Specify pose, expression and props separately so the brief shows what can change.
-3. Generate or draw one representative scene first. Review it at app size and enlarged. Check silhouette, readable gesture, elbow and wrist transitions, hand proportions, visual hierarchy, and crop. Keep live UI text and buttons in the app. Use distinct gestures and shape cues to communicate success, waiting, failure, and recovery.
-4. Use the reviewed master and the same comparison scale for the rest of the set. Place variants side by side to spot drift. Track the source, prompt or vector source, dimensions, and intended screen or state.
-5. For SVG and Lottie, build deliberate paths from the visual reference. Separate background, character, movable limbs, expression and status marks as needed. Use a continuous arm-and-palm silhouette, stable pivots, and explicit paint order. Render the SVG and check the exported animation in the target player where available. Use a static fallback and reduced-motion treatment when integrating motion.
+| Task | Reference |
+|---|---|
+| Choosing a rendering technology & 6-phase lifecycle | [renderer-selection.md](references/canvas-webgl-procedural/renderer-selection.md) |
+| Canvas 2D drawing, Bézier curves, compositing & hit testing | [canvas-2d-techniques.md](references/canvas-webgl-procedural/canvas-2d-techniques.md) |
+| Custom GLSL shaders, VAOs, instancing, FBOs & context recovery | [webgl-shaders.md](references/canvas-webgl-procedural/webgl-shaders.md) |
+| Procedural noise, Poisson distributions & generative patterns | [procedural-generation.md](references/canvas-webgl-procedural/procedural-generation.md) |
+| Animation, delta-time math, fixed timestep, springs & timelines | [animation-engineering.md](references/canvas-webgl-procedural/animation-engineering.md) |
+| Mouse, touch, pointer events, gestures & interaction states | [interaction-patterns.md](references/canvas-webgl-procedural/interaction-patterns.md) |
+| Rendering performance, object pooling, batching & GPU profiling | [performance-optimization.md](references/canvas-webgl-procedural/performance-optimization.md) |
+| Accessibility, feature detection, fallback & reduced motion | [accessibility-and-fallback.md](references/canvas-webgl-procedural/accessibility-and-fallback.md) |
+| Visual composition, focal hierarchy, color harmony & aesthetics | [visual-design-principles.md](references/canvas-webgl-procedural/visual-design-principles.md) |
+| Testing, deterministic seeded rendering & visual verification | [testing-and-validation.md](references/canvas-webgl-procedural/testing-and-validation.md) |
 
-For example, if a mobile finance app already uses a teal-uniform mascot, use the approved success scene as the master. A recording scene can present a floating note and pencil. A failure scene can show a mild shrug and a red status mark. Give each pose the same character proportions and keep copy and actions as UI components.
+Do not load unrelated references unnecessarily. Use multiple references when a task spans multiple domains. Production-ready strict-TS examples live under `references/canvas-webgl-procedural/examples/` ([layered-renderer.ts](references/canvas-webgl-procedural/examples/canvas-2d/layered-renderer.ts), [recoverable-shader.ts](references/canvas-webgl-procedural/examples/webgl-shaders/recoverable-shader.ts), [pooled-particles.ts](references/canvas-webgl-procedural/examples/particle-systems/pooled-particles.ts), [seeded-flow.ts](references/canvas-webgl-procedural/examples/procedural-patterns/seeded-flow.ts), [HeroCanvas.tsx](references/canvas-webgl-procedural/examples/interactive-hero/HeroCanvas.tsx)).
 
-## Deliver and report
+Use the host's available image tool for authorized raster generation. In Codex, load the installed imagegen skill when appropriate. For editable artwork, author deliberate paths and use the project's exporter. A text-only host delivers a brief, specification, or storyboard and identifies the unrun checks. Record actual host and tool evidence rather than assuming equivalent capabilities across agents.
 
-Deliver requested assets in their editable or runtime formats, with a preview or comparison and clear filenames. State whether the result was checked as a static render, animation, or in the app on a device. For implementation under Shadow Monarch, consult its MOBILE-DESIGN.md for runtime integration and verification.
+This skill owns illustration direction, construction, exports, and visual review. Use Shadow Design for product journeys, components, and design tokens. Use Shadow Mobile or the project owner for platform integration. Use Shadow Accessibility for assistive-technology and interaction review. Shadow Monarch defines scope and execution permissions. Keep app copy and actions in live UI when the project requires it.
+
+Report structural, visual, playback, integration, and provenance checks separately. A rendered PNG proves only the observed still. A parsed SVG or animation file cannot establish visual quality or runtime behavior.

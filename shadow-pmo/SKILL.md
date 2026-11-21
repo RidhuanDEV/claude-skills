@@ -39,3 +39,11 @@ python "shadow-pmo/scripts/pmo_governance_engine.py" --evaluate-cr path/to/cr_re
 
 - `/shadow-pmo` owns PERT/CPM/Monte Carlo/EVM calculations and CR contractual governance; NEVER duplicate `.docx`/`.pdf`/`.html` rendering inside `pmo_governance_engine.py`.
 - Route formal `PROJECT_REPORT` / `CHANGE_REQUEST` deliverables through `shadow-doc/scripts/doc_orchestrator.py` (reusing existing repo generators first, or bridging PMO JSON outputs via `domain_adapters.py::adapt_pmo_or_ea_payload`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Contractual Precedence CR Triage, PERT (`O/M/P`), CPM Merge Bias, Monte Carlo `P50/P80/P90` & EVM | [references/contractual-cr-pert-and-evm.md](references/contractual-cr-pert-and-evm.md) |
+
+Do not load unrelated references unnecessarily.

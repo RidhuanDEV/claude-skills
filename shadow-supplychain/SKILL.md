@@ -37,3 +37,11 @@ Separate the producer's inventory from the consumer's trust policy and CI verifi
 - If waivers exist, compare each expiry with the independently supplied assessment date (expiry day inclusive). Expiry validation alone grants no exception: obtain the organization's signed exception record and validate its subject, scope and owner separately.
 
 [Executable release and rollback scenarios](tests/test_supplychain_cli.py) distinguish a correctly bound fixture, identical name with changed bytes, untrusted issuer/builder pairing, missing receipt, offline verification and expired waiver. Apply the consumer trust model in [SLSA v1.2, Verifying artifacts](https://slsa.dev/spec/v1.2/verifying-artifacts).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| CycloneDX/SPDX SBOM Parity, CI 40-Char SHA Pinning, Container Digest Pinning, SLSA v1.2 Cosign Verification & Expiring CVE Waivers | [references/sbom-and-ci-pinning-patterns.md](references/sbom-and-ci-pinning-patterns.md) |
+
+Do not load unrelated references unnecessarily.

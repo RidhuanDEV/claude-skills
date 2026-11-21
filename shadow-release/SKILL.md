@@ -52,3 +52,11 @@ Immediately after deployment finishes (within `< 2 minutes`):
 4. Compare the candidate against a healthy cohort or the agreed service baseline. Use the release-specific observation window, minimum traffic and abort threshold. On breach, halt promotion and confirm the previous artifact can consume current data and configuration before invoking an authorized rollback. For incompatible migrations contain writes or roll forward with the incident owner.
 5. **Execution Approval Boundary (`L0` vs `L4`)**: Preparing release checklists, SBOM verification, and SemVer changelogs is `L0_READ_ONLY`. Executing production deploys, live migrations, or tag pushes is **`L4: HIGH_IMPACT`** requiring explicit 7-part Monarch approval and rollback verification (`shadow-monarch/scripts/execution_approval_gate.py`).
 6. **Dependency Traceability & Pinning (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Confirm every newly adopted package in the release has a `Verified` 8-field Decision Record, pinned version (no floating `latest`), and lockfile parity (`official_first_verifier.py`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Kill-Switch Flags, Deterministic Canary Cohorts, `< 2 Min` Smoke Probes & Safe Rollback vs Forward-Fix | [references/release-and-rollback-execution.md](references/release-and-rollback-execution.md) |
+
+Do not load unrelated references unnecessarily.

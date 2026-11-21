@@ -31,3 +31,6 @@ Read [`methodologies/DURABLE-ASYNC-OUTBOX-AND-IDEMPOTENCY.md`](methodologies/DUR
 python "shadow-concurrency/scripts/concurrency_invariant_checker.py" --self-test
 python "shadow-concurrency/scripts/concurrency_invariant_checker.py" --verify-workflow path/to/workflow.json
 ```
+
+## Deep Engineering Reference (Load On-Demand)
+- For Saga orchestration vs choreography, distributed locks & monotonic fencing tokens, queue/broker trade-offs (Postgres `SKIP LOCKED` vs BullMQ/RabbitMQ/Kafka/NATS/Temporal), rate-limiting algorithms, and graceful worker shutdown -> read [Distributed concurrency patterns](references/distributed-patterns.md).

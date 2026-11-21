@@ -57,3 +57,11 @@ Task-oriented guide grouped by **User Role** (`Operator`, `Verifikator`, `Pimpin
 - Always resolve the repository's existing document generator first via `shadow-doc/scripts/doc_orchestrator.py resolve --repo . --outputs docx,pdf,md`; only fall back to the Global Document Engine (`shadow-doc/scripts/domain_adapters.py::adapt_handover_payload`) when no compatible project generator exists and authorization permits.
 
 For a contracted operator handover with a local release artifact, run `python scripts/check_receipt.py ARTIFACT RECEIPT.json` from this skill directory. Include release, contract_ref, sender, recipient, criteria, warranty_owner, contract_sha256 and references signed_receipt_ref, operator_demo_ref and access_receipt_ref. A reviewer must open the evidence, verify recipient authority and confirm the walkthrough. The helper checks the digest and reference presence only.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| BAST Deliverable Inventory, Zero-Plaintext Vault Cutover, ToT Operator Readiness & `check_receipt.py` | [references/bast-cutover-and-operator-readiness.md](references/bast-cutover-and-operator-readiness.md) |
+
+Do not load unrelated references unnecessarily.

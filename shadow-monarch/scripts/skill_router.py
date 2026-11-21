@@ -84,7 +84,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["DOCS-PIPELINE.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
-            r"\b(?:BAST|berita\s+acara\s+serah\s+terima|serah\s+terima\s+(?:klien|proyek)|admin\s+manual|operator\s+manual|training\s+of\s+trainers|ToT)\b",
+            r"\b(?:BAST|berita\s+acara\s+serah\s+terima|serah\s+terima\s+(?:klien|proyek)|admin\s+manual|operator\s+manual|training\s+of\s+trainers|ToT|"
+            r"credential\s+transfer\s+manifest|operator\s+handover|access\s+cutover|client\s+handover)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:lanjut\s+handoff|load\s+handoff|session\s+handoff)\b", re.IGNORECASE),
@@ -94,7 +95,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["PRESALES-PROPOSAL-KAK.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
-            r"\b(?:KAK|TOR|RFP|tender|aanwijzing|bid/no-bid|RAB|BoQ|HPS|TKDN|UMKK|Perpres\s*46|server\s*sizing|capacity\s*sizing|3[- ]year\s*TCO|NPV|price[- ]estimation\s+for\s+tender)\b",
+            r"\b(?:KAK|TOR|RFP|tender|aanwijzing|bid/no-bid|RAB|BoQ|HPS|TKDN|BMP|PDN|UMKK|Perpres\s*46|"
+            r"server\s*sizing|capacity\s*sizing|workload\s+sizing|3[- ]scenario\s+(?:sizing|capacity)|3[- ]year\s*TCO|NPV|price[- ]estimation\s+for\s+tender)\b",
             re.IGNORECASE,
         ),
     },
@@ -103,7 +105,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["IT-PMO-GOVERNANCE.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
-            r"\b(?:COBIT|ISO\s*(?:/IEC\s*)?27001|Statement\s+of\s+Applicability|SoA|Annex\s+A|Indeks\s+KAMI|BSSN|POJK\s*11|PADK\s*OJK|audit\s+(?:TI|IT|workpaper)|governance\s+assurance)\b",
+            r"\b(?:COBIT|ISO\s*(?:/IEC\s*)?27001|Statement\s+of\s+Applicability|SoA|Annex\s+A|Indeks\s+KAMI|BSSN|"
+            r"POJK\s*11|PADK\s*OJK|SEOJK\s*21/2017|PPJTI|Design\s+Effectiveness|Operating\s+Effectiveness|"
+            r"audit\s+(?:TI|IT|workpaper)|governance\s+assurance)\b",
             re.IGNORECASE,
         ),
     },
@@ -112,7 +116,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["REFACTORING.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
-            r"\b(?:technical\s+due\s+diligence|strangler\s+fig|business[- ]rule\s+archaeology|refactor\s+vs\s+rewrite|coexistence\s+cost|EOL\s+runtime)\b",
+            r"\b(?:technical\s+due\s+diligence|strangler\s+fig|business[- ]rule\s+archaeology|refactor\s+vs\s+rewrite|"
+            r"coexistence\s+cost|EOL\s+runtime|legacy\s+modernization|dual[- ]run\s+TCO|full\s+rewrite\s+vs|monolith\s+modernization)\b",
             re.IGNORECASE,
         ),
     },
@@ -121,7 +126,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["IT-PMO-GOVERNANCE.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
-            r"\b(?:contract\s+change\s+request|change\s+request|paid\s+CR|scope\s+creep|PERT|critical\s+path|CPM|monte\s+carlo|P80|earned\s+value|EVM|CPI|SPI|RAID\s+log|laporan\s+(?:pendahuluan|antara|akhir))\b",
+            r"\b(?:contract\s+change\s+request|change\s+request|paid\s+CR|scope\s+creep|Change\s+Control\s+Board|PERT|critical\s+path|CPM|"
+            r"monte\s+carlo|merge\s+bias|contractual\s+precedence|P80|earned\s+value|EVM|CPI|SPI|EAC\s+forecast|RAID\s+log|laporan\s+(?:pendahuluan|antara|akhir))\b",
             re.IGNORECASE,
         ),
     },
@@ -130,7 +136,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["ARCHITECTURE.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
-            r"\b(?:TOGAF|enterprise\s+architecture|arsitektur\s+SPBE|6\s+domain\s+SPBE|Perpres\s*132|Satu\s+Data|TIME\s+(?:matrix|portfolio)|application\s+rationalization|ABB|SBB|capability\s+heatmap)\b",
+            r"\b(?:TOGAF|enterprise\s+architecture|arsitektur\s+SPBE|6\s+domain\s+SPBE|SPBE\s+6[- ]domain|"
+            r"Perpres\s*95/2018|Perpres\s*132|Perpres\s*39/2019|Satu\s+Data|TIME\s+(?:matrix|portfolio)|application\s+rationalization|ABB|SBB|capability\s+heatmap)\b",
             re.IGNORECASE,
         ),
     },
@@ -141,7 +148,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:returns?\s+500|HTTP\s*500|500\s+errors?|random\s+500|\b500\b\s+(?:di|in|on)\s+\w+|"
             r"diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|"
-            r"database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|flaky\s+test|"
+            r"database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|heap\s+snapshot|"
+            r"flamegraph|pprof|clinic\.js|CPU\s+profiling|goroutine\s+leak|OOMKilled|flaky\s+test|"
             r"git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug|"
             r"(?:ada|fix|perbaiki)\s+bug\b|sering\s+timeout|tidak\s+(?:mengirim|berfungsi|bekerja)\s+\w+)\b",
             re.IGNORECASE,
@@ -153,7 +161,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["BACKEND.md", "ENTERPRISE-INTEGRATION.md"],
         "include": re.compile(
-            r"\b(?:duplicat(?:ed?|es)\s+(?:notification|email|webhook|charge)|emails?\s+duplicated|after\s+retries?|worker\s+retry|outbox|inbox\s+dedup|poison\s+DLQ|dead[- ]letter|crash[- ]before[- ]ack|optimistic\s+lock|CAS\s+version|queue\s+semantics|Redis\s+vs\s+queue)\b",
+            r"\b(?:duplicat(?:ed?|es)\s+(?:notification|email|webhook|charge)|emails?\s+duplicated|after\s+retries?|"
+            r"worker\s+retry|outbox|inbox\s+dedup|poison\s+DLQ|dead[- ]letter|crash[- ]before[- ]ack|optimistic\s+lock|"
+            r"CAS\s+version|queue\s+semantics|Redis\s+vs\s+queue|saga\s+(?:orchestrat|choreograph|compensat)|"
+            r"fencing\s+token|distributed\s+lock|Redlock|BullMQ|RabbitMQ|Kafka|NATS\s+JetStream|Temporal\s+workflow|"
+            r"token\s+bucket|rate\s+limit(?:ing|er)\s+algorithm)\b",
             re.IGNORECASE,
         ),
     },
@@ -163,7 +175,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["REFACTORING.md", "CODEBASE-INTELLIGENCE.md"],
         "include": re.compile(
             r"\b(?:refactor\s+(?:old|legacy|module|feature|service|controller|handler|component|helper|function|kode|code|class|[a-z0-9_-]+\s+(?:service|module|handler|controller|component))|"
-            r"behavior\s+unchanged|characterization\s+test|branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam)\b",
+            r"refactoring\s+(?:legacy|module|service)|behavior\s+unchanged|characterization\s+test|Golden\s+Master\s+test|seam\s+extraction|"
+            r"branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam|safe\s+refactor)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -176,7 +189,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["ARCHITECTURE.md", "PRODUCT-ANALYSIS.md"],
         "include": re.compile(
-            r"\b(?:bounded\s+contexts?|aggregate\s+(?:roots?|invariants?)|domain\s+events?|anti[- ]corruption\s+layers?|ubiquitous\s+language|complex\s+(?:approvals?|cancellations?|state\s+machines?)(?:\s+and\s+cancellations?)?|state\s+transition\s+invariants?|invarian\s+(?:domain|state)|DDD)\b",
+            r"\b(?:bounded\s+contexts?|aggregate\s+(?:roots?|invariants?)|domain\s+events?|anti[- ]corruption\s+layers?|ubiquitous\s+language|"
+            r"finite\s+state\s+machine|state\s+machine\s+(?:transition|table|workflow)|maker[- ]checker|four[- ]eyes\s+approval|"
+            r"complex\s+(?:approvals?|cancellations?|state\s+machines?)(?:\s+and\s+cancellations?)?|state\s+transition\s+invariants?|"
+            r"business\s+invariants?|value\s+objects?|invarian\s+(?:domain|state)|DDD)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -189,7 +205,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["sub-RAG-VECTOR-KNOWLEDGE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
-            r"\b(?:search\s+relevance|relevansi\s+pencarian|BM25|lexical\s+search|vector\s+ANN|hybrid\s+RRF|reciprocal\s+rank\s+fusion|cross[- ]encoder\s+rerank|NDCG@|MRR@|Recall@\d+|zero[- ]downtime\s+alias|Indonesian\s+analyzer|search_after|PIT\s+pagination|retrieval\s+ACL\s+prefilter|tenant\s+ACL\s+pre[- ]filter|searchDocumentsForTenant)\b",
+            r"\b(?:search\s+relevance|relevansi\s+pencarian|BM25|lexical\s+search|vector\s+ANN|hybrid\s+(?:RRF|search)|reciprocal\s+rank\s+fusion|"
+            r"cross[- ]encoder\s+rerank|NDCG@|MRR@|Recall@\d+|zero[- ]downtime\s+alias|Indonesian\s+analyzer|search_after|PIT\s+pagination|"
+            r"retrieval\s+ACL\s+prefilter|tenant\s+ACL\s+pre[- ]filter|searchDocumentsForTenant|Meilisearch|Typesense|OpenSearch|pgvector|Qdrant|HNSW)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Context\s+Recall\s*,?\s*(?:dan|and)\s*.*prompt\s+injection)\b", re.IGNORECASE),
@@ -199,7 +217,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["sub-REALTIME-IOT-DESKTOP.md", "BACKEND.md"],
         "include": re.compile(
-            r"\b(?:realtime\s+(?:notification|transport|dashboard|disconnect)|WebSocket|Server[- ]Sent\s+Events|SSE|EventSource|Last[- ]Event[- ]ID|slow[- ]consumer\s+backpressure|mid[- ]connection\s+(?:auth|revocation)|pub/sub\s+fan[- ]out|socket\s+reconnect)\b",
+            r"\b(?:realtime\s+(?:notification|transport|dashboard|disconnect)|WebSocket|Server[- ]Sent\s+Events|SSE|"
+            r"EventSource|Last[- ]Event[- ]ID|slow[- ]consumer\s+backpressure|mid[- ]connection\s+(?:auth|revocation)|"
+            r"pub/sub\s+fan[- ]out|socket\s+reconnect|WebRTC|STUN/TURN|WebTransport|MQTT|CRDT|Yjs|Automerge|"
+            r"collaborative\s+edit(?:ing|or))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:duplicat(?:ed?|es)\s+(?:notification|email)|emails?\s+duplicated\s+after\s+retries)\b", re.IGNORECASE),
@@ -209,7 +230,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["SECURITY.md", "SECOPS-PENTEST.md"],
         "include": re.compile(
-            r"\b(?:transitive\s+dependency|CycloneDX|SPDX|SBOM|SLSA\s+provenance|lockfile\s+integrity|typosquat|dependency\s+confusion|pin(?:ned)?\s+(?:SHA|digest)|floating\s+:latest|supply[- ]chain\s+(?:audit|integrity|waiver))\b",
+            r"\b(?:transitive\s+dependency|CycloneDX|SPDX|SBOM|SLSA\s+(?:provenance|v?1\.[012])|lockfile\s+integrity|typosquat|dependency\s+confusion|"
+            r"pin(?:ned)?\s+(?:SHA|digest)|SHA\s+pin(?:ning)?|GitHub\s+Actions\s+pin|Cosign|Sigstore|in-toto|verify-attestation|"
+            r"provenance\s+attestation|vulnerability\s+waiver|floating\s+:latest|supply[- ]chain\s+(?:audit|integrity|waiver))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:price[- ]estimation\s+for\s+tender|KAK|TOR|RAB|HPS)\b", re.IGNORECASE),
@@ -220,6 +243,21 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["SECURITY.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
             r"\b(?:UU\s*PDP|UU\s*(?:No\.?\s*)?27\s*(?:Tahun\s*)?2022|GDPR|DPIA|ROPA|DSAR|data\s+(?:spesifik|pribadi)|cross[- ]border\s+transfer|PII\s+(?:redaction|masking)|NIK\s+log|kebocoran\s+data|erasure[-_]tombstones|legal[-_ ]?hold|3\s*x\s*24)\b",
+            re.IGNORECASE,
+        ),
+    },
+    {
+        "skill": "shadow-ai-eng",
+        "layer": "task",
+        "references": ["AI-LLM.md", "AGENTS-MCP.md"],
+        "include": re.compile(
+            r"\b(?:structured\s+outputs?|tool[- ]calling\s+agent|function\s+calling|LLM\s+(?:gateway|streaming|copilot|feature|app)|"
+            r"AI\s+(?:agent|copilot|assistant|workflow|gateway)|build\s+(?:an?\s+)?MCP\s+server|buat\s+MCP\s+server|"
+            r"MCP\s+(?:server|tool\s+schema)|token\s+streaming|semantic\s+cach(?:e|ing)|prompt\s+versioning|context\s+compaction)\b",
+            re.IGNORECASE,
+        ),
+        "exclude": re.compile(
+            r"\b(?:RAG\s*(?:eval|triad|faithfulness)|red[- ]team|OWASP\s*LLM|tagihan\s+cloud|FOCUS\s+spec)\b",
             re.IGNORECASE,
         ),
     },
@@ -271,7 +309,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:REST\s+API|API\s+(?:endpoint|documentation)|dokumentasi\s+API|backend\s+endpoint|endpoint\s+backend|"
             r"endpoint\s+(?:Express|FastAPI|NestJS|Hono|Laravel|Go|REST)|\b(?:GET|POST|PUT|PATCH|DELETE)\s+/[a-z0-9_/:.-]+|"
             r"OpenAPI|openapi\.yaml|Swagger|Postman|Bruno|\.bru\b|Scalar|Redoc|Insomnia|TypeSpec|"
-            r"HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457)\b",
+            r"HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457|"
+            r"tRPC|multipart\s+upload|presigned\s+URL|tus\s+resumable|S3\s+multipart|cursor\s+pagination)\b",
             re.IGNORECASE,
         ),
     },
@@ -280,7 +319,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["SECURITY.md", "BACKEND.md"],
         "include": re.compile(
-            r"\b(?:login|authentication|AuthN|AuthZ|RBAC|ABAC|OAuth2|OIDC|SSO|JWT\s+refresh|session\s+rotation|tenant\s+isolation|multi[- ]tenant\s+auth|confused\s+deputy)\b",
+            r"\b(?:login|authentication|AuthN|AuthZ|RBAC|ABAC|ReBAC|OpenFGA|SpiceDB|Zanzibar|Passkeys?|WebAuthn|FIDO2|"
+            r"MFA|TOTP|OAuth2|OIDC|SSO|mTLS|DPoP|API\s+key\s+(?:lifecycle|rotation)|JWT\s+refresh|session\s+rotation|"
+            r"tenant\s+isolation|multi[- ]tenant\s+auth|confused\s+deputy)\b",
             re.IGNORECASE,
         ),
     },
@@ -289,7 +330,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
-            r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|read[- ]only\s+query|MVCC\s+bloat|query\s+planner|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock)\b",
+            r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|"
+            r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock|"
+            r"PgBouncer|transaction\s+pooling|SQLite\s+WAL|MongoDB|TimescaleDB|ClickHouse|connection\s+pool\s+sizing)\b",
             re.IGNORECASE,
         ),
     },
@@ -298,7 +341,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:database\s+migration|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock)\b",
+            r"\b(?:database\s+migration|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|"
+            r"deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock|"
+            r"Debezium|CDC\s+pipeline|online\s+DDL|pg_repack|gh-ost|NOT\s+VALID\s+constraint|CONCURRENTLY\s+index)\b",
             re.IGNORECASE,
         ),
     },
@@ -307,7 +352,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["FRONTEND.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:TanStack\s+Query|SWR|Redis\s+cach|cache\s+stampede|optimistic\s+UI|Idempotency[- ]Key|stale[- ]while[- ]revalidate|cache\s+coherency)\b",
+            r"\b(?:TanStack\s+Query|SWR|Redis\s+cach|cache\s+stampede|singleflight|request\s+coalescing|Bloom\s+filter|"
+            r"negative\s+cach(?:e|ing)|CDN\s+cach(?:e|ing)|Surrogate-Key|ETag\s+cach|optimistic\s+UI|Idempotency[- ]Key|"
+            r"stale[- ]while[- ]revalidate|cache\s+coherency)\b",
             re.IGNORECASE,
         ),
     },
@@ -316,7 +363,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["ENTERPRISE-INTEGRATION.md", "sub-FINTECH-ID-ECOSYSTEM.md"],
         "include": re.compile(
-            r"\b(?:payment\s+gateway|SNAP\s+BI|Midtrans|Xendit|QRIS|webhook|HMAC\s+signature|Transactional\s+Outbox|circuit\s+breaker|WhatsApp\s+gateway|SMTP|emails?\s+duplicated)\b",
+            r"\b(?:payment\s+gateway|SNAP\s+BI|Midtrans|Xendit|Stripe|QRIS|webhook|webhook\s+replay|HMAC\s+signature|"
+            r"Transactional\s+Outbox|circuit\s+breaker|reconciliation\s+job|provider\s+inquiry|"
+            r"third[- ]party\s+API\s+(?:retry|timeout|integration)|WhatsApp\s+gateway|SMTP|emails?\s+duplicated)\b",
             re.IGNORECASE,
         ),
     },
@@ -325,9 +374,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["SECURITY.md", "SECOPS-PENTEST.md"],
         "include": re.compile(
-            r"\b(?:STRIDE|threat\s+model|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|"
-            r"IDOR|SSRF|XSS|CSRF|CSP|CORS|BOLA|broken\s+access|clickjacking|kerentanan|celah\s+keamanan|"
-            r"audit\s+keamanan|transitive\s+dependency|attack[- ]surface)\b",
+            r"\b(?:STRIDE|threat\s+model|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|SQLi|"
+            r"IDOR|SSRF|XSS|CSRF|CSP|CSP\s+nonce|HSTS|CORS|security\s+headers|path\s+traversal|169\.254\.169\.254|"
+            r"BOLA|broken\s+access|clickjacking|kerentanan|celah\s+keamanan|audit\s+keamanan|transitive\s+dependency|attack[- ]surface)\b",
             re.IGNORECASE,
         ),
     },
@@ -336,7 +385,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["FRONTEND.md", "sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:Playwright|browser\s+E2E|375px|mobile\s+viewport\s+overflow|console\s+error\s+in\s+browser|UI\s+click[- ]through)\b",
+            r"\b(?:Playwright|browser\s+E2E|375px|mobile\s+viewport\s+overflow|console\s+error\s+in\s+browser|UI\s+click[- ]through|"
+            r"visual\s+regression|toHaveScreenshot|HAR\s+recording|Playwright\s+trace|storageState)\b",
             re.IGNORECASE,
         ),
     },
@@ -345,7 +395,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["FRONTEND.md", "sub-QA-AUTOMATION.md", "sub-VISION-OCR-MEDIA.md"],
         "include": re.compile(
-            r"\b(?:video\s+tutorial|tutorial\s+video|narasi\s+TTS|TTS\s+narration|narrated\s+video|video-pipeline|rekam(?:an)?\s+layar|screen\s+recording|Azure\s+(?:AI\s+)?Speech|kartu\s+judul|title\s+cards?|video\s+panduan)\b",
+            r"\b(?:video\s+tutorial|tutorial\s+video|narasi\s+TTS|TTS\s+narration|narrated\s+video|video-pipeline|"
+            r"rekam(?:an)?\s+layar|screen\s+recording|Azure\s+(?:AI\s+)?Speech|kartu\s+judul|title\s+cards?|"
+            r"video\s+panduan|Remotion|programmatic\s+video|motion\s+product\s+video|mobile\s+app\s+demo\s+video|"
+            r"docs\s+GIF|LUFS\s+loudness)\b",
             re.IGNORECASE,
         ),
     },
@@ -354,9 +407,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["MOBILE-DESIGN.md", "DESIGN.md"],
         "include": re.compile(
-            r"\b(?:product\s+illustration|ilustrasi\s+(?:SVG|produk|maskot|onboarding|status)|mascot|maskot|"
-            r"onboarding\s+(?:art|illustration)|status\s+artwork|SVG\s+(?:character|mascot|illustration)|"
-            r"Lottie\s+(?:motion|handoff|animation))\b",
+            r"\b(?:product\s+illustration|ilustrasi\s+(?:SVG|produk|maskot|onboarding|status|canvas|isometric)|mascot|maskot|"
+            r"onboarding\s+(?:art|illustration)|status\s+artwork|SVG\s+(?:character|mascot|illustration|icon\s+system)|"
+            r"Lottie\s+(?:motion|handoff|animation)|Rive\s+animation|HTML5\s+canvas|WebGL|Three\.js|GLSL\s+shader|"
+            r"procedural\s+(?:art|visual)|OG\s+card|Satori|spritesheet|favicon\s+(?:set|pack)|PWA\s+icons?|"
+            r"isometric\s+diagram|CMYK\s+print|banner\s+cetak)\b",
             re.IGNORECASE,
         ),
     },
@@ -378,7 +433,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
             r"\b(?:WCAG|screen\s+reader|ARIA\s+live|aria-label|aria-describedby|focus\s+trap|"
-            r"keyboard\s+navigation|tab\s+order|kontras\s+warna|color\s+contrast|aksesibilitas|lansia\s+contrast)\b",
+            r"keyboard\s+navigation|tab\s+order|kontras\s+warna|color\s+contrast|aksesibilitas|lansia\s+contrast|"
+            r"i18n|internationalization|RTL\s+layout|ICU\s+MessageFormat|pseudo[- ]localization)\b",
             re.IGNORECASE,
         ),
     },
@@ -405,7 +461,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["CODE-REVIEW.md", "CROSS-MODEL-PARITY.md"],
         "include": re.compile(
-            r"\b(?:static\s+analysis|lint|typecheck|dead\s+code|cyclomatic\s+complexity|shadow_gate|pure\s+formatting\s+refactor|formatting[- ]only)\b",
+            r"\b(?:static\s+analysis|lint|typecheck|dead\s+code|cyclomatic\s+complexity|shadow_gate|"
+            r"fitness\s+function|architectural\s+fitness|ESLint\s+boundary|noUncheckedIndexedAccess|strict\s+tsconfig|convention\s+drift|"
+            r"pure\s+formatting\s+refactor|formatting[- ]only)\b",
             re.IGNORECASE,
         ),
     },
@@ -432,7 +490,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["PRODUCT-ANALYSIS.md"],
         "include": re.compile(
-            r"\b(?:elicit\s+requirement|PRD|SRS|BRD|stakeholder\s+mapping|Given/When/Then|acceptance\s+criteria)\b",
+            r"\b(?:elicit\s+requirement|PRD|SRS|BRD|stakeholder\s+mapping|Given/When/Then|acceptance\s+criteria|"
+            r"NFR\s+(?:table|spec|quantif|engineering)|non[- ]functional\s+requirements?|requirements?\s+(?:discovery|elicitation|gap))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:KAK|tender|RAB|HPS|paid\s+CR)\b", re.IGNORECASE),
@@ -442,7 +501,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["ARCHITECTURE.md"],
         "include": re.compile(
-            r"\b(?:C4\s+diagram|ADR|modular\s+monolith|microservices\s+vs\s+monolith|system\s+architecture|architecture\s+for\s+a\s+new\s+app(?:lication)?)\b",
+            r"\b(?:C4\s+diagram|ADR|Architecture\s+Decision\s+Record|modular\s+monolith|microservices\s+vs\s+monolith|"
+            r"module\s+boundar(?:y|ies)|topology\s+selection|system\s+architecture|architecture\s+for\s+a\s+new\s+app(?:lication)?)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:TOGAF|SPBE|6\s+domain|application\s+portfolio|TIME\s+matrix)\b", re.IGNORECASE),
@@ -451,7 +511,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "skill": "shadow-plan",
         "layer": "task",
         "references": ["PRODUCT-ANALYSIS.md", "IT-PMO-GOVERNANCE.md"],
-        "include": re.compile(r"\b(?:epic|user\s+story|sprint\s+task|DoR|DoD|task\s+breakdown)\b", re.IGNORECASE),
+        "include": re.compile(r"\b(?:epic|user\s+story|sprint\s+task|DoR|DoD|task\s+breakdown|vertical\s+slic(?:e|ing)|sprint\s+planning|story\s+decomposition)\b", re.IGNORECASE),
         "exclude": re.compile(r"\b(?:paid\s+CR|monte\s+carlo|EVM|CPI|SPI)\b", re.IGNORECASE),
     },
     {
@@ -459,7 +519,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["OFFICIAL-FIRST-DEPENDENCY-POLICY.md", "CORE.md", "DEVOPS.md"],
         "include": re.compile(
-            r"\b(?:scaffold\s+new\s+project|from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+(?:a\s+)?(?:new\s+)?project|buat\s+proyek\s+baru|(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
+            r"\b(?:scaffold\s+new\s+project|scaffold\s+(?:a\s+)?(?:new\s+)?(?:service|CLI|library|worker|app)|greenfield\s+(?:project|service|app|CLI)|"
+            r"from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+(?:a\s+)?(?:new\s+)?project|buat\s+proyek\s+baru|"
+            r"(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:technical\s+due\s+diligence|legacy\s+(?:codebase|module|feature)|refactor)\b", re.IGNORECASE),
@@ -469,7 +531,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:Staging\s+UAT|UAT\s+scenario|tim\s+QA\s+melaporkan|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off)\b",
+            r"\b(?:Staging\s+UAT|UAT\s+scenario|Berita\s+Acara\s+UAT|UAT\s+sign[- ]off|UAT\s+defect\s+triage|UAT\s+exit\s+gate|"
+            r"tim\s+QA\s+melaporkan|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off)\b",
             re.IGNORECASE,
         ),
     },
@@ -478,7 +541,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["DEVOPS.md", "CLOUD-SRE.md"],
         "include": re.compile(
-            r"\b(?:production\s+(?:release|deploy)|SemVer|changelog|rollback\s+runbook|kriteria\s+rollback\s+aman|feature\s+flag\s+rollout)\b",
+            r"\b(?:production\s+(?:release|deploy)|SemVer|changelog|rollback\s+runbook|kriteria\s+rollback\s+aman|feature\s+flag\s+rollout|"
+            r"kill[- ]switch\s+(?:flag|feature\s+flag)|canary\s+cohort|pre[- ]flight\s+release|release\s+checklist|deployment\s+rollback|roll\s+forward\s+vs\s+rollback)\b",
             re.IGNORECASE,
         ),
     },
@@ -487,7 +551,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["BACKEND.md", "FRONTEND.md"],
         "include": re.compile(
-            r"\b(?:backward\s+compatib|dependency\s+upgrade|breaking\s+change|cross[- ]browser\s+matrix|behavior\s+unchanged|schema\s+evolution)\b",
+            r"\b(?:backward\s+compatib|dependency\s+upgrade|breaking\s+change|cross[- ]browser\s+matrix|behavior\s+unchanged|schema\s+evolution|"
+            r"RFC\s*9745|RFC\s*8594|Deprecation\s+header|Sunset\s+header|410\s+Gone|deprecat(?:e|ing)\s+(?:an?\s+)?(?:API|endpoint|route)|"
+            r"consumer[- ]driven\s+contract|tolerant\s+reader|API\s+versioning)\b",
             re.IGNORECASE,
         ),
     },
@@ -517,7 +583,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["CLOUD-SRE.md"],
         "include": re.compile(
-            r"\b(?:disaster\s+recovery|restore\s+drill|RPO|RTO|chaos\s+engineering|backup\s+restore|bulkhead\s+isolation|fault\s+injection)\b",
+            r"\b(?:disaster\s+recovery|restore\s+drill|RPO|RTO|chaos\s+engineering|backup\s+restore|bulkhead\s+(?:isolation|pattern|semaphore|pool)|"
+            r"graceful\s+degradation|feature\s+shedding|load\s+shedding|stale[- ]cache\s+fallback|business\s+continuity|fault\s+injection)\b",
             re.IGNORECASE,
         ),
     },
@@ -526,7 +593,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DEBUGGING.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
-            r"\b(?:post[- ]production|Harwat|OMKT|postmortem|blameless\s+RCA|hotfix\s+SLA)\b",
+            r"\b(?:post[- ]production|Harwat|OMKT|postmortem|blameless\s+RCA|hotfix\s+SLA|"
+            r"incident\s+triage|SEV[1-4]\s+incident|5[- ]Why\s+RCA|fault[- ]tree\s+RCA|preventive\s+maintenance)\b",
             re.IGNORECASE,
         ),
     },
@@ -968,8 +1036,8 @@ def run_self_test() -> dict[str, Any]:
     known_skills = get_known_skill_names()
     results: list[dict[str, Any]] = [
         {
-            "probe": "AUDIT-1: All 55 SKILL.md have 'Use when...' triggers & <=500 chars",
-            "passed": audit["all_passed"] and audit["total_skills"] >= 55,
+            "probe": "AUDIT-1: All 56 SKILL.md have 'Use when...' triggers & <=500 chars",
+            "passed": audit["all_passed"] and audit["total_skills"] >= 56,
             "details": audit,
         }
     ]
@@ -1372,6 +1440,132 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-refactor"],
             ["shadow-perf"],
             "shadow-refactor",
+        ),
+        (
+            "AI-ENG-1: Production LLM tool-calling agent & MCP server routes shadow-ai-eng",
+            "Build an MCP server and tool-calling agent with structured outputs and token streaming.",
+            ["shadow-ai-eng"],
+            ["shadow-perf", "shadow-eval"],
+            "shadow-ai-eng",
+        ),
+        (
+            "ILLUS-CANVAS-1: HTML5 Canvas / WebGL procedural art & Satori OG card routes shadow-illustration",
+            "Buatkan ilustrasi canvas WebGL procedural visual dan generator OG card Satori.",
+            ["shadow-illustration"],
+            ["shadow-perf"],
+            "shadow-illustration",
+        ),
+        (
+            "VIDEO-REMOTION-1: Remotion programmatic product video & LUFS audio routes shadow-video",
+            "Buat programmatic video dengan Remotion dan normalisasi LUFS loudness untuk rilis produk.",
+            ["shadow-video"],
+            ["shadow-perf"],
+            "shadow-video",
+        ),
+        (
+            "AUTH-PASSKEY-1: Passkeys WebAuthn & OpenFGA ReBAC routes shadow-auth",
+            "Implementasikan login Passkeys WebAuthn FIDO2 dan authorization ReBAC memakai OpenFGA.",
+            ["shadow-auth"],
+            ["shadow-perf"],
+            "shadow-auth",
+        ),
+        (
+            "REALTIME-WEBRTC-1: WebRTC SFU & CRDT Yjs collaborative editing routes shadow-realtime",
+            "Rancang collaborative editing memakai CRDT Yjs dan panggilan WebRTC STUN/TURN.",
+            ["shadow-realtime"],
+            ["shadow-perf"],
+            "shadow-realtime",
+        ),
+        (
+            "A11Y-I18N-1: i18n ICU MessageFormat & RTL layout routes shadow-accessibility",
+            "Tambahkan dukungan i18n ICU MessageFormat dan RTL layout pada aplikasi web ini.",
+            ["shadow-accessibility"],
+            ["shadow-perf"],
+            "shadow-accessibility",
+        ),
+        (
+            "COMPAT-RFC-1: RFC 9745 Deprecation & RFC 8594 Sunset routes shadow-compat",
+            "Add RFC 9745 Deprecation header, RFC 8594 Sunset header, and 410 Gone retirement for legacy route.",
+            ["shadow-compat"],
+            ["shadow-perf"],
+            "shadow-compat",
+        ),
+        (
+            "INTEGRATE-CB-1: Stripe webhook replay & circuit breaker reconciliation routes shadow-integrate",
+            "Implement Stripe webhook replay check and provider inquiry reconciliation job with circuit breaker.",
+            ["shadow-integrate"],
+            ["shadow-perf"],
+            "shadow-integrate",
+        ),
+        (
+            "SUPPLY-COSIGN-1: SLSA v1.2 Cosign Sigstore & GitHub Actions SHA pinning routes shadow-supplychain",
+            "Verify SLSA v1.2 provenance attestation using Cosign Sigstore and enforce GitHub Actions SHA pinning.",
+            ["shadow-supplychain", "shadow-sec", "shadow-release"],
+            ["shadow-perf"],
+            "shadow-supplychain",
+        ),
+        (
+            "DOMAIN-FSM-1: Finite state machine & maker-checker invariants route shadow-domain",
+            "Model finite state machine transition table with maker-checker approval business invariants.",
+            ["shadow-domain", "shadow-test"],
+            ["shadow-perf"],
+            "shadow-domain",
+        ),
+        (
+            "RESILIENCE-BH-1: Bulkhead semaphore & graceful degradation route shadow-resilience",
+            "Implement bulkhead semaphore isolation, stale-cache fallback, and graceful degradation for export jobs.",
+            ["shadow-resilience"],
+            ["shadow-perf"],
+            "shadow-resilience",
+        ),
+        (
+            "RELEASE-CANARY-1: Canary cohort bucketing & kill-switch rollback route shadow-release",
+            "Design deterministic canary cohort bucketing with kill-switch flag and deployment rollback plan.",
+            ["shadow-release"],
+            ["shadow-perf"],
+            "shadow-release",
+        ),
+        (
+            "MAINTAIN-RCA-1: SEV1 triage & 5-Why RCA postmortem route shadow-maintain",
+            "Run SEV1 incident triage and write a 5-Why RCA postmortem with regression hotfix checklist.",
+            ["shadow-maintain"],
+            ["shadow-perf"],
+            "shadow-maintain",
+        ),
+        (
+            "DB-POOL-1: PgBouncer transaction pooling & TimescaleDB sizing route shadow-db",
+            "Configure PgBouncer transaction pooling and connection pool sizing for PostgreSQL and TimescaleDB.",
+            ["shadow-db"],
+            ["shadow-perf"],
+            "shadow-db",
+        ),
+        (
+            "DATA-CDC-1: Debezium CDC & online DDL CONCURRENTLY route shadow-data",
+            "Set up Debezium CDC pipeline and online DDL with CONCURRENTLY index and NOT VALID constraint.",
+            ["shadow-data"],
+            ["shadow-perf"],
+            "shadow-data",
+        ),
+        (
+            "SEARCH-VEC-1: pgvector HNSW & Meilisearch hybrid search route shadow-search",
+            "Build hybrid search with pgvector HNSW and Meilisearch for Indonesian catalog.",
+            ["shadow-search", "shadow-db", "shadow-eval"],
+            ["shadow-perf"],
+            "shadow-search",
+        ),
+        (
+            "BROWSER-VIS-1: Playwright visual regression & HAR trace route shadow-browser",
+            "Add Playwright visual regression toHaveScreenshot and HAR recording trace for checkout.",
+            ["shadow-browser"],
+            ["shadow-perf"],
+            "shadow-browser",
+        ),
+        (
+            "GRC-OJK-1: DE vs OE banking PPJTI PADK OJK 1/2026 replacing SEOJK 21/2017 routes shadow-grc",
+            "Audit Design Effectiveness vs Operating Effectiveness for banking PPJTI under POJK 11/2022 and PADK OJK 1/2026 replacing SEOJK 21/2017.",
+            ["shadow-grc"],
+            ["shadow-perf"],
+            "shadow-grc",
         ),
     ]
 

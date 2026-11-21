@@ -62,3 +62,6 @@ Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, addi
 - Authoring additive Expand-only migrations locally is `L1_SAFE_VERIFICATION`. Running destructive DDL (`DROP`, `TRUNCATE`, `RENAME`, `migrate reset`) or executing migrations against staging/production/unknown databases is **`L4: HIGH_IMPACT`** and NEVER authorized by a bug fix without explicit Monarch approval and verified backup/rollback (`shadow-monarch/scripts/execution_approval_gate.py`).
 
 Run the isolated SQLite example with `python -m unittest discover -s tests` from this skill directory. It shows how a legacy writer can invalidate rows behind a completed cursor and how to detect it. Production lock behavior, replicas and independent consumers require evidence from the owning environment.
+
+## Deep Engineering Reference (Load On-Demand)
+- For lock-safe zero-downtime DDL (`lock_timeout`, `CREATE INDEX CONCURRENTLY`, `NOT VALID` constraints, `pg_repack`, `gh-ost`), throttled keyset backfills, CDC (`Debezium`) vs outbox, and UU PDP/GDPR erasure tombstone/crypto-shredding -> read [Online DDL, chunked backfills & CDC](references/online-ddl-and-cdc.md).

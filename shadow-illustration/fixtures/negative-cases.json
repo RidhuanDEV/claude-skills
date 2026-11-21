@@ -1,0 +1,38 @@
+[
+  [
+    "external image",
+    "<image href=\"https://example.invalid/picture.png\"/>"
+  ],
+  [
+    "inline event",
+    "<path d=\"M0 0 H1\" onload=\"example\"/>"
+  ],
+  [
+    "external paint",
+    "<circle r=\"1\" fill=\"url(https://example.invalid/paint.svg)\"/>"
+  ],
+  [
+    "CSS resource",
+    "<style>@import \"https://example.invalid/theme.css\";</style><rect width=\"1\" height=\"1\"/>"
+  ],
+  [
+    "embedded resource",
+    "<image href=\"data:image/png;base64,AA==\"/>"
+  ],
+  [
+    "active element",
+    "<foreignObject width=\"1\" height=\"1\"/>"
+  ],
+  [
+    "duplicate ID",
+    "<path id=\"same\" d=\"M0 0 H1\"/><path id=\"same\" d=\"M0 1 H1\"/>"
+  ],
+  [
+    "namespaced href",
+    "<g xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"https://example.invalid/asset\"><rect width=\"1\" height=\"1\"/></g>"
+  ],
+  [
+    "unclosed element",
+    "<g>"
+  ]
+]

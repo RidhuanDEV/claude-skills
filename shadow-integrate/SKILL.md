@@ -52,3 +52,11 @@ When a database transaction must trigger an email, webhook, or message queue eve
 - Prefer official provider SDKs or existing trusted internal adapters over bespoke HTTP wrappers unless verified unmaintained/unsuitable. Inspect package publisher, upstream repo, engines, and advisories via `npm view` + `/context7` before installing, and emit the 8-field Decision Record.
 
 Use `python scripts/reconcile_unknown.py --assess record.json` from this skill directory to review an ambiguous mutation offline. Supply the local operation ID, state, and only provider capabilities supported by evidence. A terminal inquiry must already be authenticated and bound to the same provider account, operation and transaction. The decision helper consumes those facts and makes no external calls. Run `--self-test` for the timeout, mismatched receipt and expired-window scenarios.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Implementing Circuit Breakers, Full-Jitter Retries, Timing-Safe HMAC Webhooks, Outbox/Inbox Dedup, or Reconciliation | [references/integration-resilience-and-webhooks.md](references/integration-resilience-and-webhooks.md) |
+
+Do not load unrelated references unnecessarily.

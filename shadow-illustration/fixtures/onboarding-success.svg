@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160">
+  <title>Completed onboarding fixture</title>
+  <desc>A stamped checklist with a separate green check.</desc>
+  <g id="background">
+    <rect width="320" height="160" rx="16" fill="#E2F7F6"/>
+    <path d="M0 123 C52 94 106 155 161 131 C212 106 268 91 320 108 L320 160 H0 Z" fill="#BCEAE7"/>
+  </g>
+  <g id="checklist">
+    <rect x="114" y="24" width="92" height="112" rx="14" fill="#FFFDFC" stroke="#102735" stroke-width="3"/>
+    <path d="M135 56 H185 M135 77 H175 M135 98 H166" fill="none" stroke="#008A97" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g id="confirmed">
+    <circle cx="214" cy="103" r="24" fill="#21935D"/>
+    <path d="M202 103 L211 112 L228 94" fill="none" stroke="#FFFDFC" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

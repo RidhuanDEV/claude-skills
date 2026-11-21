@@ -52,3 +52,12 @@ Deliver findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with:
 ### Pillar 6: Execution Approval & Security Scan Boundary (`L0`–`L4`)
 - Static SAST, STRIDE analysis, and secret scanning are `L0_READ_ONLY`. High-volume active fuzzing / aggressive DAST against live services is **`L3: RESOURCE_INTENSIVE`**, while secret rotation, permission edits, or external payload transmission are **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
 - **Official-First Dependency & Auth Claims Check (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Flag unverified packages installed solely by name, npm lookalike replacements for local SDKs (`file:../sdk/sso-client`), custom unapproved auth/crypto rewrites, and any backend endpoint trusting frontend-supplied `username` without server-verified claims.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| NIST SSDF (SP 800-218) & OWASP ASVS 5.0 Control Catalog | [references/NIST-SSDF-AND-OWASP-ASVS-5.md](references/NIST-SSDF-AND-OWASP-ASVS-5.md) |
+| Server-Side AppSec Patterns (SSRF Guard, IDOR, Nonce CSP, Strict CORS, Uploads) | [references/appsec-implementation-patterns.md](references/appsec-implementation-patterns.md) |
+
+Do not load unrelated references unnecessarily.

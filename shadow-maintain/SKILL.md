@@ -48,3 +48,11 @@ After every `P0` or `P1` incident, generate `docs/incidents/RCA-YYYY-MM-DD-<slug
 - **Corrective Maintenance**: Resolving reported bugs/tickets with commit & screenshot evidence.
 - **Adaptive Maintenance**: OS/runtime security patches, expiring TLS certificate checks, third-party API adjustments.
 - **Perfective Maintenance**: Slow query index tuning (`/shadow-db`), disk/log cleanup, dependency security updates (`npm/pip/composer audit`), and monthly restore drill (`/shadow-resilience`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| `SEV1`–`SEV4` Incident Triage, Blameless 5-Why RCA Template, Surgical Hotfix Gate & Monthly Harwat Cycle | [references/incident-triage-and-rca-playbook.md](references/incident-triage-and-rca-playbook.md) |
+
+Do not load unrelated references unnecessarily.

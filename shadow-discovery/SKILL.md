@@ -72,3 +72,11 @@ Map unverified assumptions across **5 Risk Dimensions** (*Value, Usability, Viab
 - [ ] All P0 requirements have deterministic Given/When/Then acceptance criteria.
 - [ ] Zero unresolved contradictions between business rules (Red-Team PRD check passed).
 - [ ] NFRs (concurrency, latency, security, RPO/RTO) quantified.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Epistemic Tagging, Quantified NFR Contracts, Deterministic Gherkin Acceptance Criteria & Ambiguity Resolution | [references/requirements-and-nfr-engineering.md](references/requirements-and-nfr-engineering.md) |
+
+Do not load unrelated references unnecessarily.

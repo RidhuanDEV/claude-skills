@@ -35,3 +35,11 @@ python "shadow-modernize/scripts/modernize_forensics_engine.py" --evaluate-optio
 ```
 
 - **Reuse & Preservation Gate (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Preserve established framework routing, auth/SSO SDKs (`file:../sdk/sso-client`), and package patterns unless verified insecure/obsolete or explicitly approved for replacement by the Monarch (`official_first_verifier.py`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Static Repo Forensics, 6-Dimension Risk Vector, Strangler Fig vs Rewrite Economics & Coexistence TCO | [references/due-diligence-and-strangler-tco.md](references/due-diligence-and-strangler-tco.md) |
+
+Do not load unrelated references unnecessarily.

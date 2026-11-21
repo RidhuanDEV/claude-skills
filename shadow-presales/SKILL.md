@@ -40,3 +40,11 @@ python "shadow-presales/scripts/presales_commercial_engine.py" --model-tco path/
 
 - `/shadow-presales` owns Bid/No-Bid, 3-scenario workload capacity, TCO/NPV, and Perpres 46/2025 RAB logic; NEVER duplicate `.docx`/`.pdf`/`.html` renderers.
 - Route formal `PRESALES_PROPOSAL` deliverables through `shadow-doc/scripts/doc_orchestrator.py` (existing project generator first, or Global Engine via `domain_adapters.py::adapt_presales_payload`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| 3-Scenario Capacity Sizing, 3–5 Yr TCO/NPV, Assumption Register & Perpres 46/2025 RAB/TKDN/HPS Boundaries | [references/sizing-rab-and-perpres46.md](references/sizing-rab-and-perpres46.md) |
+
+Do not load unrelated references unnecessarily.

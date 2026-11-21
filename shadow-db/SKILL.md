@@ -45,3 +45,6 @@ Connects to the **`shadow_db` MCP server** (`inspect_database_schema`, `run_read
    - Monitor MVCC dead tuples/autovacuum lag and inspect `pg_locks` / `pg_stat_activity` wait chains when diagnosing slow queries or deadlocks (pair with `/shadow-debug`).
 7. **Execution Approval & Target Environment Boundary (`L0`–`L4`)**:
    - Unknown DB hosts/environments fail closed (`BLOCKED_UNKNOWN_ENVIRONMENT`). Read-only `SELECT`/`EXPLAIN` diagnostics on verified local/dev DBs are `L0`/`L1`; any DDL/data mutation or staging/production access is **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
+
+## Deep Engineering Reference (Load On-Demand)
+- For multi-engine selection (PostgreSQL, MySQL, TimescaleDB/ClickHouse time-series, MongoDB schema versioning), `PgBouncer` transaction vs session pooling pitfalls, autovacuum/wraparound health, and read-replica lag -> read [Multi-engine database & pooling guide](references/multi-engine-and-pooling.md).

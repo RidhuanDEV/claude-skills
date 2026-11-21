@@ -54,3 +54,6 @@ For payment, order creation, approval, or webhook endpoints:
    - Define exact invalidation triggers across CDN/edge, Redis, and client `TanStack Query` caches so stale authorization or balance views never persist past security/mutation events.
 
 For a single transactional database, `python -m unittest discover -s tests` from the skill directory exercises competing connections, changed payload, tenant/principal isolation, revoked access, interrupted commit and lost reply. External side effects require a separate provider reconciliation test.
+
+## Deep Engineering Reference (Load On-Demand)
+- For HTTP/CDN Edge caching (`Cache-Control`/`ETag`/`Vary`/`Surrogate-Key`), L1 LRU + L2 Redis two-tier caching, Singleflight stampede defense, Bloom filter anti-penetration, and negative caching -> read [Multi-tier caching architecture](references/multi-tier-caching.md).

@@ -22,3 +22,6 @@ Connects to the official **`playwright` MCP server** (`@playwright/mcp`) and `ch
 - Targeted Playwright/browser checks for explicitly modified UI routes on local/sandbox are `L1_SAFE_VERIFICATION`. Unrequested broad E2E suite runs (`playwright test` full repo suite during unit-test or minor edits) are **`L2: SCOPE_EXPANSION`** and require explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
 
 For repeatable review of one action, run `python scripts/compare_action.py expected.json observed.json` from the skill directory. Set the expected role, route, action and visibleState before the run. Add httpStatus, sessionPresent, focusedControl or persistedState where applicable. Capture matching fields and environment ("reachable" or "unreachable") from the real run. Keep raw credentials, personal data and tokens out of the evidence. The comparison validates supplied observations only.
+
+## Deep Browser QA Reference (Load On-Demand)
+- For brownfield Playwright/Cypress/Puppeteer reuse, `storageState` auth reuse, `page.route()` network fault injection (500/429/401/202/offline), visual regression masking & font wait, WebKit/Firefox quirks, and CDP CLS/memory traces -> read [Advanced E2E & visual QA playbook](references/advanced-e2e-and-visual-qa.md).

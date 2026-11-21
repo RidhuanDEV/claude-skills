@@ -29,3 +29,11 @@ Read [`methodologies/DDD-BOUNDED-CONTEXTS-AND-AGGREGATES.md`](methodologies/DDD-
 python "shadow-domain/scripts/domain_invariant_verifier.py" --self-test
 python "shadow-domain/scripts/domain_invariant_verifier.py" --verify-model path/to/domain_model.json
 ```
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Choosing CRUD vs Domain Service vs Aggregate FSM, Transition Tables, Maker-Checker & Optimistic Locking | [references/ddd-tactical-and-state-machines.md](references/ddd-tactical-and-state-machines.md) |
+
+Do not load unrelated references unnecessarily.

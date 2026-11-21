@@ -44,3 +44,11 @@ Design the application so a non-critical subsystem failure never takes down the 
 - Isolate critical APIs from heavy export/AI workers using separate pools/queues (**bulkheads**) and verify dead-letter queue replay procedures (`/shadow-concurrency`) restore backlog safely without exceeding DB pool budgets.
 
 For an existing isolated drill, run `python shadow-resilience/scripts/drill_evidence.py drill.json` on its recorded measurements. Provide offset-aware ISO timestamps in `disruption_at`, `business_verified_at` and `recovered_checkpoint_at`. Set `required_dependencies_verified`, `consumer_workflow_passed` and `checkpoint_verified_in_source_timeline` from drill receipts. Retain those receipts with the report. Exit 1 identifies incomplete measurements. Compare each measured value to the business owner's agreed objective.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Bulkhead Concurrency Semaphores, Stale-Cache Fallback, Feature Shedding & Ephemeral Restore Drills | [references/degradation-bulkheads-and-drills.md](references/degradation-bulkheads-and-drills.md) |
+
+Do not load unrelated references unnecessarily.

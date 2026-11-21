@@ -66,3 +66,11 @@ Always provide a Mermaid `flowchart LR` dependency graph showing execution waves
 
 ## 4. Execution Approval & Intent Boundary (`L0`–`L4`)
 - Planning and decomposition are `L0_READ_ONLY`. Never treat a planned recommendation as Monarch authorization: tag all `L2` (broad E2E), `L3` (`/shadow-perf` load/stress/high-cost eval), and `L4` (destructive migrations/prod deploy) backlog tasks with `[APPROVAL-REQUIRED]` under `shadow-monarch/reference/EXECUTION-APPROVAL-PROTOCOL.md` (`execution_approval_gate.py`).
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Vertical Thin Slicing, Acyclic Dependency DAGs, Story DoR/DoD Contracts & `[APPROVAL-REQUIRED]` Tagging | [references/vertical-slicing-and-dependency-graphs.md](references/vertical-slicing-and-dependency-graphs.md) |
+
+Do not load unrelated references unnecessarily.

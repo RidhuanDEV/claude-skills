@@ -58,3 +58,11 @@ Before handing the Staging environment to client testers, run an internal **Inte
 - [ ] Zero open `Blocker` or `Critical` UAT defects (Severity-First Gate: critical blockers override any numeric score).
 - [ ] All UAT scenarios have verified screenshot/document evidence attached (`NOT TESTED` explicitly labeled if any manual check was skipped).
 - [ ] Formal UAT Sign-Off sheet (`Berita Acara UAT`) ready for client signature.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Executable RTM Design, `E03` Filter Contract Audit, Severity-First Gate & Berita Acara UAT | [references/rtm-and-staging-acceptance.md](references/rtm-and-staging-acceptance.md) |
+
+Do not load unrelated references unnecessarily.

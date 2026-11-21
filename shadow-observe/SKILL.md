@@ -47,3 +47,6 @@ Ensure a single `X-Request-Id` / W3C `traceparent` flows unbroken across:
 - **Cardinality Cost Guardrail**: Never attach unbounded values (`userId`, `requestId`, `email`, raw URL path with UUIDs) as Prometheus metric labels — put high-cardinality IDs in OpenTelemetry spans and structured logs only.
 - **Telemetry Redaction**: Strip `Authorization`, cookies, NIK, and credentials before exporting spans or logs.
 - **Diagnostic Handoff**: When alerts or trace anomalies pinpoint a failing subsystem, hand off trace timeline + redacted logs to `/shadow-debug` for causal hypothesis falsification.
+
+## 5. Deep Engineering Reference (Load On-Demand)
+- For RED vs USE Golden Signals, OpenTelemetry SDK auto/manual spans & FinOps tail/head sampling, synthetic probes, and concrete structured logger recipes (`pino` + `AsyncLocalStorage`, `structlog`, Go `log/slog`, Laravel Monolog) -> read [OTel & structured logging blueprints](references/otel-and-logging-patterns.md).
