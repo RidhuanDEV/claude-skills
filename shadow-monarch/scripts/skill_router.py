@@ -168,6 +168,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"token\s+bucket|rate\s+limit(?:ing|er)\s+algorithm)\b",
             re.IGNORECASE,
         ),
+        "exclude": re.compile(r"\b(?:SMTP\s+250|Postmaster\s+Tools|email\s+header\s+injection)\b", re.IGNORECASE),
     },
     {
         "skill": "shadow-refactor",
@@ -332,7 +333,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|"
             r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock|"
-            r"PgBouncer|transaction\s+pooling|SQLite\s+WAL|MongoDB|TimescaleDB|ClickHouse|connection\s+pool\s+sizing)\b",
+            r"PgBouncer|transaction\s+pooling|SQLite\s+WAL|MongoDB|TimescaleDB|ClickHouse|connection\s+pool\s+sizing|"
+            r"Row[- ]Level\s+Security|\bRLS\b\s+(?:policy|policies|index)|auth\.uid\(\)|SECURITY\s+DEFINER|Supabase\s+(?:Postgres|RLS|index))\b",
             re.IGNORECASE,
         ),
     },
@@ -366,6 +368,44 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:payment\s+gateway|SNAP\s+BI|Midtrans|Xendit|Stripe|QRIS|webhook|webhook\s+replay|HMAC\s+signature|"
             r"Transactional\s+Outbox|circuit\s+breaker|reconciliation\s+job|provider\s+inquiry|"
             r"third[- ]party\s+API\s+(?:retry|timeout|integration)|WhatsApp\s+gateway|SMTP|emails?\s+duplicated)\b",
+            re.IGNORECASE,
+        ),
+        "exclude": re.compile(r"\b(?:SMTP\s+250|Postmaster\s+Tools|email\s+header\s+injection)\b", re.IGNORECASE),
+    },
+    {
+        "skill": "shadow-email",
+        "layer": "task",
+        "references": ["BACKEND.md", "ENTERPRISE-INTEGRATION.md"],
+        "include": re.compile(
+            r"\b(?:React\s+Email|MJML|transactional\s+email|email\s+(?:template|deliverability|bounce|suppression|rendering|outbox)|"
+            r"SPF|DKIM|DMARC|BIMI|MTA-STS|TLS-RPT|RFC\s*8058|List-Unsubscribe(?:-Post)?|one[- ]click\s+unsubscribe|"
+            r"Outlook\s+VML|Gmail\s+102\s*KB|IP\s+warm[- ]?up|Mailpit|Resend|Postmark|Amazon\s+SES|SendGrid|"
+            r"SMTP\s+250|Postmaster\s+Tools|DSN\s+bounce|email\s+header\s+injection)\b",
+            re.IGNORECASE,
+        ),
+    },
+    {
+        "skill": "shadow-seo",
+        "layer": "task",
+        "references": ["FRONTEND.md"],
+        "include": re.compile(
+            r"\b(?:technical\s+SEO|\bSEO\b|JSON-LD|Schema\.org|sitemap\.xml|robots\.txt|hreflang|canonical\s+URL|"
+            r"crawl\s+budget|redirect\s+chain|domain\s+migration\s+SEO|ccTLD|X-Robots-Tag|llms\.txt|crawlabilit\w*|rich\s+snippets?|OpenGraph\s+meta|"
+            r"CrUX|Search\s+Console|keyword\s+cannibalization|faceted\s+navigation|programmatic\s+SEO|AI\s+search\s+visibility)\b",
+            re.IGNORECASE,
+        ),
+        "exclude": re.compile(r"\b(?:OG\s+card\s+Satori|generate\s+OG\s+image)\b", re.IGNORECASE),
+    },
+    {
+        "skill": "shadow-analytics",
+        "layer": "task",
+        "references": ["FRONTEND.md", "DATA-ANALYTICS-ML.md"],
+        "include": re.compile(
+            r"\b(?:product\s+analytics|event\s+taxonomy|tracking\s+plan|PostHog|GA4|Google\s+Analytics|Mixpanel|Amplitude|"
+            r"Plausible|Sample\s+Ratio\s+Mismatch|\bSRM\b|CUPED|power\s+analysis|A/B\s+(?:test(?:ing)?|experiment)|"
+            r"funnel\s+tracking|identity\s+stitching|cohort\s+retention|North\s+Star\s+Metric|"
+            r"Difference[- ]in[- ]Differences|\bDiD\b|causal\s+inference|Synthetic\s+Control|mSPRT|delta\s+method|"
+            r"sequential\s+testing|assignment\s+vs\s+exposure|switchback\s+experiment)\b",
             re.IGNORECASE,
         ),
     },
@@ -422,7 +462,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:modern[- ]web[- ]guidance|popover\s+API|anchor\s+positioning|container\s+quer(?:y|ies)|"
             r"@container|:has\(|:user-valid|view\s+transitions?\s+API|scroll[- ]driven\s+animations?|"
-            r"content-visibility|fetchpriority|core\s+web\s+vitals|native\s+<dialog>)\b",
+            r"content-visibility|fetchpriority|core\s+web\s+vitals|native\s+<dialog>|"
+            r"async\s+waterfalls?|barrel\s+imports?|React\.cache|RSC\s+(?:serialization|performance|bundle)|react-best-practices)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:SQL\s+query|Dockerfile|GitHub\s+Actions|CI/CD\s+pipeline)\b", re.IGNORECASE),
@@ -1038,8 +1079,8 @@ def run_self_test() -> dict[str, Any]:
     known_skills = get_known_skill_names()
     results: list[dict[str, Any]] = [
         {
-            "probe": "AUDIT-1: All 56 SKILL.md have 'Use when...' triggers & <=500 chars",
-            "passed": audit["all_passed"] and audit["total_skills"] >= 56,
+            "probe": "AUDIT-1: All 59 SKILL.md have 'Use when...' triggers & <=500 chars",
+            "passed": audit["all_passed"] and audit["total_skills"] >= 59,
             "details": audit,
         }
     ]
@@ -1582,6 +1623,90 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-ops"],
             ["shadow-perf"],
             "shadow-ops",
+        ),
+        (
+            "SEO-1: JSON-LD Schema.org, sitemap.xml, robots.txt & hreflang route shadow-seo",
+            "Implement XSS-safe JSON-LD Schema.org, dynamic sitemap.xml, robots.txt, and reciprocal hreflang for our Next.js catalog.",
+            ["shadow-seo"],
+            ["shadow-perf", "shadow-illustration"],
+            "shadow-seo",
+        ),
+        (
+            "EMAIL-1: SPF/DKIM/DMARC, RFC 8058 List-Unsubscribe-Post & React Email on Mailpit route shadow-email",
+            "Configure SPF, 2048-bit DKIM, DMARC alignment, RFC 8058 List-Unsubscribe-Post, and React Email templates tested on Mailpit.",
+            ["shadow-email"],
+            ["shadow-perf"],
+            "shadow-email",
+        ),
+        (
+            "ANALYTICS-1: PostHog event taxonomy, PII scrubbing & A/B SRM check route shadow-analytics (not shadow-observe)",
+            "Design a typed PostHog event taxonomy tracking plan with PII scrubbing and A/B test Sample Ratio Mismatch check.",
+            ["shadow-analytics"],
+            ["shadow-perf", "shadow-observe"],
+            "shadow-analytics",
+        ),
+        (
+            "MWG-REACT-1: Async waterfalls, barrel imports & React.cache RSC optimization route modern-web-guidance",
+            "Eliminate async waterfalls, remove barrel imports, and optimize RSC serialization with React.cache in Next.js.",
+            ["modern-web-guidance"],
+            ["shadow-perf"],
+            "modern-web-guidance",
+        ),
+        (
+            "DB-RLS-1: Supabase Postgres RLS (SELECT auth.uid()) & SECURITY DEFINER route shadow-db",
+            "Optimize Supabase Postgres RLS policies using (SELECT auth.uid()), composite indexes, and hardened SECURITY DEFINER RPC.",
+            ["shadow-db"],
+            ["shadow-perf"],
+            "shadow-db",
+        ),
+        (
+            "DISAMBIG-ANALYTICS-OBS-1: OpenTelemetry tracing & pino logs stay on shadow-observe (never shadow-analytics)",
+            "Set up OpenTelemetry distributed tracing, PromQL burn alerts, and structured pino logs for checkout service.",
+            ["shadow-observe"],
+            ["shadow-analytics", "shadow-perf"],
+            "shadow-observe",
+        ),
+        (
+            "SEO-MIGRATE-1: Crawl budget & redirect chain audit routes shadow-seo",
+            "Audit crawl budget, faceted URL traps, and redirect chain loops before our domain migration SEO rollout.",
+            ["shadow-seo"],
+            ["shadow-perf"],
+            "shadow-seo",
+        ),
+        (
+            "EMAIL-RENDER-1: Outlook VML, Gmail 102KB clip & IP warm-up MTA-STS route shadow-email",
+            "Fix Outlook VML button rendering, enforce Gmail 102KB clip limit, and plan IP warm-up with MTA-STS and TLS-RPT.",
+            ["shadow-email"],
+            ["shadow-perf"],
+            "shadow-email",
+        ),
+        (
+            "ANALYTICS-CUPED-1: CUPED variance reduction, power analysis & identity stitching route shadow-analytics",
+            "Implement CUPED variance reduction, experiment power analysis, and cross-device identity stitching with logout reset.",
+            ["shadow-analytics"],
+            ["shadow-perf", "shadow-observe"],
+            "shadow-analytics",
+        ),
+        (
+            "SEO-CRUX-1: Search Console drop diagnosis, CrUX p75 & faceted navigation route shadow-seo",
+            "Diagnose a Search Console traffic drop using CrUX p75 field data, faceted navigation rules, and keyword cannibalization checks.",
+            ["shadow-seo"],
+            ["shadow-perf"],
+            "shadow-seo",
+        ),
+        (
+            "EMAIL-INCIDENT-1: SMTP 250 missing in inbox, Postmaster Tools & header injection route shadow-email",
+            "Investigate SMTP 250 OK missing in inbox via Postmaster Tools and block CRLF email header injection in Amazon SES outbox.",
+            ["shadow-email"],
+            ["shadow-perf"],
+            "shadow-email",
+        ),
+        (
+            "ANALYTICS-CAUSAL-1: Difference-in-Differences causal inference, mSPRT & delta method route shadow-analytics",
+            "Design a Difference-in-Differences causal inference study alongside mSPRT sequential testing and delta method ratio metrics.",
+            ["shadow-analytics"],
+            ["shadow-perf", "shadow-observe"],
+            "shadow-analytics",
         ),
     ]
 

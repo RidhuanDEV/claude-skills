@@ -16,7 +16,7 @@ class RepoCoverageAndIntegrityTests(unittest.TestCase):
         skill_dirs = sorted(
             p.name for p in REPO_ROOT.iterdir() if p.is_dir() and (p / "SKILL.md").is_file()
         )
-        self.assertGreaterEqual(len(skill_dirs), 56)
+        self.assertGreaterEqual(len(skill_dirs), 59)
 
         routed_by_rules = {rule["skill"] for rule in skill_router.ROUTING_RULES}
         routed_always_on_ui = {

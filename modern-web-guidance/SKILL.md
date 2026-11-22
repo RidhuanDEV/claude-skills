@@ -42,3 +42,11 @@ Prefer native platform primitives before adding npm dependencies:
 
 - **Default:** Features marked **Baseline Widely Available** can ship without fallbacks.
 - **Newly / Limited Availability:** Feature-detect with `@supports` or runtime checks and provide graceful progressive enhancement — never silently break Safari/Firefox users or add bloated polyfills without checking bundle impact.
+
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| React & Next.js Performance (Eliminating Async Waterfalls, Barrel/Bundle Splitting, RSC `React.cache()`, Server Actions & Re-Renders) | [references/react-nextjs-performance.md](references/react-nextjs-performance.md) |
+
+Do not load unrelated references unnecessarily.

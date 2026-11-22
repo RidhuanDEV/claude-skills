@@ -46,5 +46,11 @@ Connects to the **`shadow_db` MCP server** (`inspect_database_schema`, `run_read
 7. **Execution Approval & Target Environment Boundary (`L0`–`L4`)**:
    - Unknown DB hosts/environments fail closed (`BLOCKED_UNKNOWN_ENVIRONMENT`). Read-only `SELECT`/`EXPLAIN` diagnostics on verified local/dev DBs are `L0`/`L1`; any DDL/data mutation or staging/production access is **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
 
-## Deep Engineering Reference (Load On-Demand)
-- For multi-engine selection (PostgreSQL, MySQL, TimescaleDB/ClickHouse time-series, MongoDB schema versioning), `PgBouncer` transaction vs session pooling pitfalls, autovacuum/wraparound health, and read-replica lag -> read [Multi-engine database & pooling guide](references/multi-engine-and-pooling.md).
+## Reference Guide
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Multi-Engine Selection, `PgBouncer` Pooling, Autovacuum & Read-Replica Lag | [references/multi-engine-and-pooling.md](references/multi-engine-and-pooling.md) |
+| PostgreSQL / Supabase RLS (`(SELECT auth.uid())`), Composite/Partial/FK Indexing & Hardened `SECURITY DEFINER` | [references/postgres-rls-and-indexing.md](references/postgres-rls-and-indexing.md) |
+
+Do not load unrelated references unnecessarily.
