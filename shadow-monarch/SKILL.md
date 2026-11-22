@@ -156,6 +156,12 @@ Every change must survive an attempt to break it before it is reported as done o
    Every ephemeral Docker test/migration/drill container or image (`*-test-*`, `*-migration-verification*`, `*-restore-drill*`)
    must reuse a single container per suite and clean up in `try/finally` (`docker run --rm --label shadow.ephemeral=true` +
    `docker rm -f -v`, or `docker compose down -v --rmi local --remove-orphans`).
+7. **Task-Scoped Runtime Resource Teardown (`scripts/resource_cleanup.py`).** Any dev server (`vite`, `next dev`, `video-env.cjs`,
+   backend API server), Playwright/Chromium browser (`browser_close`), background worker, or temp file started by a task MUST be
+   tracked by ownership (`--register`) and stopped automatically once verification/recording finishes (`--cleanup-owned` / `try/finally`),
+   unless the Monarch explicitly asks to keep it running for live preview (report exact `PID` & `port`). NEVER blanket-kill `node.exe`/`python.exe`
+   and NEVER terminate other projects' dev servers or active host/MCP sessions (`claude.exe` + live MCP children); use `--audit` (`L0`)
+   to separate `OWNED_BY_TASK`, `ORPHANED_MCP_NO_PARENT`, `ACTIVE_HOST_SESSION`, and `FOREIGN_PROJECT_KEEP`.
 
 ## Load Focused References & Companion Skills (3-Layer Progressive Auto-Routing)
 

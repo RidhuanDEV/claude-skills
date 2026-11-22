@@ -2018,31 +2018,57 @@ const rl = readline.createInterface({
   terminal: false,
 })
 
+let inFlightRequests = 0
+let stdinClosed = false
+let shutdownRequested = false
+
+function maybeExit() {
+  if ((stdinClosed || shutdownRequested) && inFlightRequests === 0) {
+    process.exit(0)
+  }
+}
+
+rl.on('close', () => {
+  stdinClosed = true
+  maybeExit()
+})
+
+for (const sig of ['SIGINT', 'SIGTERM']) {
+  process.on(sig, () => {
+    shutdownRequested = true
+    rl.close()
+    setTimeout(() => process.exit(0), 1500).unref()
+    maybeExit()
+  })
+}
+
 rl.on('line', async (line) => {
-  const trimmed = line.trim()
-  if (!trimmed) return
-
-  let msg
+  inFlightRequests += 1
   try {
-    msg = JSON.parse(trimmed)
-  } catch {
-    return
-  }
+    const trimmed = line.trim()
+    if (!trimmed) return
 
-  const { id, method, params } = msg
+    let msg
+    try {
+      msg = JSON.parse(trimmed)
+    } catch {
+      return
+    }
 
-  if (method === 'initialize') {
-    sendResult(id, {
-      protocolVersion: PROTOCOL_VERSION,
-      capabilities: { tools: {} },
-      serverInfo: SERVER_INFO,
-    })
-    return
-  }
+    const { id, method, params } = msg
 
-  if (method === 'notifications/initialized') {
-    return
-  }
+    if (method === 'initialize') {
+      sendResult(id, {
+        protocolVersion: PROTOCOL_VERSION,
+        capabilities: { tools: {} },
+        serverInfo: SERVER_INFO,
+      })
+      return
+    }
+
+    if (method === 'notifications/initialized') {
+      return
+    }
 
   if (method === 'ping') {
     sendResult(id, {})
@@ -2094,7 +2120,11 @@ rl.on('line', async (line) => {
     return
   }
 
-  if (id !== undefined && id !== null) {
-    sendResult(id, {})
+    if (id !== undefined && id !== null) {
+      sendResult(id, {})
+    }
+  } finally {
+    inFlightRequests -= 1
+    maybeExit()
   }
 })

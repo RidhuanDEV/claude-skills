@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"~/.claude/skills/shadow-monarch/scripts/resource_cleanup.py\" --cleanup-owned --ledger .shadow-task-resources.json --if-ledger-exists",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

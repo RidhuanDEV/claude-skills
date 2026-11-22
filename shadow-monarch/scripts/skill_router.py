@@ -562,7 +562,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DEVOPS.md", "CLOUD-SRE.md"],
         "include": re.compile(
-            r"\b(?:Docker|Dockerfile|Kubernetes|Nginx|Caddy|systemd|PM2|CI/CD|GitHub\s+Actions|GitLab\s+CI|canary\s+rollout|blue[- ]green|secret\s+rotation)\b",
+            r"\b(?:Docker|Dockerfile|Kubernetes|Nginx|Caddy|systemd|PM2|CI/CD|GitHub\s+Actions|GitLab\s+CI|canary\s+rollout|blue[- ]green|secret\s+rotation|"
+            r"orphan(?:ed)?\s+(?:MCP|process(?:es)?)|proses\s+(?:MCP|yatim)|leftover\s+(?:dev\s+server|process(?:es)?)|dev\s+server\s+(?:nyangkut|sisa)|"
+            r"resource_cleanup|port\s+conflict|bersihkan\s+proses)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Redis\s+vs\s+queue\s+semantics|queue\s+semantics\s+vs\s+Redis)\b", re.IGNORECASE),
@@ -1566,6 +1568,20 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-grc"],
             ["shadow-perf"],
             "shadow-grc",
+        ),
+        (
+            "OPS-CLEANUP-1: Orphan MCP & leftover dev server audit routes shadow-ops (never shadow-perf)",
+            "Cek proses MCP yatim dan matikan dev server sisa yang nyangkut tanpa menyentuh proyek lain.",
+            ["shadow-ops"],
+            ["shadow-perf"],
+            "shadow-ops",
+        ),
+        (
+            "OPS-CLEANUP-2: Port conflict & resource_cleanup routes shadow-ops (never shadow-perf)",
+            "Run resource_cleanup audit to inspect port conflict and orphaned processes safely.",
+            ["shadow-ops"],
+            ["shadow-perf"],
+            "shadow-ops",
         ),
     ]
 

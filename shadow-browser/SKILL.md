@@ -17,6 +17,9 @@ Connects to the official **`playwright` MCP server** (`@playwright/mcp`) and `ch
    - Before acting, record role, route, expected HTTP outcome, visible state, focus and persistence after reload where relevant. For invalid credentials, a 401 with the expected accessible error and no session can pass. A 200 with a blank page fails the UI oracle. Attribute unrelated traffic separately. If the target is unreachable, mark the scenario BLOCKED and record the attempted URL without credentials.
 3. **Interactive Control Verification**:
    - Click interactive buttons, modals, tabs, and forms to verify real behavior (`antislop` R-26).
+4. **Mandatory Browser & Dev Server Teardown (Zero Leftover Processes)**:
+   - Always call Playwright **`browser_close`** as soon as browser verification finishes so headless Chromium processes (`~300–600 MB` RAM) are released immediately even while the host MCP stays connected.
+   - If this task started a local dev server (`vite`, `next dev`, etc.) solely to run browser checks, stop that exact tracked PID (`shadow-monarch/scripts/resource_cleanup.py --cleanup-owned`) before completing — unless the Monarch explicitly asked to keep the preview server alive (report its `PID` & `port`). NEVER terminate dev servers running on other ports/projects or active host/MCP sessions.
 
 ## Execution Approval & Intent Boundary (`L1` vs `L2`)
 - Targeted Playwright/browser checks for explicitly modified UI routes on local/sandbox are `L1_SAFE_VERIFICATION`. Unrequested broad E2E suite runs (`playwright test` full repo suite during unit-test or minor edits) are **`L2: SCOPE_EXPANSION`** and require explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

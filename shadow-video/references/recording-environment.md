@@ -50,3 +50,9 @@
 - No open-source Indonesian TTS with a clear commercial licence was found (2026-10 survey: MMS-TTS is CC-BY-NC,
   Piper `id_ID` data provenance unclear). Ask legal before switching.
 - Audio is cached by provider + voice + rate + pitch + text; editing narration re-synthesises only changed scenes.
+
+## Teardown after recording (Zero Lingering Servers)
+
+- Stop every process spawned for the recording session (`tools/video-env.cjs` frontend + backend, `tools/chrome-cdp.ts`, Playwright browser instances, and ephemeral recording Docker DBs) inside `try/finally` or immediately after `npm run verify` / `npm run final` completes.
+- Register task-owned PIDs via `shadow-monarch/scripts/resource_cleanup.py --register` and release them with `--cleanup-owned` (or explicit PID tree stop) so zero recording servers remain active when switching projects.
+- Never run blanket `taskkill /IM node.exe /F` or touch dev servers belonging to other repositories/ports or active host MCP sessions.

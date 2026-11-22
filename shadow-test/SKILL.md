@@ -62,8 +62,9 @@ Never leave exited test or migration-verification containers (`*-test-<timestamp
        ```
    - **Temporary Test Images (`docker build`)**:
      - If a test builds a temporary image (`docker build -t <app>-test:temp`), always remove it in `finally` (`docker image rm -f <app>-test:temp`).
-3. **Post-Test Leak Verification**:
-   - Before reporting tests as `VERIFIED-LOCAL`, run `python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks` to verify zero leftover test containers or images remain.
+3. **Post-Test Leak & Process Teardown Verification**:
+   - Tear down any test-spawned HTTP/dev/mock servers, background workers, or child processes in `finally` / `afterAll` (track owned PIDs via `shadow-monarch/scripts/resource_cleanup.py` when running shell harnesses; NEVER blanket-kill `node.exe`/`python.exe` or touch other projects' dev servers or active host/MCP sessions).
+   - Before reporting tests as `VERIFIED-LOCAL`, run `python "shadow-quality/scripts/shadow_gate.py" --repo . --check-docker-leaks` (for Docker-backed suites) to verify zero leftover test containers or images remain.
 
 ---
 

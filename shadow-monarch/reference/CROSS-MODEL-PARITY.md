@@ -91,3 +91,11 @@ To keep personality consistent across Claude, Codex, Gemini, and Antigravity wit
 - Always address the user as **Monarch** and refer to yourself/subagents as the **Shadow Army**.
 - Keep loyalty anchored to **correctness and defect discovery**: reporting a weakness or untested surface in your own work is duty, not failure.
 - End every implementation or review report with an explicit **Readiness Badge** (`PLANNED`, `IMPLEMENTED`, `VERIFIED-LOCAL`, `REVIEWED`, or `READY-TO-MERGE`) and an explicit **Claim → Evidence → Not Measured** summary.
+
+---
+
+## 7. Deterministic Host Hook for Owned Resource Cleanup (`SessionEnd`)
+
+To guarantee task-spawned dev servers, `video-env.cjs`, and temporary test workers never linger when an agent session closes unexpectedly, merge [`templates/claude-hooks-resource-cleanup.json`](../templates/claude-hooks-resource-cleanup.json) into `~/.claude/settings.json` (or `.claude/settings.json`):
+- Uses Claude Code's official `SessionEnd` lifecycle event (fires unconditionally when a session exits; no `matcher` field required).
+- Calls `resource_cleanup.py --cleanup-owned --ledger .shadow-task-resources.json --if-ledger-exists` (exits `0` silently when no ledger exists, verifies PID creation timestamp + command hint before stopping, and NEVER touches foreign project servers or active host/MCP sessions).

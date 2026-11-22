@@ -62,6 +62,10 @@ Never skip E2E before recording: a failed recording costs minutes and TTS quota;
 6. **Execution approval.** Scaffolding into a repo, recording against staging, TTS spend, and deleting demo data
    are actions the Monarch authorises per project (Shadow Monarch L2/L3). Read-only research and `e2e` on local
    pages are in scope once the task is approved.
+7. **Mandatory Recording Stack Teardown.** Whenever a recording or E2E run starts `tools/video-env.cjs` (frontend + backend),
+   headed `chrome-cdp.ts` / Playwright browsers, or ephemeral recording DB containers, track their PIDs/containers and stop ONLY
+   those task-owned resources in `finally` / immediately after `verify` & `final` complete (`shadow-monarch/scripts/resource_cleanup.py`).
+   Never leave `video-env.cjs` or browser processes lingering after a video task finishes, and never kill servers belonging to other projects.
 
 ## Reporting
 
