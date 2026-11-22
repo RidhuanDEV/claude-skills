@@ -5,8 +5,22 @@ description: "Search, Retrieval & Ranking Engineering. Use when designing or tun
 
 # `/shadow-search` — Search, Retrieval & Ranking Engineering
 
-- **Owner:** Search pipelines (lexical, vector, hybrid RRF, rerank), analyzer/morphology tuning (Indonesian + English), ranking metrics (`Recall@K`, `MRR@K`, `NDCG@K`), zero-downtime reindex, and tenant ACL prefiltering.
-- **Boundaries:** LLM generation faithfulness/red-teaming (`shadow-eval`), Redis key caching (`shadow-cache`), OLTP SQL query tuning (`shadow-db`).
+- **Owner:** Search pipelines (lexical BM25, Indonesian + English morphology/analyzers, dense vector ANN, hybrid RRF fusion, cross-encoder reranking), ranking metrics (`Recall@K`, `MRR@K`, `NDCG@K`), zero-downtime alias reindexing, and pre-top-K tenant ACL prefiltering.
+- **Boundaries:** LLM answer faithfulness & RAG generation evaluation (`shadow-eval`), agent tool orchestration & prompt caching (`shadow-ai-eng`), Redis key caching (`shadow-cache`), OLTP SQL query tuning (`shadow-db`).
+
+## Reference Guide
+
+Load ONLY the 1–2 modular playbooks needed for the active search subtask:
+
+| Module | Topic | Load When |
+| :--- | :--- | :--- |
+| [01-search-engines-and-indonesian-analyzers.md](references/01-search-engines-and-indonesian-analyzers.md) | Engine selection (`pgvector`/FTS, Meilisearch, Typesense, OpenSearch, Qdrant), Indonesian/English analyzers, synonyms, fuzziness | Choosing a search engine, fixing Indonesian morphology/stemming/slang, exact SKU/pasal matching |
+| [02-hybrid-rrf-chunking-and-reranking.md](references/02-hybrid-rrf-chunking-and-reranking.md) | Structure-aware chunking, BM25 + dense vector RRF fusion, cross-encoder reranking, calibrated cutoffs | Tuning hybrid retrieval quality, chunk boundaries, rerank latency budgets, or removing hardcoded cosine cutoffs |
+| [03-pre-top-k-tenant-acl-and-freshness.md](references/03-pre-top-k-tenant-acl-and-freshness.md) | Pre-top-K tenant/scope ACL filtering, near-real-time revocation & tombstones, CDC indexing freshness | Preventing cross-tenant leakage, empty post-filtered pages, or stale revoked document visibility |
+| [04-zero-downtime-alias-reindexing-and-benchmarks.md](references/04-zero-downtime-alias-reindexing-and-benchmarks.md) | Blue/green alias reindexing, `PIT` + `search_after` pagination, paired `Recall@K`/`MRR@K`/`NDCG@K` benchmarks | Migrating mappings/embeddings with zero downtime, fixing deep-offset OOM, or evaluating candidate indexes |
+| [methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md](methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md) | Core hybrid retrieval & ACL methodology notes | Quick methodological reference on RRF & ACL contracts |
+| [playbooks/SEARCH-RELEVANCE-AND-MIGRATION-PLAYBOOK.md](playbooks/SEARCH-RELEVANCE-AND-MIGRATION-PLAYBOOK.md) | Operational relevance & migration checklist | Executing relevance review & index cutover gates |
+| [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`SRCH-EVAL-01..07`) | Benchmarking retrieval design, ACL safety, and benchmark judgment |
 
 ## 1. Preconditions, ACL Safety & Calibration Rules
 - **Tenant ACL Prefilter Mandatory:** Filter `tenant_id` and `permission_scopes` **inside** the lexical/vector retrieval query BEFORE top-K scoring and caching — NEVER post-filter top-K results (which leaks existence or returns empty pages) and NEVER return deleted/revoked documents.
@@ -25,6 +39,7 @@ Read [`methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md`](methodologies/HYBRID-BM
 ```powershell
 python "shadow-search/scripts/search_relevance_acl_gate.py" --self-test
 python "shadow-search/scripts/search_relevance_acl_gate.py" --evaluate path/to/search_eval.json
+python -m unittest discover -s shadow-search/tests -v
 ```
 
 ### Comparing a candidate index with the serving index
@@ -36,6 +51,3 @@ Run the evaluator once for each index. Compare only matched query IDs from the s
 A missing or all-zero judgment set contributes null relevance metrics and makes the gate fail with insufficient evidence. Evaluate intentional no-answer queries as a separate abstention task with its own oracle. A labeled query with an observed empty result gets zero. Invalid data fails before scoring. Unauthorized or revoked results anywhere in the returned list fail the gate; metrics for that query are withheld. A matched tenant and an unflagged document alone cannot establish that the retrieval engine actually applied the permission filter before top-K. Verify query construction and freshness against the owning service.
 
 When the aggregate improves but an important cohort regresses, retain its paired examples, denominators and the owner's tolerance in the decision. Hold promotion while evidence, permissions, or rollback ownership remain unresolved. Hand retrieval scores and ACL findings to `shadow-eval` separately from answer accuracy. An evaluator PASS covers the configured fixture and threshold. The incident/release owner decides rollout under the project's established workflow.
-
-## Deep Engineering Reference (Load On-Demand)
-- For search engine selection (`Postgres FTS+pg_trgm+pgvector` vs Meilisearch/Typesense vs OpenSearch/Elasticsearch vs Qdrant/Milvus), Indonesian+English query understanding/synonyms/fuzziness, structure-aware chunking, and incremental re-indexing -> read [Full-stack search architecture](references/search-architecture.md).

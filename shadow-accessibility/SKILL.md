@@ -1,61 +1,51 @@
 ---
 name: shadow-accessibility
-description: "Advanced Accessibility QA & Engineering (WCAG 2.2 AA/AAA). Use when auditing or fixing semantic HTML landmarks, ARIA roles, keyboard focus traps, screen reader labels, color-blind safety, or reduced-motion support."
+description: "Advanced Accessibility QA & Engineering (WCAG 2.2 AA/AAA). Use when auditing or fixing semantic HTML landmarks, ARIA roles, keyboard focus traps & modals, form labels/live regions, WCAG color contrast, reduced-motion, cognitive UX, or i18n/RTL localization layouts. Do NOT use for general visual branding (shadow-design) or SEO hreflang indexing (shadow-seo)."
 ---
 
-# Shadow Accessibility (`/shadow-accessibility`) — Deep WCAG 2.2 AA/AAA & Assistive Tech QA
+# Shadow Accessibility (`/shadow-accessibility`) — Deep WCAG 2.2 AA/AAA, Assistive Tech, Cognitive UX & i18n/RTL
 
-Works alongside `antislop-human` to provide deep, verifiable accessibility engineering and regression testing for public, enterprise, and government web/mobile applications.
+Works alongside `antislop-human` to provide deep, verifiable accessibility, inclusive UX, and internationalization/RTL engineering for public, enterprise, and government web/mobile applications.
 
----
+- **Owner:** Semantic HTML landmarks & WAI-ARIA authoring, keyboard navigation & modal focus management, accessible forms & ARIA live regions, WCAG 2.2 contrast/color-independence/motion/target-size compliance, cognitive/neurodivergent accessibility, and i18n/ICU/`Intl.*`/CSS-logical RTL engineering.
+- **Boundaries:** Design system brand identity & Figma tokens (`shadow-design`), live multi-viewport Playwright runs (`shadow-browser`), international `hreflang` SEO indexing (`shadow-seo`), and mobile native store gates (`shadow-mobile`).
 
-## 1. The 6 Core WCAG 2.2 AA Compliance Pillars
+## Reference Guide
 
-### 1. Semantic HTML & Landmark Structure
-- Use native interactive elements (`<button>`, `<a href>`, `<input>`, `<select>`, `<dialog>`) instead of `<div onClick>`.
-- Every page must have a logical heading hierarchy (`<h1>` once per page, followed by `<h2>` -> `<h3>` without skipping levels) and proper landmarks (`<header>`, `<nav>`, `<main id="main-content">`, `<footer>`) plus a **"Skip to main content"** link for keyboard users.
+Load ONLY the 1–2 modular playbooks needed for the active accessibility subtask:
 
-### 2. Complete Keyboard Navigation & Focus Management
-- Every interactive control must be reachable via `Tab` / `Shift+Tab` in visual reading order (`tabIndex={0}` or native focusable; never use positive `tabIndex > 0`).
-- **Visible Focus Ring**: Always use `:focus-visible` with at least a `2px` high-contrast outline (`3:1` contrast against adjacent surface). Never write `outline: none` without a clear replacement.
-- **Modals / Drawers / Dialogs**:
-  - Trap focus inside the open modal (`Tab` cycles within modal controls).
-  - Close on `Escape`.
-  - Return focus to the exact trigger button when the modal closes.
-
-### 3. Form Labels, Instructions & Error Announcements
-- Inspect the rendered accessible name, role and state. Accept explicit associations, wrapping labels or a valid naming mechanism for a custom control. Test focus after validation and return focus when a modal closes. Record which assistive technology was actually exercised.
-- Required fields and format constraints (e.g., password rules, date format) must be associated via `aria-describedby`.
-- On validation failure:
-  - Set `aria-invalid="true"` on the invalid input.
-  - Link the error message element via `aria-describedby`.
-  - Move focus to the first invalid field (or error summary banner with `role="alert"`).
-
-### 4. Dynamic Updates & ARIA Live Regions
-- Toast notifications, async form submission results, and filter result counts ("Showing 12 of 48 results") must use `aria-live="polite"` (or `role="alert"` / `aria-live="assertive"` for critical errors) so screen readers (NVDA, VoiceOver, TalkBack) announce changes without losing focus.
-
-### 5. Contrast, Color Independence & Target Size (WCAG 2.2)
-- Normal text contrast $\ge 4.5:1$; large text ($\ge 18\text{pt}$ or $14\text{pt}$ bold) and UI components/icons $\ge 3.0:1$.
-- Never convey status by color alone (pair green/yellow/red badges with explicit text labels and icons).
-- Interactive target size: minimum `24x24px` (WCAG 2.2 AA) and `44x44px` on mobile touch viewports.
-
-### 6. Motion & Zoom Resilience
-- Respect `@media (prefers-reduced-motion: reduce)` by disabling parallax, auto-playing animations, and non-essential transitions.
-- Layout must remain readable and functional without horizontal scrolling when browser zoom is set to `200%` and down to `320px` CSS width.
-
-### 7. Cognitive, Neurodivergent & Motor Accessibility (Beyond Bare Checklists)
-- **Zero Memory-Burden Transitions**: Never force users to remember or manually re-type codes, IDs, or error details from a previous screen or dismissed toast. Keep reference context visible inline.
-- **Forgiving Interactions (Undo Over Confirm)**: Support 1-click Undo for reversible actions, preserve all typed form inputs across validation failures or auth timeouts, and provide a warning with 1-click extension before any session timeout expires.
-- **Plain, Non-Blaming Microcopy**: Error and empty-state copy must explain what happened and how to recover in plain language (`06-accessibility-responsive-content.md`). Never use "weaponized accessibility" or confusing double-negative consent toggles.
-
-### 8. Localization (I18n), RTL & Text Expansion Resilience
-- Layouts, badges, and buttons must accommodate `+30–40%` text length expansion (e.g., translating terse English UI labels into Bahasa Indonesia or German) without clipping or overlapping controls.
-- Use CSS logical properties (`margin-inline`, `padding-inline`, `inset-inline`, `text-align: start`) and locale-aware date, number, and currency formatters (`Intl.DateTimeFormat`, `Intl.NumberFormat`).
+| Module | Topic | Load When |
+| :--- | :--- | :--- |
+| [01-semantic-landmarks-and-aria-authoring.md](references/01-semantic-landmarks-and-aria-authoring.md) | Native HTML over ARIA, `<html lang>`, landmarks & skip links, sequential headings, accessible names, `inert`, tables | Auditing or building semantic page structure, navigation, icons, or data tables |
+| [02-keyboard-focus-management-and-dialogs.md](references/02-keyboard-focus-management-and-dialogs.md) | Natural tab order (`0`/`-1`, zero positive `tabindex`), `:focus-visible` + `scroll-margin-block`, native `<dialog>` trap & trigger restore, roving tabindex | Fixing keyboard navigation, sticky-header obscured focus, modals/drawers, tabs, or dropdown menus |
+| [03-forms-live-regions-contrast-and-motion.md](references/03-forms-live-regions-contrast-and-motion.md) | Programmatic labels (never placeholder-only), `aria-invalid`/`aria-describedby`, pre-mounted `aria-live`, WCAG `4.5:1`/`3.0:1` contrast, color-blind safety, `prefers-reduced-motion`, `200%` zoom | Hardening forms, error announcements, badges/charts, dark-mode contrast, or motion/zoom accessibility |
+| [04-i18n-rtl-and-cognitive-accessibility.md](references/04-i18n-rtl-and-cognitive-accessibility.md) | ICU MessageFormat, `Intl.*` currency/timezone safety, CSS logical RTL, `<bdi>`, `+35%` pseudo-localization, Undo/session-extend/paste-friendly cognitive UX | Supporting Bahasa Indonesia/English/Arabic RTL, preventing clipped translations, or lowering cognitive load |
+| [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`A11Y-EVAL-01..08`) | Auditing WCAG 2.2 AA compliance, dialog focus restoration, contrast math, live regions, and RTL/i18n |
 
 ---
 
-## 2. Foreign-Key Reference Routing (`T1` Audited Packs)
-- **Inclusive Design & Screen Reader Flow Architecture**: [`ghaida-intent/skills/include/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/include/SKILL.md) & [`accessibility-foundations.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md)
-- **Cultural, Linguistic & RTL/LTR Localization**: [`ghaida-intent/skills/localize/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/localize/SKILL.md)
-- **i18n, ICU MessageFormat, `Intl.*`, CSS Logical RTL & Pseudo-Localization Engineering**: [i18n and RTL engineering playbook](references/i18n-and-rtl-engineering.md)
-- **Accessibility, Responsive & Microcopy Rules**: [`06-accessibility-responsive-content.md`](../shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md)
+## 1. Core WCAG 2.2 AA, Cognitive & i18n Invariants
+
+1. **Semantic HTML & Landmarks:** Use native `<button>`, `<a href>`, `<input>`, `<select>`, `<dialog>` over `<div onClick>`. Declare `<html lang>`, one `<h1>` with sequential headings, `<header>`/`<nav>`/`<main id="main-content">`/`<footer>`, and a **"Skip to main content"** link.
+2. **Keyboard & Focus Management:** Maintain visual tab order (zero positive `tabindex > 0`), visible `>= 2px` `:focus-visible` ring (`>= 3:1` contrast), `scroll-margin-block` so sticky headers never obscure focus, and strict modal trapping + `Escape` close + exact trigger focus restoration.
+3. **Forms & Pre-Mounted ARIA Live Regions:** Inspect rendered accessible name, role, and state (accept `<label for>`, wrapping `<label>`, or valid ARIA naming; reject placeholder-only). Link constraints/errors via `aria-describedby` + `aria-invalid="true"`, focus first invalid field or `role="alert"` summary, pre-mount `aria-live="polite"` containers, and record which assistive tech was actually exercised.
+4. **Contrast, Color Independence, Target Size & Motion:** Enforce `>= 4.5:1` normal text, `>= 3.0:1` large text and UI borders/icons, pair status colors with explicit text + icons, enforce `>= 24×24px` desktop / `44×44px` mobile touch targets, honor `prefers-reduced-motion: reduce`, and guarantee zero horizontal scroll at `200%` zoom / `320px` width.
+5. **Cognitive & i18n/RTL Resilience:** Zero memory-burden auto-dismissing error codes, allow password paste (`SC 3.3.8`), warn with 1-click extension before session expiry, support `+35–40%` text expansion, use CSS Logical Properties (`margin-inline`, `text-align: start`), `<bdi>` on codes/phones, ICU plurals, and `Intl.*` tied strictly to authoritative ISO-4217 currency & IANA timezones.
+
+---
+
+## 2. Deterministic Accessibility HTML & Contrast Verification
+
+```powershell
+python shadow-accessibility/scripts/a11y_html_verifier.py --self-test
+python shadow-accessibility/scripts/a11y_html_verifier.py --check-html path/to/page.html
+python shadow-accessibility/scripts/a11y_html_verifier.py --check-contrast "#4B5563" "#FFFFFF"
+python -m unittest discover -s shadow-accessibility/tests -v
+```
+
+---
+
+## 3. Foreign-Key Reference Routing (`T1` Audited Packs)
+- **Inclusive Design & Screen Reader Flow Architecture:** [`ghaida-intent/skills/include/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/include/SKILL.md) & [`accessibility-foundations.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/intent/references/accessibility-foundations.md)
+- **Cultural, Linguistic & RTL/LTR Localization:** [`ghaida-intent/skills/localize/SKILL.md`](../shadow-design/references/external-upstreams/ghaida-intent/skills/localize/SKILL.md)
+- **Accessibility, Responsive & Microcopy Rules:** [`06-accessibility-responsive-content.md`](../shadow-design/references/ai-product-designer-skill-pack/06-accessibility-responsive-content.md)

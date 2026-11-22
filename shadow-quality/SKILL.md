@@ -81,5 +81,6 @@ When asked to review code or a PR, report findings ordered by severity:
 | Task / Scenario | Load Reference |
 | :--- | :--- |
 | Strict `tsconfig`, ESLint Boundary Fitness Rules, `shadow_gate.py`, Dead-Code Triage & Drift Audits | [references/fitness-functions-and-drift-gates.md](references/fitness-functions-and-drift-gates.md) |
+| Skill Evaluation Harness (`validate_skill_evaluations.py`), Baseline Regression & Non-Compensatory Safety Gates | [references/skill-evaluation-and-regression-gates.md](references/skill-evaluation-and-regression-gates.md) |
 
-Do not load unrelated references unnecessarily.
+Graded specialist scenarios live in [evaluations.md](evaluations.md) (6 scenarios). Do not load unrelated references unnecessarily.

@@ -4,7 +4,7 @@
 Load when designing or debugging multi-language/multi-region websites (`id-ID`, `en`, `en-SG`, `ms-MY`), validating reciprocal `hreflang` clusters, or resolving wrong-country pages ranking in regional search results.
 
 ## 2. Prerequisites
-Modules `01`–`04` and `/shadow-accessibility` (`i18n-and-rtl-engineering.md`).
+Modules `01`–`04` and `/shadow-accessibility` (`04-i18n-rtl-and-cognitive-accessibility.md`).
 
 ## 3. Technical Principles & Constraints
 - **Reciprocity Invariant:** Every page in an `hreflang` cluster MUST reference itself AND every sibling locale, AND every sibling MUST link back, plus an `x-default` fallback. One missing return link breaks reciprocity.

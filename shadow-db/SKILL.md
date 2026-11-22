@@ -1,56 +1,48 @@
 ---
 name: shadow-db
-description: "Live Database Inspection, ERD & Data Warehousing. Use when inspecting live DBs via shadow_db MCP, running read-only SQL diagnostics, generating DBML/Mermaid ERDs, diffing schemas, or building Star Schema DW and Pentaho (.ktr/.kjb) ETL jobs."
+description: "Database Architecture, Live Inspection & SQL Performance Specialist. Use when inspecting live DBs via shadow_db MCP, diagnosing EXPLAIN ANALYZE/locks/deadlocks, designing composite/partial/FK indexes, hardening Postgres RLS ((SELECT auth.uid())) & SECURITY DEFINER, sizing PgBouncer/partitioning, generating DBML/Mermaid ERDs, or drafting Star Schema DW/Pentaho ETL. Do NOT use for app backfill workflows (/shadow-data)."
 ---
 
-# `/shadow-db` — Multi-Engine Database Inspector, Schema Diff, Auto-ERD, Migration Safety & Data Warehouse Generator
+# Shadow DB (`/shadow-db`) — Multi-Engine Database Engineering, Inspection & SQL Tuning
 
-Use this skill whenever the **Monarch** invokes `/shadow-db` or works on database inspection, query performance (`EXPLAIN ANALYZE`), zero-downtime schema evolution, cross-database migration (e.g. MySQL ↔ PostgreSQL ↔ SQL Server), or ETL / Data Warehouse Star Schema (`dim_*` / `fact_*`) + Pentaho PDI (`.ktr`/`.kjb`) design.
+Use this skill whenever the **Monarch** inspects live databases via **`shadow_db` MCP**, diagnoses `EXPLAIN (ANALYZE, BUFFERS)` query plans, MVCC/deadlocks, or connection-pool saturation, hardens PostgreSQL/Supabase RLS & `SECURITY DEFINER` RPCs, generates ERDs/schema diffs, or drafts cross-DB Data Warehouse / Pentaho PDI (`.ktr`/`.kjb`) ETL pipelines.
 
-Connects to the **`shadow_db` MCP server** (`inspect_database_schema`, `run_readonly_query`, `generate_dbml_and_erd`, `compare_database_schemas`, `generate_cross_db_etl_and_warehouse`) and pairs with **`/shadow-data`** (data lifecycle & migrations) and **`/shadow-resilience`** (backup restore compatibility).
+## 1. Supported Engines & `shadow_db` MCP Capabilities
 
----
+Auto-detected from `.env` / DSN: **PostgreSQL** (Supabase/Neon/TimescaleDB/CockroachDB/Redshift), **MySQL / MariaDB / TiDB**, **Microsoft SQL Server / Azure SQL**, **MongoDB**, and **SQLite**.
+- **`inspect_database_schema` & `run_readonly_query`:** Strictly read-only by default (`SELECT`, `EXPLAIN`, `SHOW`, `PRAGMA`). Unknown DB hosts fail closed (`BLOCKED_UNKNOWN_ENVIRONMENT`); any DDL/data mutation or staging/prod access is **`L4_HIGH_IMPACT`** requiring explicit Monarch approval.
+- **`generate_dbml_and_erd` & `compare_database_schemas`:** Generates `docs/db/schema.dbml` + `docs/db/ERD.md` and detects cross-environment schema drift.
+- **`generate_cross_db_etl_and_warehouse`:** Produces 6 **draft** artifacts under `docs/db/etl/` (`01_target_ddl`, `02_star_schema_warehouse`, `03_etl_migration_blueprint`, `04_pentaho_sync_transformation.ktr`, `05_pentaho_master_job.kjb`, `06_cron_and_airflow_orchestrator.py`). File generation alone does **NOT** verify execution — independently verify target precision (`DECIMAL`/`TIMESTAMPTZ`), DDL syntax, checkpoint restartability, and source-to-target reconciliation!
 
-## 1. Supported Engines (Auto-Detected from `.env` or DSN)
+## 2. Core Database Engineering Non-Negotiables
 
-1. **PostgreSQL / Supabase / Neon / TimescaleDB / CockroachDB / Redshift** (`postgres://`)
-2. **MySQL / MariaDB / TiDB / SingleStore** (`mysql://`, `mariadb://`)
-3. **Microsoft SQL Server / Azure SQL** (`mssql://`, `sqlserver://`)
-4. **MongoDB** (`mongodb://`, `mongodb+srv://`)
-5. **SQLite** (`sqlite://`, `.db`, `.sqlite`)
+1. **Precision & Relational Integrity:** Store currency as `BIGINT` minor units or `NUMERIC(19,4)` (never `FLOAT`), instants as UTC `TIMESTAMPTZ`, soft-delete uniqueness via partial indexes (`WHERE deleted_at IS NULL`), and index every referencing FK column.
+2. **Lock-Safe DDL & Deadlock Hygiene:** Always set `SET lock_timeout`, use `CREATE INDEX CONCURRENTLY`, add FKs/checks with `NOT VALID` + `VALIDATE CONSTRAINT`, acquire multi-row locks in deterministic `ORDER BY id ASC FOR UPDATE` order, and keep external network I/O outside DB transactions.
+3. **Measure First (`EXPLAIN (ANALYZE, BUFFERS)`):** Order composite B-tree columns `Equality (tenant_id first) -> Sort -> Range`, keep predicates SARGable, and verify InitPlan caching **`(SELECT auth.uid())`** + **`SET search_path = ''`** on `SECURITY DEFINER` functions.
+4. **Pooling, Autovacuum & Replicas:** Multiplex pods via `PgBouncer` (`pool_mode = transaction` + **`SET LOCAL`** for tenant context — never session `SET`), tune per-table autovacuum on high-churn queues, and pin read-after-write queries to primary.
 
----
+## 3. Deterministic Verification CLI & Scenario Benchmarks
 
-## 2. Core Capabilities & Workflow
-
-1. **Read-Only by Default Inspection (`inspect_database_schema`, `run_readonly_query`)**:
-   - Automatically reads `DATABASE_URL` or `DB_*` from `<projectPath>/.env`.
-   - Enforces a strict Read-Only SQL Gate (`SELECT`, `EXPLAIN`, `SHOW`, `PRAGMA` only). Any schema mutation or data deletion requires explicit confirmation from the **Monarch**.
-2. **Auto-Generate ERD (`generate_dbml_and_erd`)**:
-   - Generates `docs/db/schema.dbml` ([dbdiagram.io](https://dbdiagram.io)) and `docs/db/ERD.md` (Mermaid `erDiagram`) from the live database.
-3. **Cross-Database Schema Drift & Compatibility Check (`compare_database_schemas`)**:
-   - Compares two live databases (e.g. Local vs Staging/Production, or MySQL vs PostgreSQL) and identifies missing tables, missing columns, and type mismatches before deployment.
-4. **Migration Safety & Restore Compatibility (Integrated with `/shadow-data`)**:
-   - Audits pending migrations to prevent table-locking operations (`DROP COLUMN`, `RENAME COLUMN`, or unindexed foreign keys on large tables) and ensures backup restore compatibility with `/shadow-resilience`.
-5. **Cross-DB Migration, Data Warehouse Star Schema, Pentaho PDI & Cron (`generate_cross_db_etl_and_warehouse`)**:
-   - Generates 6 draft artifacts. Verify target type and precision, key and constraint semantics, identifier quoting and time zones before executing DDL. Syntax validation, target execution, restart from checkpoint and source-to-target reconciliation each require independent evidence. The generated job alone establishes file generation. Drafts are written in `docs/db/etl/`:
-     1. `01_target_ddl_<engine>.sql` (translated DDL for `postgres`, `mysql`, `mssql`, `clickhouse`, or `bigquery`)
-     2. `02_star_schema_warehouse_<engine>.sql` (`dim_*` & `fact_*` Star Schema with surrogate keys and audit timestamps)
-     3. `03_etl_migration_blueprint.md` (batch chunking, watermark strategy, and idempotent upsert patterns)
-     4. `04_pentaho_sync_transformation.ktr` (Pentaho Spoon Transformation XML with parameterized connections)
-     5. `05_pentaho_master_job.kjb` (Pentaho Master Job XML with DB pre-check and failure alert hops)
-     6. `06_cron_and_airflow_orchestrator.py` (Python Cron runner with anti-overlap file lock + Apache Airflow DAG)
-6. **Planner Cardinality, MVCC & Lock Wait Diagnostics (Read-Only `EXPLAIN`)**:
-   - Always inspect estimated vs actual row counts (`EXPLAIN (ANALYZE, BUFFERS)` on non-mutating `SELECT` or rolled-back test `BEGIN ... EXPLAIN ANALYZE ... ROLLBACK`) before adding indexes; check composite index column selectivity (high-selectivity equality filters before range filters).
-   - Monitor MVCC dead tuples/autovacuum lag and inspect `pg_locks` / `pg_stat_activity` wait chains when diagnosing slow queries or deadlocks (pair with `/shadow-debug`).
-7. **Execution Approval & Target Environment Boundary (`L0`–`L4`)**:
-   - Unknown DB hosts/environments fail closed (`BLOCKED_UNKNOWN_ENVIRONMENT`). Read-only `SELECT`/`EXPLAIN` diagnostics on verified local/dev DBs are `L0`/`L1`; any DDL/data mutation or staging/production access is **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
+Run offline checks (`L0`/`L1`, read-only SQL analysis) before claiming `VERIFIED-LOCAL`:
+```powershell
+python "shadow-db/scripts/sql_migration_safety_verifier.py" --self-test
+python "shadow-db/scripts/sql_migration_safety_verifier.py" --check-ddl path/to/migration.sql
+python "shadow-db/scripts/sql_migration_safety_verifier.py" --check-rls path/to/rls_policies.sql
+python -m unittest discover -s "shadow-db/tests" -v
+```
+Graded specialist scenarios live in [evaluations.md](evaluations.md) (8 scenarios covering blocking FK outages, per-row RLS `auth.uid()` slowdowns, `SECURITY DEFINER` `search_path` hijack, `PgBouncer` exhaustion, deadlocks, unknown-host `L4` blocking, and honest ETL verification).
 
 ## Reference Guide
 
-| Task / Scenario | Load Reference |
-| :--- | :--- |
-| Multi-Engine Selection, `PgBouncer` Pooling, Autovacuum & Read-Replica Lag | [references/multi-engine-and-pooling.md](references/multi-engine-and-pooling.md) |
-| PostgreSQL / Supabase RLS (`(SELECT auth.uid())`), Composite/Partial/FK Indexing & Hardened `SECURITY DEFINER` | [references/postgres-rls-and-indexing.md](references/postgres-rls-and-indexing.md) |
+Load **only** the 1–2 modules matching the active subtask (never load all 6 at once):
+
+| Task / Scenario | Tier | Load Reference |
+| :--- | :--- | :--- |
+| Relational schema design, `BIGINT`/`NUMERIC` money, UTC `TIMESTAMPTZ`, soft-delete partial unique & FK indexes | CORE | [references/01-relational-design-and-integrity-invariants.md](references/01-relational-design-and-integrity-invariants.md) |
+| MVCC isolation (`40001`/`40P01`), deterministic lock ordering, `pg_locks` diagnostics & `lock_timeout` | CORE | [references/02-transactions-isolation-and-lock-diagnostics.md](references/02-transactions-isolation-and-lock-diagnostics.md) |
+| `EXPLAIN (ANALYZE, BUFFERS)`, composite equality->sort->range ordering, partial/covering/GIN/BRIN & `CONCURRENTLY` | CORE | [references/03-query-explain-and-indexing-strategy.md](references/03-query-explain-and-indexing-strategy.md) |
+| PostgreSQL / Supabase RLS (`(SELECT auth.uid())` InitPlan, `SET LOCAL`) & hardened `SECURITY DEFINER` | ADVANCED | [references/04-postgres-rls-and-security-definer.md](references/04-postgres-rls-and-security-definer.md) |
+| Multi-engine choice, `PgBouncer` transaction pooling, autovacuum tuning, range partitioning & replica lag | ADVANCED | [references/05-connection-pooling-partitioning-and-replicas.md](references/05-connection-pooling-partitioning-and-replicas.md) |
+| `shadow_db` MCP read-only inspection, schema diff, PITR restore drills & verified Star Schema / Pentaho DW ETL | OPERATIONAL | [references/06-backup-pitr-schema-diff-and-dw-etl.md](references/06-backup-pitr-schema-diff-and-dw-etl.md) |
 
 Do not load unrelated references unnecessarily.

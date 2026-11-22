@@ -64,7 +64,7 @@ Write integration tests proving: (1) duplicate `idempotency_key` inserts are rej
 Monitor `queue_depth{stream}`, `time_to_first_attempt_p95{stream}`, `dlq_count`, and `suppressed_skips` (Module `10`).
 
 ## 11. Authoritative References
-- `/shadow-concurrency` (`distributed-patterns.md`); PostgreSQL `SKIP LOCKED` & BullMQ Rate Limiting documentation.
+- `/shadow-concurrency` (`04-queues-brokers-sagas-and-fencing-locks.md`); PostgreSQL `SKIP LOCKED` & BullMQ Rate Limiting documentation.
 
 ## 12. Limitations & When NOT to Use
 Do not store plaintext OTPs or reset secrets indefinitely in `email_outbox.payload_json` — purge or redact `payload_json` immediately upon `SENT`/`EXPIRED` completion.

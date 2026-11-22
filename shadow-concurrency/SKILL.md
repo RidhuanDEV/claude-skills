@@ -1,36 +1,39 @@
 ---
 name: shadow-concurrency
-description: "Asynchronous & Distributed Workflow Correctness. Use when designing or fixing message queues, retries, transactional outbox/inbox, idempotency keys, optimistic/pessimistic locks, DLQ poison messages, or crash-before-ack recovery. Do NOT use for third-party API HTTP client setup (shadow-integrate), WebSocket/SSE client reconnect UX (shadow-realtime), or standalone SQL schema design (shadow-data/shadow-db)."
+description: "Asynchronous & Distributed Workflow Correctness Specialist. Use when designing or fixing message queues, retries/backoff, transactional outbox/inbox deduplication, crash-before-ack recovery, monotonic fencing-token locks, sagas, or DLQ poison messages. Do NOT use for third-party payment HTTP/HMAC adapters (/shadow-integrate), WebSocket/SSE client reconnect UX (/shadow-realtime), or standalone SQL schema design (/shadow-data, /shadow-db)."
 ---
 
-# `/shadow-concurrency` — Asynchronous & Distributed Workflow Correctness
+# Shadow Concurrency (`/shadow-concurrency`) — Async Workflows, Outbox/Inbox & Distributed Locks
 
-- **Owner:** Consistency, ordering, locking, idempotency, retry budgets, DLQ, and crash-safe asynchronous execution.
-- **Boundaries:** HTTP/HMAC provider adapters (`shadow-integrate`), WebSocket/SSE connection resume (`shadow-realtime`), SQL migration scripts (`shadow-data`/`shadow-db`).
+- **Owner:** Consistency, delivery semantics, transactional outbox/inbox deduplication, crash-before-ack recovery, full-jitter retries, DLQ replay, sagas, and monotonic fencing-token locks.
+- **Boundaries:** External HTTP/HMAC payment adapters (`/shadow-integrate`), WebSocket/SSE stream resume (`/shadow-realtime`), SQL migration DDL (`/shadow-data`/`/shadow-db`).
 
-## 1. Preconditions, Non-Claims & Safety Rules
-- **No False Exactly-Once Claims:** External side effects (SMTP email, payment webhook, third-party API) **cannot** be guaranteed "exactly-once" without receiver idempotency or two-phase protocols; design for **at-least-once delivery + idempotent deduplication**.
-- **Durable State Before Ack:** Never acknowledge a queue job or commit an external trigger before persisting durable DB state / Transactional Outbox row (`commit -> outbox -> dispatch -> ack`).
+## 1. Core Invariants & Non-Claims
 
-## 2. 8-Step Concurrency & Durability Playbook
-Read [`methodologies/DURABLE-ASYNC-OUTBOX-AND-IDEMPOTENCY.md`](methodologies/DURABLE-ASYNC-OUTBOX-AND-IDEMPOTENCY.md) and [`playbooks/STATE-MACHINE-AND-FAILURE-MATRIX.md`](playbooks/STATE-MACHINE-AND-FAILURE-MATRIX.md):
-1. **Map State Transitions & Failure Boundaries:** Identify DB commit vs queue ack vs external API boundaries.
-2. **Select Delivery & Consistency Semantics:** At-least-once + idempotency key vs at-most-once; choose CAS / optimistic version (`version = version + 1`) vs pessimistic row lock (`SELECT ... FOR UPDATE SKIP LOCKED`).
-3. **Write Invariants:** Single logical side effect per `idempotency_key`; monotonic state transitions; bounded retry attempts.
-4. **Atomic Persistence & Outbox:** Write domain mutation + outbox/inbox row in the same ACID DB transaction.
-5. **Retry-Safe Dispatch, Backoff & Poison DLQ:** Bounded exponential backoff + jitter; route poison messages past `max_attempts` to Dead-Letter Queue (`DLQ`) with replay runbook.
-6. **Failure Injection & Replay Verification:** Simulate DB-commit-succeeds/ack-fails, double-claim by 2 workers, out-of-order events, and downstream outage.
-7. **Verify Backpressure & Queue Retention:** Enforce queue bounds, worker concurrency caps, and DLQ alert thresholds.
-8. **Emit Contract & Runbook:** Output state machine, failure matrix, delivery guarantee statement, and replay recovery steps.
+1. **No False Exactly-Once Claims:** External side effects (SMTP, payment APIs, webhooks) cannot guarantee unassisted "exactly-once"; engineer for **At-Least-Once Delivery + Idempotent Deduplication**.
+2. **Durable Commit Before Ack (`commit -> outbox -> dispatch -> ack`):** Insert domain state + `outbox_events` inside one ACID DB transaction; claim via `FOR UPDATE SKIP LOCKED` with lease expiry; deduplicate consumers atomically inside `inbox_dedup` in the same DB transaction as state updates.
+3. **Bounded Backoff, Backpressure & DLQ:** Classify transient vs permanent failures, apply exponential backoff + full jitter, cap concurrency & drain cleanly on `SIGTERM`, and route poison messages to DLQ with audited throttled replay.
+4. **Monotonic Fencing Tokens & Right-Sized Brokers:** Start with Postgres `SKIP LOCKED` (`< 500` jobs/s) before Kafka; pair distributed lease locks with storage-checked monotonic `fencing_token` guards (`WHERE fencing_token < $token`).
 
-## 3. Examples & Deterministic Checker
-- **Happy Path:** Worker claims job with `UPDATE ... WHERE status='PENDING' RETURNING *`, checks `inbox_dedup(idempotency_key)` before SMTP send, retries on 503, routes to DLQ after 5 fails.
-- **Adversarial / Must-Reject:** Handler sends email and deletes/acks job without durable outbox or claims "guaranteed exactly-once external email" -> **BLOCKED** by `concurrency_invariant_checker.py`.
+## 2. Playbooks & Deterministic Replay Checker
 
+Read [`methodologies/DURABLE-ASYNC-OUTBOX-AND-IDEMPOTENCY.md`](methodologies/DURABLE-ASYNC-OUTBOX-AND-IDEMPOTENCY.md) and [`playbooks/STATE-MACHINE-AND-FAILURE-MATRIX.md`](playbooks/STATE-MACHINE-AND-FAILURE-MATRIX.md), then verify offline (`L0`/`L1`):
 ```powershell
 python "shadow-concurrency/scripts/concurrency_invariant_checker.py" --self-test
 python "shadow-concurrency/scripts/concurrency_invariant_checker.py" --verify-workflow path/to/workflow.json
+python -m unittest discover -s "shadow-concurrency/tests" -v
 ```
+Graded specialist scenarios live in [evaluations.md](evaluations.md) (7 scenarios including crash-after-SMTP-before-ack duplicates, dual-write Redis outage, wallet replay double-credit, poison spin-loops, and zombie GC locks).
 
-## Deep Engineering Reference (Load On-Demand)
-- For Saga orchestration vs choreography, distributed locks & monotonic fencing tokens, queue/broker trade-offs (Postgres `SKIP LOCKED` vs BullMQ/RabbitMQ/Kafka/NATS/Temporal), rate-limiting algorithms, and graceful worker shutdown -> read [Distributed concurrency patterns](references/distributed-patterns.md).
+## Reference Guide
+
+Load **only** the 1–2 modules matching the active subtask (never load all 4 at once):
+
+| Task / Scenario | Tier | Load Reference |
+| :--- | :--- | :--- |
+| At-least-once semantics, Transactional Outbox SQL, `FOR UPDATE SKIP LOCKED` & lease recovery | CORE | [references/01-delivery-semantics-and-transactional-outbox.md](references/01-delivery-semantics-and-transactional-outbox.md) |
+| Atomic `inbox_dedup` transactions, crash-before-ack recovery & monotonic version ordering | CORE | [references/02-inbox-deduplication-and-crash-before-ack.md](references/02-inbox-deduplication-and-crash-before-ack.md) |
+| Failure classification, Full-Jitter exponential backoff, backpressure, `SIGTERM` drain & DLQ replay | CORE | [references/03-retries-backoff-backpressure-and-dlq.md](references/03-retries-backoff-backpressure-and-dlq.md) |
+| Queue/broker selection (PG/BullMQ/RabbitMQ/Kafka/Temporal), Sagas, fencing tokens & token bucket | ADVANCED | [references/04-queues-brokers-sagas-and-fencing-locks.md](references/04-queues-brokers-sagas-and-fencing-locks.md) |
+
+Do not load unrelated references unnecessarily.

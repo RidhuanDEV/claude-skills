@@ -1,63 +1,45 @@
 ---
 name: shadow-sec
-description: "Application & SDLC Security Audit. Use when performing STRIDE threat modeling, SAST/DAST, secret scanning, SBOM/supply-chain checks, or verifying NIST SSDF (SP 800-218) & OWASP ASVS 5.0 controls. Do NOT use for UU PDP privacy (/shadow-privacy) or COBIT/OJK GRC (/shadow-grc)."
+description: "Application & SDLC Security Engineering Specialist. Use when performing STRIDE threat modeling, OWASP ASVS 5.0 & NIST SSDF audits, SQLi/OS-injection/XSS/CSP/CORS/SSRF hardening, AES-256-GCM/KMS secrets review, SAST/CVE reachability triage, or security incident containment. Do NOT use for UU PDP privacy (/shadow-privacy), auth implementation (/shadow-auth), or COBIT/OJK GRC (/shadow-grc)."
 ---
 
-# `/shadow-sec` — SDLC Security, Threat Modeling, Supply-Chain & OWASP ASVS 5.0 Auditor
+# Shadow Sec (`/shadow-sec`) — SDLC Security, Threat Modeling & OWASP ASVS 5.0 Auditor
 
-Use this skill whenever the **Monarch** invokes `/shadow-sec`, before releasing to Staging/Production (**SDLC Stage 4 & Stage 6 Security Gate**), or when performing a security / VAPT review.
+Use this skill whenever the **Monarch** performs STRIDE threat modeling, AppSec code/PR reviews, SDLC Stage 4 & Stage 6 security gates, injection/SSRF/CSP/CORS/crypto hardening, CVE reachability triage, or security incident containment.
 
-Grounded in two authoritative international standards documented in [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP-ASVS-5.md):
-1. **[NIST SSDF (SP 800-218)](https://csrc.nist.gov/pubs/sp/800/218/final)** — Secure Software Development Framework across the entire SDLC (`PO`, `PS`, `PW`, `RV`).
-2. **[OWASP ASVS 5.0.0](https://asvs.owasp.org/)** — Application Security Verification Standard (Level 2 standard for enterprise/production apps; Level 3 for critical financial/government apps).
+## 1. Core Security Audit Principles & Non-Negotiables
 
----
+1. **Trust-Boundary STRIDE & Multi-Hop AuthZ:** Model every trust boundary (`Client -> Edge -> App -> Worker -> DB/Egress`), audit PR attack-surface diffs, and inspect multi-hop authorization chains (Gateway -> Internal Worker confused deputy). Delegate auth implementation to `/shadow-auth`, SBOM/SLSA attestations to `/shadow-supplychain`, UU PDP to `/shadow-privacy`, and COBIT/ISO 27001/OJK GRC to `/shadow-grc`.
+2. **Verifiable Standards Only (Zero Fabricated IDs):** Map findings to exact adopted **OWASP ASVS v5.0.0 (`v5.0.0-C.S.R`)** and **NIST SSDF (`SP 800-218`)** controls. When an exact control mapping cannot be verified against the official catalog, report the technical finding clearly and mark `control_id: UNVERIFIED` — never fabricate IDs or claim formal certification.
+3. **Structural Defenses Over Blacklists:** Enforce parameterized SQL (`$1`), shell-less `execFile` (`shell: false`), canonical path containment (`+ path.sep`), per-request nonce CSP + exact-origin CORS (`Vary: Origin`), HTTPS + upfront DNS-resolved anti-SSRF blocking all non-global IPv4/IPv6 (`169.254.169.254`, `2130706433`, `[::1]`, `::ffff:`), and `AES-256-GCM` with fresh 96-bit nonces + AAD + KMS `kid` rotation.
+4. **Reachability-First Triage & Official-First Checks:** Prioritize CVEs by `runtime x reachable x untrusted input / KEV`; flag unverified npm lookalike swaps for local SDKs (`file:../sdk/sso-client`) and endpoints trusting frontend `username`.
+5. **Strict `L0`–`L4` Approval Boundary:** Static SAST, STRIDE, and offline verification are `L0_READ_ONLY` / `L1_SAFE_VERIFICATION`. Active DAST/fuzzing against live services (`L3`) and production WAF/secret rotation/containment (`L4`) **NEVER** run without explicit Monarch approval.
 
-## 1. The 5-Pillar Security Audit Workflow (Read-Only by Default)
+## 2. Deterministic Verification CLI & Scenario Benchmarks
 
-### Pillar 1: STRIDE Threat Modeling (Architecture & Feature Level)
-Evaluate affected components against the 6 STRIDE threat categories:
-- **S — Spoofing**: Can an attacker forge identity, webhook signatures, or JWT claims? (Check `/shadow-auth` & `/shadow-integrate`).
-- **T — Tampering**: Can request parameters (`role`, `price`, `tenant_id`, `status`) be mass-assigned or modified in transit?
-- **R — Repudiation**: Are sensitive state transitions and approvals recorded in an immutable `audit_logs` table?
-- **I — Information Disclosure**: Are stack traces, internal IDs, other tenants' records (IDOR), or PII leaked in API responses or logs?
-- **D — Denial of Service**: Are login, file upload, export, and expensive search routes protected by rate limits, pagination bounds, and timeouts?
-- **E — Elevation of Privilege**: Are server-side RBAC/ABAC guards enforced on every controller/resolver?
-
-### Pillar 2: Secret Scanning & Provenance Protection (`NIST SSDF PS.1`)
-- Verify `.gitignore` blocks `.env*`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, and local SQLite/dump files.
-- Scan both working files and `git ls-files` for hardcoded API keys, database DSNs with passwords, private keys, or Bearer tokens.
-
-### Pillar 3: Supply-Chain Security, Lockfile Integrity & Attack-Surface Diffs (`NIST SSDF PW.4` & `ASVS V14`)
-- **Hand Off SBOM/Attestation Deep Audits to `/shadow-supplychain`**: For CycloneDX/SPDX SBOM generation, SLSA provenance verification, unpinned digest/floating tag scans, typosquatting checks, and license gates, invoke `/shadow-supplychain` (`supplychain_sbom_gate.py`). In `/shadow-sec`, focus on vulnerability triage, lockfile commit presence, and dependency-to-runtime risk.
-- **Exploitability & Reachability Triage**: Separate noisy SCA CVE alerts from **reachable exploit paths** by tracing whether vulnerable symbols are actually imported, invoked on untrusted input paths, and missing runtime mitigations.
-- **Multi-Hop AuthZ & Attack-Surface Diff Review**: Audit every diff/PR for newly exposed routes, auth middleware bypasses, trust-boundary crossings, and **multi-hop authorization gaps** (e.g., Gateway -> Internal Service -> Batch Query / Indirect IDOR / Confused Deputy across background workers via `/shadow-auth`).
-
-### Pillar 4: Verifiable OWASP ASVS 5.0 Control Audit (`SAST` Code Inspection)
-Read [`references/NIST-SSDF-AND-OWASP-ASVS-5.md`](references/NIST-SSDF-AND-OWASP-ASVS-5.md) and identify the audit's adopted release and level. Resolve each cited requirement against the versioned official control catalog, then record its exact ID, requirement text, affected trust boundary, evidence and observed result. When the mapping is unavailable, report the finding and leave the control mapping unverified. Inspect the applicable areas below.
-- **V1 Architecture & Tenant Isolation**: Zero cross-tenant data leakage (`tenant_id` scoped on all queries).
-- **V2 & V3 AuthN & Session**: Argon2id/bcrypt hashing, `HttpOnly`/`Secure`/`SameSite` cookies, refresh token rotation.
-- **V4 Access Control**: Zero BOLA/IDOR; server-side permission checks on every route.
-- **V5 Validation & Injection Prevention**: Parameterized SQL queries only (`0` string interpolation in SQL/shell commands); strict schema validation; XSS output encoding.
-- **V8 Data Protection**: Secrets/PII redacted from logs; sensitive fields encrypted at rest; strict `Cache-Control: no-store` on private responses.
-- **V12 Files & SSRF**: File uploads validated by MIME magic bytes + size limits + randomized storage filenames; outbound URLs checked against private IP ranges (`127.0.0.1`, `169.254.169.254`, `10.0.0.0/8`) to prevent SSRF.
-
-### Pillar 5: Actionable Security Report Format
-Deliver findings ordered by severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) with:
-- **ASVS / NIST SSDF Control ID** with release and catalog locator
-- **Exact Location** (`file:line` or endpoint route)
-- **Exploit Scenario & Business Impact**
-- **Concrete Remediation Patch**
-
-### Pillar 6: Execution Approval & Security Scan Boundary (`L0`–`L4`)
-- Static SAST, STRIDE analysis, and secret scanning are `L0_READ_ONLY`. High-volume active fuzzing / aggressive DAST against live services is **`L3: RESOURCE_INTENSIVE`**, while secret rotation, permission edits, or external payload transmission are **`L4: HIGH_IMPACT`** requiring explicit Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).
-- **Official-First Dependency & Auth Claims Check (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Flag unverified packages installed solely by name, npm lookalike replacements for local SDKs (`file:../sdk/sso-client`), custom unapproved auth/crypto rewrites, and any backend endpoint trusting frontend-supplied `username` without server-verified claims.
+Run offline checks (`L0`/`L1`, zero outbound network calls) before claiming `VERIFIED-LOCAL`:
+```powershell
+python "shadow-sec/scripts/appsec_control_verifier.py" --self-test
+python "shadow-sec/scripts/appsec_control_verifier.py" --check-security-headers path/to/headers.json
+python "shadow-sec/scripts/appsec_control_verifier.py" --check-ssrf-url "https://partner.example/hook" --allow-host partner.example --resolved-ip "93.184.216.34"
+python "shadow-sec/scripts/appsec_control_verifier.py" --check-finding-report path/to/findings.json
+python -m unittest discover -s "shadow-sec/tests" -v
+```
+Graded specialist scenarios live in [evaluations.md](evaluations.md) (10 scenarios covering exposed internal endpoints in JS bundles, SSRF obfuscation bypasses, credentialed CORS reflection, ECB/hardcoded keys, CVE reachability triage, and unauthorized live-pentest refusal).
 
 ## Reference Guide
 
-| Task / Scenario | Load Reference |
-| :--- | :--- |
-| NIST SSDF (SP 800-218) & OWASP ASVS 5.0 Control Catalog | [references/NIST-SSDF-AND-OWASP-ASVS-5.md](references/NIST-SSDF-AND-OWASP-ASVS-5.md) |
-| Server-Side AppSec Patterns (SSRF Guard, IDOR, Nonce CSP, Strict CORS, Uploads) | [references/appsec-implementation-patterns.md](references/appsec-implementation-patterns.md) |
+Load **only** the 1–2 modules matching the active subtask (never load all 8 at once):
+
+| Task / Scenario | Tier | Load Reference |
+| :--- | :--- | :--- |
+| STRIDE threat modeling, trust boundaries, multi-hop confused deputy & PR attack-surface diffs | CORE | [references/01-stride-threat-modeling-and-trust-boundaries.md](references/01-stride-threat-modeling-and-trust-boundaries.md) |
+| Verifiable OWASP ASVS v5.0.0 (`V1`–`V17`) & NIST SSDF (`SP 800-218`) control catalog & reporting | CORE | [references/02-owasp-asvs-5-and-nist-ssdf-catalog.md](references/02-owasp-asvs-5-and-nist-ssdf-catalog.md) |
+| SQLi, NoSQL, OS command injection (`execFile`), path traversal, prototype pollution & ReDoS | CORE | [references/03-injection-and-input-boundary-defenses.md](references/03-injection-and-input-boundary-defenses.md) |
+| Nonce CSP, exact-origin CORS (`Vary: Origin`), HSTS, XSS output encoding & safe rich text | CORE | [references/04-browser-security-csp-cors-and-csrf.md](references/04-browser-security-csp-cors-and-csrf.md) |
+| DNS-resolved anti-SSRF (IPv4/IPv6/decimal/IMDSv2), egress proxies & magic-byte upload sandboxing | ADVANCED | [references/05-ssrf-egress-and-file-upload-hardening.md](references/05-ssrf-egress-and-file-upload-hardening.md) |
+| `AES-256-GCM` AEAD + AAD + KMS `kid` rotation, blind indexes & zero-secret Git/CI hygiene | ADVANCED | [references/06-secrets-kms-and-cryptography-architecture.md](references/06-secrets-kms-and-cryptography-architecture.md) |
+| Reachability-first CVE/SCA triage, SAST CI rules, `/shadow-supplychain` handoff & `L3` DAST gate | OPERATIONAL | [references/07-sast-dast-and-supply-chain-reachability.md](references/07-sast-dast-and-supply-chain-reachability.md) |
+| 6-step security incident containment, forensic log preservation, key rotation & UU PDP 72h handoff | OPERATIONAL | [references/08-incident-containment-and-coordinated-patching.md](references/08-incident-containment-and-coordinated-patching.md) |
 
 Do not load unrelated references unnecessarily.

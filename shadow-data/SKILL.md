@@ -1,67 +1,43 @@
 ---
 name: shadow-data
-description: "Application Data Lifecycle & Migrations. Use when writing zero-downtime Expand-Contract database migrations, deterministic seeds, safe backfills, bulk import/export streaming, or ACID transaction locking. Do NOT use for live DB introspection or Pentaho/DW ETL (/shadow-db)."
+description: "Application Data Lifecycle & Zero-Downtime Migrations Specialist. Use when writing Expand-Contract migrations, lock-safe online DDL (lock_timeout, CONCURRENTLY, NOT VALID, pg_repack/gh-ost), resumable keyset backfills, ACID money locking, CDC/outbox pipelines, deterministic seeds, or streaming bulk I/O. Do NOT use for live DB introspection or Pentaho/DW ETL (/shadow-db)."
 ---
 
-# Shadow Data (`/shadow-data`) — Data Lifecycle, Safe Migrations & Transaction Integrity
+# Shadow Data (`/shadow-data`) — Zero-Downtime Migrations, Backfills & Data Lifecycle
 
-While `/shadow-db` handles live database introspection, ERDs, and Data Warehouse/Pentaho generation, use **`/shadow-data`** whenever managing **how data changes, moves, and stays consistent** throughout the application's lifecycle.
+Use this skill whenever the **Monarch** manages how application data evolves, moves, backfills, seeds, streams, or stays ACID-consistent across live deployments (while `/shadow-db` owns live DB inspection, ERDs, `EXPLAIN` tuning, RLS, and DW/Pentaho ETL).
 
----
+## 1. Core Data Lifecycle Principles & Non-Negotiables
 
-## 1. Zero-Downtime Schema Migration Pattern (Expand -> Migrate -> Contract)
+1. **Zero-Downtime Expand-Contract Migrations:** Never run single-step `DROP COLUMN`, `RENAME COLUMN`, `ALTER COLUMN TYPE`, or blocking `ADD CONSTRAINT` while old pods still serve traffic. Execute **Expand** (additive + dual-write/trigger, rollback-tested) -> **Backfill** (throttled keyset cursor + legacy-writer parity + reconciliation) -> **Switch Reads** (monitored parity) -> **Contract** (only after `0` legacy consumers verified AND separate **`L4`** destructive approval).
+2. **Lock Budgets & Online DDL:** Prefix DDL sessions with `SET lock_timeout = '3s'; SET statement_timeout = '30s';`, build indexes `CONCURRENTLY` outside transactions, validate FKs/`CHECK`s via `NOT VALID` -> `VALIDATE CONSTRAINT`, and use `pg_repack` / `gh-ost` instead of `VACUUM FULL`.
+3. **ACID Monetary Integrity & Zero Network I/O in Transactions:** Store money as `BIGINT` minor units or `NUMERIC(19,4)` (never `FLOAT`), use atomic conditional `UPDATE ... WHERE balance >= $1` / deterministic `ORDER BY id ASC FOR UPDATE` / CAS `version` + retry on `40001`/`40P01`, and NEVER perform HTTP/SMTP calls inside an open DB transaction.
+4. **CDC Safety, Idempotent Seeds & Streaming Bulk I/O:** Always cap logical replication WAL with `max_slot_wal_keep_size`, guard projection upserts with monotonic `source_version`, separate idempotent `UPSERT` system seeds from prod-blocked demo seeds, stream large CSV exports with formula-injection neutralization, and clean up ephemeral Docker test DBs (`--rm --label shadow.ephemeral=true` + `try/finally`).
+5. **Execution Approval Boundary (`L1` vs `L4`):** Authoring additive Expand migrations locally is `L1`; running destructive DDL (`DROP`/`TRUNCATE`/`RENAME`/`migrate reset`) or mutating staging/prod/unknown DBs is **`L4_HIGH_IMPACT`** requiring explicit Monarch approval + verified backup.
 
-Never run destructive or table-locking DDL (`DROP COLUMN`, `RENAME COLUMN`, adding `NOT NULL` without default on huge tables) in a single deployment while old application instances are still serving traffic.
+## 2. Deterministic Verification CLI & Scenario Benchmarks
 
-| Phase | Action | Evidence before proceeding |
-| --- | --- | --- |
-| Expand | Inspect engine/version, DDL locking and mixed-version writers. Add compatible structures first. | Exercise current and previous application versions and verify rollback with both writing. |
-| Backfill | Use resumable batches with stable keys. Set size and pause thresholds against observed lock wait, replica lag and latency budgets. | Interrupt and resume one batch. Reconcile row counts and values, including writes concurrent with backfill. |
-| Switch | Enable the new read path within the authorized rollout and compare results. | Record parity, monitored window, owner and tested read fallback. |
-| Contract | Inventory old readers, writers, jobs and rollback versions. Retire the old representation only after the retention window, owner decision and separate destructive-change authorization. | Missing telemetry or an external consumer with unknown status holds the contract phase. |
+Run offline checks (`L0`/`L1`) before claiming `VERIFIED-LOCAL`:
+```powershell
+python "shadow-data/scripts/data_migration_plan_verifier.py" --self-test
+python "shadow-data/scripts/data_migration_plan_verifier.py" --check-backfill-plan path/to/backfill.json
+python "shadow-data/scripts/data_migration_plan_verifier.py" --check-migration-phases path/to/phases.json
+python "shadow-data/scripts/data_migration_plan_verifier.py" --check-seed-safety path/to/seed.json
+python -m unittest discover -s "shadow-data/tests" -v
+```
+Notice `shadow-data/tests/test_expand_backfill.py` runs an isolated SQLite simulation proving how concurrent legacy writers invalidate rows behind a completed backfill cursor and how reconciliation catches it (production lock/replica behavior still requires staging evidence). Graded scenarios live in [evaluations.md](evaluations.md) (8 scenarios).
 
-- **Ephemeral Migration Verification Container Cleanup**: Whenever verifying migrations against an ephemeral Docker database (`*-migration-verification` / `*-test-*`), always launch with `docker run --rm --label shadow.ephemeral=true` and wrap the run in `try / finally` (`trap EXIT`) executing `docker rm -f -v <container>` (or `docker compose -p <project>-migtest down -v --rmi local --remove-orphans`) so zero stopped containers, volumes, or temporary images remain after verification passes.
+## Reference Guide
 
----
+Load **only** the 1–2 modules matching the active subtask (never load all 6 at once):
 
-## 2. Transaction Integrity & Concurrency Control
+| Task / Scenario | Tier | Load Reference |
+| :--- | :--- | :--- |
+| 4-phase Expand -> Backfill -> Switch -> Contract, dual-write/triggers & Docker cleanup | CORE | [references/01-expand-contract-zero-downtime-migrations.md](references/01-expand-contract-zero-downtime-migrations.md) |
+| Lock-safe DDL (`lock_timeout`, `CONCURRENTLY`, `NOT VALID`, `pg_repack`, MySQL `gh-ost`) | CORE | [references/02-online-ddl-lock-budgets-and-repack.md](references/02-online-ddl-lock-budgets-and-repack.md) |
+| Keyset-chunked resumable backfills, replica-lag throttling, legacy-writer drift & reconciliation | CORE | [references/03-chunked-resumable-backfills-and-reconciliation.md](references/03-chunked-resumable-backfills-and-reconciliation.md) |
+| ACID balances/stock (`BIGINT`), atomic updates, `40001`/`40P01` retries & zero I/O in tx | CORE | [references/04-acid-transactions-money-and-concurrency.md](references/04-acid-transactions-money-and-concurrency.md) |
+| Transactional Outbox vs Debezium CDC, `max_slot_wal_keep_size` & monotonic upserts | ADVANCED | [references/05-cdc-outbox-and-event-time-pipelines.md](references/05-cdc-outbox-and-event-time-pipelines.md) |
+| Idempotent system vs prod-blocked demo seeds, streaming CSV/formula defense & partition retention | OPERATIONAL | [references/06-deterministic-seeds-bulk-io-and-retention.md](references/06-deterministic-seeds-bulk-io-and-retention.md) |
 
-1. **Atomic Multi-Step Writes**:
-   - Wrap related writes (e.g., creating an order, decrementing inventory, and inserting an outbox event) inside a single database transaction (`BEGIN ... COMMIT`).
-   - **Never perform external network/HTTP/SMTP calls inside an open DB transaction**, as slow external responses hold row locks and exhaust the DB connection pool.
-2. **Preventing Lost Updates & Race Conditions**:
-   - For financial balances, stock counts, and quota deductions, use atomic SQL updates (`UPDATE wallets SET balance = balance - $1 WHERE id = $2 AND balance >= $1`), pessimistic row locks (`SELECT ... FOR UPDATE`), or optimistic concurrency (`version = version + 1 WHERE id = $1 AND version = $2`).
-3. **Monetary & Numeric Precision**:
-   - Never store currency or exact quantities as `FLOAT` / `DOUBLE` / JS `number` floats. Use integer minor units (`BIGINT` cents/rupiah) or `NUMERIC(18, 2)`.
-4. **Isolation Anomalies, Lock Budgets & Outbox/CDC Boundary**:
-   - Explicitly match transaction isolation level (`READ COMMITTED` + atomic `UPDATE ... WHERE` or `SERIALIZABLE` with retry on `40001` / `40P01`) against read-skew, write-skew, and phantom-read hazards.
-   - Set explicit `lock_timeout` and `statement_timeout` on online DDL/backfill sessions so migrations never queue behind slow queries and block production traffic.
-   - Coordinate durable outbox/CDC event inserts inside the same transaction with `/shadow-concurrency`.
-
----
-
-## 3. Deterministic Seeding & Bulk Import/Export Rules
-
-1. **Idempotent Seeding (`db:seed`)**:
-   - Seed scripts must use `UPSERT` (`ON CONFLICT DO UPDATE` / `ON DUPLICATE KEY UPDATE`) so running `db:seed` multiple times never fails with duplicate key errors or creates duplicate master rows.
-   - Separate **System Reference Seeds** (roles, permissions, regions, status codes — safe for production) from **Demo/Dummy Seeds** (fake users/orders — strictly blocked when `NODE_ENV=production`).
-2. **Safe Bulk Import & Export**:
-   - **Imports (CSV/Excel)**: Validate all rows against schema rules first, report exact row/column line errors to the user, and insert in bounded batches (`500–1,000` rows per batch).
-   - **Exports**: Stream large datasets via cursor/chunked queries rather than loading $100,000+$ ORM objects into RAM at once.
-
----
-
-## 4. Data Retention, Archival & Soft-Delete Hygiene
-
-- When using soft deletes (`deleted_at TIMESTAMPTZ`), remember that unique constraints must use partial indexes (`CREATE UNIQUE INDEX ... WHERE deleted_at IS NULL`) so a deleted email/code can be reused later.
-- Define archival/retention policies for high-growth log/telemetry tables (e.g., monthly declarative partitioning `PARTITION BY RANGE (created_at)`).
-
----
-
-## 5. Execution Approval & Migration Boundary (`L1` vs `L4`)
-- Authoring additive Expand-only migrations locally is `L1_SAFE_VERIFICATION`. Running destructive DDL (`DROP`, `TRUNCATE`, `RENAME`, `migrate reset`) or executing migrations against staging/production/unknown databases is **`L4: HIGH_IMPACT`** and NEVER authorized by a bug fix without explicit Monarch approval and verified backup/rollback (`shadow-monarch/scripts/execution_approval_gate.py`).
-
-Run the isolated SQLite example with `python -m unittest discover -s tests` from this skill directory. It shows how a legacy writer can invalidate rows behind a completed cursor and how to detect it. Production lock behavior, replicas and independent consumers require evidence from the owning environment.
-
-## Deep Engineering Reference (Load On-Demand)
-- For lock-safe zero-downtime DDL (`lock_timeout`, `CREATE INDEX CONCURRENTLY`, `NOT VALID` constraints, `pg_repack`, `gh-ost`), throttled keyset backfills, CDC (`Debezium`) vs outbox, and UU PDP/GDPR erasure tombstone/crypto-shredding -> read [Online DDL, chunked backfills & CDC](references/online-ddl-and-cdc.md).
+Do not load unrelated references unnecessarily.
