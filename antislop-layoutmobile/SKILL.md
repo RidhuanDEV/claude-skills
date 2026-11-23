@@ -168,3 +168,5 @@ Run these alongside the core Delivery Gate when the task is mobile or responsive
 - [ ] Does the navigation reflow into a mobile pattern (bottom nav or menu) instead of a squeezed desktop row? (R-03)
 - [ ] Do fixed nav bars (bottom nav, sticky headers) never cover content and respect safe areas? (R-03)
 - [ ] Is the layout verified at mobile breakpoints? (R-35)
+
+> **Evaluation Suite:** [evaluations.md](evaluations.md)

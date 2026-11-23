@@ -405,3 +405,5 @@ Run these alongside the core Delivery Gate when the task is copy work. Every lin
 - [ ] List items and bullet points use natural sentence case, not mechanical title case on every word (R-36)
 - [ ] Voice present: the copy has a real voice (the user's sample or a clearly chosen tone), not a sterile default (R-37)
 - [ ] Read aloud: the copy sounds like a person wrote it, not like a model padded it
+
+> **Evaluation Suite:** [evaluations.md](evaluations.md)

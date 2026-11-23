@@ -202,3 +202,11 @@ Run these alongside the core Delivery Gate when the task involves UI. All answer
 - [ ] Are the empty, loading, and error states of every data view present and perceivable, not color-only? (R-27, C-4)
 - [ ] Can text be resized to 200% without being clipped, and does the mobile keyboard never cover a focused input? (R-35)
 - [ ] Does every enabled control show `cursor: pointer`, use a native element, carry an accessible name and a visible label, and respect `prefers-reduced-motion`? (R-39)
+
+## Reference Guide
+
+| Topic / Artifact | Load Reference |
+| :--- | :--- |
+| Copy-Ready Accessible Markup (Pointer Cursor Base Layer, Focus Traps, Skip Links, ARIA Tabs, Live Regions) | [references/A11Y-PATTERNS.md](references/A11Y-PATTERNS.md) |
+| Complete WCAG 2.2 Success Criteria Reference by Level | [references/WCAG.md](references/WCAG.md) |
+| Contrast Ratio Checker Script & Keep-Lean Evaluation Suite | [contrast-check.py](contrast-check.py) & [evaluations.md](evaluations.md) |

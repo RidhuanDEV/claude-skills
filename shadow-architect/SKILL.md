@@ -1,108 +1,45 @@
 ---
 name: shadow-architect
-description: "Single-System Architecture & Design. Use when designing one application architecture, C4 diagrams, ADRs, module boundaries, or deciding Monolith vs Modular Monolith vs Microservices. Do NOT use for multi-app enterprise portfolios or 6-Domain SPBE (/shadow-ea)."
+description: "Single-System Architecture & Design. Use when designing one application architecture, C4 Mermaid diagrams, ADRs, module public facades, architectural fitness functions, capacity sizing, brownfield convention preservation, or deciding Monolith vs Modular Monolith vs Workers vs Microservices. Do NOT use for multi-app enterprise portfolios or 6-Domain SPBE (/shadow-ea)."
 ---
 
-# Shadow Architect (`/shadow-architect`) — System Architecture & ADR Gate (SDLC Stage 2)
+# Shadow Architect (`/shadow-architect`) — Single-System Architecture, C4/ADRs & Boundary Gate (SDLC Stage 2)
 
-Use this skill after `/shadow-discovery` (or when evaluating major structural changes) to establish a maintainable, right-sized architecture before scaffolding or coding.
+Use this skill after `/shadow-discovery` (or when evaluating structural changes) to establish a maintainable, right-sized architecture before scaffolding or coding.
+
+- **Owner:** Application topology selection (Modular Monolith + Async Worker default), strict Mermaid C4 diagrams & ADRs, explicit ACID vs eventual consistency models, `public.ts` module facades & CI fitness functions, baseline capacity sizing, brownfield 10-facet convention preservation, and Official-First 8-field technology Decision Records.
+- **Boundaries:** Multi-application enterprise portfolios & 6-Domain SPBE (`shadow-ea`), behavior-preserving legacy module cleanup (`shadow-refactor`), legacy due-diligence & rewrite TCO (`shadow-modernize`), greenfield CLI generator execution (`shadow-bootstrap`), and physical SQL indexing/tuning (`shadow-db`).
+
+## Reference Guide
+
+Load ONLY the 1–2 modular playbooks needed for the active architecture subtask:
+
+| Module | Topic | Load When |
+| :--- | :--- | :--- |
+| [01-topology-selection-and-modular-monolith.md](references/01-topology-selection-and-modular-monolith.md) | Monolith vs Modular Monolith vs Async Worker vs Microservices, 4 evidence-based extraction triggers, decision-scope sizing | Choosing system topology or deciding whether to split a service/worker |
+| [02-c4-diagrams-adrs-and-consistency-models.md](references/02-c4-diagrams-adrs-and-consistency-models.md) | Strict Mermaid C4 Context/Container/Sequence diagrams, compact ADR template, explicit ACID vs eventual consistency & failure assumptions | Documenting system context, flows, consistency boundaries, or formal ADRs |
+| [03-module-facades-fitness-functions-and-capacity.md](references/03-module-facades-fitness-functions-and-capacity.md) | Typed `public.ts` facades (zero cross-module SQL joins), CI fitness functions (`dependency-cruiser`/`import-linter`/`ArchUnit`), RPS/storage/RAM sizing | Enforcing clean module isolation or estimating baseline capacity |
+| [04-brownfield-convention-preservation-and-official-first.md](references/04-brownfield-convention-preservation-and-official-first.md) | 10-facet discovery (`codebase_intelligence.py`), 5-level Convention Precedence, Official-First 5-tier hierarchy & 8-field Decision Record | Extending brownfield repos without unsolicited rewrites or unapproved infra bloat |
+| [evals/decision-trials.md](evals/decision-trials.md) | Reviewer calibration trials (local extraction, cross-team ownership, capacity uncertainty) | Calibrating architecture scope proportionality |
+| [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`ARCH-EVAL-01..07`) | Auditing anti-microservice bloat, module facades, brownfield fidelity, and `/shadow-ea` boundary |
 
 ---
 
 ## 1. Core Architectural Philosophy: Right-Sized Engineering
 
-1. **Default to a Modular Monolith** unless independent team scaling, heterogeneous compute (e.g., heavy GPU worker vs CRUD API), or strict regulatory isolation proves that distributed microservices are necessary.
-2. **Enforce Strict Module Boundaries**: Modules communicate via explicit public service interfaces or domain events — never by reaching directly into another module's internal tables or private repositories.
-3. **Trace Every NFR to an Architectural Mechanism & Consistency Model**:
-   - **Consistency & Distributed Failure Assumptions**: State explicitly where **strict serializability / ACID** is required (money, inventory, auth grants) vs **eventual consistency** (search index sync, analytics projections); document failure assumptions under network partitions, split-brain locks, and clock skew (`monotonic` vs wall clock).
-   - **Architectural Fitness Functions**: Define measurable automated guardrails (max p95 latency, zero cross-module DB table imports, acyclic dependency graph, max fan-out).
-   - High read concurrency -> Read replicas + `/shadow-cache` (`Redis` / `TanStack Query`).
-   - Slow/unreliable external third-party calls -> Asynchronous outbox/queue worker + `/shadow-concurrency` + `/shadow-integrate` circuit breaker.
-   - Multi-client data isolation -> `/shadow-auth` tenant-scoped queries / PostgreSQL RLS.
+1. **Default to a Modular Monolith (+ Async Worker):** Split into distributed microservices ONLY when proven by heterogeneous compute isolation, `25+` engineer release contention, `> 10x` scaling divergence, or strict regulatory isolation.
+2. **Enforce Strict Module Boundaries:** Modules communicate exclusively via typed public facades (`public.ts`) or domain events — NEVER by joining another module's internal tables or importing `internal/*`. Enforce mechanically in CI via fitness functions.
+3. **Trace Every NFR to Consistency & Failure Mechanisms:** Explicitly separate **strict ACID** (money, inventory, auth grants) from **eventual consistency** (search sync, BI projections, notifications), documenting network partition, timeout, and clock-skew assumptions.
+4. **Calibrate Deliverables to Decision Scope:** For reversible module-local changes, answer concisely inline (precedent, transaction boundary, coupling, rollback). Reserve C4 diagrams and formal ADRs (`docs/adr/ADR-XXX-*.md`) for shared contracts, deployment boundaries, or data-ownership shifts.
 
 ---
 
-## 2. Architecture deliverables by decision scope
+## 2. Brownfield Preservation & Official-First Gate
 
-For a reversible module-local decision, identify the existing precedent, transaction boundary, coupling and rollback path. Answer inline. For a change to a shared contract, deployment boundary or data owner, compare coordination cost and failure isolation with the current design and record the decision and affected owners. Use the following artifacts only where they resolve a decision.
+- **Brownfield Discovery First (`L0`):** Run `python "shadow-quality/scripts/codebase_intelligence.py" discover --repo-dir . --write-profile` across all 10 facets (`docs/engineering/CODEBASE_CONVENTIONS.md`). Preserve existing working architectures (MVC, Feature-Based, etc.) using the 5-level Convention Precedence Hierarchy (`User/Security -> AGENTS.md -> Closest 1–3 Precedents -> Global Shadow -> AI default`). Never impose unsolicited rewrites!
+- **Official-First 8-Field Decision Record:** Follow `Existing trusted -> Official SDK -> Verified package -> Justified small custom -> Approved replacement` (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`), preserve local SSO SDKs, and obtain explicit Monarch approval before adding new frameworks or extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices).
 
-### A. C4 Model Diagrams (Strict Mermaid Syntax)
-1. **Level 1 — System Context Diagram**: The application, primary user personas, and external third-party systems (Payment Gateway, SSO, SMTP, Government APIs).
-2. **Level 2 — Container Diagram**: Web/Mobile clients, API Gateway/Reverse Proxy, Backend API, Background Worker, Primary DB, Cache (`Redis`), Object Storage (`S3`/`MinIO`), and Data Warehouse.
-3. **Level 3 — Component & Data Flow Diagram**: Key sequence diagrams (`sequenceDiagram`) for critical flows (Authentication, Checkout/Approval, Webhook Ingestion).
-
-### B. Capacity & Resource Sizing Estimation
-Calculate concrete baseline estimates from `/shadow-discovery` NFRs:
-- **Traffic**: Daily Active Users (DAU) -> Average RPS -> Peak RPS ($3\times$ average).
-- **Storage**: Row size $\times$ records/day $\times$ 365 days $\times$ retention years + $30\%$ index overhead + object storage growth.
-- **Compute & Memory**: vCPU and RAM sizing for App Servers, Database (`shared_buffers` = 25% RAM), and Redis cache.
-
-### C. Architecture Decision Records (`docs/adr/ADR-XXX-*.md`)
-For every consequential choice (Database engine, Monolith vs Microservices, Auth strategy, Queue broker, Deployment target), record:
-- **Status**: `Proposed | Accepted | Superseded`
-- **Context & Problem Statement**
-- **Options Considered (with Pros, Cons, and Cost/Operational Complexity)**
-- **Decision & Rationale**
-- **Consequences & Trade-offs**
-
----
-
-## 3. Brownfield Architecture & Convention Preservation
-
-When designing or extending an existing application (**Brownfield Project**):
-
-### A. Brownfield vs Greenfield Project Routing
-- **Greenfield**: Zero/empty repository. When implementation is explicitly requested, evaluate scaffolding (`/shadow-bootstrap`) and right-sized Modular Monolith baseline.
-- **Brownfield**: Existing codebase present. **Preserve existing architectural patterns** (Layered MVC, Feature-based, Hexagonal, Clean, Minimalist). Do **NOT** impose unsolicited architectural migrations (e.g. converting a working MVC into Clean Architecture/DDD) solely because it is perceived as "cleaner" or "more modern".
-
-### B. Mandatory Existing-Codebase Discovery & Convention Profile
-Before proposing architectural modifications, inspect the codebase across the **10 Discovery Facets** and maintain the Project Convention Profile at `docs/engineering/CODEBASE_CONVENTIONS.md`:
-1. **Framework, Language & Runtime**: Exact version, module system (CommonJS vs ESM).
-2. **Project Structure & Module Boundaries**: Directory organization, monorepo workspaces.
-3. **Architectural Patterns**: Prevailing architectural style and layer boundaries.
-4. **Naming Conventions**: File, folder, class, function, and variable casings.
-5. **Code Formatting & Lint Rules**: Linter configs, indentation, quotes, trailing commas.
-6. **API & Database Access Patterns**: Established ORM, query builders, repository patterns.
-7. **Error Handling & Validation**: Centralized error middleware, validation libraries (Zod, Joi, FormRequest).
-8. **Authentication & Authorization**: Session/JWT mechanisms, RBAC/ABAC guards.
-9. **State Management & Caching**: Frontend stores (Zustand, Redux, Pinia), Redis caching keys.
-10. **Testing & Dependency Conventions**: Test runners, mock styles, fixture conventions.
-
-Run deterministic discovery and profiling:
 ```powershell
 python "shadow-quality/scripts/codebase_intelligence.py" discover --repo-dir . --write-profile
+python -m unittest discover -s shadow-architect/tests -v
 ```
-If patterns conflict across legacy modules, **document the ambiguity** rather than inventing a global standard.
-
-### C. Convention Precedence Hierarchy
-Always resolve architectural decisions using this hierarchy:
-1. **Level 1**: Explicit user requirements & safety/security constraints (SQL injection prevention, data isolation).
-2. **Level 2**: Applicable project-level instructions (`AGENTS.md`, `CLAUDE.md`, documented architecture).
-3. **Level 3**: Established patterns in relevant existing modules.
-4. **Level 4**: Shadow Army global conventions.
-5. **Level 5**: AI default preferences (**never** allowed to override established project conventions).
-
-### D. Existing Code First Principle
-- Always search for the closest existing implementation before architecting new components.
-- Reuse existing services, utilities, middleware, and repositories.
-- Match equivalent module structure and naming patterns across feature boundaries.
-
----
-
-## 4. Full-system planning checklist (apply only the affected rows)
-- [ ] C4 Context and Container diagrams validated in strict Mermaid syntax.
-- [ ] Core database ERD (`/shadow-db`) and API contract strategy (`/shadow-api`) aligned with functional requirements.
-- [ ] ADRs written for all critical stack and infrastructure choices.
-- [ ] Capacity sizing confirms infrastructure fits client budget and SLA targets.
-- [ ] For Brownfield projects: Project Convention Profile (`docs/engineering/CODEBASE_CONVENTIONS.md`) inspected and architectural preservation confirmed.
-- [ ] **Official-First & Technology Decision Record (`shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Selected technologies follow the 5-tier hierarchy (`Existing trusted -> Official SDK -> Verified mature package -> Justified small custom -> Approved replacement`), emit the 8-field Decision Record, and require explicit Monarch approval before introducing new frameworks or extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices).
-
-For reviewer calibration, use the [architecture decision trials](evals/decision-trials.md) to exercise local extraction, cross-team ownership and capacity uncertainty.
-
-## Reference Guide
-
-| Task / Scenario | Load Reference |
-| :--- | :--- |
-| Choosing Monolith vs Modular Monolith vs Worker vs Microservices, C4 Mermaid, Module Public Facades, or ADRs | [references/topology-selection-and-module-boundaries.md](references/topology-selection-and-module-boundaries.md) |
-
-Do not load unrelated references unnecessarily.

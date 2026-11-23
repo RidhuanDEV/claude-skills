@@ -75,8 +75,13 @@ Map unverified assumptions across **5 Risk Dimensions** (*Value, Usability, Viab
 
 ## Reference Guide
 
+Load only the specific playbook matching your active Stage 1 Discovery subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| Epistemic Tagging, Quantified NFR Contracts, Deterministic Gherkin Acceptance Criteria & Ambiguity Resolution | [references/requirements-and-nfr-engineering.md](references/requirements-and-nfr-engineering.md) |
+| Epistemic Tagging (`[EVIDENCE]`/`[ASSUMPTION]`/`[PROPOSAL]`/`[NEEDS VALIDATION]`), 5 Strategy Questions & Ambiguity Stop Gates | [references/01-epistemic-discovery-and-ambiguity-gates.md](references/01-epistemic-discovery-and-ambiguity-gates.md) |
+| Atomic Functional Requirements (`FR-*`), State Transition Tables & 4-Path Gherkin Acceptance Criteria | [references/02-functional-requirements-and-gherkin-acceptance.md](references/02-functional-requirements-and-gherkin-acceptance.md) |
+| Quantified NFR Contracts (`ISO 25010`, `ASVS 5.0`, `UU PDP`, `RPO/RTO`) & 5-Dimension Assumption Risk Matrices | [references/03-quantified-nfr-and-assumption-risk-matrices.md](references/03-quantified-nfr-and-assumption-risk-matrices.md) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

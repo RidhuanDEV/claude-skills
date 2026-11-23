@@ -61,8 +61,13 @@ Before handing the Staging environment to client testers, run an internal **Inte
 
 ## Reference Guide
 
+Load only the specific playbook matching your active Staging UAT subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| Executable RTM Design, `E03` Filter Contract Audit, Severity-First Gate & Berita Acara UAT | [references/rtm-and-staging-acceptance.md](references/rtm-and-staging-acceptance.md) |
+| Executable RTM (`100%` P0/P1), Business-Language Scenarios, Headless Batch Evidence & Anonymized Staging Fixtures | [references/01-executable-rtm-and-business-scenarios.md](references/01-executable-rtm-and-business-scenarios.md) |
+| Intended-vs-Implemented Drift Audit, `E03` Query/Filter Contract Checks, Async `HTTP 202` Honesty & Adversarial Probes | [references/02-intended-vs-implemented-drift-and-adversarial-uat.md](references/02-intended-vs-implemented-drift-and-adversarial-uat.md) |
+| Severity-First Release Gate, Defect vs Change Request Triage & Formal `Berita Acara UAT` Sign-Off | [references/03-defect-vs-cr-triage-and-berita-acara-uat.md](references/03-defect-vs-cr-triage-and-berita-acara-uat.md) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

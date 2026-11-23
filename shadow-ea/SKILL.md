@@ -39,8 +39,14 @@ python "shadow-ea/scripts/ea_portfolio_engine.py" --analyze-portfolio path/to/po
 
 ## Reference Guide
 
+Load only the specific playbook or methodology matching your active Enterprise Architecture subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| 6-Domain SPBE (`Perpres 95/2018 & 132/2022`), Satu Data (`Perpres 39/2019`), TOGAF 10, TIME Matrix & ABB/SBB Separation | [references/spbe-togaf-and-time-rationalization.md](references/spbe-togaf-and-time-rationalization.md) |
+| Indonesia 6-Domain SPBE (`Perpres 95/2018 & 132/2022`), Satu Data (`Perpres 39/2019`), `Wali Data` & `SPLP` Interoperability | [references/01-indonesia-6domain-spbe-and-satu-data-interoperability.md](references/01-indonesia-6domain-spbe-and-satu-data-interoperability.md) |
+| TOGAF 10 ADM Tailoring, Capability Mapping & Strict Vendor-Neutral `ABB` vs Concrete `SBB` Separation | [references/02-togaf-10-adm-and-abb-vs-sbb-separation.md](references/02-togaf-10-adm-and-abb-vs-sbb-separation.md) |
+| TIME Portfolio Rationalization, Duplicate Capability Detection (`EA-DUP-*`) & Architecture Review Board (`ARB`) Governance | [references/03-time-portfolio-rationalization-and-arb-governance.md](references/03-time-portfolio-rationalization-and-arb-governance.md) |
+| Deep Methodology & EA Templates | [methodologies/TOGAF-10-SPBE-6-DOMAIN-AND-PORTFOLIO-INTELLIGENCE.md](methodologies/TOGAF-10-SPBE-6-DOMAIN-AND-PORTFOLIO-INTELLIGENCE.md) & [playbooks/EA-BLUEPRINT-AND-PORTFOLIO-TEMPLATES.md](playbooks/EA-BLUEPRINT-AND-PORTFOLIO-TEMPLATES.md) |
+| Deterministic EA Portfolio Validator & Specialist Eval Suite | [scripts/ea_portfolio_engine.py](scripts/ea_portfolio_engine.py) & [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

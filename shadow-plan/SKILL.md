@@ -69,8 +69,14 @@ Always provide a Mermaid `flowchart LR` dependency graph showing execution waves
 
 ## Reference Guide
 
+Load only the specific playbook matching your active sprint planning subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| Vertical Thin Slicing, Acyclic Dependency DAGs, Story DoR/DoD Contracts & `[APPROVAL-REQUIRED]` Tagging | [references/vertical-slicing-and-dependency-graphs.md](references/vertical-slicing-and-dependency-graphs.md) |
+| Vertical Thin Slicing (`1–3d`), User vs Job Stories & Unbroken `EPIC -> FR -> US -> AC -> TASK -> TEST` Traceability | [references/01-vertical-thin-slicing-and-story-traceability.md](references/01-vertical-thin-slicing-and-story-traceability.md) |
+| Acyclic Dependency DAGs, 5-Wave Execution Roadmaps & Pre-Mortem Risk Analysis (`Tigers \| Paper Tigers \| Elephants`) | [references/02-dependency-dags-waves-and-pre-mortem-risks.md](references/02-dependency-dags-waves-and-pre-mortem-risks.md) |
+| Enforced Definition of Ready/Done (DoR/DoD) Gates & `L0`–`L4` `[APPROVAL-REQUIRED]` Backlog Tagging | [references/03-dor-dod-governance-and-approval-tagging.md](references/03-dor-dod-governance-and-approval-tagging.md) |
+| Automated Sprint DAG, Traceability & Approval-Tag Verifier | [scripts/sprint_dag_verifier.py](scripts/sprint_dag_verifier.py) (`python shadow-plan/scripts/sprint_dag_verifier.py --self-test`) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

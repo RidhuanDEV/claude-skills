@@ -49,8 +49,14 @@ python "shadow-grc/scripts/grc_assurance_engine.py" --validate-findings path/to/
 
 ## Reference Guide
 
+Load only the specific playbook or methodology matching your active GRC assurance subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| COBIT 2019 Capability vs Maturity, ISO 27001:2022 93-Control SoA, `POJK 11/2022` + `PADK OJK 1/2026` & 6-Part DE/OE Evidence | [references/audit-evidence-and-regulatory-mapping.md](references/audit-evidence-and-regulatory-mapping.md) |
+| COBIT 2019 Capability vs Maturity, ISO/IEC 27001:2022 Clauses 4–10 + 93-Control SoA & Non-Certification Boundaries | [references/01-cobit-2019-capability-maturity-and-iso27001-soa.md](references/01-cobit-2019-capability-maturity-and-iso27001-soa.md) |
+| Dated Indonesian Regulatory Assurance (`POJK 11/2022` + `PADK OJK 1/2026` revoking `SEOJK 21/2017`, SPBE & Indeks KAMI BSSN) | [references/02-indonesian-regulatory-assurance-pojk-padk-and-spbe-kami.md](references/02-indonesian-regulatory-assurance-pojk-padk-and-spbe-kami.md) |
+| Risk-Based Audit Fieldwork, Design vs Operating Effectiveness (`DE`/`OE`) Sampling & 6-Part Defensible Findings | [references/03-audit-fieldwork-de-oe-sampling-and-6part-findings.md](references/03-audit-fieldwork-de-oe-sampling-and-6part-findings.md) |
+| Deep Methodology & Workpaper Templates | [methodologies/AUDIT-LIFECYCLE-AND-REGULATORY-CROSSWALK.md](methodologies/AUDIT-LIFECYCLE-AND-REGULATORY-CROSSWALK.md) & [playbooks/WORKPAPERS-AND-ASSURANCE-TEMPLATES.md](playbooks/WORKPAPERS-AND-ASSURANCE-TEMPLATES.md) |
+| Deterministic GRC Assurance Engine & Specialist Eval Suite | [scripts/grc_assurance_engine.py](scripts/grc_assurance_engine.py) & [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

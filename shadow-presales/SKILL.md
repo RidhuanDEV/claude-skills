@@ -43,8 +43,14 @@ python "shadow-presales/scripts/presales_commercial_engine.py" --model-tco path/
 
 ## Reference Guide
 
+Load only the specific playbook or methodology matching your active pre-sales subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| 3-Scenario Capacity Sizing, 3–5 Yr TCO/NPV, Assumption Register & Perpres 46/2025 RAB/TKDN/HPS Boundaries | [references/sizing-rab-and-perpres46.md](references/sizing-rab-and-perpres46.md) |
+| RFP/KAK Mandatory vs Desirable Decomposition, `Aanwijzing` Clarification Register & Bid/No-Bid Gate | [references/01-rfp-kak-decomposition-aanwijzing-and-bid-no-bid.md](references/01-rfp-kak-decomposition-aanwijzing-and-bid-no-bid.md) |
+| 3-Scenario Service-Demand Workload Capacity Sizing (`Conservative/Expected/Stress`) & 3–5 Yr DB Growth | [references/02-three-scenario-workload-capacity-and-db-growth-sizing.md](references/02-three-scenario-workload-capacity-and-db-growth-sizing.md) |
+| 3–5 Yr TCO/NPV, USD FX Shock, Commercial Provider RAB/BoQ & `Perpres 46/2025` (Non-HPS, PDN/TKDN, UMKK) | [references/03-tco-npv-commercial-rab-and-perpres-46-2025-compliance.md](references/03-tco-npv-commercial-rab-and-perpres-46-2025-compliance.md) |
+| Deep Methodology & Commercial Templates | [methodologies/CAPACITY-TCO-AND-TENDER-METHODOLOGY.md](methodologies/CAPACITY-TCO-AND-TENDER-METHODOLOGY.md) & [playbooks/ENGAGEMENT-PLAYBOOK-AND-TEMPLATES.md](playbooks/ENGAGEMENT-PLAYBOOK-AND-TEMPLATES.md) |
+| Deterministic Pre-Sales Sizing/TCO Engine & Specialist Eval Suite | [scripts/presales_commercial_engine.py](scripts/presales_commercial_engine.py) & [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

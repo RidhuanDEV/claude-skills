@@ -1,68 +1,49 @@
 ---
 name: shadow-compat
-description: "Compatibility & Upgrade Assurance. Use when auditing API/webhook backward compatibility, database schema evolution safety, dependency upgrade breaking changes, or cross-browser/device support matrices."
+description: "Compatibility & Upgrade Assurance. Use when auditing API/webhook wire & semantic backward compatibility, implementing RFC 9745 Deprecation / RFC 8594 Sunset / 410 Gone, upgrading dependencies/runtimes safely, or verifying cross-browser/iOS Safari/OS casing & consumer replay matrices. Do NOT use for greenfield API design (shadow-api) or SBOM provenance (shadow-supplychain)."
 ---
 
-# Shadow Compat (`/shadow-compat`) — API, Dependency & Cross-Browser/Device Compatibility
+# Shadow Compat (`/shadow-compat`) — API Evolution, RFC 9745/8594 Deprecation, Upgrades & Cross-Platform Compatibility
 
-Use this skill when modifying existing API contracts, upgrading framework/library dependencies, or verifying that web and mobile interfaces work consistently across browsers, operating systems, and client versions.
+Use this skill when evolving live API/webhook/event contracts, upgrading framework/runtime dependencies, or verifying that web, mobile, and OS builds work cleanly across versions and platforms.
 
----
-
-## 1. API & Contract Backward-Compatibility Rules
-
-When mobile apps (which users do not update immediately), partner webhooks, or external systems consume your backend API:
-
-| Change Type | Classification | Safe Evolution Rule |
-| :--- | :--- | :--- |
-| Adding an **optional** request field or **new** response field | **Non-Breaking (Safe)** | Safe to deploy in minor release (`v1.x`). |
-| Adding a **required** request field | **BREAKING** | Make optional with a safe server default, or introduce `/api/v2/...` endpoint. |
-| Renaming or removing a response field | **BREAKING** | Keep returning both old and new fields during deprecation window; remove old field only after all clients upgrade. |
-| Changing field type (e.g., `number` -> `string` or `object` -> `array`) | **BREAKING** | Never mutate field types in-place on live endpoints. |
-| Narrowing an enum in responses (adding a new enum value that old mobile clients don't recognize) | **Potentially Breaking** | Ensure mobile/frontend clients have a safe fallback branch for unknown enum values. |
-
----
-
-## 2. Dependency & Runtime Upgrade Protocol
-
-When upgrading packages (`package.json`, `requirements.txt`, `composer.json`, `go.mod`):
-1. **Audit Breaking Changes First**: Use `/context7` MCP to inspect the official migration guide / changelog between the installed major version and target version.
-2. **Incremental Group Upgrades**: Upgrade one ecosystem group at a time (e.g., ORM first -> verify tests -> framework next -> verify tests), never 40 major versions in a single blind commit.
-3. **Lockfile & Native Binding Check**: Verify compatibility with the production OS/architecture (`linux/amd64` vs `linux/arm64`, `glibc` vs `musl` Alpine in Docker).
-
----
-
-## 3. Cross-Browser & Mobile Device Compatibility Checklist
-
-Watch for and eliminate common cross-platform pitfalls:
-- **iOS Safari Viewport & Input Quirks**:
-  - Use `100dvh` (`min-h-dvh`) instead of `100vh` so the iOS Safari address bar does not clip bottom buttons.
-  - Ensure all `<input>`, `<select>`, and `<textarea>` elements have `font-size >= 16px` (`1rem`) on mobile so iOS Safari does not auto-zoom the page on input focus!
-  - Respect `env(safe-area-inset-bottom)` on fixed bottom navigation bars and sticky action footers.
-- **Date & Timezone Parsing**:
-  - Never pass non-standard date strings like `"2026-11-10 14:30:00"` into `new Date(...)` (returns `Invalid Date` in Safari/WebKit!). Always use strict ISO-8601 `"2026-11-10T14:30:00Z"` or explicit date parsers.
-- **Windows vs Linux Path & Case-Sensitivity**:
-  - Git on Windows is case-insensitive by default (`import './Header'` works locally even if file is `header.tsx`), which breaks immediately on Linux CI/Docker builds! Always verify exact filename casing.
-
-### Schema Evolution Compatibility Matrix & Contract Governance
-- **Wire & Schema Evolution Rules**:
-
-| Evolution Mode | Constraint | Safe Deployment Order |
-| --- | --- | --- |
-| **Backward Compatible** | New consumer/reader reads old producer payloads (`add optional field` with safe default) | Deploy **Consumer first**, then Producer |
-| **Forward Compatible** | Old consumer ignores new optional fields (`tolerant reader` + no `additionalProperties: false` breakage) | Deploy **Producer first**, then Consumer |
-| **Full Compatible** | Only add/remove fields that both old and new versions default safely; never rename/retype in place | Expand-Contract dual-write / dual-read window (`/shadow-data`) |
-
-- **Semantic API Diff & Consumer-Driven Contract Tests**: Beyond AST/OpenAPI syntactic diffs, audit **semantic breaking changes** (default value flips, keyset/sort order changes, error code remapping, `null` vs omitted field semantics, pagination limit caps). Inventory consumers by version, owner and reachability. Run available clients and replay approved sanitized historical payloads for unreachable clients. Record which behavior replay measures and identify missing evidence (strict decoding, retry semantics, platform support). Route residual risk to the contract owner for an approved staged rollout or defer the breaking change.
-- **Deprecation & Sunset Policy**: Annotate deprecated endpoints/fields with RFC 8594/9745 headers (`Deprecation` and `Sunset` timestamps), document migration guides, and verify telemetry shows near-zero legacy traffic before the Contract phase removes the field or route.
-- **Version Pinning & Decision Record (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`)**: Resolve peer/runtime `engines` compatibility first and pin approved concrete versions in production/regulated projects instead of leaving floating `latest` ranges.
-
-Run `python -m unittest discover -s tests` from this skill directory for examples of strict decoding, omitted cursors and ordering changes. Capture each real client's decoder/version and business expectations before treating a replay as representative.
+- **Owner:** Wire & semantic backward/forward/full compatibility, RFC 9745 `Deprecation` + RFC 8594 `Sunset` + `410 Gone` retirement governance, incremental dependency/runtime upgrades, iOS Safari/WebKit & Windows/Linux parity, and honest consumer payload replay (`test_consumer_replay.py`).
+- **Boundaries:** Greenfield API authoring & OpenAPI generation (`shadow-api`), SQL Expand-Contract backfill execution (`shadow-data`), SBOM & SLSA provenance verification (`shadow-supplychain`), and full release orchestration (`shadow-release`).
 
 ## Reference Guide
 
-| Task / Scenario | Load Reference |
-| :--- | :--- |
-| RFC 9745/8594 `Deprecation`/`Sunset`/`410 Gone`, Expand-Contract Compatibility & Semantic Diff Checks | [references/backward-compat-and-deprecation.md](references/backward-compat-and-deprecation.md) |
+Load ONLY the 1–2 modular playbooks needed for the active compatibility subtask:
 
-Do not load unrelated references unnecessarily.
+| Module | Topic | Load When |
+| :--- | :--- | :--- |
+| [01-wire-and-semantic-compatibility-matrix.md](references/01-wire-and-semantic-compatibility-matrix.md) | Backward/Forward/Full deploy order, breaking wire diffs vs 6 semantic breaks (sort order, `null` vs omitted, enum exhaustiveness) | Auditing API, webhook, or event contract changes for existing mobile/partner consumers |
+| [02-rfc9745-deprecation-sunset-and-410-gone.md](references/02-rfc9745-deprecation-sunset-and-410-gone.md) | RFC 9745 `@<unix>` `Deprecation`, RFC 8594 IMF-fixdate `Sunset`, `Link` pointers, telemetry drain gate, `410 Gone` | Deprecating or retiring legacy `/v1` endpoints cleanly without breaking integrators |
+| [03-dependency-and-runtime-upgrade-assurance.md](references/03-dependency-and-runtime-upgrade-assurance.md) | `/context7` migration audits, incremental single-ecosystem waves, `amd64`/`arm64`/`musl` native checks, zero `--legacy-peer-deps` | Upgrading Node/Python/Go/framework/ORM major versions safely |
+| [04-cross-browser-os-and-consumer-replay-qa.md](references/04-cross-browser-os-and-consumer-replay-qa.md) | iOS Safari (`100dvh`, `16px` input zoom, ISO-8601 dates), Windows/Linux casing (`forceConsistentCasingInFileNames`), honest replay | Eliminating Safari/Linux-only bugs or evaluating unreachable external consumer compatibility |
+| [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`CMP-EVAL-01..07`) | Auditing breaking diff detection, RFC 9745/8594 headers, upgrade rigor, and replay honesty |
+
+---
+
+## 1. Core Compatibility, Deprecation & Platform Rules
+
+1. **Wire & Semantic Evolution (`01`):**
+   - **Backward Compatible** (new reader reads old data): deploy **Consumer first**, then Producer.
+   - **Forward Compatible** (old tolerant reader ignores new optional fields; zero `additionalProperties: false` tightening): deploy **Producer first**, then Consumer.
+   - **Full Compatible / Rename / Retype:** Use Expand-Contract dual-write/dual-read (`/shadow-data`) or introduce `/api/v2/...`. Audit semantic breaks (sort flips, `null` vs omitted, default changes, pagination cap cuts, enum exhaustion) beyond AST OpenAPI diffs!
+2. **RFC 9745 & RFC 8594 Retirement (`02`):**
+   - Emit `Deprecation: @<unix_sec>` (NEVER draft `true`), `Sunset: <IMF-fixdate>` (`Sunset >= Deprecation`), and `Link` (`rel="alternate"`, `rel="deprecation"`). Verify `legacy_route_hits` telemetry drained before enabling **`410 Gone`** (not `404`).
+3. **Incremental Dependency Upgrades (`03`):**
+   - Inspect changelogs via `/context7`, inspect metadata non-destructively (`npm view`), upgrade one ecosystem group at a time, test native bindings on target Linux/Alpine images, pin resolved versions, and preserve internal/local SDKs (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`).
+4. **Cross-Browser, OS & Honest Consumer Replay (`04`):**
+   - Enforce `100dvh`, `font-size >= 16px` mobile inputs, `env(safe-area-inset-bottom)`, strict ISO-8601 `"T...Z"` dates, and exact filename casing (`forceConsistentCasingInFileNames: true`).
+   - Inventory consumers by version/owner/reachability; replay sanitized historical payloads honestly noting unmeasured strict-decoder and retry risks.
+
+---
+
+## 2. Deterministic Compatibility & Consumer Replay Verification
+
+```powershell
+python shadow-compat/scripts/compat_deprecation_verifier.py --self-test
+python shadow-compat/scripts/compat_deprecation_verifier.py --check-compat path/to/compat_spec.json
+python -m unittest discover -s shadow-compat/tests -v
+```

@@ -42,3 +42,7 @@ This skill connects directly to the **`shadow_handoff` MCP server** (`save_hando
 
 4. **History (`/handoff list`)**:
    - Call `list_handoffs` on the `shadow_handoff` MCP server and display the saved snapshots and any unmerged `sessions`.
+
+## Scope & Evaluation
+- **Keep-Lean Boundary:** Exclusively for AI coding session memory transfer (`shadow_handoff` MCP). NEVER use `/handoff` for formal client BAST delivery, Admin/User manuals, or Vault cutovers — route those strictly to `/shadow-handover`.
+- **Evaluation Suite:** [evaluations.md](evaluations.md).

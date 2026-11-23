@@ -140,7 +140,18 @@ python "$ShadowDocRoot/scripts/reference_verifier.py" --self-test
 ```
 
 - **Word TOC Field Note**: When opening generated `.docx` files in Microsoft Word, press `Ctrl+A` then `F9` to populate dynamic page numbers in the native Word Table of Contents (`TOC`) field.
-- **References**:
-  - Canonical Schema: [`schemas/canonical-document.schema.json`](schemas/canonical-document.schema.json)
-  - Hybrid Schema & Migration Reference: [`references/HYBRID-JSON-MD-SCHEMA.md`](references/HYBRID-JSON-MD-SCHEMA.md)
-  - Full PRD/SRS Requirements: [`requirements/SHADOW_DOC_V2_PRD_SRS.md`](requirements/SHADOW_DOC_V2_PRD_SRS.md)
+
+## Reference Guide
+
+Load only the specific playbook or schema reference matching your active document-engineering subtask:
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| Generator-Agnostic Discovery (`doc_orchestrator.py`), Never-Edit-Binary Law, Selective `scope_id` Patching, `APPROVED` Auto-Fork & `migrate-v1` | [references/01-canonical-ast-governance-and-selective-updates.md](references/01-canonical-ast-governance-and-selective-updates.md) |
+| Zero-Fabricated-Facts Strict Validation, `arXiv` `[PREPRINT]` Policy, 7-Point `reference_verifier.py` Safety Quarantine & Multi-Format Export QA | [references/02-citations-reference-verifier-and-export-qa.md](references/02-citations-reference-verifier-and-export-qa.md) |
+| Canonical JSON AST v2.0 & Legacy v1.0 Hybrid Schema Reference | [references/HYBRID-JSON-MD-SCHEMA.md](references/HYBRID-JSON-MD-SCHEMA.md) |
+| Canonical Schema, 20-Template Catalog & Full v2.0 PRD/SRS | [schemas/canonical-document.schema.json](schemas/canonical-document.schema.json), [TEMPLATE_CATALOG.md](TEMPLATE_CATALOG.md) & [requirements/SHADOW_DOC_V2_PRD_SRS.md](requirements/SHADOW_DOC_V2_PRD_SRS.md) |
+| Core Engine, Generator Discovery & Citation Safety Verifier Scripts | [scripts/doc_scaffold.py](scripts/doc_scaffold.py), [scripts/doc_orchestrator.py](scripts/doc_orchestrator.py) & [scripts/reference_verifier.py](scripts/reference_verifier.py) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
+
+Do not load unrelated references unnecessarily.

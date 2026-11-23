@@ -51,8 +51,13 @@ After every `P0` or `P1` incident, generate `docs/incidents/RCA-YYYY-MM-DD-<slug
 
 ## Reference Guide
 
+Load only the specific playbook matching your active post-production maintenance subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| `SEV1`–`SEV4` Incident Triage, Blameless 5-Why RCA Template, Surgical Hotfix Gate & Monthly Harwat Cycle | [references/incident-triage-and-rca-playbook.md](references/incident-triage-and-rca-playbook.md) |
+| `SEV1`–`SEV4` SLA Triage, Evidence Preservation Before Restarts & 3-Point Rollback Compatibility Gate | [references/01-severity-sla-triage-and-containment.md](references/01-severity-sla-triage-and-containment.md) |
+| Surgical Hotfix Minimalism, Red-Before-Green Regression Proof & Post-Hotfix Back-Merge Sync | [references/02-surgical-hotfix-and-regression-gates.md](references/02-surgical-hotfix-and-regression-gates.md) |
+| Blameless 5-Why Postmortem (RCA), Verifiable CAPA Controls & Monthly Harwat / OMKT Maintenance Cycle | [references/03-blameless-rca-capa-and-monthly-harwat.md](references/03-blameless-rca-capa-and-monthly-harwat.md) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

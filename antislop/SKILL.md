@@ -372,3 +372,10 @@ All answers must be **no**:
 - [ ] Is there any major visual decision (color, layout, typography, spacing, cards, illustration) whose reason cannot be written in one line? *(R-31)*
 
 If even one answer is **yes** (or **no** in Block 3), do not deliver. Fix it, re-run the gate, and only then ship. Delivery without a clean gate is a failure.
+
+## Reference Guide
+
+| Topic / Artifact | Load Reference |
+| :--- | :--- |
+| Full Mandatory Rules `R-01` to `R-40` & Carve-Outs | [references/MANDATORY-RULES-R01-R40.md](references/MANDATORY-RULES-R01-R40.md) |
+| Keep-Lean Filter Evaluation Suite & Boundary Red Flags | [evaluations.md](evaluations.md) |

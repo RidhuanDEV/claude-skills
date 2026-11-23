@@ -7,7 +7,7 @@ description: "Cloud, Kubernetes & AI/LLM Token FinOps. Use when analyzing or opt
 
 Use this skill whenever the **Monarch** invokes `/shadow-finops`, investigates cloud/database/AI cost spikes, designs multi-agent or RAG token budgets, or reviews Kubernetes/Terraform infrastructure for production efficiency.
 
-Grounded in industry-canonical specifications documented in [`references/FINOPS-FRAMEWORK-FOCUS-AND-LLM-COST.md`](references/FINOPS-FRAMEWORK-FOCUS-AND-LLM-COST.md):
+Grounded in industry-canonical specifications indexed in the `## Reference Guide` below:
 1. **FinOps Foundation Framework** (`Inform` -> `Optimize` -> `Operate` phases across 4 Domains: *Understand Usage & Cost*, *Quantify Business Value*, *Optimize Usage & Cost*, *Manage the FinOps Practice*) — `https://www.finops.org/framework/`.
 2. **FOCUS (FinOps Open Cost and Usage Specification)** — `https://focus.finops.org/` unified billing schema (`BilledCost`, `EffectiveCost`, `ChargeCategory`, `PricingCategory`, `Tags`).
 
@@ -39,3 +39,17 @@ python "shadow-finops/scripts/finops_cost_auditor.py" --self-test
 ```
 
 Report every optimization with **Current Cost / Risk -> Concrete Change -> Estimated Monthly Savings -> Trade-off (Latency / Reliability)**.
+
+## Reference Guide
+
+Load only the specific playbook matching your active FinOps subtask:
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| FinOps Foundation Framework (`Inform/Optimize/Operate`), FOCUS Schema (`EffectiveCost` vs `BilledCost`), `UNATTRIBUTED_SHARED` Reconciliation & Unit Economics | [references/01-finops-framework-focus-schema-and-unit-economics.md](references/01-finops-framework-focus-schema-and-unit-economics.md) |
+| AI/LLM Token Economics (Thinking Tokens at Output Rate), Static Prefix Prompt Caching, Model Routing & `OWASP LLM10:2025` Caps | [references/02-ai-llm-token-economics-prefix-caching-and-thinking-caps.md](references/02-ai-llm-token-economics-prefix-caching-and-thinking-caps.md) |
+| Cloud, Kubernetes (`requests`/`limits`/HPA), NAT/VPC Gateway Egress, Storage Lifecycle & Non-Prod Hygiene | [references/03-cloud-kubernetes-egress-and-storage-optimization.md](references/03-cloud-kubernetes-egress-and-storage-optimization.md) |
+| Tiered Budgets (`50%/80%/100%`), Hourly Anomaly Burn Alerts, Graceful AI Degradation & CI FinOps Gates | [references/04-budgets-burn-alerts-and-automated-finops-gates.md](references/04-budgets-burn-alerts-and-automated-finops-gates.md) |
+| Deterministic FinOps Cost & Prompt Auditor + Specialist Eval Suite | [scripts/finops_cost_auditor.py](scripts/finops_cost_auditor.py) & [evaluations.md](evaluations.md) |
+
+Do not load unrelated references unnecessarily.

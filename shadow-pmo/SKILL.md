@@ -42,8 +42,14 @@ python "shadow-pmo/scripts/pmo_governance_engine.py" --evaluate-cr path/to/cr_re
 
 ## Reference Guide
 
+Load only the specific playbook or methodology matching your active PMO governance subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| Contractual Precedence CR Triage, PERT (`O/M/P`), CPM Merge Bias, Monte Carlo `P50/P80/P90` & EVM | [references/contractual-cr-pert-and-evm.md](references/contractual-cr-pert-and-evm.md) |
+| 5-Rank Contractual Precedence Hierarchy, Defect vs `PAID_CR` Candidate Triage & CCB/PPK Escalation | [references/01-contractual-precedence-and-defect-vs-paid-cr-triage.md](references/01-contractual-precedence-and-defect-vs-paid-cr-triage.md) |
+| Three-Point PERT (`O/M/P`), CPM Merge Bias, Cycle Validation & Seeded Monte Carlo (`P50`/`P80`/`P90`) | [references/02-pert-cpm-merge-bias-and-monte-carlo-p50-p80-p90.md](references/02-pert-cpm-merge-bias-and-monte-carlo-p50-p80-p90.md) |
+| Earned Value Management (`CPI`/`SPI`/`EAC`/`VAC`), RAID Attribution & Institutional Project Reports | [references/03-evm-tracking-raid-governance-and-project-reporting.md](references/03-evm-tracking-raid-governance-and-project-reporting.md) |
+| Deep Methodology & PMO Templates | [methodologies/CONTRACTUAL-GOVERNANCE-AND-SCHEDULE-RISK.md](methodologies/CONTRACTUAL-GOVERNANCE-AND-SCHEDULE-RISK.md) & [playbooks/PMO-DELIVERABLES-AND-CR-TEMPLATES.md](playbooks/PMO-DELIVERABLES-AND-CR-TEMPLATES.md) |
+| Deterministic PMO Governance Engine & Specialist Eval Suite | [scripts/pmo_governance_engine.py](scripts/pmo_governance_engine.py) & [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

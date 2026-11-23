@@ -126,3 +126,5 @@ Run these alongside the core Delivery Gate when the task touches comments. All a
 - [ ] Is every comment one line, or two only when the second carries a new fact?
 - [ ] Do the remaining comments read short, natural, and in sentence case?
 - [ ] Is the scope guardrail held: only comments changed, the code untouched?
+
+> **Evaluation Suite:** [evaluations.md](evaluations.md)

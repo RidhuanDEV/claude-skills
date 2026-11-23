@@ -38,8 +38,14 @@ python "shadow-modernize/scripts/modernize_forensics_engine.py" --evaluate-optio
 
 ## Reference Guide
 
+Load only the specific playbook or methodology matching your active modernization subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| Static Repo Forensics, 6-Dimension Risk Vector, Strangler Fig vs Rewrite Economics & Coexistence TCO | [references/due-diligence-and-strangler-tco.md](references/due-diligence-and-strangler-tco.md) |
+| `L0_READ_ONLY` Static Forensics, 6-Axis Multi-Dimensional Risk Vectors, `evidence_confidence` & SDK Preservation | [references/01-readonly-forensics-and-multidimensional-risk-vectors.md](references/01-readonly-forensics-and-multidimensional-risk-vectors.md) |
+| 5-Strata Business-Rule Archaeology (Triggers, Cron, Views), External DB Coupling & Characterization Parity | [references/02-business-rule-archaeology-and-characterization-seams.md](references/02-business-rule-archaeology-and-characterization-seams.md) |
+| Strangler Fig vs Rewrite 3–5 Yr Coexistence TCO, Shadow-Compare Parity & Mandatory Slice Retirement | [references/03-strangler-vs-rewrite-coexistence-tco-and-cutover-parity.md](references/03-strangler-vs-rewrite-coexistence-tco-and-cutover-parity.md) |
+| Deep Methodology & Cutover Templates | [methodologies/TECHNICAL-FORENSICS-AND-MIGRATION-ECONOMICS.md](methodologies/TECHNICAL-FORENSICS-AND-MIGRATION-ECONOMICS.md) & [playbooks/DUE-DILIGENCE-AND-CUTOVER-TEMPLATES.md](playbooks/DUE-DILIGENCE-AND-CUTOVER-TEMPLATES.md) |
+| Deterministic Forensics & Economics Engine & Specialist Eval Suite | [scripts/modernize_forensics_engine.py](scripts/modernize_forensics_engine.py) & [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

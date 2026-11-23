@@ -28,32 +28,72 @@ PROBE_ROW_RE = re.compile(r"^\|\s*`?[^|\n-]+`?\s*\|\s*[^|\n]+\|", re.MULTILINE)
 
 # Skills upgraded to the W0+ modular specialist standard
 UPGRADED_SPECIALIST_SKILLS = {
+    "antislop",
+    "antislop-code",
+    "antislop-copywriting",
+    "antislop-human",
+    "antislop-layoutmobile",
+    "antislop-ui",
+    "context7",
+    "handoff",
+    "modern-web-guidance",
     "shadow-accessibility",
     "shadow-ai-eng",
     "shadow-analytics",
     "shadow-api",
+    "shadow-architect",
     "shadow-auth",
+    "shadow-bootstrap",
     "shadow-browser",
     "shadow-cache",
+    "shadow-compat",
     "shadow-concurrency",
     "shadow-data",
     "shadow-db",
     "shadow-debug",
+    "shadow-design",
+    "shadow-discovery",
+    "shadow-doc",
     "shadow-domain",
+    "shadow-ea",
     "shadow-email",
     "shadow-eval",
+    "shadow-finops",
+    "shadow-git",
+    "shadow-grc",
+    "shadow-handover",
     "shadow-integrate",
+    "shadow-maintain",
+    "shadow-mobile",
+    "shadow-modernize",
     "shadow-observe",
+    "shadow-ops",
     "shadow-perf",
+    "shadow-plan",
+    "shadow-pmo",
+    "shadow-presales",
     "shadow-privacy",
     "shadow-quality",
     "shadow-realtime",
+    "shadow-refactor",
+    "shadow-release",
     "shadow-resilience",
     "shadow-search",
     "shadow-sec",
     "shadow-seo",
+    "shadow-supplychain",
     "shadow-test",
+    "shadow-uat",
 }
+
+
+def _is_vendored_upstream_subfile(rel_posix: str) -> bool:
+    """Exclude deep subfiles inside vendored external-upstreams packs tracked by UPSTREAM_PROVENANCE.json,
+    while keeping each upstream pack's README.md entrypoint required in SKILL.md."""
+    parts = rel_posix.split("/")
+    if len(parts) >= 4 and parts[0] == "references" and parts[1] == "external-upstreams":
+        return not (len(parts) == 4 and parts[3].upper() == "README.MD")
+    return False
 
 
 def _count_eval_scenarios(eval_text: str) -> int:
@@ -76,7 +116,11 @@ def audit_skill(skill_dir: Path, strict_eval_required: bool = False) -> dict[str
     text = skill_md_path.read_text(encoding="utf-8", errors="ignore")
     refs_dir = skill_dir / "references"
     ref_files = (
-        sorted(p.relative_to(skill_dir).as_posix() for p in refs_dir.rglob("*.md"))
+        sorted(
+            rel
+            for p in refs_dir.rglob("*.md")
+            if not _is_vendored_upstream_subfile(rel := p.relative_to(skill_dir).as_posix())
+        )
         if refs_dir.exists()
         else []
     )

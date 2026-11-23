@@ -60,8 +60,14 @@ For a contracted operator handover with a local release artifact, run `python sc
 
 ## Reference Guide
 
+Load only the specific playbook matching your active client handover subtask:
+
 | Task / Scenario | Load Reference |
 | :--- | :--- |
-| BAST Deliverable Inventory, Zero-Plaintext Vault Cutover, ToT Operator Readiness & `check_receipt.py` | [references/bast-cutover-and-operator-readiness.md](references/bast-cutover-and-operator-readiness.md) |
+| BAST Deliverable Inventory, Immutable Artifact Provenance, Partial Handover States & `check_receipt.py` | [references/01-bast-deliverable-inventory-and-receipt-verification.md](references/01-bast-deliverable-inventory-and-receipt-verification.md) |
+| Zero-Plaintext Credential Vault Cutover (`<SECRET_REF:...>`), 9-Class Inventory & Two-Sided Vendor Revocation | [references/02-zero-plaintext-vault-cutover-and-access-revocation.md](references/02-zero-plaintext-vault-cutover-and-access-revocation.md) |
+| Role-Segmented Admin/User Manuals, Hands-On ToT Operator Drills (`TOT-01..04`) & Warranty Transition | [references/03-admin-operator-manuals-tot-and-warranty-transition.md](references/03-admin-operator-manuals-tot-and-warranty-transition.md) |
+| Deterministic Artifact Digest & Receipt Presence Checker | [scripts/check_receipt.py](scripts/check_receipt.py) (`python shadow-handover/scripts/check_receipt.py ARTIFACT RECEIPT.json`) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
 
 Do not load unrelated references unnecessarily.

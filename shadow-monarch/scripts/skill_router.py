@@ -484,7 +484,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
-            r"\b(?:design\s+system|wireframe|UI/UX|user\s+flow|thumb\s+zone|design\s+token|komponen\s+UI|antarmuka|interview-script|task[- ]usability)\b",
+            r"\b(?:design\s+systems?|wireframes?|UI/UX|user\s+flows?|thumb\s+zone|design\s+tokens?|9[- ]state\s+(?:component|machine)|"
+            r"Human[- ]AI\s+(?:UX|HITL)|komponen\s+UI|antarmuka|interview-script|task[- ]usability)\b",
             re.IGNORECASE,
         ),
     },
@@ -535,7 +536,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"NFR\s+(?:table|spec|quantif|engineering)|non[- ]functional\s+requirements?|requirements?\s+(?:discovery|elicitation|gap))\b",
             re.IGNORECASE,
         ),
-        "exclude": re.compile(r"\b(?:KAK|tender|RAB|HPS|paid\s+CR)\b", re.IGNORECASE),
+        "exclude": re.compile(
+            r"\b(?:KAK|tender|RAB|HPS|paid\s+CR|decompose\s+(?:the\s+)?(?:approved\s+)?(?:PRD|SRS|BRD)\s+into)\b",
+            re.IGNORECASE,
+        ),
     },
     {
         "skill": "shadow-architect",
@@ -552,7 +556,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "skill": "shadow-plan",
         "layer": "task",
         "references": ["PRODUCT-ANALYSIS.md", "IT-PMO-GOVERNANCE.md"],
-        "include": re.compile(r"\b(?:epic|user\s+story|sprint\s+task|DoR|DoD|task\s+breakdown|vertical\s+slic(?:e|ing)|sprint\s+planning|story\s+decomposition)\b", re.IGNORECASE),
+        "include": re.compile(
+            r"\b(?:epics?|user\s+stor(?:y|ies)|sprint\s+tasks?|DoR|DoD|task\s+breakdown|vertical\s+slic(?:e|ing)|"
+            r"sprint\s+planning|story\s+decomposition|dependency\s+graph)\b",
+            re.IGNORECASE,
+        ),
         "exclude": re.compile(r"\b(?:paid\s+CR|monte\s+carlo|EVM|CPI|SPI)\b", re.IGNORECASE),
     },
     {
@@ -560,7 +568,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["OFFICIAL-FIRST-DEPENDENCY-POLICY.md", "CORE.md", "DEVOPS.md"],
         "include": re.compile(
-            r"\b(?:scaffold\s+new\s+project|scaffold\s+(?:a\s+)?(?:new\s+)?(?:service|CLI|library|worker|app)|greenfield\s+(?:project|service|app|CLI)|"
+            r"\b(?:scaffold\s+new\s+project|scaffold\s+(?:a\s+)?(?:new\s+|greenfield\s+)?(?:(?:HTTP|static|Node|Python|Go|Rust|CLI)\s+)?(?:service|CLI|site|library|worker|app)|"
+            r"greenfield\s+(?:(?:HTTP|static|CLI|worker)\s+)?(?:project|service|site|app|CLI)|preview_scaffold|"
             r"from\s+scratch|from\s+zero|init\s+repository|bootstrap\s+(?:a\s+)?(?:new\s+)?project|buat\s+proyek\s+baru|"
             r"(?:initialize|create|start|buat)\s+(?:a\s+)?new\s+[^\n]{0,30}\b(?:project|app)|create-next-app|create\s+vite)\b",
             re.IGNORECASE,
@@ -683,6 +692,16 @@ UI_ANTISLOP_RE = re.compile(
     r"component|komponen|card|dropdown|dialog|drawer|table|tabel|tabs|sidebar|header|footer|input|select|"
     r"badge|toast|popover|tooltip|accordion|theme|styling|form|modal|navbar|dashboard|tombol|button|layout|"
     r"mobile\s+responsive)\b",
+    re.IGNORECASE,
+)
+UI_STRONG_SIGNAL_RE = re.compile(
+    r"\b(?:UI|frontend|halaman|landing\s+page|CSS|Tailwind|React|Next\.js|Vue|Svelte|Angular|shadcn|"
+    r"component|komponen|card|dropdown|dialog|drawer|tabs|sidebar|footer|badge|toast|popover|tooltip|"
+    r"accordion|theme|styling|form|modal|navbar|dashboard|tombol|button|layout|mobile\s+responsive|data\s+table)\b",
+    re.IGNORECASE,
+)
+SQL_BACKEND_CONTEXT_RE = re.compile(
+    r"\b(?:PostgreSQL|Postgres|MySQL|SQLite|SQL\s+query|CTE|EXPLAIN\s+ANALYZE|PgBouncer|MVCC\s+bloat|database\s+schema|RLS\s+polic(?:y|ies))\b",
     re.IGNORECASE,
 )
 COPYWRITING_RE = re.compile(
@@ -864,7 +883,10 @@ def route_prompt(
 
     always_on_ui: list[str] = []
     if not is_typo_only:
-        if UI_ANTISLOP_RE.search(signal_text):
+        is_pure_sql_without_ui = bool(SQL_BACKEND_CONTEXT_RE.search(signal_text)) and not bool(
+            UI_STRONG_SIGNAL_RE.search(signal_text)
+        )
+        if UI_ANTISLOP_RE.search(signal_text) and not is_pure_sql_without_ui:
             for ui_skill in ("antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "modern-web-guidance"):
                 if ui_skill in known_skills and ui_skill not in matched_ordered and ui_skill not in always_on_ui:
                     always_on_ui.append(ui_skill)
@@ -1884,6 +1906,195 @@ def run_self_test() -> dict[str, Any]:
             ["shadow-accessibility"],
             ["shadow-perf"],
             "shadow-accessibility",
+        ),
+        (
+            "W5-OWNER-RELEASE: SemVer changelog, 8-gate pre-flight, canary abort & rollback owns shadow-release",
+            "Prepare a SemVer 2.0.0 changelog, 8-gate pre-flight release checklist, canary cohort abort thresholds, and rollback runbook.",
+            ["shadow-release"],
+            ["shadow-perf"],
+            "shadow-release",
+        ),
+        (
+            "W5-OWNER-OPS: Non-root Dockerfile, Compose 127.0.0.1 bind, Nginx TLS & systemd owns shadow-ops",
+            "Harden production Dockerfile as non-root, bind docker-compose Postgres port to 127.0.0.1, and configure Nginx TLS reverse proxy with systemd.",
+            ["shadow-ops"],
+            ["shadow-perf"],
+            "shadow-ops",
+        ),
+        (
+            "W5-OWNER-ARCHITECT: Single-system Modular Monolith, C4 diagrams, ADR & module facades owns shadow-architect (not shadow-ea)",
+            "Design a Modular Monolith application architecture with C4 Mermaid diagrams, ADR-001, and typed module public facades instead of microservices.",
+            ["shadow-architect"],
+            ["shadow-ea", "shadow-perf"],
+            "shadow-architect",
+        ),
+        (
+            "W5-OWNER-COMPAT: API backward compatibility, RFC 9745 Deprecation/Sunset & consumer replay owns shadow-compat",
+            "Audit API backward compatibility, emit RFC 9745 Deprecation and RFC 8594 Sunset headers with 410 Gone, and run consumer payload replay.",
+            ["shadow-compat"],
+            ["shadow-perf"],
+            "shadow-compat",
+        ),
+        (
+            "W5-OWNER-BOOTSTRAP: Greenfield CLI/HTTP scaffolding via official CLI generator & preview owns shadow-bootstrap",
+            "Scaffold a greenfield HTTP service in a new target directory using an official CLI generator and vertical-slice preview.",
+            ["shadow-bootstrap"],
+            ["shadow-perf"],
+            "shadow-bootstrap",
+        ),
+        (
+            "W5-OWNER-GIT: git merge-tree dry-run, parallel agent worktrees & safe sync owns shadow-git",
+            "Run git merge-tree dry-run conflict checks, manage isolated parallel agent worktrees, and sync team feature branches safely.",
+            ["shadow-git"],
+            ["shadow-perf"],
+            "shadow-git",
+        ),
+        (
+            "W5-OWNER-SUPPLYCHAIN: CycloneDX SBOM, 40-char SHA CI pinning & SLSA provenance owns shadow-supplychain",
+            "Generate a CycloneDX SBOM from frozen lockfile, pin GitHub Actions to 40-char commit SHA, and verify SLSA provenance attestation.",
+            ["shadow-supplychain"],
+            ["shadow-perf"],
+            "shadow-supplychain",
+        ),
+        (
+            "W5-OWNER-REFACTOR: Behavior-preserving characterization tests, seam extraction & branch-by-abstraction owns shadow-refactor",
+            "Refactor a 400-line legacy billing module safely using characterization tests, seam extraction, and branch-by-abstraction within existing conventions.",
+            ["shadow-refactor"],
+            ["shadow-modernize", "shadow-perf"],
+            "shadow-refactor",
+        ),
+        (
+            "W5-OWNER-MODERN-WEB: Native dialog, Popover API, container queries & LCP fetchpriority activates modern-web-guidance",
+            "Build a modal using native HTML dialog, Popover API, CSS container queries, :has(), and fetchpriority high for Core Web Vitals.",
+            ["modern-web-guidance"],
+            ["shadow-db", "shadow-perf"],
+            None,
+        ),
+        (
+            "W6A-OWNER-DESIGN: 9-state component contracts, semantic tokens, wireframes & Human-AI UX owns shadow-design",
+            "Design a 9-state component contract, semantic design tokens, wireframes, and Human-AI HITL confirmation flow for our approval modal.",
+            ["shadow-design"],
+            ["shadow-perf"],
+            "shadow-design",
+        ),
+        (
+            "W6A-OWNER-DISCOVERY: PRD/SRS requirements elicitation, quantified NFRs & Gherkin acceptance owns shadow-discovery (not presales/pmo)",
+            "Elicit software requirements, write a PRD and SRS with quantified NFRs, and define Given/When/Then acceptance criteria.",
+            ["shadow-discovery"],
+            ["shadow-presales", "shadow-pmo", "shadow-perf"],
+            "shadow-discovery",
+        ),
+        (
+            "W6A-OWNER-PLAN: Epics, vertical User Stories, Sprint Tasks, DAG & DoR/DoD owns shadow-plan (not shadow-pmo)",
+            "Decompose the approved SRS into Epics, vertical User Stories, Sprint Tasks, an acyclic dependency graph, and DoR/DoD gates.",
+            ["shadow-plan"],
+            ["shadow-pmo", "shadow-perf"],
+            "shadow-plan",
+        ),
+        (
+            "W6A-OWNER-UAT: RTM, Staging UAT scenarios, defect triage & Berita Acara UAT owns shadow-uat",
+            "Prepare a Requirement Traceability Matrix (RTM), Staging UAT business scenarios, defect triage log, and Berita Acara UAT sign-off.",
+            ["shadow-uat"],
+            ["shadow-perf"],
+            "shadow-uat",
+        ),
+        (
+            "W6A-OWNER-MAINTAIN: SEV1 production incident triage, blameless RCA, Harwat SLA & surgical hotfix owns shadow-maintain",
+            "Triage a live SEV1 production incident, write a blameless 5-Why postmortem RCA, manage monthly Harwat SLA tickets, and ship a surgical hotfix with regression tests.",
+            ["shadow-maintain"],
+            ["shadow-perf"],
+            "shadow-maintain",
+        ),
+        (
+            "W6A-OWNER-MOBILE: OWASP MASVS v2.1.0, PrivacyInfo.xcprivacy, Play Integrity, 16 KB & App Links owns shadow-mobile (not shadow-browser)",
+            "Audit OWASP MASVS v2.1.0, configure PrivacyInfo.xcprivacy, migrate to Google Play Integrity API, align 16 KB native libraries, and verify Android App Links.",
+            ["shadow-mobile"],
+            ["shadow-browser", "shadow-perf"],
+            "shadow-mobile",
+        ),
+        (
+            "W6A-OWNER-DOC: Canonical JSON AST v2.0 .docx/.pdf/.xlsx export & reference_verifier.py owns shadow-doc",
+            "Generate formal .docx, .pdf, and .xlsx SDLC deliverables from Canonical JSON AST v2.0 and scan downloaded references with reference_verifier.py.",
+            ["shadow-doc"],
+            ["shadow-perf"],
+            "shadow-doc",
+        ),
+        (
+            "W6B-OWNER-HANDOVER: Client BAST, zero-plaintext vault cutover, Admin manuals & ToT owns shadow-handover (not /handoff)",
+            "Prepare the client BAST Berita Acara Serah Terima package, zero-plaintext vault credential transfer manifest, Admin/Operator manuals, and Training of Trainers (ToT).",
+            ["shadow-handover"],
+            ["handoff", "shadow-perf"],
+            "shadow-handover",
+        ),
+        (
+            "W6B-OWNER-GRC: COBIT 2019 Capability vs Maturity, ISO 27001:2022 SoA & POJK 11/2022 + PADK OJK 1/2026 owns shadow-grc",
+            "Audit COBIT 2019 Process Capability vs Maturity, ISO/IEC 27001:2022 93-control Annex A SoA, and POJK 11/2022 + PADK OJK 1/2026 banking IT governance.",
+            ["shadow-grc"],
+            ["shadow-perf"],
+            "shadow-grc",
+        ),
+        (
+            "W6B-OWNER-MODERNIZE: Legacy technical due diligence, business-rule archaeology & Strangler Fig vs Rewrite TCO owns shadow-modernize",
+            "Conduct technical due diligence on an inherited legacy monolith, run business-rule archaeology, and compare Strangler Fig Refactor vs Full Rewrite coexistence TCO.",
+            ["shadow-modernize"],
+            ["shadow-refactor", "shadow-perf"],
+            "shadow-modernize",
+        ),
+        (
+            "W6B-OWNER-PMO: Contractual Precedence Defect vs Paid CR, PERT/CPM Monte Carlo P80 & EVM CPI/SPI owns shadow-pmo",
+            "Triage a client request against Contractual Precedence as Defect vs Paid CR candidate, compute PERT + CPM + Monte Carlo P80 schedule, and evaluate EVM CPI/SPI.",
+            ["shadow-pmo"],
+            ["shadow-plan", "shadow-presales", "shadow-perf"],
+            "shadow-pmo",
+        ),
+        (
+            "W6B-OWNER-PRESALES: KAK tender Bid/No-Bid, 3-scenario workload sizing, 5-yr TCO/NPV & Perpres 46/2025 Provider RAB owns shadow-presales",
+            "Analyze an Indonesian government KAK tender, score Bid/No-Bid, size 3-scenario workload capacity, model 5-year TCO/NPV, and build a Provider RAB/BoQ under Perpres 46/2025.",
+            ["shadow-presales"],
+            ["shadow-pmo", "shadow-perf"],
+            "shadow-presales",
+        ),
+        (
+            "W6B-OWNER-EA: TOGAF 10, Indonesia 6-Domain SPBE + Satu Data, TIME rationalization & ABB vs SBB owns shadow-ea (not shadow-architect)",
+            "Design a multi-system TOGAF 10 and Indonesia 6-Domain SPBE (Perpres 95/2018 & 132/2022) + Satu Data blueprint with TIME application rationalization and ABB vs SBB separation.",
+            ["shadow-ea"],
+            ["shadow-architect", "shadow-perf"],
+            "shadow-ea",
+        ),
+        (
+            "W6B-OWNER-FINOPS: FinOps Framework, FOCUS EffectiveCost, prefix prompt caching & thinking token caps owns shadow-finops",
+            "Audit Kubernetes and LLM token costs under FinOps Framework and FOCUS EffectiveCost, fix dynamic prefix prompt caching leaks, and cap thinking/output token budgets.",
+            ["shadow-finops"],
+            ["shadow-presales", "shadow-perf"],
+            "shadow-finops",
+        ),
+        (
+            "W7-OWNER-CONTEXT7: Version-accurate framework API docs via Context7 owns context7",
+            "Check the latest breaking API in v15 docs via Context7 for Next.js App Router.",
+            ["context7"],
+            ["shadow-perf"],
+            "context7",
+        ),
+        (
+            "W7-OWNER-HANDOFF: AI coding session memory transfer via shadow_handoff MCP owns handoff (not shadow-handover)",
+            "Save our session context with lanjut handoff via shadow_handoff MCP so the next agent continues cleanly.",
+            ["handoff"],
+            ["shadow-handover", "shadow-perf"],
+            "handoff",
+        ),
+        (
+            "W7-NOOP-ANTISLOP-BACKEND: Pure PostgreSQL DB task mentioning 'orders table' must NOT load any antislop UI skills",
+            "Inspect the PostgreSQL database schema, MVCC bloat, and PgBouncer connection pool sizing on the orders table.",
+            ["shadow-db"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-copywriting", "antislop-layoutmobile", "antislop-code"],
+            "shadow-db",
+        ),
+        (
+            "W7-SCOPED-ANTISLOP-CODE: Code comment cleanup activates antislop-code without pulling backend/perf skills",
+            "Clean up AI-slop code comments in orderService.ts while preserving non-obvious why-comments.",
+            ["antislop-code"],
+            ["shadow-db", "shadow-perf"],
+            None,
         ),
     ]
 

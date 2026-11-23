@@ -343,3 +343,11 @@ Run these alongside the core Delivery Gate when the task is UI work. All answers
 - [ ] Does the page hold up at every breakpoint, theme, and state, and pass keyboard-only use? (R-03, R-34, C-4)
 - [ ] Do all custom components consume the project's semantic theme/design tokens (no ad-hoc hardcoded colors or unstyled default widgets clashing with light/dark themes), and do all enabled buttons/controls show `cursor: pointer` + visible `hover`, `active`, `:focus-visible` (3:1), and `disabled` (`cursor: not-allowed`) states? (R-25, R-32, R-34, R-39)
 - [ ] Is every media element sized, the hero image in the HTML with `fetchpriority="high"` and not lazy, no third-party script blocking render, and every reported metric actually measured? (R-40, R-36)
+
+## Reference Guide
+
+| Topic / Artifact | Load Reference |
+| :--- | :--- |
+| Core Web Vitals Thresholds (`LCP`, `INP`, `CLS` Field Measurement) | [references/CORE-WEB-VITALS.md](references/CORE-WEB-VITALS.md) |
+| Production Web Baseline Checklist (Doctype, HTTPS, Pinned Scripts, Secrets) | [references/WEB-BASELINE.md](references/WEB-BASELINE.md) |
+| Keep-Lean UI Filter Evaluation Suite & Boundary Red Flags | [evaluations.md](evaluations.md) |

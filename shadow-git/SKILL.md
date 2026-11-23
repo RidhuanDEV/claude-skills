@@ -1,126 +1,53 @@
 ---
 name: shadow-git
-description: "Safe Team Git & Worktree Collaboration. Use when syncing team branches, running git merge-tree dry-run conflict checks, managing parallel multi-agent worktrees, integrating independent feature branches, or resolving merge conflicts safely."
+description: "Safe Team Git & Worktree Collaboration. Use when syncing team branches, detecting branching strategies, running git merge-tree dry-run conflict & semantic risk checks, managing parallel multi-agent worktrees, integrating independent feature branches, or resolving merge conflicts safely. Do NOT run commit/push/rebase/cleanup without explicit L4 approval."
 ---
 
-# Shadow Git v2.0 (`/shadow-git`) — Branching, Worktree & Parallel Multi-Agent Orchestrator
+# Shadow Git v2.0 (`/shadow-git`) — Branching, Worktrees & Parallel Multi-Agent Orchestrator
 
 Use this skill whenever the **Monarch** asks to manage branches, create/inspect/clean Git worktrees, run parallel agents across isolated features, integrate completed branches independently into `main`, sync unfinished branches with `main`, pull safely, or predict/resolve merge conflicts.
 
-- **Conditional Activation & Read-Only Default**: Do **not** execute Git synchronization or branch mutations automatically merely because a session starts. Always run read-only inspection/previews first (`health`, `predict-conflicts`, or commands without `--approve`) and require explicit **Monarch** authorization before merge, rebase, force-push, branch deletion, or worktree removal.
-- **Detailed Architectural Reference**: Load [`references/WORKTREE-AND-PARALLEL-AGENTS.md`](references/WORKTREE-AND-PARALLEL-AGENTS.md) for the branching strategy matrix, worktree ownership manifest, conflict taxonomy, and recovery playbooks.
+- **Owner:** Branching strategy detection (`FR-01`), isolated Git worktree lifecycle & parallel path-ownership manifests (`FR-02`/`FR-03`), independent integration & safe forward-sync (`FR-04`/`FR-05`), `git merge-tree` + semantic risk prediction (`FR-06`), intent-preserving conflict resolution, and 6-point safe cleanup (`FR-08`).
+- **Boundaries:** SemVer release tagging & production rollout (`shadow-release`), sprint task breakdown (`shadow-plan`), AI session context snapshots (`handoff`), and automated test suite authoring (`shadow-test`).
+
+> [!CAUTION]
+> **Read-Only Default (`L0` vs `L4`):** Never execute Git syncs or mutations merely because a session starts. Run read-only reconnaissance/previews first (`health`, `detect-strategy`, `predict-conflicts`, commands without `--approve`). Executing `--approve` merges, rebases, force-pushes, branch deletions, worktree removals, or `git push` is **`L4_HIGH_IMPACT`** requiring explicit **Monarch** approval (`shadow-monarch/scripts/execution_approval_gate.py`).
+
+## Reference Guide
+
+Load ONLY the 1–2 modular playbooks needed for the active Git collaboration subtask:
+
+| Module | Topic | Load When |
+| :--- | :--- | :--- |
+| [01-branching-strategy-detection-and-safe-sync.md](references/01-branching-strategy-detection-and-safe-sync.md) | `detect-strategy`, read-only pre-pull reconnaissance, dirty-tree backup stash, `SHARED_BRANCH_REBASE_BLOCKED` guard | Pulling teammate updates, syncing feature branches with `main`, checking repo branch model |
+| [02-worktrees-and-parallel-agent-ownership.md](references/02-worktrees-and-parallel-agent-ownership.md) | Sibling worktrees (`worktree-create`), `.git/shadow-worktrees/agents_registry.json`, disjoint `allowed_paths`, `check-parallel-scope`, independent integration | Coordinating parallel developers or multi-agent worktrees without collisions |
+| [03-merge-tree-conflict-prediction-and-semantic-risks.md](references/03-merge-tree-conflict-prediction-and-semantic-risks.md) | `git merge-tree --write-tree`, Hard Git Conflicts vs 4 Semantic Risks (`PARALLEL_SCHEMA_MIGRATIONS`, `API_CONTRACT`, `CONFIG`, `LOCKFILE`), SHA freshness | Predicting merge conflicts and silent cross-branch regressions before merging |
+| [04-collaborative-conflict-resolution-cleanup-and-recovery.md](references/04-collaborative-conflict-resolution-cleanup-and-recovery.md) | Two-sided `git log -p` resolution (zero blind `--ours`/`--theirs`), lockfile regeneration, 6-point `safe-cleanup`, `merge/rebase --abort` recovery | Resolving `UU` conflicts safely, cleaning finished worktrees, or recovering interrupted Git states |
+| [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`GIT-EVAL-01..07`) | Auditing dirty-tree safety, shared-branch rebase blocking, semantic risk checks, and cleanup gates |
 
 ---
 
 ## 1. Natural-Language Intent to Command Routing (`scripts/git_orchestrator.py`)
 
-| Monarch Natural-Language Intent | Orchestrator Command (`python ".../shadow-git/scripts/git_orchestrator.py" ...`) |
+| Monarch Natural-Language Intent | Orchestrator Command (`python "shadow-git/scripts/git_orchestrator.py" ...`) |
 | :--- | :--- |
 | *"Cek strategi branch repo ini"* | `--repo <path> detect-strategy` |
 | *"Cek semua worktree dan branch aktif"* / *"Health report"* | `--repo <path> health --stale-days 14` |
 | *"Buat worktree baru untuk fitur RAG"* | `--repo <path> worktree-create --branch feature-rag --path ../feature-rag --base main --agent Agent-RAG --task TASK-01 --allowed-paths rag/` |
-| *"Kerjakan fitur A dan B secara paralel"* | `worktree-create` for each branch + `--repo <path> check-parallel-scope --base main` |
+| *"Kerjakan fitur A dan B secara paralel"* | `worktree-create` per branch + `--repo <path> check-parallel-scope --base main` |
 | *"Prediksi conflict sebelum merge"* | `--repo <path> predict-conflicts --source <feature-branch> --target main` |
-| *"Branch C sudah selesai, cek apakah aman merge ke main"* | `--repo <path> integrate-feature --branch <branch-C> --target main` *(add `--approve` only after Monarch confirmation)* |
+| *"Branch C sudah selesai, cek apakah aman merge ke main"* | `--repo <path> integrate-feature --branch <branch-C> --target main` *(add `--approve` ONLY after Monarch `L4` confirmation)* |
 | *"Sync branch A dan B dengan main terbaru"* | `--repo <path> sync-from-main --branch <branch-A> --main main --strategy merge` *(add `--approve` to execute)* |
 | *"Bersihkan worktree yang sudah selesai"* | `--repo <path> safe-cleanup --branch <branch-C> --target main --release-agent-lock` *(add `--approve` to execute)* |
 
 ---
 
-## 2. Core Workflows (`FR-01` .. `FR-08`)
+## 2. Core Non-Negotiable Collaboration Invariants
 
-### A. Branching Strategy Detection (`FR-01`)
-Never assume every project uses Git Flow. Run `detect-strategy` first to identify:
-- **Trunk-Based (`main` only)**, **Short-Lived Feature Branches (GitHub Flow)**, **Long-Lived Feature/Research Branches**, **Release/Hotfix Branches**, or **Git Flow (`main` + `develop`)**.
+1. **Disjoint Path Ownership & Serialized Shared Contracts:** Partition parallel worktrees by disjoint `allowed_paths`; serialize shared contracts (`openapi.yaml`, `schema.prisma`, `package.json`, migration indexes) into a base branch or coordinator gate. Record both commit SHAs + merge base on every preview and re-resolve immediately before integration — re-run checks if either moved!
+2. **Semantic Risks Even on Clean `merge-tree`:** Check `PARALLEL_SCHEMA_MIGRATIONS`, `API_CONTRACT_MODIFICATION`, `SHARED_CONFIGURATION_CHANGE`, and `LOCKFILE_DIVERGENCE`, and run producer/consumer contract + typecheck + test suites on the combined integrated tree even when touched paths are disjoint.
+3. **Zero Blind `--ours`/`--theirs` & 6-Point Safe Cleanup:** Inspect both sides' `git log -p`, merge both intents cleanly (`0 any`/`0 as Type`), regenerate lockfiles via package manager, verify `git diff --check` + tests, and require all 6 checks (`0` uncommitted, `0` untracked, `0` unmerged commits, not checked out elsewhere, no active lock/merge/rebase, explicit `--approve`) before removing worktrees/branches.
 
-### B. Git Worktree Lifecycle & Parallel Multi-Agent Isolation (`FR-02`, `FR-03`)
-When multiple agents work in parallel (e.g., `Tejas/main`, `Tejas/feature-rag`, `Tejas/feature-sitaba`, `Tejas/feature-export`):
-1. Create an isolated worktree per agent via `worktree-create` (automatically blocks if the branch is already checked out elsewhere or if the target directory is non-empty).
-2. Each worktree registers an ownership & scope manifest (`.git/shadow-worktrees/agents_registry.json`) with `agent_id`, `task_id`, `allowed_paths`, and `depends_on_branches`.
-3. Run `check-parallel-scope` to detect if two parallel worktrees are modifying the same shared file or violating their allowed path scope.
-4. When pausing an agent's worktree, save state via `/handoff` (`shadow_handoff` MCP).
-
-### C. Independent Feature Integration (`FR-04`)
-When Branch C (`feature-export`) is completed while Branch A (`feature-rag`) and Branch B (`feature-sitaba`) are still in progress:
-1. Run `integrate-feature --branch feature-export --target main` (Read-Only Preview) to verify:
-   - Worktrees are clean (`0` uncommitted/untracked files).
-   - Required `depends_on_branches` are already merged.
-   - Zero Git conflicts (`git merge-tree --write-tree`) and semantic risks are listed.
-2. Run `/shadow-test` and `/shadow-sec` inside Branch C's worktree.
-3. Upon explicit **Monarch** approval, execute `integrate-feature --branch feature-export --target main --approve` (or open a PR per repository policy without bypassing protected branch rules).
-
-### D. Forward Integration / Sync From Main (`FR-05`)
-After Branch C merges into `main`, bring updated `main` into unfinished branches A and B:
-1. Default to `--strategy merge` (`git merge --no-ff main`) for shared, published, or long-lived branches.
-2. **Shared-Branch Rebase Guard**: `sync-from-main` automatically blocks `--strategy rebase` if the branch tracks a remote upstream or is marked shared (`SHARED_BRANCH_REBASE_BLOCKED`). Never force-push without explicit approval and risk disclosure.
-3. Predicts conflicts and blocks if the target worktree has uncommitted/untracked changes (`DIRTY_WORKTREE_PROTECTED`).
-
-### E. Enhanced Conflict Prediction: Git Conflicts vs Semantic Risks (`FR-06`)
-`predict-conflicts` distinguishes:
-- **Hard Git Conflicts**: Content conflicts, rename/delete conflicts, file mode changes, and divergent histories.
-- **Semantic Integration Risks** (flagged even when Git merge is clean):
-  - `PARALLEL_SCHEMA_MIGRATIONS`: Both branches added DB migration files (`/shadow-data`).
-  - `API_CONTRACT_MODIFICATION`: Changes to `openapi.yaml`, routes, controllers, `.proto`, `.graphql` (`/shadow-api`).
-  - `SHARED_CONFIGURATION_CHANGE`: Edits to `.env*`, `package.json`, `tsconfig.json`, `docker-compose.yml`.
-  - `LOCKFILE_DIVERGENCE`: Concurrent lockfile updates.
-
-### F. 6-Point Safe Cleanup Gate (`FR-08`)
-`safe-cleanup` refuses to remove a worktree or delete a branch unless all 6 checks pass:
-1. Zero staged or unstaged changes (`UNCOMMITTED_CHANGES`).
-2. Zero untracked files (`UNTRACKED_FILES_PRESENT`).
-3. Zero unmerged commits relative to target branch (`UNMERGED_COMMITS`).
-4. Not checked out in another active worktree (`BRANCH_CHECKED_OUT_IN_WORKTREE`).
-5. No active agent ownership lock unless `--release-agent-lock` is confirmed (`ACTIVE_AGENT_OWNERSHIP`), and zero ongoing `MERGE`/`REBASE`/`CHERRY_PICK` operations.
-6. Explicit `--approve` flag provided after **Monarch** confirmation.
-
----
-
-## 3. Preserved v1.0 Team Branch Sync & Conflict Resolution Protocol
-
-### Phase 1: Safe Pre-Pull Reconnaissance (Zero Working-Tree Mutation)
 ```powershell
-git status -sb
-git branch -vv
-git fetch --all --prune
-git log HEAD..origin/<target-branch> --oneline --stat
-git merge-tree --write-tree HEAD origin/<target-branch>
+python -m unittest discover -s shadow-git/tests -v
 ```
-
-### Phase 2: Safe Pull Execution Protocol
-- **Clean working tree & `0` conflicts**:
-  - `0` ahead commits: `git pull --ff-only origin <target-branch>`
-  - Diverged (`>0` ahead, `0` conflicts): `git pull --no-rebase origin <target-branch>`
-- **Uncommitted local changes exist**:
-  - Create an explicit named backup stash (including untracked files) only when authorized:
-    ```powershell
-    git stash push -u -m "shadow-pre-pull-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-    ```
-  - Pull safely, then restore with `git stash pop` (never run implicit `stash drop`).
-
-### Phase 3: Intelligent Collaborative Conflict Resolution
-1. List conflicted files: `git diff --name-only --diff-filter=U`
-2. Inspect both sides' commit intent:
-   - `git log -p -n 3 HEAD -- <file>`
-   - `git log -p -n 3 origin/<target-branch> -- <file>`
-3. **Never Blindly Apply `--ours` or `--theirs` on Source Code**:
-   - Combine both contracts cleanly (`0 any`, `0 as Type` casting, zero dead code).
-   - Regenerate lockfiles via the package manager (`npm install --package-lock-only`) after merging manifests.
-4. Verify resolution: `git diff --check` + run project typecheck, linter, and unit tests (`/shadow-test`).
-
----
-
-## 4. Ecosystem Integration Boundaries (`FR-09`)
-
-- **`/shadow-monarch`**: Enforces approval gates, strict typing during conflict resolution, and read-only default behavior.
-- **`/shadow-plan`**: Maps `TASK-*` IDs and `depends_on_branches` to isolated worktrees.
-- **`/shadow-test`**: Runs module & integration regression tests inside each worktree before `integrate-feature` and after `sync-from-main`.
-- **`/shadow-sec`**: Runs secret scanning and ASVS access-control checks before merging into `main`.
-- **`/shadow-release`**: Verifies release tags, migration backward compatibility, and rollback SHAs after `main` integration.
-- **`/handoff`**: Persists worktree path, branch name, and active task state across AI agent sessions (`shadow_handoff` MCP).
-
-## 5. Parallel Worktree Path-Ownership & Reconciliation Protocol
-
-- **Explicit Path-Ownership Invariant**: Before spawning parallel worktrees or swarm workers, partition modified file paths so each worktree owns a disjoint set of directories/files. Shared contracts (`openapi.yaml`, `schema.prisma`, `package.json`, shared types/router indexes) MUST NOT be edited concurrently by multiple feature branches; assign shared contracts to a serialized coordinator gate or prerequisite base branch first.
-- Record both commit SHAs and the merge base with each preview. Re-resolve both refs immediately before integration. When either moves, repeat preview and contract checks against the new pair. Include producer/consumer contract tests even when the touched paths are disjoint.
-- **Deterministic Post-Merge Reconciliation**: After integrating worktrees sequentially into an integration branch, run cross-boundary checks (`typecheck`, `openapi` validation, integration tests, and `/shadow-quality` drift checks) on the combined tree before cleanup. Conflict resolution MUST merge both worktrees' semantic invariants rather than taking `--ours`/`--theirs` blindly.
-- **Execution Approval Boundary (`L0` vs `L4`)**: Read-only `status`/`diff`/`merge-tree` diagnostics are `L0_READ_ONLY`, whereas `--approve` branch integration, rebase, force cleanup, or `git push` are **`L4: HIGH_IMPACT`** requiring explicit Monarch authorization (`shadow-monarch/scripts/execution_approval_gate.py`).

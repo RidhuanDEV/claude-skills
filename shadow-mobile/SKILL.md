@@ -7,7 +7,7 @@ description: "Mobile Build, MASVS v2.1.0 & Store Release Engineering. Use when h
 
 Use this skill whenever the **Monarch** invokes `/shadow-mobile`, configures Android/iOS/Flutter/React Native production builds, sets up deep links or attestation, or prepares binaries for Google Play Console or Apple App Store Connect submission.
 
-Grounded in authoritative standards and platform rules documented in [`references/MASVS-2-1-AND-STORE-RELEASE-GATES.md`](references/MASVS-2-1-AND-STORE-RELEASE-GATES.md):
+Grounded in authoritative standards and platform rules indexed in the `## Reference Guide` below:
 1. **OWASP MASVS v2.1.0 (Mobile Application Security Verification Standard)** — `https://mas.owasp.org/MASVS/` (`MASVS-STORAGE`, `MASVS-CRYPTO`, `MASVS-AUTH`, `MASVS-NETWORK`, `MASVS-PLATFORM`, `MASVS-CODE`, `MASVS-RESILIENCE`, `MASVS-PRIVACY`).
 2. **Apple App Store & `PrivacyInfo.xcprivacy` Requirements** + **Google Play Policy, `targetSdkVersion` & Play Integrity API**.
 
@@ -50,3 +50,18 @@ Report findings with exact `MASVS ID / Store Policy`, `file:line`, impact (rejec
 Use official CLI generators (`create-expo-app`, `flutter create`) and non-destructively verified packages with pinned versions per `shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md` (`official_first_verifier.py`).
 
 Bind release advice to the shipping channel, build variant and artifact digest. Source scans exclude build output. Inspect the merged manifest or signed package with the project's existing build tools for final effective settings. For storage changes exercise upgrade from a supported installed version with existing data and interrupted migration. Record whether old clients can still use the deployed service.
+
+## Reference Guide
+
+Load only the specific playbook matching your active mobile security or store-release subtask:
+
+| Task / Scenario | Load Reference |
+| :--- | :--- |
+| OWASP MASVS v2.1.0 (`STORAGE`, `CRYPTO`, `AUTH`, `NETWORK`, `PLATFORM`, `CODE`), Rotatable SPKI Pinning & Merged Manifest Checks | [references/01-owasp-masvs-v21-storage-crypto-network-platform.md](references/01-owasp-masvs-v21-storage-crypto-network-platform.md) |
+| iOS App Store Compliance, `PrivacyInfo.xcprivacy` (`ITMS-91053`), ATS, Sign in with Apple & Server-Verified App Attest | [references/02-ios-app-store-privacy-manifest-and-app-attest.md](references/02-ios-app-store-privacy-manifest-and-app-attest.md) |
+| Google Play Console `.aab`, 16 KB ELF Page Alignment (`NDK r27+`), Signing Hygiene & Server-Verified Play Integrity API | [references/03-android-play-console-16kb-signing-and-integrity.md](references/03-android-play-console-16kb-signing-and-integrity.md) |
+| Verified Universal Links / App Links (`AASA` / `assetlinks.json`), In-Place Upgrade Migrations & Maestro/Detox E2E | [references/04-deep-links-upgrade-migrations-and-maestro-e2e.md](references/04-deep-links-upgrade-migrations-and-maestro-e2e.md) |
+| Automated Mobile MASVS & Store Release Gate Auditor | [scripts/mobile_release_gate.py](scripts/mobile_release_gate.py) (`python shadow-mobile/scripts/mobile_release_gate.py --self-test`) |
+| Specialist Evaluation Suite & Behavioral Red Flags | [evaluations.md](evaluations.md) |
+
+Do not load unrelated references unnecessarily.
