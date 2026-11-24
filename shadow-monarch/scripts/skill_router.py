@@ -71,11 +71,12 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["TOKEN-EFFICIENCY.md"],
         "include": re.compile(
-            r"\b(?:lanjut\s+handoff|load\s+handoff|merge\s+handoff|session\s+handoff|context\s+(?:full|penuh|compaction)|simpan\s+sesi)\b",
+            r"\b(?:lanjut\s+handoff|load\s+handoff|merge\s+handoff|session\s+handoff|simpan\s+handoff|"
+            r"(?:tolong|minta|lakukan)\s+handoff|context\s+(?:udah|sudah|full|penuh|compaction)\s*(?:penuh)?|simpan\s+sesi)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
-            r"\b(?:BAST|serah\s+terima\s+klien|admin\s+manual|operator\s+manual|training\s+of\s+trainers)\b",
+            r"\b(?:BAST|serah\s+terima\s+klien|admin\s+manual|operator\s+manual|training\s+of\s+trainers|client\s+handover)\b",
             re.IGNORECASE,
         ),
     },
@@ -308,6 +309,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["BACKEND.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
             r"\b(?:REST\s+API|API\s+(?:endpoint|documentation)|dokumentasi\s+API|backend\s+endpoint|endpoint\s+backend|"
+            r"(?:buat(?:kan)?|build|create)\s+(?:an?\s+)?endpoint|endpoint\s+CRUD|CRUD\s+(?:API|endpoint)|"
             r"endpoint\s+(?:Express|FastAPI|NestJS|Hono|Laravel|Go|REST)|\b(?:GET|POST|PUT|PATCH|DELETE)\s+/[a-z0-9_/:.-]+|"
             r"OpenAPI|openapi\.yaml|Swagger|Postman|Bruno|\.bru\b|Scalar|Redoc|Insomnia|TypeSpec|"
             r"HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457|"
@@ -332,7 +334,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DATABASE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
             r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|"
-            r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock|"
+            r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|slow\s+query|query\s+[^\n]{0,35}\blambat|N\+1|SELECT\s+\*\s+FROM|"
+            r"Prisma\s+(?:query|N\+1|backend|schema)|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock|"
             r"PgBouncer|transaction\s+pooling|SQLite\s+WAL|MongoDB|TimescaleDB|ClickHouse|connection\s+pool\s+sizing|"
             r"Row[- ]Level\s+Security|\bRLS\b\s+(?:policy|policies|index)|auth\.uid\(\)|SECURITY\s+DEFINER|Supabase\s+(?:Postgres|RLS|index))\b",
             re.IGNORECASE,
@@ -343,7 +346,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:database\s+migration|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|"
+            r"\b(?:database\s+migration|migrasi\s+(?:database|skema|DB)|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|"
             r"deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock|"
             r"Debezium|CDC\s+pipeline|online\s+DDL|pg_repack|gh-ost|NOT\s+VALID\s+constraint|CONCURRENTLY\s+index)\b",
             re.IGNORECASE,
@@ -695,13 +698,28 @@ UI_ANTISLOP_RE = re.compile(
     re.IGNORECASE,
 )
 UI_STRONG_SIGNAL_RE = re.compile(
-    r"\b(?:UI|frontend|halaman|landing\s+page|CSS|Tailwind|React|Next\.js|Vue|Svelte|Angular|shadcn|"
-    r"component|komponen|card|dropdown|dialog|drawer|tabs|sidebar|footer|badge|toast|popover|tooltip|"
-    r"accordion|theme|styling|form|modal|navbar|dashboard|tombol|button|layout|mobile\s+responsive|data\s+table)\b",
+    r"\b(?:UI|frontend|landing\s+page|CSS|Tailwind|React|Next\.js|Vue|Svelte|Angular|shadcn|"
+    r"component|komponen|dropdown|dialog|drawer|tabs|sidebar|badge|toast|popover|tooltip|"
+    r"accordion|theme|styling|modal|navbar|dashboard|tombol|button|layout|mobile\s+responsive|data\s+table)\b",
+    re.IGNORECASE,
+)
+NON_UI_HOMOGRAPH_RE = re.compile(
+    r"\b(?:"
+    r"(?:HTTP|request|response|email|auth(?:orization)?|security|CORS|cache|deprecation|sunset|custom|MIME)\s+headers?|"
+    r"headers?\s+(?:injection|Authorization|X-[A-Za-z0-9-]+|validation)|"
+    r"(?:credit|debit|payment|gift|smart|id|sim|loyalty|business)\s+cards?|"
+    r"(?:validasi|validate|validat\w*|sanitiz\w*|untrusted|client|user|API|DTO|Zod|schema|malformed|invalid|raw|prompt)\s+inputs?|"
+    r"inputs?\s+(?:validation|Zod|schema|DTO|sanitiz\w*)|"
+    r"multipart(?:\s*/\s*|\s+)form[- ]data|form[- ]urlencoded|"
+    r"SELECT\s+(?:\*|[a-z0-9_.,\s]{1,40})\s+FROM\b|"
+    r"(?:orders|users|products|invoices|payments|audit|logs|database|SQL|Postgres|PostgreSQL|MySQL|SQLite)\s+tables?|"
+    r"tables?\s+(?:index|lock|migration|schema|bloat|partition|column)|"
+    r"SEO\s+halaman|halaman\s+[^\n]{0,40}\b(?:SEO|JSON-LD|sitemap\.xml|robots\.txt|canonical|hreflang)"
+    r")\b",
     re.IGNORECASE,
 )
 SQL_BACKEND_CONTEXT_RE = re.compile(
-    r"\b(?:PostgreSQL|Postgres|MySQL|SQLite|SQL\s+query|CTE|EXPLAIN\s+ANALYZE|PgBouncer|MVCC\s+bloat|database\s+schema|RLS\s+polic(?:y|ies))\b",
+    r"\b(?:PostgreSQL|Postgres|MySQL|SQLite|SQL\s+query|CTE|EXPLAIN\s+ANALYZE|PgBouncer|MVCC\s+bloat|database\s+schema|RLS\s+polic(?:y|ies)|Prisma\s+(?:query|N\+1|backend)|N\+1)\b",
     re.IGNORECASE,
 )
 COPYWRITING_RE = re.compile(
@@ -717,7 +735,10 @@ TYPO_ONLY_RE = re.compile(
     r"perbaiki\s+typo\s+(?:di\s+)?[^\n]{0,40}(?:README|\.(?:md|txt))|only\s+typo)\b",
     re.IGNORECASE,
 )
-TRIVIAL_FACT_RE = re.compile(r"^\s*(?:apa\s+itu|what\s+is|berapa|bagi\s+benchmark|knp|kenapa)\b", re.IGNORECASE)
+TRIVIAL_FACT_RE = re.compile(
+    r"^\s*(?:apa\s+itu|apa\s+bedanya|bedanya|what\s+is|difference\s+between|jelaskan\s+singkat|berapa|bagi\s+benchmark|knp|kenapa)\b",
+    re.IGNORECASE,
+)
 NON_TRIVIAL_INCIDENT_RE = re.compile(
     r"\b(?:API|error|500|40[0-9]|timeout|crash|bug|gagal|production|staging|DB|database|server|query|endpoint|"
     r"slow|lambat|tagihan|cost|token|cloud|K8s)\b",
@@ -790,6 +811,79 @@ def _strip_non_authoritative_signals(prompt: str) -> str:
     return cleaned
 
 
+PLAYBOOK_LINK_RE = re.compile(r"\[[^\]]+\]\((references/[^)#\s]+\.md)\)")
+STOPWORDS = {
+    "the", "and", "for", "with", "that", "this", "from", "into", "when", "only", "use", "using",
+    "yang", "dan", "untuk", "dengan", "dari", "pada", "atau", "tolong", "bantu", "buat", "buatkan",
+    "kita", "kami", "agar", "supaya", "lebih", "tidak", "jangan", "bisa", "juga", "saja", "apa",
+}
+
+
+def _tokenize_keywords(text: str) -> set[str]:
+    return {
+        tok
+        for tok in re.findall(r"[a-z0-9]{3,}", text.lower())
+        if tok not in STOPWORDS
+    }
+
+
+def _recommend_skill_playbooks(
+    prompt: str,
+    companion_skills: list[str],
+    primary_skill: str,
+    repo_root: Path = REPO_ROOT,
+    max_total: int = 4,
+) -> list[str]:
+    """2-Step Progressive Loading helper: select 1-2 matching references/*.md playbooks from loaded skills' Reference Guides."""
+    if not companion_skills:
+        return []
+    prompt_tokens = _tokenize_keywords(prompt)
+    selected: list[str] = []
+    seen: set[str] = set()
+
+    for skill in companion_skills:
+        if len(selected) >= max_total:
+            break
+        skill_md = repo_root / skill / "SKILL.md"
+        if not skill_md.is_file():
+            continue
+        text = skill_md.read_text(encoding="utf-8", errors="ignore")
+        guide_idx = text.find("## Reference Guide")
+        section = text[guide_idx:] if guide_idx != -1 else text
+
+        candidates: list[tuple[int, int, str]] = []
+        order = 0
+        for line in section.splitlines():
+            if "references/" not in line:
+                continue
+            for match in PLAYBOOK_LINK_RE.finditer(line):
+                rel_ref = match.group(1)
+                if not (repo_root / skill / rel_ref).is_file():
+                    continue
+                full_rel = f"{skill}/{rel_ref}"
+                if full_rel in seen:
+                    continue
+                row_tokens = _tokenize_keywords(f"{line} {Path(rel_ref).stem.replace('-', ' ')}")
+                score = len(prompt_tokens & row_tokens)
+                candidates.append((score, order, full_rel))
+                order += 1
+
+        if not candidates:
+            continue
+        candidates.sort(key=lambda item: (-item[0], item[1]))
+        per_skill_limit = 2 if skill == primary_skill else 1
+        picked = 0
+        for score, _, full_rel in candidates:
+            if picked >= per_skill_limit or len(selected) >= max_total:
+                break
+            if score > 0 or (skill == primary_skill and picked == 0):
+                selected.append(full_rel)
+                seen.add(full_rel)
+                picked += 1
+
+    return selected
+
+
 def _compute_disclosure_metrics(
     companion_skills: list[str],
     always_on_ui: list[str],
@@ -848,7 +942,9 @@ def route_prompt(
     excluded_records: list[dict[str, str]] = []
 
     is_typo_only = bool(TYPO_ONLY_RE.search(signal_text)) and not explicit_skills
-    is_definitional_query = bool(re.match(r"^\s*(?:apa\s+itu|what\s+is|what\s+does)\b", signal_text, re.IGNORECASE))
+    is_definitional_query = bool(
+        re.match(r"^\s*(?:apa\s+itu|apa\s+bedanya|bedanya|what\s+is|what\s+does|difference\s+between|jelaskan\s+singkat)\b", signal_text, re.IGNORECASE)
+    )
     is_trivial_fact = (
         bool(TRIVIAL_FACT_RE.match(signal_text))
         and not explicit_skills
@@ -883,10 +979,11 @@ def route_prompt(
 
     always_on_ui: list[str] = []
     if not is_typo_only:
+        ui_signal_text = NON_UI_HOMOGRAPH_RE.sub(" ", signal_text)
         is_pure_sql_without_ui = bool(SQL_BACKEND_CONTEXT_RE.search(signal_text)) and not bool(
-            UI_STRONG_SIGNAL_RE.search(signal_text)
+            UI_STRONG_SIGNAL_RE.search(ui_signal_text)
         )
-        if UI_ANTISLOP_RE.search(signal_text) and not is_pure_sql_without_ui:
+        if UI_ANTISLOP_RE.search(ui_signal_text) and not is_pure_sql_without_ui:
             for ui_skill in ("antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "modern-web-guidance"):
                 if ui_skill in known_skills and ui_skill not in matched_ordered and ui_skill not in always_on_ui:
                     always_on_ui.append(ui_skill)
@@ -1040,6 +1137,7 @@ def route_prompt(
     requires_api_docs_decision = asks_generic_api_docs and readme_summary_only and not has_active_api_doc_gen
 
     final_refs = [] if is_trivial else matched_refs[:4]
+    recommended_playbooks = [] if is_trivial else _recommend_skill_playbooks(signal_text, companion_skills, primary_skill)
     disclosure_metrics = _compute_disclosure_metrics(companion_skills, always_on_ui, final_refs, is_trivial)
 
     denied_actions = ["load_test", "stress_test", "soak_test"] if is_code_review or is_load_test_denied else []
@@ -1052,6 +1150,7 @@ def route_prompt(
         "primary_skill": primary_skill,
         "supporting_skills": supporting_skills,
         "risk_review_skills": risk_review_skills,
+        "recommended_playbooks": recommended_playbooks,
         "activation_reason": activation_reason,
         "excluded_skills": excluded_records,
         "required_permissions": required_perms,
@@ -1089,6 +1188,7 @@ def route_prompt(
         "companion_skills": companion_skills,
         "always_on_ui_skills": always_on_ui,
         "reference_modules": final_refs,
+        "recommended_playbooks": recommended_playbooks,
         "excluded_skills": excluded_records,
         "disclosure_metrics": disclosure_metrics,
         "routing_decision": decision_record,
@@ -2095,6 +2195,76 @@ def run_self_test() -> dict[str, Any]:
             ["antislop-code"],
             ["shadow-db", "shadow-perf"],
             None,
+        ),
+        (
+            "ADV-HOMOGRAPH-HTTP-HEADER: Express HTTP header validation must NOT load UI antislop skills",
+            "Tambahkan validasi HTTP header Authorization dan X-Request-Id di REST API endpoint Express.",
+            ["shadow-api"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-api",
+        ),
+        (
+            "ADV-HOMOGRAPH-CREDIT-CARD: Midtrans credit card webhook must NOT load UI antislop skills",
+            "Integrasikan pembayaran credit card dan QRIS lewat Midtrans webhook HMAC signature.",
+            ["shadow-integrate"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-integrate",
+        ),
+        (
+            "ADV-HOMOGRAPH-ZOD-INPUT: Backend Zod input validation must NOT load UI antislop skills",
+            "Perbaiki validasi input Zod untuk POST /api/v1/orders supaya menolak amount negatif.",
+            ["shadow-api"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-api",
+        ),
+        (
+            "ADV-HOMOGRAPH-MULTIPART-FORM: S3 multipart form-data upload must NOT load UI antislop skills",
+            "Implementasikan multipart form-data upload file PDF ke S3 dengan presigned URL.",
+            ["shadow-api"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-api",
+        ),
+        (
+            "ADV-HOMOGRAPH-SQL-SELECT-N1: Prisma N+1 SELECT * FROM users table owns shadow-db with zero UI skills",
+            "Perbaiki query SELECT * FROM users table yang lambat karena N+1 di Prisma backend.",
+            ["shadow-db"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-db",
+        ),
+        (
+            "ADV-HOMOGRAPH-EMAIL-HEADER: Email header injection SPF/DKIM/DMARC must NOT load UI antislop skills",
+            "Audit email header injection dan SPF DKIM DMARC alignment untuk transactional email.",
+            ["shadow-email"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-email",
+        ),
+        (
+            "ADV-HOMOGRAPH-SEO-HALAMAN: Pure JSON-LD & sitemap.xml SEO on halaman produk must NOT load UI styling skills",
+            "Perbaiki SEO halaman produk kami, tambahkan JSON-LD schema dan sitemap.xml.",
+            ["shadow-seo"],
+            ["antislop", "antislop-ui", "antislop-human", "antislop-layoutmobile", "modern-web-guidance"],
+            "shadow-seo",
+        ),
+        (
+            "ADV-ID-CRUD-MIGRASI: Indonesian endpoint CRUD + migrasi database routes to shadow-api and shadow-data",
+            "Tolong buatkan endpoint CRUD master produk beserta migrasi database dan testnya.",
+            ["shadow-api", "shadow-data"],
+            ["antislop", "shadow-perf"],
+            "shadow-api",
+        ),
+        (
+            "ADV-ID-HANDOFF-NATURAL: Indonesian casual context full + tolong handoff routes to handoff",
+            "Context udah penuh nih, tolong handoff dulu ya.",
+            ["handoff"],
+            ["shadow-handover", "antislop"],
+            "handoff",
+        ),
+        (
+            "ADV-ID-TRIVIAL-BEDANYA: Indonesian definitional question hits L0 trivial fast path with 0 skills/refs",
+            "Bedanya HTTP 401 dan 403 apa sih?",
+            [],
+            ["shadow-auth", "shadow-api", "antislop"],
+            "shadow-monarch",
         ),
     ]
 

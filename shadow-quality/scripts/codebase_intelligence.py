@@ -791,7 +791,7 @@ def audit_convention_drift(
             stem = f.stem.split(".")[0]
             if stem not in ("index", "main", "app", "server", "setup", "conftest") and not stem.startswith("_"):
                 det_naming = profile.naming_conventions.detected
-                if "kebab-case" in det_naming and "_" in stem:
+                if "kebab-case" in det_naming and "_" in stem and f.suffix != ".py":
                     violations.append({
                         "severity": "MEDIUM",
                         "code": "INCONSISTENT_NAMING",

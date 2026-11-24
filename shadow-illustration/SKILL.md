@@ -12,6 +12,8 @@ description: "Full-Spectrum Visual, Illustration & Graphics Engineering. Use whe
 3. Establish a master and review one representative asset before expanding. Read only the applicable playbooks below. Include a reference comparison, contact sheet, or timeline frames when they help verify the requested work.
 4. Deliver the requested sources and exports. Record provenance, runtime paths, and separate verification results using [export and handoff](references/asset-export-and-optimization.md).
 
+## Reference Guide
+
 | Task | Load |
 |---|---|
 | Define a style or review a visual family | [Art direction](references/art-direction.md), [composition and color](references/composition-and-color.md) |

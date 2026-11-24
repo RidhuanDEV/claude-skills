@@ -31,7 +31,9 @@ scenes ─► validate ─► e2e (GUI proof) ─► tts ─► record ─► me
 
 Never skip E2E before recording: a failed recording costs minutes and TTS quota; a failed E2E costs seconds.
 
-## Load only what the task needs
+## Reference Guide
+
+Load only what the task needs:
 
 | Task | Read |
 |---|---|

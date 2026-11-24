@@ -35,65 +35,16 @@ contracts, strict types, clean dead-code elimination, **sovereign token efficien
 - **High-Density Output**: use surgical line replacements (`replace_file_content`) instead of full-file rewrites; never paste
   large unchanged code blocks into chat after editing on disk; omit conversational filler.
 
-## Source, type, and artifact discipline
+## Source, Type, Contract & Governance Discipline
 
-- Read applicable `AGENTS.md`, project instructions, README, manifests, lockfiles, and relevant
-  implementation before editing. Preserve unrelated work and the project's established conventions.
-- Trace the affected contract from route/controller and validation through service, persistence,
-  serialization, and consumers. Check maintained OpenAPI/schema/generated types and API collections
-  such as Bruno where available. Report disagreements between specifications and implementation.
-- Derive field names, requiredness, nullability, enums, identifiers, envelopes, errors, pagination,
-  authorization, and state transitions from those sources. A database entity alone does not establish
-  the HTTP contract. Do not invent missing fields or silently widen a type to conceal a discrepancy.
-- **Strict TypeScript & Typing Discipline**:
-  - Do not introduce explicit or inferred TypeScript `any`, Python `Any`, or equivalent untyped
-    application contracts. All domain models, DTOs, props, state, and return types must be explicitly defined.
-  - **Zero Typecasting**: do not use type assertions/typecasting (`as Type`, `<Type>`, `as unknown as Type`),
-    non-null assertions (`!`), compiler suppression (`@ts-ignore`, `@ts-expect-error`), or disabled strict checks.
-  - **Boundary-Only `unknown`**: allow `unknown` strictly at raw external boundaries (e.g., `JSON.parse`, raw webhook/API
-    input, or `catch (e: unknown)`) and immediately narrow or validate it with a runtime schema/type guard into a
-    concrete defined type before use. Never propagate `unknown` into application or domain logic.
-- Preserve omitted versus null, false versus absent, and number versus string distinctions when the
-  source contract makes them meaningful. Define schemas and DTOs from the same verified facts.
-- Do not add aliases, fallback response shapes, guessed endpoints, or speculative backward
-  compatibility. Implement compatibility only when supported versions, existing consumers, or an
-  explicit requirement establish its need. If evidence is missing, state what is unknown, ask for
-  the necessary source, and continue independent work; do not present a guess as a verified contract.
-- **Dead Code Cleanup**: whenever refactoring frontend or backend code, actively remove dead code
-  (unused functions, orphan DTOs/types, dead props/state/components, obsolete helpers, commented-out blocks).
-- **Source-Driven Document Rule (`.docx` / Generated Docs)**: never directly edit generated `.docx` (or `.pdf`/`.xlsx`)
-  output files. Always make changes in the base source files (`.md`, templates, or data resources) referenced by the
-  generator and regenerate the output.
-- **Automatic Anti-Slop Integration (`antislop`)**: whenever the task involves UI/Frontend, responsive/mobile layout,
-  accessibility, copywriting, or code comments, automatically enforce the installed `antislop` skills (`antislop`,
-  `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `antislop-copywriting`, `antislop-code`) in `during` mode
-  (from global preference) without waiting for the Monarch to tag `@antislop`.
-- **API Documentation Ownership, Existing Collections & Bounded Verification (`shadow_api` & `context7` MCP)**:
-  - Before changing a backend endpoint, use `discover_api_artifacts` and the owning service's repository evidence to identify the protocol, authoritative source, generator, downstream outputs and collection workflow. Update code-first declarations or contract-first source as appropriate. Treat generated artifacts and viewers as downstream. Use the existing tools and protocol to regenerate and validate.
-  - If no compatible workflow exists, follow the Monarch's explicit compatible choice. Ask before initializing a documentation stack when that choice is unresolved. Escalate conflicting ownership only if it affects the requested change and repository evidence cannot resolve it.
-  - Update existing collections through their established workflow after verifying the mapping. Preserve tests, examples, authentication and environment values. Create a collection only with explicit intent.
-  - When a verified local server is running, test only relevant operations in scope using `test_api_endpoint` or a bounded `run_api_collection` request. Apply the User Intent Boundary & Execution Approval Protocol before broader execution.
-  - Use the `context7` MCP (`resolve-library-id`, `query-docs`) to fetch up-to-date official framework/library docs.
-- **Task-Based Research & Standards Source Routing (`reference/RESEARCH-SOURCE-POLICY.md`)**:
-  - Do NOT default to `arXiv` (unreviewed preprints) for software engineering, SDLC documentation, architecture, testing, or security.
-  - Route sources by task: **Requirements/SRS** -> `ISO/IEC/IEEE 29148`; **Architecture/SDD/ADR** -> `ISO/IEC/IEEE 42010` & `ISO/IEC 25010`; **Testing/RTM/UAT** -> `ISO/IEC/IEEE 29119`; **AppSec & DevSecOps** -> `NIST SSDF (SP 800-218)` & `OWASP ASVS 5.0`; **Ops/Maintenance/Handover** -> `ISO/IEC 20000-1`, `NIST SP 800-61`, `ISO/IEC/IEEE 14764`, & `IEEE 1063`; **Framework Implementation** -> official version-matched docs via `/context7`; **Empirical CS/SE Research** -> peer-reviewed venues (`IEEE Xplore`, `ACM Digital Library`, `SpringerLink`, `ScienceDirect`, indexed via `Semantic Scholar` / `OpenAlex` / `Google Scholar`); **AI/ML Research** -> `IEEE Xplore`, `ACM`, `Springer`, top conferences, and `arXiv` (explicitly marked `PREPRINT` unless a peer-reviewed DOI is verified). Always verify year/version, DOI, peer-review status, and publisher credibility.
-  - **Mandatory Local Reference Download & 7-Point File Safety Gate (`shadow-doc/scripts/reference_verifier.py`)**: Download publicly accessible reference files into `docs/references/` (`references_manifest.json`) and re-check every file with `reference_verifier.py` (blocks dangerous/macro extensions, double-extension spoofing, `MZ`/`ELF` binaries disguised as `.pdf`, PDF `/JavaScript` or `/Launch` exploits, and active `<script>` payloads, automatically deleting unsafe files from the local PC).
-- **Cross-Agent Context Compaction & Session Handoff (`shadow_handoff` MCP)**:
-  - When the Monarch says `"handoff"` (or asks to compact/save session state before context fills up or before switching agents), immediately call `save_handoff` on the `shadow_handoff` MCP with the active `projectPath`, goal, completed work, prioritized next steps, active contracts/decisions, key files, the required `readinessLevel` and `untestedSurfaces`, and a `claimEvidenceMap` for readiness claims. Set `sessionLabel` when another session works on the same project in parallel.
-  - When the Monarch starts a session with `"lanjut handoff"` (or `"load handoff"`), immediately call `load_handoff` on the `shadow_handoff` MCP, read `untestedSurfaces` before writing any conclusion, and resume execution from step 1 of the saved next steps.
-  - When parallel sessions (e.g. plan + review) must continue in one agent, call `merge_handoffs`; it keeps the lowest readiness level and reports conflicts as warnings.
-- **Safe Collaborative Git, Worktree & Parallel Multi-Agent Orchestration (`/shadow-git` v2.0)**:
-  - Read-only by default. Do not run unrequested `git commit`, `git push`, `git merge`, `git rebase`, `git reset --hard`, `git clean -fd`, `git worktree remove --force`, or `git push --force`.
-  - Detect the repository's actual branching strategy (`detect-strategy`) rather than assuming Git Flow.
-  - When multiple agents or features run in parallel, isolate each feature in its own Git worktree (`worktree-create`) with an explicit agent ownership & path scope manifest (`.git/shadow-worktrees/agents_registry.json`).
-  - Support independent integration of completed feature branches into `main` (`integrate-feature`) without waiting for unrelated in-progress branches, and forward-sync updated `main` into active feature branches (`sync-from-main`, defaulting to `merge` and blocking automatic `rebase` on shared/published branches).
-  - Use `predict-conflicts` (`git merge-tree --write-tree` + diff analysis) to separate hard Git conflicts from semantic risks (parallel DB migrations, OpenAPI changes, shared config, lockfiles). Enforce the 6-point `safe-cleanup` gate before removing any worktree or branch.
-- **Codebase Intelligence & Convention Preservation (Brownfield Projects — `reference/CODEBASE-INTELLIGENCE.md`)**:
-  - Classify project state before designing or coding: **Greenfield** (scaffold from zero via `/shadow-bootstrap`) vs **Brownfield** (existing application).
-  - For Brownfield projects, perform **Mandatory 10-Facet Discovery** before editing (runtime, structure, architecture pattern, naming conventions, formatting/lint, DB/ORM access, error handling/validation, auth, state/caching, testing).
-  - Enforce the **Convention Precedence Hierarchy**: Level 1 (User Reqs & Safety) > Level 2 (Project Instructions / `AGENTS.md`) > Level 3 (Relevant Existing Module Patterns) > Level 4 (Shadow Army Global Conventions) > Level 5 (AI Default Preferences). Never impose unsolicited tech preferences or new architectural layers onto established codebases.
-  - Enforce **Existing Code First & Minimal Change Policy**: reuse existing services, utilities, hooks, and repositories; follow closest existing module structures; never perform unrelated refactoring, unsolicited architecture/library migrations (e.g. CJS to ESM, plain JS to TS, Redux to Zustand), unrequested dependency additions, or unrelated file formatting.
-  - Validate against the Architecture & Convention Drift Gate via `/shadow-quality` (`scripts/codebase_intelligence.py audit-drift`).
+> Core 27 global non-negotiables live in [`GLOBAL.md`](GLOBAL.md) (synced across `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`). Below are the orchestrator-level operational contracts governing cross-skill execution:
+
+- **Contract Tracing & Strict Typing:** Trace route/controller -> validation -> service -> persistence -> serialization -> consumers (OpenAPI/Bruno/Postman where maintained); never invent fields or silent fallbacks. Enforce `0 any`, `0 as Type` (except `as const`), `0 !`, `0 @ts-ignore`; allow `unknown` strictly at external boundaries / `catch (e: unknown)` before immediate narrowing. Clean dead code on every refactor.
+- **Brownfield Convention Precedence (`reference/CODEBASE-INTELLIGENCE.md`):** Classify Greenfield (`/shadow-bootstrap` + official CLI generators) vs Brownfield (10-facet discovery before edits; precedence `User/Safety > AGENTS.md > Nearby Module > Global > AI Default`; zero unsolicited migrations/refactors; verify via `codebase_intelligence.py audit-drift`).
+- **Source-Driven Docs & Research Safety (`reference/RESEARCH-SOURCE-POLICY.md`):** Never directly edit generated `.docx`/`.xlsx`/`.pdf` outputs — update the owning source and regenerate via `shadow-doc/scripts/doc_orchestrator.py`. Anchor standards to ISO/IEEE/NIST/OWASP & `/context7` first, tag unreviewed arXiv `[PREPRINT]`, and scan downloaded references with `shadow-doc/scripts/reference_verifier.py scan docs/references --quarantine-delete`.
+- **API Docs, Session Handoff & Safe Git:** Inspect owning API artifacts read-only (`discover_api_artifacts`) before endpoint edits; use `shadow_handoff` MCP (`/handoff`) strictly for AI session memory (distinct from `/shadow-handover` BAST); keep Git strictly read-only by default (`detect-strategy`, `predict-conflicts` via `git merge-tree`, isolated worktrees, never unrequested `commit`/`push`/`reset --hard`/`rebase`).
+- **Scoped Anti-Slop Enforcement:** Activate `antislop`, `antislop-ui`, `antislop-layoutmobile`, `antislop-human`, `antislop-copywriting`, `antislop-code` + `modern-web-guidance` in `during` mode (global preference) **strictly on UI/layout/accessibility/copywriting/code-comment tasks** — skip completely on pure backend/SQL/CLI/typo tasks.
+- **Official-First & SSO Preservation (`reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Non-destructively verify packages (`npm view`, `/context7`), emit the 8-field Decision Record, and never silently replace internal SSO SDKs (`ridhuan-sso` / `file:../sdk/sso-client`) or trust unverified frontend `username`.
 
 ## Execution (6-Step Repository-Native Engineering Protocol)
 
@@ -166,11 +117,11 @@ Every change must survive an attempt to break it before it is reported as done o
 ## Load Focused References & Companion Skills (3-Layer Progressive Auto-Routing)
 
 Load capabilities cleanly across **3 progressive layers** so trivial edits stay tiny:
-1. **Layer 1 — Always-On Minimal Safeguards (`shadow-monarch` Mandatory):** Core correctness, strict typing (`0 any`, `0 as Type`, `0 !`), security/read-only boundaries, `L0`–`L4` Intent & Execution Approval gates, Official-First & SDK-Preservation checks, and token conservation (`antislop*` + `modern-web-guidance` activate automatically ONLY when touching UI, copywriting, layout, or comments — never load all 56 skills or all playbooks on typo/formatting edits).
-2. **Layer 2 — Task-Triggered Primary & Supporting Skills (2-Step Load):** Load the skills selected for the task through the host's skill mechanism or read their installed `SKILL.md` files directly without requiring a slash mention. Then inspect each loaded skill's `## Reference Guide` table and read ONLY the 1–2 `references/*.md` playbooks matching the active subtask (never stop at `SKILL.md` alone on deep implementation tasks, and never load unrelated references).
-3. **Layer 3 — Risk/Review-Triggered Specialists:** Pull `/shadow-sec`, `/shadow-perf` (Pre-UAT ONLY, `L3` approval required to execute), `/shadow-accessibility`, `/shadow-compat`, `/shadow-resilience`, `/shadow-privacy`, or `/shadow-grc` only when change surface or risk dictates.
+1. **Layer 1 — Always-On Minimal Safeguards (`shadow-monarch` Mandatory):** Core correctness, strict typing (`0 any`, `0 as Type`, `0 !`), security/read-only boundaries, `L0`–`L4` Intent & Execution Approval gates, Official-First & SDK-Preservation checks, and token conservation (`antislop*` + `modern-web-guidance` activate automatically ONLY when touching UI, copywriting, layout, or comments — never load all 59 skills or UI bundles on backend/SQL/typo edits).
+2. **Layer 2 — Task-Triggered Primary & Supporting Skills (2-Step Load):** Load selected skills (`<= 4`) via the host skill loader or installed `SKILL.md` without requiring a slash mention, THEN load ONLY the `1–2` targeted `references/*.md` playbooks returned in `recommended_playbooks` / each skill's `## Reference Guide` (never stop at `SKILL.md` alone on deep implementation tasks, and never load unrelated playbooks).
+3. **Layer 3 — Risk/Review-Triggered Specialists:** Pull `/shadow-sec`, `/shadow-perf` (**Pre-UAT Gate ONLY**, `L3` approval required to run), `/shadow-accessibility`, `/shadow-compat`, `/shadow-resilience`, `/shadow-privacy`, or `/shadow-grc` only when change surface or risk dictates.
 
-For non-trivial work, always keep `shadow-monarch` active and run `python "shadow-monarch/scripts/skill_router.py" --route "<task and current phase>"` from the workspace or installed router path. Use `companion_skills`, `always_on_ui_skills`, and `reference_modules` as the load lists, then follow each loaded skill's `## Reference Guide` for targeted `references/*.md` playbooks. The Router Decision Record includes scope exclusions, permission boundaries, and `user_input_policy`. Check the selected skill descriptions against the actual task and repository evidence. If the router is unavailable or misses a relevant task, use the routing tables and skill descriptions below. Re-run routing if the scope or phase materially changes. Route independently authorized test phases on their own. Trivial requests use no companion skills or references. Non-trivial work normally uses up to four companion skills and four references.
+For non-trivial work, run `python "shadow-monarch/scripts/skill_router.py" --route "<task and current phase>"`. Use `companion_skills`, `recommended_playbooks`, `always_on_ui_skills`, and `reference_modules` (`<= 4` companion skills, `<= 4` refs, `<= 4` playbooks) as the load lists. Re-route whenever scope or phase materially changes. Trivial requests use `0` companion skills, `0` playbooks, and `0` references.
 
 ### 1. Role & Domain Guides (with Companion Skill Auto-Load)
 
@@ -267,24 +218,16 @@ For non-trivial work, always keep `shadow-monarch` active and run `python "shado
 
 ### 4. Full-Stack SDLC Orchestration & 59-Skill Shadow Army Matrix
 
-`shadow-monarch` acts as the **SDLC & Enterprise IT Consulting Orchestrator** across 8 quality-gated lifecycle stages plus dedicated Enterprise Consulting engagements (returning work to the appropriate stage whenever a gate fails rather than forcing deployment):
-`1. Discovery (/shadow-discovery)` -> `2. Architecture (/shadow-architect, /shadow-domain, /shadow-plan, /shadow-bootstrap)` -> `3. Implementation (/shadow-design, /modern-web-guidance, /shadow-seo, /shadow-auth, /shadow-data, /shadow-cache, /shadow-concurrency, /shadow-realtime, /shadow-search, /shadow-ai-eng, /shadow-email, /shadow-analytics, /shadow-integrate, /shadow-api, /shadow-illustration, /shadow-video)` -> `4. Verification (/shadow-quality, /shadow-test, /shadow-debug, /shadow-refactor, /shadow-eval, /shadow-sec, /shadow-supplychain, /shadow-privacy, /shadow-browser, /shadow-mobile, /shadow-compat, /shadow-accessibility)` -> `5. Pre-UAT (/shadow-perf)` -> `6. Staging UAT (/shadow-uat)` -> `7. Production Release & Smoke Test (/shadow-release, /shadow-ops)` -> `8. Handover & Maintenance (/shadow-handover, /shadow-observe, /shadow-finops, /shadow-resilience, /shadow-maintain)`.
-
-#### 3-Tier Skill Activation Policy
-1. **Tier 1 — Always-On (Mandatory Core Guardrails)**: `shadow-monarch`, strict typing (`0 any`, `0 as Type`, `0 !`), token efficiency, read-only by default for server/DB mutations, ambiguity stop gate when requirements conflict, and `antislop` + `modern-web-guidance` scoped to UI/layout/copy/comments.
-2. **Tier 2 — Conditional (Task-Triggered + `## Reference Guide` Load)**:
-   - `/shadow-debug` when diagnosing root causes/races/500s · `/shadow-refactor` when extracting/cleaning legacy modules · `/shadow-concurrency` when designing queues/outbox/locks/DLQ · `/shadow-domain` when modeling bounded contexts/state invariants · `/shadow-search` when tuning BM25/vector/RRF/search ACL · `/shadow-realtime` when building WS/SSE/WebRTC/CRDT/backpressure · `/shadow-supplychain` when auditing SBOM/lockfiles/provenance · `/shadow-api` when API contracts/uploads change · `/shadow-auth` when identity/Passkeys/RBAC/ReBAC/tenant logic changes · `/shadow-ai-eng` when building LLM apps, agents, structured outputs, streaming or MCP servers · `/shadow-seo` when building JSON-LD/sitemaps/robots/hreflang/SSR SEO · `/shadow-email` when building React Email/MJML, SPF/DKIM/DMARC, RFC 8058 or Mailpit flows · `/shadow-analytics` when designing event taxonomy, PostHog/GA4 or A/B SRM experiments · `/shadow-data` & `/shadow-db` when schemas, RLS, pooling, CDC or migrations change · `/shadow-cache` when client/Redis/CDN caching changes · `/shadow-integrate` when webhooks/circuit breakers/3rd-party APIs change · `/shadow-test` when behavior changes · `/shadow-eval` when RAG/LLM prompts or agent safety change · `/shadow-browser` when web UI E2E/visual QA runs · `/shadow-mobile` when Android/iOS/Flutter/RN native config or store builds change · `/shadow-illustration` when creating SVG/Canvas 2D/WebGL/Shaders/Procedural/OG/icon/print visuals · `/shadow-video` when creating tutorials, Remotion/motion clips, mobile demos or PR GIFs · `/modern-web-guidance` when writing modern HTML/CSS/React/Next.js perf · `/shadow-git` when syncing branches or resolving conflicts · `/context7` when checking library docs.
-3. **Tier 3 — Gate-Based (High-Risk Stage Transitions)**:
-   - `/shadow-discovery` & `/shadow-architect` before new systems · `/shadow-bootstrap` when scaffolding from zero · `/shadow-quality`, `/shadow-sec` (NIST SSDF + OWASP ASVS 5.0), `/shadow-supplychain` (SBOM/SLSA provenance), & `/shadow-privacy` (UU PDP UU No. 27/2022 + GDPR) before release · `/shadow-perf` strictly at the **Pre-UAT Gate** · `/shadow-uat` at **Staging UAT & Client Acceptance** · `/shadow-release` at **Production Deployment** · `/shadow-finops` for cloud & LLM cost optimization · `/shadow-handover` at **BAST & Client Delivery** · `/handoff` for AI session memory transfer.
+`shadow-monarch` orchestrates 8 quality-gated SDLC stages plus Enterprise IT Consulting across all **59 skills** (returning work to the appropriate stage whenever a gate fails rather than forcing deployment). Use the table below and `skill_router.py --route` to pick the exact `1–4` skills + `recommended_playbooks`:
 
 | Group | Slash Skill | Priority | Core Responsibility & Deliverable |
 |---|---|---|---|
 | **A. Discovery & Architecture** | `/shadow-discovery` | P0 | Requirement elicitation, FR/NFR, scope boundaries, Given/When/Then criteria & gap analysis |
 | | `/shadow-architect` | P0 | System Design, C4 diagrams, ADRs, Modular Monolith vs Microservices & consistency models |
 | | `/shadow-domain` | P1 | Bounded contexts, aggregate invariants, state transitions & anti-overengineering on CRUD |
-| | `/shadow-plan` | P0 | Epic -> User Story -> Task breakdown, dependency graph, DoR/DoD & effort estimation |
+| | `/shadow-plan` | P0 | Epic -> User Story -> Task breakdown, acyclic DAG (`sprint_dag_verifier.py`), DoR/DoD & `[APPROVAL-REQUIRED]` tagging |
 | | `/shadow-bootstrap` | P0 | Zero-to-runnable project scaffold (strict TS/lint, env validation, DB/ORM, Docker dev, CI, seed) |
-| | `/shadow-design` | P1 | Design system tokens, user flows, wireframe specs & 5-state component contracts |
+| | `/shadow-design` | P1 | Design system tokens, user flows, wireframe specs, 9-state component contracts & Human-AI UX |
 | **B. App & Data Lifecycle** | `/shadow-auth` | P0 | AuthN/AuthZ, RBAC/ABAC, OAuth2/OIDC, SSO, refresh rotation, confused deputy & tenant isolation |
 | | `/shadow-data` | P0 | Zero-downtime Expand-Contract migrations, isolation levels, outbox CDC & ACID integrity |
 | | `/shadow-db` | P0 | Multi-DB introspect, DBML/ERD, Star Schema DW, planner `EXPLAIN`, MVCC & Pentaho (`shadow_db` MCP) |
@@ -322,7 +265,7 @@ For non-trivial work, always keep `shadow-monarch` active and run `python "shado
 | | `/shadow-resilience` | P1 | Automated DB backup restore drills (RPO/RTO proof), graceful degradation & fault isolation |
 | | `/shadow-maintain` | P1 | Post-production Harwat/OMKT, SLA bug triage, hotfix + regression test workflow & blameless RCA |
 | **E. Delivery & Collaboration** | `/shadow-handover` | P0 | Client BAST, source/SBOM inventory, secure credential transfer, Admin/User Manuals & ToT |
-| | `/shadow-doc` | P0 | Generator-Agnostic Document Orchestrator (`doc_orchestrator.py`: repo-local first -> adapter -> Global AST v2.0/v2.1 engine fallback, 25 templates, HTML/DOCX/PDF/XLSX/MD/ZIP + `build-manifest.json`) |
+| | `/shadow-doc` | P0 | Generator-Agnostic Document Orchestrator (`doc_orchestrator.py`: repo-local first -> adapter -> Global AST v2.0/v2.1 engine fallback, 20 standardized SDLC templates / 26 type aliases, HTML/DOCX/PDF/XLSX/MD/ZIP + `build-manifest.json`) |
 | | `/shadow-git` | P0 | Branching strategy detection, Git worktrees, parallel multi-agent isolation, independent feature integration, forward sync from `main`, `git merge-tree` conflict/semantic risk prediction & 6-point safe cleanup |
 | | `/handoff` | P0 | Cross-agent AI session context compaction & resumption (`shadow_handoff` MCP) |
 | | `/context7` | P0 | Real-time official library/framework documentation lookup (`context7` MCP) |

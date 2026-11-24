@@ -9,19 +9,18 @@ Operate like the **Shadow Monarch** commanding a specialized **Shadow Army**:
 - **The Monarch (Primary Context Window)**: holds only the mission objective, verified system contracts, active execution
   plan, and final verification state. Guard the primary context window fiercely — every unnecessary token loaded into
   the main conversation is re-billed and re-processed on **every subsequent turn**.
-- **Shadow Generals (49 Relational `reference/*.md` Modules)**: domain, role, language, and sub-task knowledge tables.
-  Summon (**load**) only the exact Generals required for the current battle via Foreign Key routing; dismiss the rest.
+- **Shadow Generals (56 Relational `reference/*.md` Modules + 59 Modular Specialist Skills)**: domain, role, language, and sub-task knowledge tables plus skill-owned `references/01..NN-*.md` playbooks. Summon (**load**) only the exact Generals via `skill_router.py --route` (`companion_skills` -> `recommended_playbooks` / `## Reference Guide`); dismiss the rest.
 - **Shadow Soldiers (Tools & Subagents)**: execute targeted reconnaissance (grep/search), parallel file edits, or noisy
   background research, returning only distilled, verified intelligence to the Monarch.
 
-## 2. Foreign Key Reference Loading Budget
+## 2. Foreign Key & 2-Step Playbook Loading Budget
 
-Strictly bound how many `reference/*.md` files you load per task:
-- **Tier 0 — Trivial / Factual Question** (*"what is HTTP 409?"*, *"explain this regex"*): load **0 reference files**.
+Strictly bound how many `reference/*.md` files and specialist playbooks you load per task:
+- **Tier 0 — Trivial / Factual Question** (*"what is HTTP 409?"*, *"bedanya HTTP 401 dan 403?"*, *"fix README typo"*): load **0 skills & 0 reference files**.
   Answer directly in 2–5 sentences.
-- **Tier 1 — Single-Layer Edit or Bug Fix**: load **1–2 reference files** (e.g., `lang-TYPESCRIPT-NODE.md` + `BACKEND.md`).
-- **Tier 2 — Cross-Layer Feature or Architecture**: load **`CORE.md` + 2–3 relevant domain/stack files** (max 4 files).
-- **Never pre-load unrelated language or role guides** "just in case".
+- **Tier 1 — Single-Layer Edit or Bug Fix**: load **1 primary skill `SKILL.md` + 1–2 matched `references/*.md` playbooks** (via `recommended_playbooks`) and **0–2** `shadow-monarch/reference/*.md` files.
+- **Tier 2 — Cross-Layer Feature or Architecture**: load **up to 4 companion skills + up to 4 playbooks/refs** total (`max_companion_skills = 4`).
+- **Never pre-load unrelated language guides, UI `antislop*` bundles on pure backend/SQL/CLI tasks, or entire `references/` directories** "just in case".
 
 ## 3. Surgical Codebase Reconnaissance (Input Token Efficiency)
 

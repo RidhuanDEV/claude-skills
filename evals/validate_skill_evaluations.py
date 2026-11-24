@@ -62,6 +62,7 @@ UPGRADED_SPECIALIST_SKILLS = {
     "shadow-git",
     "shadow-grc",
     "shadow-handover",
+    "shadow-illustration",
     "shadow-integrate",
     "shadow-maintain",
     "shadow-mobile",
@@ -84,6 +85,7 @@ UPGRADED_SPECIALIST_SKILLS = {
     "shadow-supplychain",
     "shadow-test",
     "shadow-uat",
+    "shadow-video",
 }
 
 
