@@ -1,11 +1,11 @@
 ---
 name: shadow-sec
-description: "Application & SDLC Security Engineering Specialist. Use when performing STRIDE threat modeling, OWASP ASVS 5.0 & NIST SSDF audits, SQLi/OS-injection/XSS/CSP/CORS/SSRF hardening, AES-256-GCM/KMS secrets review, SAST/CVE reachability triage, or security incident containment. Do NOT use for UU PDP privacy (/shadow-privacy), auth implementation (/shadow-auth), or COBIT/OJK GRC (/shadow-grc)."
+description: "Application & SDLC Security Engineering Specialist. Use when performing STRIDE threat modeling, OWASP ASVS 5.0 & NIST SSDF audits, SQLi/OS-injection/XSS/CSP/CORS/SSRF hardening, AES-256-GCM/KMS secrets review, SAST/CVE reachability triage, security incident containment, or pre-install audits of third-party skills, plugins, and MCP servers. Do NOT use for UU PDP privacy (/shadow-privacy), auth implementation (/shadow-auth), or COBIT/OJK GRC (/shadow-grc)."
 ---
 
 # Shadow Sec (`/shadow-sec`) — SDLC Security, Threat Modeling & OWASP ASVS 5.0 Auditor
 
-Use this skill whenever the **Monarch** performs STRIDE threat modeling, AppSec code/PR reviews, SDLC Stage 4 & Stage 6 security gates, injection/SSRF/CSP/CORS/crypto hardening, CVE reachability triage, or security incident containment.
+Use this skill for STRIDE, AppSec reviews, security hardening, CVE reachability, incident containment, and pre-install audits of third-party skills, plugins, and MCP servers.
 
 ## 1. Core Security Audit Principles & Non-Negotiables
 
@@ -29,7 +29,7 @@ Graded specialist scenarios live in [evaluations.md](evaluations.md) (10 scenari
 
 ## Reference Guide
 
-Load **only** the 1–2 modules matching the active subtask (never load all 8 at once):
+Load **only** the 1–2 modules matching the active subtask.
 
 | Task / Scenario | Tier | Load Reference |
 | :--- | :--- | :--- |
@@ -41,5 +41,6 @@ Load **only** the 1–2 modules matching the active subtask (never load all 8 at
 | `AES-256-GCM` AEAD + AAD + KMS `kid` rotation, blind indexes & zero-secret Git/CI hygiene | ADVANCED | [references/06-secrets-kms-and-cryptography-architecture.md](references/06-secrets-kms-and-cryptography-architecture.md) |
 | Reachability-first CVE/SCA triage, SAST CI rules, `/shadow-supplychain` handoff & `L3` DAST gate | OPERATIONAL | [references/07-sast-dast-and-supply-chain-reachability.md](references/07-sast-dast-and-supply-chain-reachability.md) |
 | 6-step security incident containment, forensic log preservation, key rotation & UU PDP 72h handoff | OPERATIONAL | [references/08-incident-containment-and-coordinated-patching.md](references/08-incident-containment-and-coordinated-patching.md) |
+| Third-party skill, plugin, and MCP pre-install audit, with a managed Windows/Codex skill ZIP pilot | OPERATIONAL | [references/09-third-party-download-and-install-audit.md](references/09-third-party-download-and-install-audit.md) |
 
 Do not load unrelated references unnecessarily.

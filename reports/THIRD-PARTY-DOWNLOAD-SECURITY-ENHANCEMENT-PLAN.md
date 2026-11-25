@@ -1,0 +1,65 @@
+# Rencana enhancement verifikasi unduhan dan audit pra-instalasi
+
+**Baseline** 25 November 2026 · `main` · `410b2f3`
+
+Shadow Army sudah punya pemeriksaan file referensi, kontrol supply chain, dan protokol approval. Cakupannya masih parsial dibanding G0–G7 di lampiran. Belum ada alur yang menghasilkan bukti audit untuk satu snapshot eksternal dan memastikan installer hanya mengaktifkan snapshot yang sama setelah persetujuan Monarch.
+
+## Cakupan saat ini
+
+| Kontrol di lampiran | Cakupan dan bukti saat ini |
+| --- | --- |
+| Verifikasi file unduhan | `reference_verifier.py` memeriksa ekstensi, ukuran, magic bytes, serta pola aktif PDF/HTML. `fetch` memakai staging dan menyimpan SHA-256. `assess` mencocokkan arsip dengan manifest lokal dan versi yang diminta. Hash hasil unduhan berfungsi sebagai sidik jari lokal. Pemeriksaan terhadap checksum dari penerbit atau signature membutuhkan bukti tambahan. [`reference_verifier.py`](../shadow-doc/scripts/reference_verifier.py#L203) · [Kebijakan riset](../shadow-monarch/reference/RESEARCH-SOURCE-POLICY.md#L45) |
+| G0 · Origin dan maintainer | Official-First punya inspeksi metadata paket. `shadow-supplychain` punya metode verifikasi publisher/provenance dan mencocokkan digest file lokal dengan receipt dari verifier independen. Belum ada intake yang menerapkannya ke repo skill, paket plugin, atau MCP eksternal. [Official-First](../shadow-monarch/reference/OFFICIAL-FIRST-DEPENDENCY-POLICY.md) · [Supply-chain gate](../shadow-supplychain/SKILL.md#L51) |
+| G1–G3 · Static analysis, dependency, secrets | Playbook sudah mendokumentasikan SAST, SCA, secret scanning, inventaris lockfile, dan lisensi. Belum ada laporan sebelum instalasi yang menjalankan pemeriksaan yang relevan bagi tipe artefak dan mencatat versi scanner, cakupan file, hasil yang tidak tersedia, serta temuan. [AppSec](../shadow-sec/references/07-sast-dast-and-supply-chain-reachability.md) · [DevSecOps](../shadow-monarch/reference/SECOPS-PENTEST.md#L26) · [SBOM](../shadow-supplychain/references/01-sbom-cyclonedx-spdx-and-lockfile-parity.md) |
+| G4–G5 · Prompt injection, hooks, permission, MCP | Ada prinsip memperlakukan keluaran eksternal sebagai data dan panduan engineering MCP. Belum ada profil audit untuk `SKILL.md`, `README`, file referensi, manifest, lifecycle hooks, dan cakupan izin sebelum artefak masuk ke host. [Tool trust boundaries](../shadow-ai-eng/references/02-structured-outputs-and-tool-trust-boundaries.md#L13) · [Panduan MCP](../shadow-monarch/reference/AGENTS-MCP.md#L32) |
+| G6 · Runtime terisolasi | Ada aturan isolasi dan approval untuk tindakan berisiko. Dari jalur yang diperiksa, belum ada prosedur runtime khusus artefak eksternal yang menghasilkan bukti perilaku filesystem, proses, dan jaringan. [Protokol approval](../shadow-monarch/reference/EXECUTION-APPROVAL-PROTOCOL.md#L18) |
+| G7 · Verdict, approval, instalasi | Approval gate bisa menolak SHA repo yang berubah bila field itu diisi. Installer lokal menyalin folder berdasarkan keberadaan `SKILL.md`, atau membuat junction untuk Codex. Belum ada preflight yang memeriksa audit dan approval terhadap digest artefak eksternal, target host, serta konfigurasi yang akan dipasang. [Approval gate](../shadow-monarch/scripts/execution_approval_gate.py#L190) · [Windows](../install.ps1#L17) · [macOS/Linux](../install.sh#L24) · [Codex](../install-codex.ps1#L24) |
+
+### Temuan pada verifier dokumen
+
+1. **HIGH · Penghapusan perlu batas direktori.** `verify_file_safety` me-resolve path sebelum memanggil `unlink`. Bila file hasil enumerasi berupa symbolic link yang mengarah keluar direktori pemindaian, target akhirnya berpotensi ikut terhapus. Ini temuan pembacaan kode. [`resolve`](../shadow-doc/scripts/reference_verifier.py#L85) · [`unlink`](../shadow-doc/scripts/reference_verifier.py#L150)
+2. **MEDIUM · Pemindaian tanpa file menghasilkan status lulus.** `scan` menghitung `all(...)` atas hasil pemindaian. Untuk path hilang atau direktori kosong, hasilnya dapat berupa `checked_count: 0`, `all_safe: true`, dan exit code `0`. [`scan`](../shadow-doc/scripts/reference_verifier.py#L438)
+3. **MEDIUM · Kebijakan transport dan integritas belum diterapkan pada `fetch`.** Help menyebut HTTPS, sedangkan implementasi menerima HTTP/HTTPS. Tidak ada kebijakan tujuan redirect atau input expected digest. PDF dan HTML diperiksa melalui pola teks/byte, sehingga dukungan format dan cakupan deteksi perlu dinyatakan eksplisit. [`fetch`](../shadow-doc/scripts/reference_verifier.py#L203) · [Pemeriksaan pola](../shadow-doc/scripts/reference_verifier.py#L118)
+
+## Daftar improvement dan urutan delivery
+
+| Fase | Prioritas dan area | Perubahan yang diusulkan | Kriteria penerimaan |
+| --- | --- | --- | --- |
+| 1 | **P0 · Routing dan batas audit** · `shadow-monarch` + `shadow-sec` | Tambahkan satu playbook audit pra-instalasi di `shadow-sec`. Router mengenali audit skill/plugin/MCP dan pemindaian unduhan dokumen sebagai intent terpisah. Audit membaca snapshot dari staging di luar direktori discovery host. Konten calon skill, termasuk instruksi, prompt, output scanner, dan konfigurasi MCP, diperlakukan sebagai data lewat profil audit tanpa kapabilitas install, eksekusi kandidat, atau akses kredensial. | Permintaan Indonesia dan Inggris mengarah ke pemilik yang sesuai. Audit pra-instalasi berhenti setelah laporan. Fixture skill yang berisi instruksi berbahaya menghasilkan temuan dengan nol pemanggilan tool aktivasi atau pembacaan rahasia. |
+| 1 | **P0 · Pengamanan verifier dokumen** · `shadow-doc` | Tolak input hilang dan cakupan nol file. Gunakan mode laporan sebagai default di playbook. Batasi penghapusan otomatis ke staging yang dibuat verifier. Tolak symlink/junction dan file yang keluar dari root. Untuk public fetch, terapkan HTTPS dan policy tujuan pada setiap redirect, simpan URL final dan dukung expected digest dari sumber tepercaya. Pertahankan pembacaan manifest lama dan kontrak `assess`. | Fixture dokumen valid tetap lolos. Input kosong, path hilang, tujuan redirect terlarang, dan digest berbeda menghasilkan status non-lulus. Fixture link tidak menyentuh target di luar staging. Manifest lama tetap dapat dinilai. |
+| 2 | **P0 · Identitas dan audit statis G0–G5** · `shadow-sec` + `shadow-supplychain` | Mulai dari snapshot Git yang dipatok ke SHA penuh. Catat repo kanonis, publisher, riwayat relevan, digest snapshot, dan lisensi. Inventaris file dan dependensi terkunci. Periksa script, manifest, hooks, akses filesystem/environment, egress, telemetry, dan kompatibilitas host. Pakai scanner lokal yang sudah disetujui untuk SAST, CVE, dan secret scanning, ditambah review semantik atas instruksi serta izin. Jika artefak punya attestasi, verifikasi identitas, source, dan digest lewat verifier independen. | Laporan mencatat file yang diperiksa dan dilewati, alasan, versi tool, usia database jika relevan, dan hasil per gate. Scanner wajib yang tidak berjalan, snapshot berubah, atau bagian wajib yang tidak tercakup menghasilkan `INCONCLUSIVE` atau `REJECTED` sesuai penyebab. Temuan secret disamarkan. |
+| 2 | **P0 · Approval dan enforcement G7** · `shadow-monarch` | Kaitkan verdict dengan SHA/digest, versi kebijakan, dan waktu. Simpan persetujuan manusia melalui kanal tepercaya dengan kandidat, host, tujuan, izin, perintah yang akan dijalankan, dan rollback. Verifikasi ulang bytes serta konfigurasi sebelum aktivasi melalui satu jalur instalasi terkelola. Gunakan snapshot immutable untuk artefak eksternal dan audit ulang perubahan versi atau cakupan izin. | Fixture tanpa approval, approval kedaluwarsa, perubahan bytes pada SHA yang sama di working tree, atau perubahan target/perintah gagal sebelum ada perubahan profil. Snapshot yang sama dengan approval valid lolos pada profil sementara. Restore versi sebelumnya dapat dibuktikan pada fixture. |
+| 3 | **P1 · Perluasan format dan host** · `shadow-sec` + `shadow-supplychain` | Tambahkan profil paket plugin, archive, binary, serta MCP lokal dan remote sesuai jalur yang dipakai. Arsip diperiksa terpisah dari dokumen, dengan aturan path, link, isi dan batas ekstraksi. MCP lokal dinilai atas perintah startup dan akses. MCP remote dinilai atas endpoint, scope, aliran data, dan perubahan daftar tool. Pertimbangkan antimalware lokal untuk binary. Unggah sampel ke layanan eksternal memerlukan persetujuan khusus. | Setiap profil punya aturan wajib dan eksplisit untuk format yang belum didukung. Cakupan enforcement dicatat per host dan per jalur. Installer native atau instalasi manual di luar jalur terkelola dicatat sebagai batas enforcement. |
+| 3 | **P1 · Runtime G6 dengan approval terpisah** · `shadow-sec` + `shadow-ops` | Jika profil risiko memerlukan runtime, gunakan VM disposable atau isolasi yang sudah diverifikasi. Jalankan dengan filesystem dan privilege minimum, tanpa home mount, credential, atau socket Docker, serta egress tertutup secara default. Rekam proses, filesystem, dan jaringan. | Probe isolasi dan cleanup dilakukan dengan fixture aman sebelum calon artefak diuji. G6 hanya boleh `NOT_APPLICABLE` dengan alasan dari policy. Jika G6 wajib dan belum diotorisasi, verdict tetap `INCONCLUSIVE`. |
+
+Urutan pilot yang diusulkan adalah **Windows/Codex dengan profil sementara dan satu fixture skill berbasis Git**. Setelah jalur positif dan negatif lulus, perluas ke plugin dan MCP yang dipakai Monarch. Integrasikan dengan backlog yang ada untuk pembatasan persetujuan, status lintas alat, dan rollback installer. [X02](REMAINING-IMPROVEMENTS.md#x02--scope-tindakan-dan-persetujuan-interaktif) · [E02](REMAINING-IMPROVEMENTS.md#e02--rekonsiliasi-setelah-interupsi-pemasangan-lintas-host)
+
+Sebelum menguji pada profil asli, buktikan bahwa audit menerima fixture yang hanya mengutip contoh instruksi sebagai dokumentasi, memblokir efek samping yang diminta oleh konten kandidat, dan melaporkan bukti yang hilang saat scanner dimatikan. Jalankan ulang tes verifier, supply chain, dan approval yang ada. Untuk jalur instalasi, uji dry run, interupsi, retry, dan rollback di profil sementara.
+
+## Kontrak hasil audit
+
+`THIRD-PARTY-SKILL-SECURITY-AUDIT.md` mencatat kandidat, versi/SHA/digest, cakupan inventorinya, hasil tiap gate, temuan dengan severity dan path/baris, dampak, perbaikan, risiko sisa, serta cara instalasi sesuai host. Simpan hasil alat dan bukti persetujuan di luar direktori artefak yang diaudit.
+
+`APPROVED` berarti kandidat memenuhi kebijakan audit. `CONDITIONALLY APPROVED` menunggu kondisi yang bisa diverifikasi. `REJECTED` berarti ditemukan pelanggaran yang memblokir. `INCONCLUSIVE` berarti bukti wajib belum cukup. Aktivasi memerlukan hasil audit yang memenuhi syarat **dan** persetujuan tindakan terpisah dari Monarch.
+
+## Bukti baseline
+
+| Pemeriksaan | Hasil |
+| --- | --- |
+| `python -B shadow-doc/scripts/reference_verifier.py --self-test` | `PASS` · 10/10 probe bawaan |
+| `python -B -m unittest discover -s shadow-supplychain/tests -v` | `PASS` · 6/6 tes |
+| `python -B shadow-monarch/scripts/execution_approval_gate.py --self-test` | `PASS` · 16/16 probe |
+| `skill_router.py --route` pada empat permintaan Indonesia/Inggris | Satu permintaan cek PDF dirutekan ke `shadow-monarch/general`. Tiga permintaan audit pra-instalasi menghasilkan `shadow-sec/feature_implementation`, `shadow-monarch/general`, dan `shadow-ai-eng/feature_implementation`. Keempatnya melaporkan batas otomatis `L1_SAFE_VERIFICATION`. |
+| SHA-256 pada dua root skill Codex lokal | Enam file kunci yang diperiksa cocok dengan checkout pada `~/.codex/skills` dan `~/.agents/skills`. |
+
+**Not measured** · Unduhan live, reproduksi temuan statis, efektivitas scanner eksternal, runtime kandidat, dan enforcement pada host asli. Tiga repo eksternal dalam lampiran berada di luar audit ini. Seluruh fase enhancement berstatus usulan.
+
+## Cakupan implementasi pilot
+
+Perubahan pertama menerapkan verifikasi dokumen, routing read-only, playbook G0–G7, dan aktivasi terkelola untuk ZIP skill teks pada Windows/Codex. CLI memakai receipt dari operator dan mencocokkan digest ZIP, target, gate wajib, dan masa berlaku approval sebelum menyalin bytes. Pilot ini menguji activation gate pada profil sementara. Untuk plugin, binary, dan MCP, playbook sudah menjelaskan prosedur audit. Adapter aktivasi dan runner sandbox untuk format tersebut masih di luar cakupan pilot. [Playbook audit](../shadow-sec/references/09-third-party-download-and-install-audit.md)
+
+## Rujukan desain
+
+- Provenance perlu diperiksa terhadap digest artefak dan identitas build/source yang diharapkan. [SLSA v1.2](https://slsa.dev/spec/v1.2/verifying-artifacts)
+- Instruksi eksternal dapat memengaruhi agent lewat konten. Batasi kapabilitas saat mengolahnya. [OWASP LLM01](https://genai.owasp.org/llm2026/llm012026-prompt-injection/)
+- Untuk one-click MCP lokal, panduan MCP mensyaratkan pengguna melihat perintah lengkap dan memberi persetujuan sebelum eksekusi. [MCP Security Best Practices](https://modelcontextprotocol.io/docs/2025-11-25/tutorials/security/security_best_practices#local-mcp-server-compromise)

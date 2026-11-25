@@ -29,7 +29,7 @@ Use this skill whenever the **Monarch** asks to create, import, selectively upda
 7. **Research & Normative Standards Source Policy (`NORMATIVE_STANDARDS_MAP`)**:
    - **Industry Standards First**: Every SDLC document (`SRS`, `SDD`, `RTM`, `TEST_PLAN`, `UAT`, `SECURITY_RISK`, `INCIDENT`, `MANUAL`, `MAINTENANCE`) anchors to authoritative standards (`ISO/IEC/IEEE 29148:2018`, `ISO/IEC/IEEE 42010:2022`, `ISO/IEC/IEEE 29119`, `ISO/IEC 25010`, `NIST SSDF SP 800-218`, `OWASP ASVS 5.0.0`, `ISO/IEC/IEEE 12207`, `NIST SP 800-61`, `ISO/IEC/IEEE 14764`, `ISO/IEC/IEEE 26514`) and official version-matched framework documentation (`/context7` MCP).
    - **Academic Literature & `arXiv` Preprint Rules**: Use peer-reviewed databases (`IEEE Xplore`, `ACM Digital Library`, `SpringerLink`, `ScienceDirect`, indexed via `Semantic Scholar` / `OpenAlex` / `Google Scholar`) as supporting evidence when architectural or algorithmic decisions require empirical backing. Never default to `arXiv` for software engineering standards; `arXiv` preprints must be tagged `source_type: "PREPRINT"` (`peer_reviewed: false`) unless a peer-reviewed journal/conference DOI is verified.
-   - **Mandatory Local Download & 7-Point File Safety Gate (`scripts/reference_verifier.py`)**: Download publicly accessible reference files into `docs/references/` and verify every downloaded or imported file with `scripts/reference_verifier.py` (checks extension allowlist, double-extension spoofing, `%PDF-` vs `MZ`/`ELF` magic bytes, PDF `/JavaScript` & `/Launch` exploit tokens, HTML `<script>` injection, and SHA-256 manifest; unsafe files are immediately deleted from the local PC).
+   - **Mandatory Local Download & 7-Point File Safety Gate (`scripts/reference_verifier.py`)**. Fetch public HTTPS references through staging and record SHA-256 in `docs/references/`. Provide `--expected-sha256` when a trusted checksum exists. Use `scan` to check imported local files without modifying them. Rejected downloads are discarded in staging.
 
 ---
 
@@ -134,8 +134,8 @@ python "$ShadowDocRoot/scripts/reference_verifier.py" fetch `
   --url "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf" `
   --dest-dir docs/references --title "NIST SSDF SP 800-218" --venue "NIST" --year "2022" --doi "10.6028/NIST.SP.800-218"
 
-# 11. Scan local reference folder and auto-delete any disguised/dangerous file
-python "$ShadowDocRoot/scripts/reference_verifier.py" scan docs/references --quarantine-delete
+# 11. Scan local reference files
+python "$ShadowDocRoot/scripts/reference_verifier.py" scan docs/references
 python "$ShadowDocRoot/scripts/reference_verifier.py" --self-test
 ```
 

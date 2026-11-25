@@ -21,14 +21,14 @@ Activate this playbook when:
    - Anchor SDLC documents to authoritative international/national standards first (`ISO/IEC/IEEE 29148:2018`, `42010:2022`, `29119`, `25010`, `NIST SSDF SP 800-218`, `OWASP ASVS 5.0.0`, `NIST SP 800-61`, `ISO/IEC/IEEE 14764`, `UU PDP No. 27/2022`) and version-matched official framework docs (`/context7`).
    - For empirical scholarly backing, verify DOI/URL, publisher/venue, year, and peer-review status (`IEEE Xplore`, `ACM Digital Library`, `SpringerLink`, `ScienceDirect`). NEVER default to `arXiv` for software engineering standards; any unreviewed `arXiv` preprint MUST be tagged `source_type: "PREPRINT"` (`peer_reviewed: false`, `[PREPRINT]`).
 3. **Mandatory Local Download & 7-Point File Safety Gate (`reference_verifier.py`)**:
-   - Download publicly accessible references into `docs/references/` tracked by `references_manifest.json` (with SHA-256 checksums) and scan every file with `reference_verifier.py scan docs/references --quarantine-delete`:
+   - Download publicly accessible references with `fetch` and scan imported references with `reference_verifier.py scan docs/references`. Fetch validates HTTPS and the public destination on each hop, then publishes accepted bytes and the SHA-256 receipt to the archive.
      1. Extension allowlist check (blocks `.exe`, `.bat`, `.ps1`, `.js`, `.vbs`, `.docm`, `.xlsm`, `.scr`, etc.).
      2. Double-extension spoofing check (blocks `paper.pdf.exe` or hidden executable suffixes).
      3. Magic-byte verification (`%PDF-` required for `.pdf`; blocks `MZ` PE / `ELF` / Mach-O binaries disguised as `.pdf`).
      4. PDF active-content exploit scan (blocks `/JavaScript`, `/JS`, `/Launch`, `/OpenAction` malicious payloads).
      5. HTML/SVG `<script>` / `onerror=` injection check.
      6. Size & path-traversal containment check (no escaping `docs/references/`).
-     7. SHA-256 manifest registration + **automatic quarantine deletion** of unsafe files from the local PC!
+     7. SHA-256 manifest registration. Supply `--expected-sha256` when a trusted checksum is available. Rejected downloads are discarded in staging. Local scans report findings without modifying their input files.
 4. **Secret Scanning, Cross-Project Isolation & Atomic Export (`AT-06`, `AT-10`, `AT-14`)**:
    - Automatically redact leaked credentials (`[REDACTED_SECRET]`) before any export leaves the workspace.
    - Reject any document containing cross-project `forbidden_terms` (prevents accidentally copying Client A's name or internal codename into Client B's proposal/BAST!).
@@ -49,8 +49,8 @@ python "$ShadowDocRoot/scripts/reference_verifier.py" fetch `
   --dest-dir docs/references --title "NIST SSDF SP 800-218" `
   --venue "NIST" --year "2022" --doi "10.6028/NIST.SP.800-218"
 
-# 2. Re-scan local references directory and auto-delete any disguised/malicious file
-python "$ShadowDocRoot/scripts/reference_verifier.py" scan docs/references --quarantine-delete
+# 2. Re-scan local references directory
+python "$ShadowDocRoot/scripts/reference_verifier.py" scan docs/references
 
 # 3. Strict pre-release validation (blocks [TBD], unreferenced PASS claims, secrets, forbidden_terms)
 python "$ShadowDocRoot/scripts/doc_scaffold.py" validate --doc docs/SRS.json --strict
@@ -107,7 +107,7 @@ export function auditStrictDocumentClaims(
 
 ## 5. Platform / Vendor Variations
 - **Windows Corporate Environments (PowerShell + Word)**: Always force explicit UTF-8 file I/O to avoid `cp1252` Mojibake in Bahasa Indonesia/Unicode tables, and advise reviewers to press `Ctrl+A` then `F9` in Microsoft Word to populate dynamic `TOC` page numbers.
-- **Air-Gapped / Restricted Networks**: When external downloads cannot run live, record `download_status: "OFFLINE_BLOCKED"` honestly in `references_manifest.json` while still scanning any manually supplied local PDFs with `reference_verifier.py scan --quarantine-delete`.
+- **Air-gapped or restricted networks.** Record `download_status: "OFFLINE_BLOCKED"` when download is unavailable. Check manually supplied references with `reference_verifier.py scan <path>`.
 
 ## 6. Decision Matrix & Trade-Offs
 | Verification Gate | Draft Stage (`validate`) | Release Stage (`validate --strict`) |
@@ -119,13 +119,13 @@ export function auditStrictDocumentClaims(
 
 ## 7. Real Production Scenario
 **Context:** While assembling an enterprise security assessment report, a team reused a previous client's SRS template and downloaded a third-party "whitepaper.pdf" from an unverified blog mirror.
-**Blocked Disasters:** Running `doc_scaffold.py validate --strict` caught two lingering mentions of the previous client's name via `forbidden_terms` AND an accidentally pasted staging Bearer token (`[REDACTED_SECRET]`), while `reference_verifier.py scan --quarantine-delete` detected an embedded `/JavaScript` `/OpenAction` payload inside the downloaded PDF and automatically removed the unsafe file before anyone opened it locally.
+**Review checks.** `doc_scaffold.py validate --strict` surfaces forbidden client names and possible secret values for review. `reference_verifier.py scan` reports active-content indicators before a downloaded PDF is opened.
 
 ## 8. Failure Modes & Edge Cases
 - **WRONG (Filling missing stakeholder dates/metrics with plausible guesses to pass `--strict`):** Replacing `[ISI TANGGAL UAT]` with an invented date `"2026-11-15"` or writing `"p95 = 120ms (PASS)"` without an executed benchmark log.
   **RIGHT:** Keep unknown facts as explicit `[TBD]` / `UNVERIFIED` placeholders until real verified evidence exists, then attach the actual `source_refs` entry.
 - **WRONG (Citing unreviewed `arXiv` preprints as authoritative compliance standards or skipping local file safety scans):** Treating an unreviewed blog/preprint as equivalent to `NIST SP 800-218` or saving uninspected internet PDFs into the repo.
-  **RIGHT:** Cite normative standards first, tag unreviewed preprints `[PREPRINT]` (`peer_reviewed: false`), and run `reference_verifier.py scan docs/references --quarantine-delete` on every local reference file.
+  **RIGHT:** Cite normative standards first, tag unreviewed preprints `[PREPRINT]` (`peer_reviewed: false`), and run `reference_verifier.py scan docs/references` on the local archive.
 
 ## 9. Testing & Verification
 - Run `python shadow-doc/scripts/reference_verifier.py --self-test` to confirm 7-point safety probes (`MZ` disguised as `.pdf`, `/JavaScript` PDF exploit, `<script>` HTML injection, double extension, clean PDF precision).

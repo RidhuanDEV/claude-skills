@@ -63,6 +63,60 @@ API_DOCS_EXPLICIT_FORMAT_RE = re.compile(
     r"\b(?:openapi|swagger|postman|bruno|scalar|redoc|insomnia|asyncapi|graphql\s+sdl|protobuf)\b",
     re.IGNORECASE,
 )
+ARTIFACT_AUDIT_ACTION = r"(?:audit|verify|validate|scan|inspect|assess|check|review|cek|periksa|verifikasi|pindai|tinjau)"
+ARTIFACT_INSTALL_ACTION = r"(?:install|register|activate|instal|pasang|aktifkan|(?:mcp|plugin)\s+add)"
+ARTIFACT_AUDIT_ACTION_RE = re.compile(rf"\b{ARTIFACT_AUDIT_ACTION}\b", re.IGNORECASE)
+ARTIFACT_INSTALL_ACTION_RE = re.compile(rf"\b{ARTIFACT_INSTALL_ACTION}\b", re.IGNORECASE)
+NEGATED_ARTIFACT_ACTION_RE = re.compile(
+    rf"\b(?:jangan|tidak\s+(?:perlu|usah)|stop\s+before|do\s+not|don't|no\s+need\s+to|skip|never)\s+"
+    rf"(?:(?:lakukan|run|do)\s+)?(?:(?:a|an)\s+)?(?:{ARTIFACT_AUDIT_ACTION}|{ARTIFACT_INSTALL_ACTION})"
+    rf"(?:\s+(?:or|and|atau|dan)\s+(?:{ARTIFACT_AUDIT_ACTION}|{ARTIFACT_INSTALL_ACTION}))*\b",
+    re.IGNORECASE,
+)
+ARTIFACT_CLAUSE_SEPARATOR_RE = re.compile(r"\n+|[;.!?](?=\s|$)|\s+(?:but|tapi|tetapi)\s+", re.IGNORECASE)
+NON_AUDIT_ARTIFACT_TASK_RE = re.compile(
+    r"^\s*(?:(?:tolong|please|help\s+me|bantu(?:\s+saya)?)\s+)*(?:implement|build|create|write|update|enhance|fix|document|"
+    r"buat(?:kan)?|tulis|perbaiki|tambah(?:kan)?|implementasi(?:kan)?|kembangkan|tingkatkan)\b",
+    re.IGNORECASE,
+)
+EXTENSION_ARTIFACT_RE = re.compile(
+    r"\b(?:skills?|plugins?|mcp(?:\s+servers?)?|agent\s+extensions?)\b",
+    re.IGNORECASE,
+)
+EXTERNAL_ARTIFACT_RE = re.compile(
+    r"\b(?:third[- ]party|pihak\s+ketiga|external|eksternal|download(?:s|ed)?|unduh(?:an)?|"
+    r"(?:from|dari)\s+(?:GitHub|GitLab|Bitbucket|registry|marketplace|https?://))\b",
+    re.IGNORECASE,
+)
+PRE_INSTALL_ARTIFACT_RE = re.compile(
+    r"\b(?:(?:before|sebelum)\s+(?:install(?:ation|ing)?|instal(?:l|asi)?|diinstal|"
+    r"dipasang|pasang|memasang|menginstal)|pre[- ]install(?:ation)?)\b",
+    re.IGNORECASE,
+)
+DOCUMENT_DOWNLOAD_RE = re.compile(
+    r"\b(?:download(?:s|ed)?|diunduh|unduh(?:an)?|di-download)\b",
+    re.IGNORECASE,
+)
+DOCUMENT_SAFETY_TARGET_RE = re.compile(
+    r"\b(?:pdf|markdown|html|referensi|(?:reference|research)\s+(?:file|document|paper))\b",
+    re.IGNORECASE,
+)
+DOCUMENT_SAFETY_CONTEXT_RE = re.compile(
+    r"\b(?:file|berkas|dokumen|document|keamanan|keaslian|malware|checksum|integrity|authenticity|signature|"
+    r"security|safety|safe|aman|sebelum\s+dibuka|before\s+opening)\b",
+    re.IGNORECASE,
+)
+ARTIFACT_AUDIT_HELPER_RE = re.compile(
+    r"\b(?:with|using|use|pakai|gunakan)\s+[/\$]([a-z][a-z0-9-]+)(?![\w/-])",
+    re.IGNORECASE,
+)
+
+DOCUMENT_AUDIT_PLAYBOOKS = ["shadow-doc/references/02-citations-reference-verifier-and-export-qa.md"]
+EXTENSION_AUDIT_PLAYBOOK = "shadow-sec/references/09-third-party-download-and-install-audit.md"
+EXTENSION_AUDIT_PLAYBOOKS = [
+    EXTENSION_AUDIT_PLAYBOOK,
+    "shadow-supplychain/references/04-slsa-v12-provenance-cosign-and-expiring-waivers.md",
+]
 
 # Ordered by domain specificity so primary ownership resolves cleanly before general helpers.
 ROUTING_RULES: list[dict[str, Any]] = [
@@ -811,6 +865,29 @@ def _strip_non_authoritative_signals(prompt: str) -> str:
     return cleaned
 
 
+def _artifact_audit_owners(prompt: str) -> tuple[str, ...]:
+    if NON_AUDIT_ARTIFACT_TASK_RE.match(prompt):
+        return ()
+    has_document_audit = False
+    for clause in ARTIFACT_CLAUSE_SEPARATOR_RE.split(prompt):
+        active = NEGATED_ARTIFACT_ACTION_RE.sub(" ", clause)
+        audit_requested = ARTIFACT_AUDIT_ACTION_RE.search(active)
+        if (
+            (audit_requested or ARTIFACT_INSTALL_ACTION_RE.search(active))
+            and EXTENSION_ARTIFACT_RE.search(active)
+            and (EXTERNAL_ARTIFACT_RE.search(active) or PRE_INSTALL_ARTIFACT_RE.search(active))
+        ):
+            return ("shadow-sec", "shadow-supplychain")
+        if (
+            audit_requested
+            and DOCUMENT_DOWNLOAD_RE.search(active)
+            and DOCUMENT_SAFETY_TARGET_RE.search(active)
+            and DOCUMENT_SAFETY_CONTEXT_RE.search(active)
+        ):
+            has_document_audit = True
+    return ("shadow-doc",) if has_document_audit else ()
+
+
 PLAYBOOK_LINK_RE = re.compile(r"\[[^\]]+\]\((references/[^)#\s]+\.md)\)")
 STOPWORDS = {
     "the", "and", "for", "with", "that", "this", "from", "into", "when", "only", "use", "using",
@@ -861,7 +938,7 @@ def _recommend_skill_playbooks(
                 if not (repo_root / skill / rel_ref).is_file():
                     continue
                 full_rel = f"{skill}/{rel_ref}"
-                if full_rel in seen:
+                if full_rel == EXTENSION_AUDIT_PLAYBOOK or full_rel in seen:
                     continue
                 row_tokens = _tokenize_keywords(f"{line} {Path(rel_ref).stem.replace('-', ' ')}")
                 score = len(prompt_tokens & row_tokens)
@@ -928,18 +1005,6 @@ def route_prompt(
     is_code_review = bool(CODE_REVIEW_RE.search(signal_text) or READ_ONLY_SCOPE_RE.search(unquoted))
     is_load_test_denied = bool(LOAD_TEST_DENIAL_RE.search(unquoted))
     is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", signal_text, re.IGNORECASE))
-    blocked_by_scope = (
-        {"shadow-browser", "shadow-perf"} if is_code_review or is_unit_test_only else set()
-    )
-
-    if is_load_test_denied:
-        blocked_by_scope.add("shadow-perf")
-
-    matched_ordered: list[str] = []
-    matched_task: list[str] = []
-    matched_risk: list[str] = []
-    matched_refs: list[str] = []
-    excluded_records: list[dict[str, str]] = []
 
     is_typo_only = bool(TYPO_ONLY_RE.search(signal_text)) and not explicit_skills
     is_definitional_query = bool(
@@ -951,7 +1016,25 @@ def route_prompt(
         and (is_definitional_query or not NON_TRIVIAL_INCIDENT_RE.search(signal_text))
     )
 
-    for sl in explicit_skills:
+    artifact_audit_owners = () if is_typo_only or is_definitional_query else _artifact_audit_owners(signal_text)
+    is_code_review = is_code_review or bool(artifact_audit_owners)
+    blocked_by_scope = (
+        {"shadow-browser", "shadow-perf"} if is_code_review or is_unit_test_only else set()
+    )
+    if is_load_test_denied:
+        blocked_by_scope.add("shadow-perf")
+
+    matched_ordered: list[str] = []
+    matched_task: list[str] = []
+    matched_risk: list[str] = []
+    matched_refs: list[str] = []
+    excluded_records: list[dict[str, str]] = []
+
+    selected_skills = explicit_skills
+    if artifact_audit_owners:
+        requested_helpers = ARTIFACT_AUDIT_HELPER_RE.findall(signal_text.lower())
+        selected_skills = [*artifact_audit_owners, *(skill for skill in requested_helpers if skill in known_skills)]
+    for sl in selected_skills:
         if sl in blocked_by_scope:
             continue
         if sl not in matched_ordered:
@@ -959,7 +1042,7 @@ def route_prompt(
         if sl not in matched_task:
             matched_task.append(sl)
 
-    if not is_typo_only:
+    if not is_typo_only and not artifact_audit_owners:
         for rule in ROUTING_RULES:
             sname = rule["skill"]
             if sname not in known_skills or sname in blocked_by_scope:
@@ -978,7 +1061,7 @@ def route_prompt(
                     target_bucket.append(sname)
 
     always_on_ui: list[str] = []
-    if not is_typo_only:
+    if not is_typo_only and not artifact_audit_owners:
         ui_signal_text = NON_UI_HOMOGRAPH_RE.sub(" ", signal_text)
         is_pure_sql_without_ui = bool(SQL_BACKEND_CONTEXT_RE.search(signal_text)) and not bool(
             UI_STRONG_SIGNAL_RE.search(ui_signal_text)
@@ -1025,7 +1108,7 @@ def route_prompt(
                 matched_ordered.append(rsk)
                 matched_risk.append(rsk)
 
-    if not is_trivial and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
+    if not is_trivial and not artifact_audit_owners and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
         if "shadow-auth" in known_skills and primary_skill != "shadow-auth":
             if "shadow-auth" in matched_ordered:
                 matched_ordered.remove("shadow-auth")
@@ -1112,6 +1195,8 @@ def route_prompt(
     ]
     if intent_mode == "code_review":
         prohibited_actions.extend(["write_or_modify_source_files", "run_mutating_commands"])
+    if artifact_audit_owners:
+        prohibited_actions.extend(["execute_candidate_code", "install_candidate", "activate_candidate", "load_candidate_as_instructions"])
     if is_load_test_denied:
         prohibited_actions.append("run_explicitly_denied_load_test")
     if intent_mode in {"debug", "unit_test", "ui_implementation"}:
@@ -1137,12 +1222,18 @@ def route_prompt(
     requires_api_docs_decision = asks_generic_api_docs and readme_summary_only and not has_active_api_doc_gen
 
     final_refs = [] if is_trivial else matched_refs[:4]
-    recommended_playbooks = [] if is_trivial else _recommend_skill_playbooks(signal_text, companion_skills, primary_skill)
+    if artifact_audit_owners:
+        audit_playbooks = DOCUMENT_AUDIT_PLAYBOOKS if primary_skill == "shadow-doc" else EXTENSION_AUDIT_PLAYBOOKS
+        recommended_playbooks = [path for path in audit_playbooks if path.split("/", 1)[0] in companion_skills]
+    else:
+        recommended_playbooks = [] if is_trivial else _recommend_skill_playbooks(signal_text, companion_skills, primary_skill)
     disclosure_metrics = _compute_disclosure_metrics(companion_skills, always_on_ui, final_refs, is_trivial)
 
     denied_actions = ["load_test", "stress_test", "soak_test"] if is_code_review or is_load_test_denied else []
     if is_code_review:
         denied_actions.append("broad_e2e")
+    if artifact_audit_owners:
+        denied_actions.extend(["global_install", "execute_candidate_code", "install_candidate", "activate_candidate", "load_candidate_as_instructions"])
 
     decision_record = {
         "task_id": task_id,

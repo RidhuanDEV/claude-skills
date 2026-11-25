@@ -54,12 +54,12 @@ Before citing any external standard, documentation, or research paper in code co
 6. **Traceable Citation in AST (`sources[]` & `source_refs[]`)**: Every normative rule or empirical claim in `/shadow-doc` must link its block `source_refs` to an entry in `root.sources[]`.
 7. **Mandatory Local Download & Offline Archival (`docs/references/`)**:
    - Whenever a cited reference (open-access paper, public standard PDF/spec from NIST/OWASP/IETF/W3C, or technical bulletin) is publicly downloadable, download a local copy into `<project>/docs/references/` using `shadow-doc/scripts/reference_verifier.py fetch` and record its `sha256`, `doi_or_url`, `venue`, `peer_reviewed`, and `citation_badge` in `docs/references/references_manifest.json`.
-8. **Mandatory 7-Point File Safety Re-Check (`reference_verifier.py` — Zero Dangerous Files on Local PC)**:
-   - Every downloaded or imported reference file MUST pass `python "shadow-doc/scripts/reference_verifier.py" scan <path> --quarantine-delete` before being kept or opened:
+8. **Mandatory 7-Point File Safety Re-Check (`reference_verifier.py`)**
+   - Check imported references with `python "shadow-doc/scripts/reference_verifier.py" scan <path>` before opening them. Fetch public HTTPS sources through verifier-owned staging and supply `--expected-sha256` when a trusted publisher checksum is available.
      1. **Blocked Executable/Macro Extensions**: Rejects `.exe`, `.dll`, `.bat`, `.cmd`, `.ps1`, `.vbs`, `.js`, `.scr`, `.msi`, `.jar`, `.docm`, `.xlsm`, `.pptm`, `.lnk`, `.iso`.
      2. **Double-Extension Spoof Detection**: Blocks disguised filenames such as `paper.pdf.exe` or `standard.pdf.ps1`.
      3. **Magic-Byte Header Verification**: Verifies `%PDF-` header on `.pdf` files and blocks Windows PE (`MZ`), Linux `ELF`, Mach-O, or ZIP/Archive (`PK`) binaries masquerading as PDFs or text files.
      4. **PDF Active-Content / Exploit Scan**: Rejects PDFs containing `/JavaScript`, `/JS`, `/Launch`, `/EmbeddedFiles`, `/RichMedia`, `/XFA`, or `/SubmitForm` dictionary actions.
      5. **Text/HTML Script Injection Scan**: Rejects `.html`/`.md`/`.txt` references containing active `<script>`, `<iframe>`, `<object>`, `<embed>`, inline `onload=`/`onerror=`, or `javascript:` URIs.
      6. **File Size Sanity Check**: Rejects 0-byte files or >100 MB archive bombs.
-     7. **Automatic Quarantine Deletion**: Any file failing safety verification is immediately deleted from disk (`DELETED_UNSAFE_FILE`) so dangerous files never remain on the Monarch's PC.
+     7. **Staging and integrity**. `fetch` discards rejected staging files and records SHA-256 plus the submitted and final URL without query parameters for accepted references. Local scans report findings without deleting inputs.
