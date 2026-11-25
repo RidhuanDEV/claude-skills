@@ -65,3 +65,13 @@ trap cleanup EXIT INT TERM
   - Set `SHELL := /usr/bin/env bash` and `.SHELLFLAGS := -eu -o pipefail -c` when recipes use Bash features.
 - Ensure cross-platform developer experience: if the team works on Windows without WSL/Make, provide equivalent `package.json`
   scripts, `Taskfile.yml` (`go-task`), or a `.ps1` wrapper.
+
+## 4. Anti-Stuck Execution: Hard Timeouts, Idle Watchdogs & SSH Keepalives
+
+- **Never run unbounded blocking scripts or SSH calls:** wrap potentially long/hung commands with
+  `python shadow-monarch/scripts/bounded_exec.py --timeout <sec> --idle-timeout <sec> -- <cmd>` (exit `124` on `WALL_TIMEOUT`,
+  exit `125` on `IDLE_TIMEOUT`, live heartbeat on stderr, and exact-PID tree termination without blanket kills).
+- **SSH commands MUST fail fast:** use `--ssh-safe` or pass `-o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2`
+  so unexpected password prompts or dropped TCP links terminate in `<= 30s` instead of hanging indefinitely.
+- **Avoid silent pipe buffering:** when piping long commands into `tail` or log filters on Linux, flush line-by-line (`stdbuf -oL` / `flush=True`)
+  and wrap remote commands with `timeout --kill-after=5s <sec> ...` so remote work stops even if the client disconnects.

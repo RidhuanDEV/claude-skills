@@ -21,6 +21,9 @@ From the skill repository root:
 ```text
 python -B shadow-illustration/scripts/verify_fixtures.py
 python -B shadow-illustration/scripts/inspect_static_svg.py shadow-illustration/fixtures/onboarding-success.svg --viewbox 0 0 320 160
+python -B shadow-illustration/scripts/build_stack_diagram.py --self-test
+node shadow-illustration/scripts/pixelfx_engine.mjs check
+python -B -m unittest discover -s shadow-illustration/tests -v
 ```
 
 The fixture suite exercises accepted and rejected XML, element and attribute vocabulary, literal paint, IDs, and viewBox syntax. For a rendering check, run the installed compatible SVG renderer on the two sources in `fixtures/` at 320Ã—160 and 128Ã—128. Inspect the PNGs visually and sample alpha at the upper-left corner and the center for the transparent motif. Compare runs only under matched renderer, size and alpha settings. Keep structural and visual results separate.

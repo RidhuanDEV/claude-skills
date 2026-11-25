@@ -23,6 +23,8 @@ description: "Full-Spectrum Visual, Illustration & Graphics Engineering. Use whe
 | Build HTML5 `<canvas>`, WebGL, GLSL shaders, particles, or procedural hero visuals | [Canvas, WebGL & procedural hub](references/canvas-webgl-procedural.md) (routes to 10 focused engineering modules + 5 strict-TS examples — load only the task-relevant modules) |
 | Batch-generate OG cards, responsive `srcset`, favicons, PWA icons, or spritesheets via code | [Programmatic image pipelines](references/programmatic-image-pipelines.md) |
 | Design UI icon systems, custom architecture diagrams, or annotated screenshots | [Iconography and diagrams](references/iconography-and-diagrams.md) |
+| Build offline engineering-drawing stack/architecture diagrams (HTML light/dark + SVG, zero egress) | [Offline stack diagrams](references/offline-stack-diagrams.md) + [`scripts/build_stack_diagram.py`](scripts/build_stack_diagram.py) |
+| Build deterministic procedural pixel-art VFX & Aseprite sprite sheets (pure Node, 0 deps, offline) | [Pixel-art VFX engineering](references/pixel-art-vfx-engineering.md) + [`scripts/pixelfx_engine.mjs`](scripts/pixelfx_engine.mjs) |
 | Manage sRGB/P3/CMYK print specs, alpha anti-halo, or safe SVGO optimization | [Color, print and optimization](references/color-print-and-optimization.md) |
 | Animate a pose, transition, or frame sequence | [Motion design](references/motion-design-principles.md) and the target format reference |
 | Export or debug Lottie JSON or dotLottie | [Lottie and dotLottie](references/lottie-and-dotlottie.md) |

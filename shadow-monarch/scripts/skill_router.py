@@ -507,7 +507,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:product\s+illustration|ilustrasi\s+(?:SVG|produk|maskot|onboarding|status|canvas|isometric)|mascot|maskot|"
             r"onboarding\s+(?:art|illustration)|status\s+artwork|SVG\s+(?:character|mascot|illustration|icon\s+system)|"
             r"Lottie\s+(?:motion|handoff|animation)|Rive\s+animation|HTML5\s+canvas|WebGL|Three\.js|GLSL\s+shader|"
-            r"procedural\s+(?:art|visual)|OG\s+card|Satori|spritesheet|favicon\s+(?:set|pack)|PWA\s+icons?|"
+            r"procedural\s+(?:art|visual)|OG\s+card|Satori|spritesheet|sprite\s+sheets?|pixel[- ]art\s+(?:VFX|effects?|animations?)|"
+            r"stack\s+diagram|diagram\s+(?:arsitektur\s+tech\s+stack|tech\s+stack)|favicon\s+(?:set|pack)|PWA\s+icons?|"
             r"isometric\s+diagram|CMYK\s+print|banner\s+cetak)\b",
             re.IGNORECASE,
         ),
@@ -542,6 +543,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
             r"\b(?:design\s+systems?|wireframes?|UI/UX|user\s+flows?|thumb\s+zone|design\s+tokens?|9[- ]state\s+(?:component|machine)|"
+            r"visual\s+(?:hierarchy|refinement)|hierarki\s+visual|competing\s+emphasis|anti[- ]slop\s+review|"
             r"Human[- ]AI\s+(?:UX|HITL)|komponen\s+UI|antarmuka|interview-script|task[- ]usability)\b",
             re.IGNORECASE,
         ),
@@ -671,7 +673,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:Docker|Dockerfile|Kubernetes|Nginx|Caddy|systemd|PM2|CI/CD|GitHub\s+Actions|GitLab\s+CI|canary\s+rollout|blue[- ]green|secret\s+rotation|"
             r"orphan(?:ed)?\s+(?:MCP|process(?:es)?)|proses\s+(?:MCP|yatim)|leftover\s+(?:dev\s+server|process(?:es)?)|dev\s+server\s+(?:nyangkut|sisa)|"
-            r"resource_cleanup|port\s+conflict|bersihkan\s+proses)\b",
+            r"resource_cleanup|bounded_exec|watchdog|anti[- ]stuck|(?:script|command|idle)\s+timeout|SSH\s+stuck|port\s+conflict|bersihkan\s+proses)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Redis\s+vs\s+queue\s+semantics|queue\s+semantics\s+vs\s+Redis)\b", re.IGNORECASE),
