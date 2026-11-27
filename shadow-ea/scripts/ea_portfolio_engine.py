@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -38,11 +39,23 @@ def classify_time(business_value: float, tech_health: float, is_duplicate_redund
     return "ELIMINATE"
 
 
+def _score_1_5(app: dict[str, Any], field: str) -> float:
+    value = app.get(field)
+    if type(value) not in (int, float) or not math.isfinite(value) or not 1 <= value <= 5:
+        raise ValueError(f"{app.get('system_id', '<unknown>')}.{field} must be an evidenced JSON number in [1, 5].")
+    return float(value)
+
+
 def analyze_portfolio(spec: dict[str, Any]) -> dict[str, Any]:
     org_type = str(spec.get("org_type", "GENERAL_ENTERPRISE")).upper()
     apps = spec.get("applications", [])
-    if not apps:
+    if not isinstance(apps, list) or not apps:
         raise ValueError("applications list cannot be empty.")
+    for app in apps:
+        if not isinstance(app, dict) or not all(isinstance(app.get(k), str) and app[k].strip() for k in ("system_id", "name")):
+            raise ValueError("Each application must be an object with nonblank system_id and name.")
+        _score_1_5(app, "business_value")
+        _score_1_5(app, "tech_health")
 
     by_capability: dict[str, list[dict[str, Any]]] = {}
     for app in apps:
@@ -71,12 +84,12 @@ def analyze_portfolio(spec: dict[str, Any]) -> dict[str, Any]:
         # Keep highest (business_value + tech_health) system as anchor; lower duplicates marked redundant
         sorted_group = sorted(
             group,
-            key=lambda a: (float(a.get("business_value", 0)), float(a.get("tech_health", 0))),
+            key=lambda a: (float(a["business_value"]), float(a["tech_health"])),
             reverse=True,
         )
         for idx, app in enumerate(sorted_group):
-            bv = float(app.get("business_value", 3.0))
-            th = float(app.get("tech_health", 3.0))
+            bv = float(app["business_value"])
+            th = float(app["tech_health"])
             quad = classify_time(bv, th, is_duplicate_redundant=(is_dup and idx > 0))
             catalog_out.append({
                 "system_id": app["system_id"],
@@ -92,11 +105,17 @@ def analyze_portfolio(spec: dict[str, Any]) -> dict[str, Any]:
     if org_type == "GOVERNMENT_SPBE":
         declared_domains = {str(d).upper() for d in spec.get("spbe_domains_covered", [])}
         missing = sorted(REQUIRED_SPBE_6_DOMAINS - declared_domains)
+        # Satu Data (Perpres 39/2019) requires a named Wali Data per system.
+        unassigned = sorted(
+            c["system_id"] for c in catalog_out
+            if not isinstance(c["data_owner"], str) or c["data_owner"].strip().upper() in {"", "UNASSIGNED"}
+        )
         spbe_validation = {
             "required": True,
             "expected_domains_count": 6,
             "missing_domains": missing,
-            "valid": len(missing) == 0,
+            "unassigned_data_owners": unassigned,
+            "valid": len(missing) == 0 and len(unassigned) == 0,
         }
 
     abb_gaps = []

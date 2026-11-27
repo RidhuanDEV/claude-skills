@@ -1,6 +1,6 @@
 ---
 name: shadow-browser
-description: "Live Web Browser E2E Verification. Use when running real Playwright browser tests, inspecting 375px/768px/1440px responsive viewport overflow, injecting network faults (401/429/500/202), checking console/pageerror oracles, stabilizing visual regressions, or clicking through live web UI flows. Do NOT use for native mobile store gates (/shadow-mobile)."
+description: "Use when verifying real browser behavior with Playwright, screenshots, console, navigation, or mocked network errors."
 ---
 
 # `/shadow-browser` — Live Web Browser E2E, Responsive QA & Fault-Injection Verification

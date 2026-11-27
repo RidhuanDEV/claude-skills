@@ -1,6 +1,6 @@
 ---
 name: shadow-auth
-description: "Identity, AuthN & AuthZ Engineering Specialist. Use when designing or auditing login, Argon2id/MFA/Passkeys, OAuth2/OIDC PKCE, cookie/CSRF sessions, JWT/JWKS rotation, RBAC/ABAC/ReBAC, multi-tenant anti-IDOR isolation, SSO SDK coexistence (ridhuan-sso), or immutable security audit trails. Do NOT use for generic AppSec SAST/SSRF audits (/shadow-sec)."
+description: "Use when designing login, MFA, passkeys, SSO, OAuth/OIDC, JWT/JWKS rotation, cookies, RBAC, or tenant authorization."
 ---
 
 # Shadow Auth (`/shadow-auth`) — Identity, AuthN, AuthZ & Multi-Tenant Isolation
@@ -9,7 +9,7 @@ Use this skill whenever the **Monarch** designs, implements, migrates, or audits
 
 ## 1. Core Engineering Principles & Non-Negotiables
 
-1. **Hardened Credentials & Enumeration Defense (NIST SP 800-63-4 / ASVS 5.0):** Hash passwords with `Argon2id` (preferred) or `bcrypt >= 12`, block breached passwords, execute timing-safe dummy hashing on unknown users, and rate-limit per IP + account without permanent DoS lockouts.
+1. **Hardened Credentials & Enumeration Defense (NIST SP 800-63-4 / ASVS 5.0.0):** Hash passwords with `Argon2id` (preferred) or `bcrypt >= 12`, block breached passwords, execute timing-safe dummy hashing on unknown users, and rate-limit per IP + account without permanent DoS lockouts.
 2. **Session, Cookie & Token Discipline:** Use `__Host-` `HttpOnly`, `Secure`, `SameSite=Lax/Strict` cookies with CSRF `Origin` checks and fixation rotation on login/step-up; keep access JWTs `<= 5–15m` with pinned asymmetric `allowed_algs` (`EdDSA`/`RS256`/`ES256`, NEVER `alg: none`), dual-key `kid` JWKS rollover, rotating refresh tokens with **token-family reuse revocation**, and immediate revocation propagation (including `/shadow-realtime`).
 3. **Server-Side Deny-by-Default & Zero-IDOR:** Enforce AuthN + AuthZ on every server route/resolver/worker (never UI-only). Scope every multi-tenant DB query by authenticated `tenant_id` (`WHERE id = $1 AND tenant_id = $2` + Postgres RLS); reject client-supplied `tenant_id`/`role`/`username` (confused deputy & mass assignment).
 4. **Local SSO SDK Preservation (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):** Inspect existing local/internal SSO SDKs (`ridhuan-sso` / `file:../sdk/sso-client`) first via `official_first_verifier.py --check-auth-sdk`; NEVER silently replace with an unverified npm lookalike or trust frontend `username` without server-verified claims. Resolve coexisting SSO + cookie + JWKS JWT into one canonical `AuthenticatedPrincipal`.
@@ -34,7 +34,7 @@ Load **only** the 1–2 modules matching the active subtask (never load all 8 at
 | Task / Scenario | Tier | Load Reference |
 | :--- | :--- | :--- |
 | AuthN threat model, Argon2id/bcrypt, NIST SP 800-63-4, timing-safe anti-enumeration & recovery | CORE | [references/01-authn-threat-model-and-credentials.md](references/01-authn-threat-model-and-credentials.md) |
-| OAuth 2.1 / OIDC Authorization Code + PKCE `S256`, `state`/`nonce`, ID-token checks & BFF pattern | CORE | [references/02-oauth2-oidc-and-pkce-flows.md](references/02-oauth2-oidc-and-pkce-flows.md) |
+| OAuth 2.1 (draft; baseline RFC 9700) / OIDC Authorization Code + PKCE `S256`, `state`/`nonce`, ID-token checks & BFF pattern | CORE | [references/02-oauth2-oidc-and-pkce-flows.md](references/02-oauth2-oidc-and-pkce-flows.md) |
 | `__Host-` `HttpOnly`/`Secure` cookies, CSRF `Origin`, fixation rotation & instant revocation | CORE | [references/03-sessions-cookies-csrf-and-revocation.md](references/03-sessions-cookies-csrf-and-revocation.md) |
 | Short-lived JWTs, pinned `allowed_algs`, refresh-token family replay revocation & JWKS `kid` rollover | CORE | [references/04-jwt-jwks-and-key-rotation.md](references/04-jwt-jwks-and-key-rotation.md) |
 | Passkeys / WebAuthn (FIDO2) `origin`/`rpIdHash`/`signCount`, TOTP replay protection & step-up MFA | ADVANCED | [references/05-passkeys-webauthn-and-mfa.md](references/05-passkeys-webauthn-and-mfa.md) |

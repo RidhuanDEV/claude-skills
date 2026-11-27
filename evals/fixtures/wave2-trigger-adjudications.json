@@ -1,0 +1,54 @@
+[
+  {
+    "original_id": "modern-web-guidance-07",
+    "case": {
+      "id": "modern-web-guidance-07-adjudicated",
+      "language": "en",
+      "prompt": "Use the Search Console coverage export to diagnose URLs excluded as duplicates. Correlate canonical targets and sitemap coverage, then prioritize which product URLs should be crawled again.",
+      "expected_primary": "shadow-seo",
+      "exclude": [
+        "modern-web-guidance"
+      ]
+    },
+    "reason": "Search Console coverage, canonical targets and XML sitemap coverage are technical SEO ownership. This is an indexing and crawl analysis without browser implementation, rendering, layout, Core Web Vitals or Baseline API choices."
+  },
+  {
+    "original_id": "antislop-layoutmobile-07",
+    "case": {
+      "id": "antislop-layoutmobile-07-adjudicated",
+      "language": "en",
+      "prompt": "For the phone app's sync client, design a cursor-based REST response that can resume a query after a lost connection. Document continuation tokens and stable ordering in the owning OpenAPI contract.",
+      "expected_primary": "shadow-api",
+      "exclude": [
+        "antislop-layoutmobile"
+      ]
+    },
+    "reason": "The mobile client is a consumer of the requested backend API contract. Cursor semantics and OpenAPI belong to shadow-api. The task contains no screen, reflow, viewport, breakpoint or touch target work."
+  },
+  {
+    "original_id": "antislop-human-07",
+    "case": {
+      "id": "antislop-human-07-adjudicated",
+      "language": "en",
+      "prompt": "Trace why the terminal-only batch command hangs after a saved stdin recording contains a Tab character. Isolate the parser or input-mode boundary and produce a minimal reproducer.",
+      "expected_primary": "shadow-debug",
+      "exclude": [
+        "antislop-human"
+      ]
+    },
+    "reason": "Tab is a character in batch-process input rather than a UI navigation event. Root-cause analysis and reproducer ownership belong to shadow-debug. The command has no interactive affordance or visual element."
+  },
+  {
+    "original_id": "shadow-doc-08",
+    "case": {
+      "id": "shadow-doc-08-adjudicated",
+      "language": "id",
+      "prompt": "Klien meminta lampiran tambahan pada BAST sebagai syarat pembayaran. Tentukan apakah permintaan itu masuk ruang lingkup kontrak berdasarkan pasal deliverable yang disepakati, lalu identifikasi jalur persetujuan CCB.",
+      "expected_primary": "shadow-pmo",
+      "exclude": [
+        "shadow-doc"
+      ]
+    },
+    "reason": "The BAST is evidence in a contract scope and acceptance dispute. Clause interpretation and escalation to the change-control board are PMO work. The user asks for classification and an approval route, without generating, rendering or revising the BAST."
+  }
+]

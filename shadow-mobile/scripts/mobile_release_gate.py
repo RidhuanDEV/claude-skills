@@ -145,7 +145,7 @@ def scan_mobile_repo(root: Path) -> dict[str, Any]:
         "target": str(root),
         "scanned_files": scanned,
         "finding_count": len(findings),
-        "status": "PASS" if not findings else "FINDINGS_DETECTED",
+        "status": "BLOCKED_NO_FILES_SCANNED" if scanned == 0 else ("PASS" if not findings else "FINDINGS_DETECTED"),
         "findings": findings,
     }
 
@@ -247,7 +247,7 @@ def main() -> int:
     if args.scan:
         res = scan_mobile_repo(Path(args.scan))
         print(json.dumps(res, indent=2))
-        return 0 if res["finding_count"] == 0 else 1
+        return 0 if res["status"] == "PASS" else 1
 
     parser.print_help()
     return 0

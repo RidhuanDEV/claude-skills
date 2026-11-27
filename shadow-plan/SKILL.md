@@ -1,6 +1,6 @@
 ---
 name: shadow-plan
-description: "Agile Sprint & Delivery Planning. Use when decomposing approved PRD/SRS specs into Epics, User Stories, Sprint Tasks, dependency graphs, and DoR/DoD. Do NOT use for contractual Paid CR evaluation, PERT/Monte Carlo P80, or EVM (/shadow-pmo)."
+description: "Use when turning approved requirements into epics, stories, sprint backlog, dependencies, and DoR/DoD. Not for elicitation (/shadow-discovery)."
 ---
 
 # Shadow Plan (`/shadow-plan`) — Task Decomposition & Delivery Roadmap (SDLC Stage 2 -> 3 Bridge)

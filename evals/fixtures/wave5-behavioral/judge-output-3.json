@@ -1,0 +1,194 @@
+{
+ "b11": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both decompose TTFT, delimit data, server-side auth+HITL."
+ },
+ "b12": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B omits metric owners; A mentions owner registry."
+ },
+ "b13": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks RFC 9745 Deprecation/Sunset headers."
+ },
+ "b15": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A imposes 404 without preserving existing concealment convention."
+ },
+ "b20": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks transactional outbox written with business commit."
+ },
+ "b21": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "note": "B misses legacy-writer behind-cursor sweep and pre-switch reconciliation."
+ },
+ "b22": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B cites squawk lint for postmortem, not migration safety verification."
+ },
+ "b27": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "note": "Neither explicitly separates Dispatch vs Settled Payroll contexts."
+ },
+ "b30": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "note": "B lacks dataset SHA/version and NOT_RUN reporting."
+ },
+ "b36": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "Neither covers dual-secret rotation; A lacks timingSafeEqual."
+ },
+ "b47": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks receipts, HMAC tombstone, synthetic auditor rehearsal."
+ },
+ "b54": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B lacks tenant predicate on server fix."
+ }
+}

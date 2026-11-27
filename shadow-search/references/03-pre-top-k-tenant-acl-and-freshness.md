@@ -8,7 +8,7 @@ Enforce zero-leakage multi-tenant and document-level authorization **inside** se
 
 ## 3. Technical Principles & Constraints
 - **Mandatory Pre-Top-K ACL Filtering (NEVER Post-Filter!):**
-  - **Why Post-Filtering Fails Catastrophically:** Fetching global `topK = 20` vectors across all tenants and running `.filter(doc => doc.tenantId === callerTenant)` in Node/Python: (1) returns **0 results** for small tenants crowded out by giant tenants' documents, (2) leaks document counts/facets across tenants, and (3) creates a single bug away from total cross-tenant data breach (`OWASP LLM08:2025`)!
+  - **Why Post-Filtering Fails Catastrophically:** Fetching global `topK = 20` vectors across all tenants and running `.filter(doc => doc.tenantId === callerTenant)` in Node/Python: (1) returns **0 results** for small tenants crowded out by giant tenants' documents, (2) leaks document counts/facets across tenants, and (3) creates a single bug away from total cross-tenant data breach (`OWASP LLM09:2026`)!
   - **Mandatory Rule:** Pass `tenant_id` AND authorized `acl_principals` (`['user:u1', 'role:finance', 'group:g9']`) + `deleted = false` as an **indexed pre-filter** inside PostgreSQL `WHERE`, OpenSearch `bool.filter`, or Qdrant payload filter BEFORE scoring, facet aggregation, and top-K cutoffs!
 - **Near-Real-Time Deletion & Revocation Tombstones:** When a user revokes a collaborator's access, deletes a document, or submits a UU PDP DSAR erasure (`/shadow-privacy`), stale search indexes can continue serving revoked content for hours if indexed only by nightly cron!
   - Emit a high-priority outbox tombstone event (`search.doc.revoked` / `search.doc.deleted`) processed within seconds (`<= 5–30s` SLA),
@@ -90,7 +90,7 @@ An HR employee leaves the `payroll-admins` group at 10:00 AM, yet at 2:00 PM the
 - Monitor `search_index_freshness_lag_sec` (time from OLTP `updated_at`/`revoked_at` to search index visibility) as a Tier-1 SRE SLO (`< 30s` p99).
 
 ## 11. Authoritative References
-- OWASP Top 10 for LLM Applications 2025 — `LLM08:2025` (*Vector and Embedding Weaknesses*).
+- OWASP Top 10 for LLM Applications 2026 — `LLM09:2026` (*Vector and Embedding Weaknesses*) (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
 - Qdrant Multitenancy & Payload Indexing Docs (`https://qdrant.tech/documentation/guides/multiple-partitions/`).
 
 ## 12. Limitations & When NOT to Use

@@ -13,11 +13,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 SKIP_DIRS = {".git", "node_modules", ".next", "dist", "build", "__pycache__", ".venv", "venv", "vendor"}
+REQUIRED_COST_INPUTS = ("annual_legacy_ops_cost", "rewrite_build_cost", "strangler_build_cost", "encapsulate_build_cost")
 MANIFEST_NAMES = {
     "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock",
     "pyproject.toml", "requirements.txt", "poetry.lock",
@@ -86,28 +91,79 @@ def evaluate_modernization_options(profile: dict[str, Any]) -> dict[str, Any]:
         "business_criticality": 0.15,
     })
 
+    if not isinstance(dims, dict) or not isinstance(weights, dict):
+        raise InvalidInput("risk_dimensions and dimension_weights must be JSON objects.")
     vector_out: dict[str, Any] = {}
+    has_evidence = False
     weighted_risk = 0.0
     low_conf_dims: list[str] = []
+    missing_dims: list[str] = []
     for dim, weight in weights.items():
-        entry = dims.get(dim, {"score": 3.0, "confidence": "LOW"})
-        sc = float(entry.get("score", 3.0))
+        if type(weight) not in (int, float) or not math.isfinite(weight) or weight < 0:
+            raise InvalidInput(f"dimension_weights.{dim} must be finite and nonnegative.")
+        if dim not in dims:
+            if weight > 0:
+                missing_dims.append(dim)
+            continue
+        entry = dims[dim]
+        if not isinstance(entry, dict):
+            raise InvalidInput(f"risk_dimensions.{dim} must be a JSON object.")
+        evidence = entry.get("evidence_refs", [])
+        if not isinstance(evidence, list) or not all(isinstance(ref, str) and ref.strip() for ref in evidence):
+            raise InvalidInput(f"risk_dimensions.{dim}.evidence_refs must be an array of nonblank strings.")
+        if "score" not in entry:
+            if weight > 0:
+                missing_dims.append(dim)
+            continue
+        sc = entry["score"]
+        if type(sc) not in (int, float) or not 0 <= sc <= 5:
+            raise InvalidInput(f"risk_dimensions.{dim}.score must be a finite JSON number in [0, 5].")
+        has_evidence = has_evidence or (weight > 0 and "score" in entry and bool(evidence))
         conf = str(entry.get("confidence", "LOW")).upper()
         if conf == "LOW":
             low_conf_dims.append(dim)
         weighted_risk += sc * float(weight)
-        vector_out[dim] = {"score_0_5": sc, "weight": weight, "confidence": conf, "evidence_refs": entry.get("evidence_refs", [])}
+        vector_out[dim] = {"score_0_5": sc, "weight": weight, "confidence": conf, "evidence_refs": evidence}
+
+    if not has_evidence:
+        raise InvalidInput("At least one weighted risk dimension requires a score and evidence_refs.")
 
     rule_complexity = str(profile.get("business_rule_complexity", "HIGH")).upper()
-    ops_stable = bool(profile.get("production_stability_high", True))
-    has_tests = bool(profile.get("has_automated_tests", False))
+    ops_stable = strict_bool(profile.get("production_stability_high", True), "production_stability_high")
+    has_tests = strict_bool(profile.get("has_automated_tests", False), "has_automated_tests")
 
-    # Economics inputs (3-5 yr horizon)
-    years = int(profile.get("horizon_years", 3))
-    annual_legacy_ops = float(profile.get("annual_legacy_ops_cost", 1_000_000_000))
-    rewrite_build = float(profile.get("rewrite_build_cost", 3_000_000_000))
-    strangler_build = float(profile.get("strangler_build_cost", 1_800_000_000))
-    encapsulate_build = float(profile.get("encapsulate_build_cost", 600_000_000))
+    # Economics inputs (3-5 yr horizon) must come from the profile; no hidden default costs.
+    missing_costs: list[str] = []
+    costs: dict[str, float] = {}
+    for field in REQUIRED_COST_INPUTS:
+        if field not in profile:
+            missing_costs.append(field)
+            continue
+        value = profile[field]
+        if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+            raise InvalidInput(f"{field} must be a finite, positive JSON number.")
+        costs[field] = float(value)
+    years_raw = profile.get("horizon_years")
+    if years_raw is None:
+        missing_costs.append("horizon_years")
+    elif type(years_raw) is not int or not 1 <= years_raw <= 10:
+        raise InvalidInput("horizon_years must be a JSON integer in [1, 10].")
+
+    if missing_dims or missing_costs:
+        return {
+            "system_id": profile.get("system_id", "SYS-UNKNOWN"),
+            "status": "INSUFFICIENT_EVIDENCE",
+            "recommended_strategy": None,
+            "missing_risk_dimensions": missing_dims,
+            "missing_cost_inputs": missing_costs,
+            "guardrail_rationale": "Provide every weighted risk dimension (score + evidence_refs) and all cost inputs before ranking strategies.",
+        }
+
+    years = int(years_raw)
+    annual_legacy_ops = costs["annual_legacy_ops_cost"]
+    rewrite_build = costs["rewrite_build_cost"]
+    strangler_build = costs["strangler_build_cost"]
+    encapsulate_build = costs["encapsulate_build_cost"]
 
     # Rewrite carries higher business-rule loss & dual-run coexistence risk when undocumented rules are HIGH
     rewrite_risk_penalty = 0.45 * rewrite_build if rule_complexity == "HIGH" else 0.20 * rewrite_build
@@ -151,6 +207,7 @@ def evaluate_modernization_options(profile: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "system_id": profile.get("system_id", "SYS-UNKNOWN"),
+        "status": "EVALUATED",
         "risk_vector": vector_out,
         "composite_reference_risk_0_5": round(weighted_risk, 2),
         "low_confidence_dimensions": low_conf_dims,
@@ -272,12 +329,13 @@ def main() -> int:
         return 0
     if args.evaluate_options:
         profile = json.loads(Path(args.evaluate_options).read_text(encoding="utf-8"))
-        print(json.dumps(evaluate_modernization_options(profile), indent=2))
-        return 0
+        res = evaluate_modernization_options(profile)
+        print(json.dumps(res, indent=2))
+        return 0 if res["status"] == "EVALUATED" else 1
 
     parser.print_help()
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

@@ -1,6 +1,6 @@
 ---
 name: shadow-integrate
-description: "External & Third-Party Integration Engineering Specialist. Use when integrating payment gateways (SNAP BI, Midtrans, Xendit, Stripe), verifying raw-body HMAC webhooks with replay/ordering guards, implementing bounded timeouts/Full-Jitter retries/circuit breakers, resolving ambiguous UNKNOWN mutations, or scheduling ledger reconciliation. Do NOT use for internal queue internals (/shadow-concurrency) or email deliverability (/shadow-email)."
+description: "Use when integrating payment gateways, HMAC webhooks, third-party retries, or ambiguous transaction reconciliation."
 ---
 
 # Shadow Integrate (`/shadow-integrate`) — Resilient Third-Party APIs, Webhooks & Reconciliation
@@ -22,7 +22,7 @@ python "shadow-integrate/scripts/reconcile_unknown.py" --self-test
 python "shadow-integrate/scripts/reconcile_unknown.py" --assess path/to/unknown_record.json
 python -m unittest discover -s "shadow-integrate/tests" -v
 ```
-Supply `reconcile_unknown.py --assess` strictly with verified local operation ID, state, and evidence-backed provider capabilities (a terminal inquiry must be authenticated and bound to the exact same account, operation, and transaction). Graded specialist scenarios live in [evaluations.md](evaluations.md) (7 scenarios).
+Supply `reconcile_unknown.py --assess` strictly with verified local operation ID, state, and evidence-backed provider capabilities (a terminal inquiry must set verified to true and match operation_id, account, currency, provider_tx_id, and integer amount_minor on both the local record and the inquiry). Graded specialist scenarios live in [evaluations.md](evaluations.md) (7 scenarios).
 
 ## Reference Guide
 

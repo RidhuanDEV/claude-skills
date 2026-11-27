@@ -9,7 +9,7 @@ Module `01` (envelope `MAIL FROM` vs header `From:`) and DNS management access.
 ## 3. Technical Principles & Constraints
 - **SPF (`RFC 7208`) Hard 10-Lookup Ceiling:** Exceeding **10 DNS lookup mechanisms** (`include:`, `a`, `mx`, `ptr`, `exists:`, `redirect=`) causes `PermError` and fails SPF silently across receivers! Isolating streams onto dedicated subdomains (`tx.`, `news.`, `support.`) prevents lookup bloat.
 - **DKIM (`RFC 6376`):** Use **2048-bit RSA** (1024-bit minimum legacy) with custom domain signing (`d=tx.example.com`) and periodic selector rotation (`s2026a -> s2026b`). Sign critical headers (`From`, `To`, `Subject`, `Date`, `Message-ID`, plus `List-Unsubscribe` & `List-Unsubscribe-Post` on bulk/subscribed mail).
-- **DMARC (`RFC 7489` / Standards Track Updates):** Requires SPF **or** DKIM to pass **AND align** with the `RFC 5322 From:` domain (`adkim=s/r`, `aspf=s/r`). Roll out safely: `p=none` + `rua` monitoring (`2–4 weeks`) -> `p=quarantine; pct=25 -> 100` -> `p=reject`.
+- **[DMARC (RFC 9989)](https://www.rfc-editor.org/rfc/rfc9989.html):** An authenticated SPF or DKIM identifier must align with the author domain. Strict mode requires an exact match. Relaxed mode compares organizational domains determined by the DNS Tree Walk. Stage enforcement with monitoring at p=none, then p=quarantine, then p=reject.
 - **Transport Encryption Enforcement:** Publish **MTA-STS (`RFC 8461`)** (`_mta-sts` TXT + `https://mta-sts.<domain>/.well-known/mta-sts.txt`) + **TLS-RPT (`RFC 8460`)** (`_smtp._tls`) to block SMTP STARTTLS downgrade attacks.
 
 ## 4. Architecture & Implementation
@@ -21,17 +21,17 @@ _dmarc.tx.example.com.            IN TXT "v=DMARC1; p=reject; adkim=s; aspf=s; r
 _mta-sts.tx.example.com.          IN TXT "v=STSv1; id=2026112201"
 _smtp._tls.tx.example.com.        IN TXT "v=TLSRPTv1; rua=mailto:tls-rpt@example.com"
 ```
-Validate DNS configuration offline before cutover via `python shadow-email/scripts/email_deliverability_verifier.py --check-dns dns_spec.json`.
+Validate DNS configuration offline before cutover via `python shadow-email/scripts/email_deliverability_verifier.py --check-dns dns_spec.json`. Supply the TXT record for every reachable SPF include or redirect in the `spf_records` map. Supply DNS Tree Walk results for differing From and identifier domains in `organizational_domains` when using relaxed alignment. Use ASCII DNS names or IDNA A-labels for fixture keys. The offline check bounds DNS-triggering terms across the supplied SPF records. Receiver authentication and live DNS still require a separate check.
 
 ## 5. Platform / Vendor Variations
-- **Amazon SES / Resend / Postmark / SendGrid:** Always configure a **Custom `MAIL FROM` / Return-Path** subdomain (e.g., `bounces.tx.example.com`) AND CNAME-delegated DKIM selectors so BOTH SPF and DKIM align cleanly with `tx.example.com`.
+- **Amazon SES / Resend / Postmark / SendGrid:** Always configure a **Custom `MAIL FROM` / Return-Path** subdomain (e.g., `bounces.tx.example.com`) AND CNAME-delegated DKIM selectors with the author domain. A Return-Path subdomain can satisfy relaxed SPF alignment given a shared organizational domain. Strict alignment needs the exact author domain, which the DKIM signing domain can provide.
 - **Apex Domain Defense:** Even if `example.com` sends zero mail (all mail uses subdomains), publish `v=spf1 -all` + `_dmarc.example.com "v=DMARC1; p=reject; ..."` on parked/non-sending domains to block spoofing!
 
 ## 6. Decision Matrix & Trade-Offs
 | Security Stage | Policy Configuration | Objective |
 | :--- | :--- | :--- |
 | New Sending Subdomain (Week 1–3) | SPF `~all` + 2048-bit DKIM + DMARC `p=none; rua=...` | Inventory every legitimate sender via aggregate XML reports |
-| Verified Alignment (Week 4–6) | SPF `-all` + DMARC `p=quarantine; pct=100` | Route spoofed/unaligned mail to spam safely |
+| Verified Alignment (Week 4–6) | SPF `-all` + DMARC `p=quarantine` | Route spoofed/unaligned mail to spam safely |
 | Hardened Production | DMARC `p=reject` + MTA-STS `enforce` + TLS-RPT (+ optional BIMI VMC) | Maximum anti-spoofing, TLS integrity & brand trust |
 
 ## 7. Real Production Scenario
@@ -50,7 +50,7 @@ Run `email_deliverability_verifier.py --check-dns dns.json`, inspect live TXT re
 Rotate DKIM selectors every 6–12 months using **dual-selector overlap** (publish new `s2027a`, switch signing, keep old `s2026a` live for 7 days for in-flight mail before removing).
 
 ## 11. Authoritative References
-- IETF **RFC 7208** (SPF), **RFC 6376** (DKIM), **RFC 7489** (DMARC), **RFC 8461** (MTA-STS), **RFC 8460** (TLS-RPT); Google & Yahoo Bulk Sender Guidelines.
+- IETF **RFC 7208** (SPF), **RFC 6376** (DKIM), **RFC 9989** (DMARC), **RFC 8461** (MTA-STS), **RFC 8460** (TLS-RPT); Google & Yahoo Bulk Sender Guidelines.
 
 ## 12. Limitations & When NOT to Use
 SPF breaks on traditional email forwarding (envelope IP changes); therefore **DKIM alignment** is essential so forwarded mail continues passing DMARC cleanly.

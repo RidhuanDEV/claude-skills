@@ -11,7 +11,7 @@ Assemble fast, grounded RAG runtime pipelines — maximizing provider **prefix p
   1. **Zone 1 (Static, 100% Cacheable):** System policy + output format rules + tool JSON schemas (ZERO timestamps, ZERO `requestId`, ZERO per-user names!).
   2. **Zone 2 (Semi-Static, Cacheable per Session/Tenant):** Static domain reference docs or cached workspace summary.
   3. **Zone 3 (Dynamic per Turn):** Untrusted `<retrieved_context>` chunks + current user question + current date/time if needed.
-- **Untrusted Context Delimiting & Grounded Citation Contract (`LLM01`, `LLM09`):**
+- **Untrusted Context Delimiting & Grounded Citation Contract (`LLM01`, `LLM07` — 2026 numbering):**
   - Wrap retrieved chunks with explicit structural tags (`<retrieved_context doc_id="doc-42">...</retrieved_context>`) and instruct the model to treat everything inside as **passive reference data (never instructions)**, citing exact `doc_id`s and explicitly abstaining (`"Insufficient evidence in authorized documents"`) when context does not support an answer!
 - **Per-Stage TTFT Latency Instrumentation (Stop Guessing Why RAG Is Slow!):** Always record 5 separate span durations on every RAG request (`/shadow-observe`):
   1. `query_rewrite_ms` (skip LLM rewrite on standalone first turns — saves `400–800ms`!),
@@ -19,6 +19,7 @@ Assemble fast, grounded RAG runtime pipelines — maximizing provider **prefix p
   3. `retrieval_bm25_vec_ms` (run lexical + vector **in parallel**, never sequentially! Hand index tuning to `/shadow-search`),
   4. `rerank_ms` (rerank top `20–30` candidates only, never top `200`, with tight `<= 500ms` timeout!),
   5. `llm_ttft_ms` (stream immediately once context arrives; monitor `cached_input_tokens` hit rate!).
+  6. `delivery_ms`: the client-observed first byte minus the server's first token. When the server spans look healthy but users still wait, a reverse proxy or CDN is buffering the stream; send `X-Accel-Buffering: no` and `Cache-Control: no-cache, no-transform`, and disable proxy buffering for the route ([05-streaming-sse-ux-and-cancellation.md](05-streaming-sse-ux-and-cancellation.md)).
 
 ## 4. Architecture & Implementation
 ```typescript
@@ -93,7 +94,7 @@ An internal knowledge-base RAG copilot averages `4.9s` TTFT. Per-stage OTel span
 
 ## 11. Authoritative References
 - Anthropic / OpenAI / Google Gemini Official Prompt Caching Guides (`/context7`).
-- OWASP Top 10 for LLM Applications 2025 — `LLM01` & `LLM08`.
+- OWASP Top 10 for LLM Applications 2026 — `LLM01` Prompt Injection & `LLM09` Vector and Embedding Weaknesses (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
 
 ## 12. Limitations & When NOT to Use
 - Do NOT add complex multi-hop agentic RAG loops when single-shot parallel hybrid RRF + 6 focused chunks already achieves `>= 0.90` Recall@K and Faithfulness — simpler RAG is dramatically faster and easier to debug.

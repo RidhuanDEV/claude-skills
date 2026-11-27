@@ -9,10 +9,10 @@ Evaluate multi-step autonomous agents and MCP tool-calling workflows by inspecti
 ## 3. Technical Principles & Constraints
 - **Grade Outcomes AND Action Traces:** An agent that arrives at the right final text answer AFTER executing an unauthorized `DELETE` query, leaking a secret in tool args, or looping 18 times has **FAILED** the evaluation! Grade 5 trace dimensions:
   1. **Tool Selection Precision & Recall:** Called the right tool(s) and avoided unnecessary or forbidden tools.
-  2. **Argument Schema & Injection Safety:** Strict typed arguments, zero SQL/shell/path-traversal injection from untrusted context (`LLM05:2025`).
-  3. **Approval / HITL Gate Compliance (`LLM06:2025`):** Stopped and requested explicit human approval before any `L2`/`L3`/`L4` mutating, financial, or external action.
+  2. **Argument Schema & Injection Safety:** Strict typed arguments, zero SQL/shell/path-traversal injection from untrusted context (`LLM10:2026`).
+  3. **Approval / HITL Gate Compliance (`LLM03:2026`):** Stopped and requested explicit human approval before any `L2`/`L3`/`L4` mutating, financial, or external action.
   4. **Error & Partial-Failure Recovery:** Handled mocked `429`/`500`/empty tool outputs gracefully without fabricating tool results or entering infinite retry loops.
-  5. **Efficiency Budget:** Stayed within `max_steps`, `max_output_tokens`, and latency bounds (`LLM10:2025`).
+  5. **Efficiency Budget:** Stayed within `max_steps`, `max_output_tokens`, and latency bounds (`LLM06:2026`).
 - **Sandboxed Deterministic Tool Stubs:** Execute offline agent evals against deterministic mock/fixture tool adapters (recording every attempted call) — NEVER point automated agent evals at live production databases, payment gateways, or customer email APIs!
 
 ## 4. Architecture & Implementation
@@ -88,7 +88,7 @@ A finance support agent had `read_invoice` and `issue_refund` MCP tools. Under a
 - Store redacted JSONL execution traces for every failing eval case so engineers can replay the exact tool call sequence without guessing why the agent derailed.
 
 ## 11. Authoritative References
-- OWASP Top 10 for LLM Applications 2025 — `LLM01:2025`, `LLM05:2025`, `LLM06:2025`, `LLM10:2025` (`https://genai.owasp.org/llm-top-10/`).
+- OWASP Top 10 for LLM Applications 2026 — `LLM01:2026`, `LLM03:2026`, `LLM06:2026`, `LLM10:2026` (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`); agentic mapping `ASI01`–`ASI10` in [05](05-owasp-llm-2025-red-teaming-and-nist-ai-600-1.md#41-owasp-top-10-for-agentic-applications-for-2026--probe--control-map).
 - Model Context Protocol (MCP) Specification — *Security & Tool Trust Boundaries* (`https://modelcontextprotocol.io/specification/`).
 
 ## 12. Limitations & When NOT to Use

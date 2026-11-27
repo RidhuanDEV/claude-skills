@@ -18,6 +18,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 BCP47_RE = re.compile(r"^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|\d{3}))?$")
 INVALID_LOCALE_ALIASES = {"en-UK", "in-ID", "iw-IL", "zh-CH"}
 
@@ -106,7 +109,7 @@ def validate_ssr_seo_page(page: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     url = str(page.get("url", "<unknown>"))
     env = str(page.get("environment", "production")).lower()
-    has_noindex = bool(page.get("has_noindex", False))
+    has_noindex = strict_bool(page.get("has_noindex", False), "has_noindex")
     if env == "production" and has_noindex:
         errors.append(f"{url}: CRITICAL accidental noindex in production")
     if env != "production" and not has_noindex:
@@ -237,4 +240,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

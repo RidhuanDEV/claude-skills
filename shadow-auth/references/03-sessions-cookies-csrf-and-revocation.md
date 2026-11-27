@@ -7,7 +7,7 @@ Design hijacking-resistant browser sessions, hardened cookie attributes, CSRF de
 - HTTPS everywhere (HSTS), server-side session store (Redis/Postgres), and knowledge of cross-site vs same-site frontend topology.
 
 ## 3. Technical Principles & Constraints
-- **Hardened Session Cookie Invariants (`OWASP ASVS V3`):**
+- **Hardened Session Cookie Invariants (`OWASP ASVS 5.0.0 V7 Session Management`):**
   - High-entropy opaque session ID (`>= 128` bits CSPRNG, stored **hashed** in Redis/DB so a read-only cache dump cannot hijack live sessions).
   - Mandatory flags: `HttpOnly`, `Secure`, `SameSite=Lax` (or `Strict` for admin panels; use `SameSite=None; Secure` ONLY when cross-site embedding is truly required, paired with explicit CSRF defense), and `__Host-` cookie prefix (`Path=/`, no `Domain` attribute -> blocks subdomain cookie-tossing!).
 - **Session Fixation & Privilege-Elevation Rotation:** Always regenerate a brand-new session ID and invalidate the old one upon: (1) login, (2) MFA step-up, (3) role/privilege change, and (4) password reset.
@@ -94,4 +94,4 @@ A finance admin disables a terminated employee's account at 09:00, yet the emplo
 - IETF RFC 6265bis — *HTTP State Management Mechanism* (`__Host-` & `SameSite`).
 
 ## 12. Limitations & When NOT to Use
-- Cookie sessions are designed for browser user agents; for native mobile apps or M2M backend clients, use OAuth 2.1 tokens in Keychain/Keystore or mTLS/scoped API keys (`04`, `07`).
+- Cookie sessions are designed for browser user agents; for native mobile apps or M2M backend clients, use OAuth tokens (RFC 9700 baseline; OAuth 2.1 still draft) in Keychain/Keystore or mTLS/scoped API keys (`04`, `07`).

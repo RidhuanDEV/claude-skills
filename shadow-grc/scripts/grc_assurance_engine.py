@@ -18,6 +18,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CORE_SCRIPTS = REPO_ROOT / "shadow-monarch" / "consulting-core" / "scripts"
 if str(CORE_SCRIPTS) not in sys.path:
@@ -51,10 +54,14 @@ def assess_cobit_2019(payload: dict[str, Any]) -> dict[str, Any]:
     for obj in objectives:
         oid = str(obj["objective_id"]).upper()
         domain = re.sub(r"\d+", "", oid)
-        level = int(obj["capability_level"])
+        level = obj["capability_level"]
+        if isinstance(level, bool) or not isinstance(level, int):
+            raise InvalidInput(f"{oid}: capability_level must be a JSON integer.")
         if not (0 <= level <= 5):
             raise ValueError(f"Capability level for {oid} must be 0..5, got {level}.")
         ev_refs = obj.get("evidence_refs", [])
+        if not isinstance(ev_refs, list) or not all(isinstance(ref, str) and ref.strip() for ref in ev_refs):
+            raise InvalidInput(f"{oid}: evidence_refs must be an array of nonblank strings.")
         confidence = "HIGH" if len(ev_refs) >= 2 else ("MEDIUM" if len(ev_refs) == 1 else "INSUFFICIENT")
         if confidence == "INSUFFICIENT":
             low_confidence_count += 1
@@ -105,21 +112,31 @@ def validate_iso27001_soa(soa: dict[str, Any]) -> dict[str, Any]:
         errors.append("HG3: Self-assessment SoA cannot declare official ISO 27001 certification.")
 
     controls = soa.get("annex_a_controls", [])
+    if not isinstance(controls, list):
+        raise InvalidInput("annex_a_controls must be a JSON array.")
+    if not controls:
+        errors.append("Annex A scope requires at least one control with an applicability determination.")
     theme_counts: dict[str, int] = {k: 0 for k in EXPECTED_ANNEX_A_COUNTS}
     for ctrl in controls:
-        cid = ctrl.get("control_id", "<unknown>")
+        if not isinstance(ctrl, dict):
+            raise InvalidInput("Each annex_a_controls entry must be a JSON object.")
+        cid = ctrl.get("control_id")
+        if not isinstance(cid, str) or not cid.strip():
+            raise InvalidInput("Each Annex A control requires a nonblank control_id.")
         theme = str(ctrl.get("theme", "")).upper()
-        if theme in theme_counts:
-            theme_counts[theme] += 1
-        applicable = bool(ctrl.get("applicable", True))
-        justif = str(ctrl.get("justification", "")).strip()
-        if not justif:
+        if theme not in theme_counts:
+            raise InvalidInput(f"{cid}: theme must match an Annex A control theme.")
+        theme_counts[theme] += 1
+        applicable = strict_bool(ctrl.get("applicable", True), "applicable")
+        justification = ctrl.get("justification")
+        if not isinstance(justification, str) or not justification.strip():
             errors.append(f"{cid}: missing applicability justification.")
         if applicable and str(ctrl.get("status", "")).upper() == "IMPLEMENTED":
-            if not ctrl.get("design_evidence_ref") or not ctrl.get("operating_evidence_ref"):
+            refs = (ctrl.get("design_evidence_ref"), ctrl.get("operating_evidence_ref"))
+            if not all(isinstance(ref, str) and ref.strip() for ref in refs):
                 errors.append(f"{cid}: IMPLEMENTED control requires both design_evidence_ref and operating_evidence_ref.")
 
-    if soa.get("require_full_93_controls", False):
+    if strict_bool(soa.get("require_full_93_controls", False), "require_full_93_controls"):
         if theme_counts != EXPECTED_ANNEX_A_COUNTS:
             errors.append(f"Annex A control distribution mismatch: got {theme_counts}, expected {EXPECTED_ANNEX_A_COUNTS}.")
 
@@ -139,10 +156,15 @@ def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENER
     errors: list[dict[str, Any]] = []
     cited_regs: list[str] = []
 
+    if not isinstance(findings, list):
+        raise InvalidInput("findings must be a JSON array.")
     for f in findings:
+        if not isinstance(f, dict):
+            raise InvalidInput("Each findings entry must be a JSON object.")
         fid = f.get("finding_id", "<unknown>")
         for part in required_parts:
-            if not str(f.get(part, "")).strip():
+            value = f.get(part)
+            if not isinstance(value, str) or not value.strip():
                 errors.append({"finding_id": fid, "error": f"Missing mandatory audit element '{part}'."})
         for reg_id in f.get("regulation_ids", []):
             cited_regs.append(str(reg_id))
@@ -153,6 +175,9 @@ def validate_audit_findings(findings: list[dict[str, Any]], sector: str = "GENER
     except (ValueError, TypeError):
         errors.append({"finding_id": "REGULATORY_GATE", "error": "Supply assessment date as YYYY-MM-DD."})
         return {"sector": sector, "as_of_date": as_of_date, "finding_count": len(findings), "valid": False, "errors": errors}
+
+    if not findings:
+        errors.append({"finding_id": "FINDINGS_GATE", "error": "At least one audit finding is required."})
 
     reg_check = check_regulations(sector, cited_regs, as_of_date=as_of_date)
     for rerr in reg_check["errors"]:
@@ -304,4 +329,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

@@ -1,0 +1,50 @@
+[
+ {
+  "id": "antislop-human-l-en-03",
+  "issue": "Positive ambiguous: tiny tap targets overlap antislop-layoutmobile ownership",
+  "old_prompt": "Check the shipment-tracking filter chips: tap targets feel tiny, the pressed state is missing, and light-grey text on white looks faint. Tighten states and contrast for that component only.",
+  "new_prompt": "Check the shipment-tracking filter chips: the pressed state is missing, the selected chip is only distinguishable by color, and light-grey text on white looks faint. Tighten states and contrast for that component only.",
+  "old_expected": "antislop-human",
+  "new_expected": "antislop-human"
+ },
+ {
+  "id": "antislop-human-l-id-03",
+  "issue": "Positive ambiguous: 28px touch area overlaps antislop-layoutmobile ownership",
+  "old_prompt": "Toggle 'Simpan rekening favorit' di app bank daerah kontrasnya rendah saat off dan area sentuhnya cuma 28px. Rapikan affordance dan state-nya.",
+  "new_prompt": "Toggle 'Simpan rekening favorit' di app bank daerah kontrasnya rendah saat off, tidak ada focus ring saat dinavigasi keyboard, dan state disabled-nya tidak terlihat. Rapikan affordance dan state-nya.",
+  "old_expected": "antislop-human",
+  "new_expected": "antislop-human"
+ },
+ {
+  "id": "shadow-data-l-id-02",
+  "issue": "Positive weak: deterministic seed data is outside the catalog description (could be shadow-test/shadow-db)",
+  "old_prompt": "Buat seed data deterministik untuk lingkungan dev arsip museum: 50 ribu objek dengan relasi pencipta yang konsisten.",
+  "new_prompt": "Rancang kebijakan retensi untuk log audit kurasi arsip museum: simpan 7 tahun, pindahkan bertahap ke partisi arsip tanpa downtime, dan catat lineage-nya.",
+  "old_expected": "shadow-data",
+  "new_expected": "shadow-data"
+ },
+ {
+  "id": "shadow-db-l-id-02",
+  "issue": "Positive weak: star schema/Pentaho ETL is outside the catalog description (could be shadow-data)",
+  "old_prompt": "Rancang star schema untuk data warehouse konsumsi listrik per wilayah dan job ETL Pentaho dari database operasional.",
+  "new_prompt": "Inspeksi live database konsumsi listrik per wilayah untuk menemukan index yang tidak pernah dipakai dan index duplikat, lalu usulkan mana yang aman di-drop.",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-eval-l-id-02",
+  "issue": "Positive ambiguous: regex precision/recall probing is not in eval catalog scope and could be shadow-test",
+  "old_prompt": "Kami punya regex untuk mendeteksi nomor resi palsu di chat. Uji presisi dan recall-nya dengan probe positif dan negatif.",
+  "new_prompt": "Uji keamanan chatbot forwarder dengan jailbreak dan prompt injection: apakah bisa dibujuk membocorkan system prompt, lalu laporkan tingkat keberhasilan serangannya.",
+  "old_expected": "shadow-eval",
+  "new_expected": "shadow-eval"
+ },
+ {
+  "id": "shadow-privacy-l-en-near-01",
+  "issue": "Near-duplicate of shadow-data-l-en-03 positive (archive shipment events + finance lineage)",
+  "old_prompt": "Archive freight tracking events older than 24 months into partitioned cold tables in resumable batches, keeping lineage for finance reports.",
+  "new_prompt": "Move freight rate-quote snapshots older than 24 months into partitioned cold tables in resumable batches while writes continue, keeping lineage for margin reports.",
+  "old_expected": "shadow-data",
+  "new_expected": "shadow-data"
+ }
+]

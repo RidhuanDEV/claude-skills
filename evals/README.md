@@ -33,7 +33,7 @@
 | 17 ui-ux-design-knowledge-base-id | UI/UX v2 foundations & art direction, thumb zone/touch targets, WCAG AA, handoff checklist |
 | 18 review-followup-heuristic-false-positive | precision probes for Indonesian `-nya` follow-up regex false positives |
 | 19 uu-pdp-privacy-compliance-audit | `/shadow-privacy`: UU No. 27 Tahun 2022 (Pasal 4, 20, 34, 46, 56, 57) & GDPR controls |
-| 20 ai-rag-eval-owasp-llm-2025 | `/shadow-eval`: OWASP Top 10 for LLM 2025, NIST AI 600-1 & RAG Triad metrics |
+| 20 ai-rag-eval-owasp-llm-2025 | `/shadow-eval`: OWASP Top 10 for LLM 2026, NIST AI 600-1 & RAG Triad metrics |
 | 21 mobile-masvs-store-release-gate | `/shadow-mobile`: OWASP MASVS v2.1.0, `PrivacyInfo.xcprivacy`, Play Integrity API & manifest hardening |
 | 22 finops-focus-llm-token-cost | `/shadow-finops`: FinOps Framework, FOCUS, prefix prompt caching & thinking-token billing |
 | 23 presales-kak-tco-perpres-46-2025 | `/shadow-presales`: 3-scenario workload capacity, 3-yr TCO/NPV, Perpres 46/2025 RAB vs PPK HPS & UMKK |
@@ -70,3 +70,27 @@ python evals/test_search_index_pilot.py
 ```
 
 The fixture pins two index revisions, a shared corpus, per-query reviewer judgments and the authorization snapshot. Pass the current ACL revision separately from the policy owner. The CLI compares observed rankings and generated-answer context, returns exit 1 on HOLD and exit 0 on ELIGIBLE_FOR_REVIEW. The example has one query per language and illustrates the decision mechanics only. Set the minimum paired sample count and acceptance criteria before inspecting service results. The generic text scorer reports manual review required on cases without a dedicated oracle. Token overlap in those cases is a diagnostic only.
+
+## Wave 2 skill trigger evaluation
+
+Run the paired offline comparison from the repository root.
+
+```powershell
+$candidateFingerprint = python -B evals/compare_skill_trigger_routing.py --fingerprint
+python -B evals/compare_skill_trigger_routing.py --expect-candidate $candidateFingerprint --markdown reports/wave2-routing-evaluation.md
+```
+
+The two original JSON fixtures cover 59 skills, with three positive cases and one near-miss in each language per skill. The audited [near-miss replacements](fixtures/wave2-trigger-adjudications.json) preserve language and excluded skill. The report retains specificity for the original fixtures alongside the revised gate. The router was tuned using the earlier review examples and separate development probes. Compare primary recall, primary precision, and whether excluded skills stay inactive in any routing role. Exit 1 means at least one skill misses the acceptance thresholds. The fixture hashes and the candidate fingerprint identify the paired comparison.
+
+The separate [development fixture](fixtures/wave2-trigger-development.json) provides one calibration case per skill. Its results are excluded from the acceptance gate.
+
+The [confusion diagnostics](fixtures/wave2-trigger-confusion-dev.json) provide a second development set with two close rival owners per prompt. These cases are reserved for comparing ranking methods and are excluded from the acceptance gate.
+
+The source description audit checks the 250-character per-skill limit and the 9,000-character catalog limit. Each host applies its own budget to the rendered listing.
+
+### Claude Code listing profiles
+
+Use the [Wave 2 session settings](../docs/claude-code-wave2.settings.json) for the full catalog on a 200k context window. In the isolated Claude Code 2.1.332 verification, the 2% budget matched all 59 project rows from the high-budget reference. Default settings kept the full token estimate for 7 descriptions and collapsed the other 52 to their names. The setting applies to a session when supplied through --settings. [Claude Code listing budget](https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short)
+
+
+[Example session settings](../docs/claude-code-name-only.example.json) show how to keep a manually invoked personal or project skill as `name-only`. Select skills for this profile based on the usage of the intended host. With the profile, the selected skill stays invocable by name and its description is deliberately omitted. Claude Code accepts the optional file through `--settings`. Its `/context all` command reports the live listing for that session. [Claude Code skill visibility](https://code.claude.com/docs/en/settings-reference#skilloverrides) · [Context command](https://code.claude.com/docs/en/commands#all-commands)

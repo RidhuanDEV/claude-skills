@@ -21,6 +21,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 EVENT_NAME_RE = re.compile(r"^[A-Z][a-zA-Z0-9]*_[A-Z][a-zA-Z0-9]*$")
 ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$")
 FORBIDDEN_PII_KEYS = {
@@ -145,7 +148,7 @@ def check_event(payload: dict[str, Any]) -> dict[str, Any]:
         errors.append("Missing or invalid ISO-8601 UTC 'timestamp'.")
 
     # Mandatory correction #3: repeatable events cannot use static entity hashes
-    repeatable = bool(payload.get("repeatable", True))
+    repeatable = strict_bool(payload.get("repeatable", True), "repeatable")
     id_strategy = str(payload.get("event_id_strategy", "occurrence_uuid")).strip().lower()
     if repeatable and id_strategy in {"static_entity_hash", "entity_transition_hash", "deterministic_entity_only"}:
         errors.append(
@@ -162,7 +165,7 @@ def check_event(payload: dict[str, Any]) -> dict[str, Any]:
     if not payload.get("anonymous_id") and not payload.get("user_id"):
         errors.append("Event must carry at least one identity key ('anonymous_id' or 'user_id').")
 
-    if payload.get("consent_analytics") is False:
+    if not strict_bool(payload.get("consent_analytics", True), "consent_analytics"):
         errors.append("Event emitted while 'consent_analytics' is explicitly false (violates consent gate).")
 
     return {
@@ -206,9 +209,24 @@ def check_experiment(payload: dict[str, Any]) -> dict[str, Any]:
             "metrics": {},
         }
 
-    srm_alpha = float(payload.get("srm_alpha", 0.001))
+    srm_alpha = payload.get("srm_alpha", 0.001)
+    if type(srm_alpha) not in (int, float) or not 1e-6 <= srm_alpha <= 0.01:
+        raise InvalidInput("srm_alpha must be a finite JSON number in [1e-6, 0.01].")
+    justification = payload.get("srm_alpha_justification")
+    if srm_alpha != 0.001 and not (isinstance(justification, str) and justification.strip()):
+        raise InvalidInput("srm_alpha_justification is required for a non-default srm_alpha.")
+    metrics["srm_alpha"] = srm_alpha
     alpha = float(payload.get("alpha", 0.05))
-    ratio_sum = sum(float(v.get("expected_ratio", 0.0)) for v in variants)
+    for variant in variants:
+        if not isinstance(variant, dict):
+            raise InvalidInput("Each variants entry must be a JSON object.")
+        ratio = variant.get("expected_ratio")
+        assigned = variant.get("assigned_count")
+        if type(ratio) not in (int, float) or not 0 < ratio <= 1:
+            raise InvalidInput("Each expected_ratio must be a finite JSON number in (0, 1].")
+        if type(assigned) is not int or assigned <= 0:
+            raise InvalidInput("Each assigned_count must be a positive JSON integer.")
+    ratio_sum = sum(v["expected_ratio"] for v in variants)
     if abs(ratio_sum - 1.0) > 1e-4:
         errors.append(f"Expected allocation ratios must sum to 1.0 (got {ratio_sum:.6f}).")
 
@@ -244,7 +262,7 @@ def check_experiment(payload: dict[str, Any]) -> dict[str, Any]:
         )
 
     # Assignment vs Exposure check
-    if payload.get("assignment_exposure_separated") is False:
+    if not strict_bool(payload.get("assignment_exposure_separated", True), "assignment_exposure_separated"):
         errors.append("Assignment and exposure events are conflated; separate Assignment (ITT) from Exposure.")
     for v in variants:
         if "exposed_count" in v and int(v["exposed_count"]) > int(v["assigned_count"]):
@@ -254,9 +272,14 @@ def check_experiment(payload: dict[str, Any]) -> dict[str, Any]:
 
     # CUPED pre-experiment covariate check
     cuped_invalid = False
-    cuped = payload.get("cuped")
-    if isinstance(cuped, dict) and cuped.get("enabled", False):
-        if cuped.get("covariate_is_pre_experiment") is not True or cuped.get("covariate_unaffected_by_assignment") is not True:
+    cuped = payload.get("cuped", {})
+    if not isinstance(cuped, dict):
+        raise InvalidInput("cuped must be a JSON object.")
+    cuped_enabled = strict_bool(cuped.get("enabled", False), "cuped.enabled")
+    pre_experiment = strict_bool(cuped.get("covariate_is_pre_experiment", False), "cuped.covariate_is_pre_experiment")
+    unaffected = strict_bool(cuped.get("covariate_unaffected_by_assignment", False), "cuped.covariate_unaffected_by_assignment")
+    if cuped_enabled:
+        if not (pre_experiment and unaffected):
             cuped_invalid = True
             errors.append(
                 "Invalid CUPED covariate: covariate MUST be measured strictly pre-experiment and unaffected by treatment assignment."
@@ -267,10 +290,18 @@ def check_experiment(payload: dict[str, Any]) -> dict[str, Any]:
 
     # Guardrails
     blocking_guardrail = False
-    for g in payload.get("guardrails", []):
-        if isinstance(g, dict) and g.get("regressed") is True:
-            sev = str(g.get("severity", "blocking")).lower()
-            if sev == "blocking":
+    guardrails = payload.get("guardrails", [])
+    if not isinstance(guardrails, list):
+        raise InvalidInput("guardrails must be a JSON array.")
+    for index, g in enumerate(guardrails):
+        if not isinstance(g, dict):
+            raise InvalidInput(f"guardrails[{index}] must be a JSON object.")
+        regressed = strict_bool(g.get("regressed"), f"guardrails[{index}].regressed")
+        severity = g.get("severity", "blocking")
+        if not isinstance(severity, str) or severity.lower() not in {"blocking", "non-blocking", "non_blocking", "advisory", "warning"}:
+            raise InvalidInput(f"guardrails[{index}].severity must be blocking or non-blocking.")
+        if regressed:
+            if severity.lower() == "blocking":
                 blocking_guardrail = True
                 errors.append(f"Blocking guardrail regressed: {g.get('name', 'unnamed')}.")
             else:
@@ -388,14 +419,14 @@ def check_dsar_plan(payload: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
 
-    warehouse_covered = bool(payload.get("warehouse_tables_covered", False))
+    warehouse_covered = strict_bool(payload.get("warehouse_tables_covered", False), "warehouse_tables_covered")
     if not warehouse_covered:
         errors.append("Local analytics warehouse identity/event tables are not covered by DSAR deletion workflow.")
 
     configured = {str(v).strip().lower() for v in payload.get("configured_vendors", []) if str(v).strip()}
     wired = {str(v).strip().lower() for v in payload.get("vendor_deletion_apis_wired", []) if str(v).strip()}
 
-    if payload.get("warehouse_only") is True and len(configured) > 0:
+    if strict_bool(payload.get("warehouse_only", False), "warehouse_only") and configured:
         errors.append(
             f"warehouse_only DSAR does NOT satisfy UU PDP/GDPR when third-party vendors ({sorted(configured)}) hold user copies."
         )
@@ -628,4 +659,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

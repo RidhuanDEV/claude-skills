@@ -1,7 +1,7 @@
 # 06 — Deliverability Engineering (`ADVANCED`)
 
 ## 1. Purpose & Activation Conditions
-Load when diagnosing spam-folder placement, managing IP/domain reputation, planning IP warm-up ramps, handling bounces/complaints, or monitoring Google Postmaster Tools & Microsoft SNDS.
+Load when diagnosing spam-folder placement, managing IP/domain reputation, planning IP warm-up ramps, handling bounces/complaints, or monitoring Google Postmaster Tools (v2 Compliance Status) & Microsoft SNDS.
 
 ## 2. Prerequisites
 Modules `01`–`05` (authentication, stream separation, queue pacing).
@@ -19,7 +19,7 @@ Modules `01`–`05` (authentication, stream separation, queue pacing).
 | :--- | :--- | :--- | :--- |
 | Week 1 | Most engaged users (opened/active `<= 14d`) | `500 -> 2,500 -> 5,000` | Pause immediately if complaint `>= 0.15%` or bounce `>= 2%` |
 | Week 2 | Engaged users (`<= 30d`) | `10,000 -> 25,000` | Watch Gmail `4.7.28` deferral rate `< 2%` |
-| Week 3 | Active users (`<= 60d`) | `50,000 -> 75,000` | Verify Postmaster Domain & IP Reputation = Medium/High |
+| Week 3 | Active users (`<= 60d`) | `50,000 -> 75,000` | Verify Postmaster v2 Compliance Status passes and user-reported spam rate `< 0.1%` |
 | Week 4+ | Full opted-in active base | Ramp `<= +25%/day` to target | Sunset unengaged marketing contacts (`> 180d` 0 opens/clicks) |
 
 Use `python shadow-email/scripts/email_deliverability_verifier.py --classify-dsn <code>` to enforce exact bounce handling (`5.1.1` suppress permanently, `5.7.1` reputation/policy alert, `4.2.2` bounded retry).
@@ -37,7 +37,7 @@ LIMIT 2500;
 ```
 
 ## 5. Platform / Vendor Variations
-- **Google Postmaster Tools (GPT):** Authoritative source for Gmail domain reputation, spam complaint rate, DMARC/SPF/DKIM pass rates, and delivery error taxonomy (`4.7.28` vs `5.7.26`).
+- **Google Postmaster Tools (GPT):** Authoritative source for Gmail sender compliance (v2 Compliance Status; the v1 domain/IP reputation dashboards were retired in 2025), user-reported spam rate, DMARC/SPF/DKIM pass rates, and delivery error taxonomy (`4.7.28` vs `5.7.26`).
 - **Microsoft SNDS & JMRP:** Authoritative source for Outlook.com/Hotmail IP reputation and complaint feedback loops.
 - **Apple Mail Privacy Protection (MPP):** Pre-fetches tracking pixels — **never treat raw Open Rate alone as proof of human engagement**; combine clicks, app logins, and purchases when defining active warm-up cohorts!
 

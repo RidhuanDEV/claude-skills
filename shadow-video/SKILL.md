@@ -1,6 +1,6 @@
 ---
 name: shadow-video
-description: "Flexible Video Production & GUI E2E Recording. Use when producing narrated web tutorials (Playwright + TTS + ffmpeg MP4/SRT), programmatic/motion product videos (Remotion/Canvas/Lottie), mobile app demo captures, lightweight docs GIF/WebM clips, or GUI E2E click-through verification."
+description: "Use when making narrated tutorials, app demos, GUI recordings, Remotion motion videos, or TTS/ffmpeg MP4 and SRT output."
 ---
 
 # Shadow Video

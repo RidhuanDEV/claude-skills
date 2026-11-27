@@ -17,17 +17,21 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 
 def verify_refactor_plan(plan: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     if not isinstance(plan, dict) or not plan:
         return {"status": "FAIL", "valid": False, "errors": ["Refactor payload must be a non-empty JSON object."]}
 
-    if not plan.get("precedents_inspected"):
-        errors.append("Missing 'precedents_inspected' (must inspect 1-3 nearest comparable files before editing).")
-
-    if not plan.get("invariants_locked"):
-        errors.append("Missing 'invariants_locked' declaring preserved API, validation, and data semantics.")
+    for field in ("precedents_inspected", "invariants_locked"):
+        evidence = plan.get(field)
+        if not isinstance(evidence, list) or not evidence or not all(
+            isinstance(item, str) and item.strip() for item in evidence
+        ):
+            raise InvalidInput(f"{field} must contain at least one nonblank evidence string.")
 
     char = plan.get("characterization_suite", {})
     if not isinstance(char, dict) or int(char.get("cases_count", 0)) < 1:
@@ -39,7 +43,9 @@ def verify_refactor_plan(plan: dict[str, Any]) -> dict[str, Any]:
     if plan.get("silent_contract_changes"):
         errors.append(f"Forbidden silent contract/validation changes detected: {plan['silent_contract_changes']}")
 
-    if plan.get("introduces_new_architecture_pattern") and not plan.get("adr_approved_for_new_pattern"):
+    has_new_pattern = strict_bool(plan.get("introduces_new_architecture_pattern", False), "introduces_new_architecture_pattern")
+    has_approved_adr = strict_bool(plan.get("adr_approved_for_new_pattern", False), "adr_approved_for_new_pattern")
+    if has_new_pattern and not has_approved_adr:
         errors.append("Introducing a new architecture pattern requires an explicit approved ADR.")
 
     changed = {str(f) for f in plan.get("changed_files", [])}
@@ -139,4 +145,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

@@ -208,6 +208,31 @@ def verify_file_safety(file_path: Path, quarantine_delete: bool = False) -> dict
     }
 
 
+SOURCE_RECORD_FIELDS = ("owner", "effective_version", "accessed_at", "digest", "revalidation_trigger")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def evaluate_source_freshness(record: object, now: datetime, max_age_days: int = 365) -> dict[str, Any]:
+    """Classify a dated source record as VERIFIED_ARCHIVED, STALE, UNKNOWN_METADATA or INVALID_INPUT.
+
+    Every field must be a non-blank string, `accessed_at` a timezone-aware ISO-8601 time that is not
+    in the future, and `digest` a lowercase SHA-256 of the archived file.
+    """
+    if not isinstance(record, dict):
+        return {"status": "INVALID_INPUT", "missing": list(SOURCE_RECORD_FIELDS), "stale": True}
+    missing = [key for key in SOURCE_RECORD_FIELDS if not (isinstance(record.get(key), str) and record[key].strip())]
+    if missing:
+        return {"status": "UNKNOWN_METADATA", "missing": missing, "stale": True}
+    try:
+        accessed = datetime.fromisoformat(record["accessed_at"].replace("Z", "+00:00"))
+    except ValueError:
+        return {"status": "INVALID_INPUT", "missing": ["accessed_at"], "stale": True}
+    if accessed.tzinfo is None or accessed > now or not SHA256_RE.match(record["digest"]):
+        return {"status": "INVALID_INPUT", "missing": [], "stale": True}
+    stale = (now - accessed).days > max_age_days
+    return {"status": "STALE" if stale else "VERIFIED_ARCHIVED", "missing": [], "stale": stale}
+
+
 def classify_source_metadata(
     title: str,
     doi_or_url: str,

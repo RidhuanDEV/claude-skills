@@ -1,6 +1,6 @@
 ---
 name: shadow-ai-eng
-description: "Production AI, LLM & Agent Systems Engineering Specialist. Use when building multi-provider LLM gateways, JSON Schema structured outputs, safe tool-calling agents with HITL, context compaction, hybrid RAG runtime & prefix caching, cancellable SSE streaming UX, or hardened MCP servers. Do NOT use for RAG evaluation/red-teaming (/shadow-eval), search index tuning (/shadow-search), or token billing audits (/shadow-finops)."
+description: "Use when building LLM runtimes, structured outputs, tool calling, MCP servers, agent approvals, and provider fallback. Not for eval (/shadow-eval)."
 ---
 
 # Shadow AI Engineering (`/shadow-ai-eng`) — Production LLM, Agents & MCP Systems

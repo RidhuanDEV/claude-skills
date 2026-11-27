@@ -1,6 +1,6 @@
 ---
 name: shadow-privacy
-description: "Data Privacy & Regulatory Engineering (UU PDP & GDPR). Use when classifying Data Spesifik vs Umum (UU No. 27/2022 Pasal 4), building consent ledgers (Pasal 20), orchestrating multi-store DSAR/erasure & crypto-shredding, running DPIA/ROPA (Pasal 31/34), gating cross-border & AI transfers (Pasal 56), redacting PII logs, or planning 3x24h breach response (Pasal 46). Escalate legal opinions to counsel."
+description: "Use when classifying personal data, mapping consent, DPIA/ROPA, DSAR, erasure, cross-border transfers, or breach handling."
 ---
 
 # Shadow Privacy (`/shadow-privacy`) — UU PDP (UU No. 27/2022) & GDPR Engineering Auditor

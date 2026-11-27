@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "file": "GoldbergYoni_JS_Testing_Best_Practices.md",
+      "source_url": "https://github.com/goldbergyoni/javascript-testing-best-practices",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2019 Yoni Goldberg",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "2fa13ad69c6c1e58db2320f430ff628073a54b7b63deaf540c68fd400364fef8"
+    }
+  ]
+}

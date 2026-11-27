@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "file": "OWASP_CI_CD_Security_Cheat_Sheet.md",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html",
+      "license": "CC-BY-SA-4.0",
+      "copyright": "OWASP Cheat Sheet Series contributors (OWASP Foundation)",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "36a3b133db5dbabda136d3b442ddff6b294bf5d5c373a9fcf27d20fdab2ed5ff"
+    },
+    {
+      "file": "OWASP_Docker_Security_Cheat_Sheet.md",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html",
+      "license": "CC-BY-SA-4.0",
+      "copyright": "OWASP Cheat Sheet Series contributors (OWASP Foundation)",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "44c5098a5273836a2d9afff895318efccf435367213db50b9e90fbb59d88f0c5"
+    },
+    {
+      "file": "OWASP_Kubernetes_Security_Cheat_Sheet.md",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html",
+      "license": "CC-BY-SA-4.0",
+      "copyright": "OWASP Cheat Sheet Series contributors (OWASP Foundation)",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "14f8a20e0c8a424039f667304520626f5be2161e0b6a05c822b066f3ec7c7958"
+    },
+    {
+      "file": "OWASP_Logging_Cheat_Sheet.md",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+      "license": "CC-BY-SA-4.0",
+      "copyright": "OWASP Cheat Sheet Series contributors (OWASP Foundation)",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "9154d8d0814ae1fe678128096351919fa2f1738b1843146f9cdd38190fb04bb6"
+    },
+    {
+      "file": "OWASP_Secrets_Management_Cheat_Sheet.md",
+      "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "license": "CC-BY-SA-4.0",
+      "copyright": "OWASP Cheat Sheet Series contributors (OWASP Foundation)",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "eac476c834553d22f2193de4a537dc67884c8d7fe0840296191fc5560f52772b"
+    },
+    {
+      "file": "H5BP_nginx_compression.conf",
+      "source_url": "https://github.com/h5bp/server-configs-nginx",
+      "license": "MIT",
+      "copyright": "Copyright (c) H5BP",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "7e6e12856a4870eabd36dc53786d0525fe86c0a20dd1b434726bdf298f9e38cc"
+    },
+    {
+      "file": "H5BP_nginx_main.conf",
+      "source_url": "https://github.com/h5bp/server-configs-nginx",
+      "license": "MIT",
+      "copyright": "Copyright (c) H5BP",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "79c283b5222ea8c3edfe563329aba315918285d88ab46716f80a1d0b0e152bff"
+    },
+    {
+      "file": "H5BP_nginx_ssl_engine.conf",
+      "source_url": "https://github.com/h5bp/server-configs-nginx",
+      "license": "MIT",
+      "copyright": "Copyright (c) H5BP",
+      "modified": "license notice added",
+      "upstream_revision": null,
+      "recorded_on": "2026-11-27",
+      "sha256": "befdfc1e61d4e7f89f9e3c971a7dc61d1fd257129cdb49aa11c93fd52a8524cc"
+    }
+  ]
+}

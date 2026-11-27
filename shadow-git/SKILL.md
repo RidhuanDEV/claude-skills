@@ -1,6 +1,6 @@
 ---
 name: shadow-git
-description: "Safe Team Git & Worktree Collaboration. Use when syncing team branches, detecting branching strategies, running git merge-tree dry-run conflict & semantic risk checks, managing parallel multi-agent worktrees, integrating independent feature branches, or resolving merge conflicts safely. Do NOT run commit/push/rebase/cleanup without explicit L4 approval."
+description: "Use when comparing or syncing Git branches, inspecting merge-tree conflicts, managing worktrees, or resolving merges."
 ---
 
 # Shadow Git v2.0 (`/shadow-git`) — Branching, Worktrees & Parallel Multi-Agent Orchestrator

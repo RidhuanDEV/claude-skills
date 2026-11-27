@@ -1,0 +1,466 @@
+{
+ "b02": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B suggests renaming to validateInput(), touching code."
+ },
+ "b04": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks image/gradient scrim check and 3:1 non-text pairing."
+ },
+ "b06": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B offers to implement full slop look if insisted."
+ },
+ "b08": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "A omits claimEvidenceMap and ID reporting; B omits file path."
+ },
+ "b10": {
+  "criteria_total": 7,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 9,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 7,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks HTML verifier step."
+ },
+ "b12": {
+  "criteria_total": 1,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criterion; both give account-grain NSM, OEC, guardrails."
+ },
+ "b14": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A extraction triggers not quantitative."
+ },
+ "b16": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A skips preview_scaffold.py / REVIEW_EXISTING."
+ },
+ "b18": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A omits Redis key deletion and outbox purge."
+ },
+ "b20": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criteria; both effectively-once with idempotency keys."
+ },
+ "b22": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criteria; both NOT VALID + VALIDATE + concurrent index."
+ },
+ "b24": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 4,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "A no explicit tags or risk-if-wrong; neither routes method resolver."
+ },
+ "b26": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "note": "A lacks output conservation check; B no discover tool or scope_id."
+ },
+ "b28": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A misses Perpres 132/2022 and SPLP."
+ },
+ "b30": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criteria; both reject ship and require blind holdout."
+ },
+ "b32": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 3,
+   "pass": false
+  },
+  "note": "B lacks merge-tree; pulls dirty tree without confirmed stash."
+ },
+ "b34": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks verified client login before revocation."
+ },
+ "b36": {
+  "criteria_total": 1,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criterion; both raw-body verify, dedupe, monotonic state."
+ },
+ "b38": {
+  "criteria_total": 6,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A omits allowBackup=false."
+ },
+ "b40": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 1,
+   "score": 6,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 1,
+   "score": 6,
+   "pass": false
+  },
+  "note": "Both omit EVM CPI/SPI, an asserted requirement."
+ },
+ "b42": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "note": "B lacks ops_hardening_verifier step."
+ },
+ "b44": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "note": "B lacks 1-3 day sizing and FR/US/AC traceability."
+ },
+ "b46": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 2,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A no Perpres 46/2025, required label, or price evidence."
+ },
+ "b48": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "Neither cites exact file:line."
+ },
+ "b50": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B skips repo precedent inspection."
+ },
+ "b52": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 4,
+   "pass": false
+  },
+  "note": "B lacks decryption key, business-recovery RTO, drill evidence audit."
+ },
+ "b54": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Opaque criteria; both secure backend route and investigate logs."
+ },
+ "b56": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A uses contents:read not {}; SBOM not reconciled to lockfile."
+ },
+ "b58": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A no explicit REJECT_REVISE; permits signed risk acceptance."
+ }
+}

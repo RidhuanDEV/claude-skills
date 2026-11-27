@@ -7,7 +7,7 @@ Implement RFC-compliant OAuth 2.0 / OpenID Connect (OIDC) login, social/enterpri
 - Registered OAuth client with exact HTTPS redirect URIs (zero wildcards) and server-side session/state store.
 
 ## 3. Technical Principles & Constraints
-- **Authorization Code + PKCE (`S256`) Mandatory (RFC 7636 & OAuth 2.1):** Use ONLY the Authorization Code flow with **PKCE (`code_challenge_method=S256`)** for BOTH public clients (SPA/mobile) and confidential web backends. NEVER use legacy Implicit (`response_type=token`) or Resource Owner Password Credentials (`grant_type=password`).
+- **Authorization Code + PKCE (`S256`) Mandatory (RFC 7636, RFC 9700 BCP 240 & OAuth 2.1 draft-ietf-oauth-v2-1):** Use ONLY the Authorization Code flow with **PKCE (`code_challenge_method=S256`)** for BOTH public clients (SPA/mobile) and confidential web backends. NEVER use legacy Implicit (`response_type=token`) or Resource Owner Password Credentials (`grant_type=password`).
 - **Cryptographic `state` & `nonce` Binding:**
   - Generate `>= 128-bit` CSPRNG `state` bound to the user's browser (`HttpOnly`, `Secure`, `SameSite=Lax` cookie) to prevent login-CSRF / account-linking hijacking.
   - Generate `>= 128-bit` CSPRNG `nonce` stored server-side/cookie and verify exact match inside the signed OIDC `id_token` to block replay attacks.
@@ -75,7 +75,7 @@ export function assertIdTokenClaimsValid(
 ```
 
 ## 5. Platform / Vendor Variations
-| Client Type | Recommended OAuth 2.1 / OIDC Architecture | Token Storage Rule |
+| Client Type | Recommended OAuth 2.1 (draft; baseline RFC 9700) / OIDC Architecture | Token Storage Rule |
 | :--- | :--- | :--- |
 | **Server-Rendered / BFF Web App (Next.js / Express / Laravel)** | Confidential Authorization Code + PKCE `S256` on backend | Tokens stored server-side (encrypted Redis/DB); browser holds `HttpOnly` session cookie |
 | **Native Mobile (Android / iOS / Flutter)** | System Browser (`Custom Tabs` / `ASWebAuthenticationSession`) + PKCE `S256` — **NEVER embedded WebViews** | Android Keystore / iOS Keychain (`/shadow-mobile`) |
@@ -86,7 +86,7 @@ export function assertIdTokenClaimsValid(
 | :--- | :---: | :---: | :--- |
 | **BFF + `HttpOnly` Cookie** | Very Low (tokens unreachable from JS) | Medium | **Recommended default for production web apps** |
 | **SPA PKCE + `localStorage` JWT** | High (any XSS steals refresh token) | Low | Avoid for fintech/enterprise/PII apps |
-| **Implicit Flow (`#access_token`)** | Extreme (URL history/referrer leaks) | Low | **Deprecated & FORBIDDEN (OAuth 2.1)** |
+| **Implicit Flow (`#access_token`)** | Extreme (URL history/referrer leaks) | Low | **Deprecated & FORBIDDEN (RFC 9700; OAuth 2.1 draft)** |
 
 ## 7. Real Production Scenario
 A SaaS app allows `"Sign in with Google"` and automatically links incoming OIDC logins to existing local accounts solely by matching `claims.email` WITHOUT checking `email_verified === true` and WITHOUT verifying `state`. An attacker registers an unverified third-party OIDC account with a victim's corporate email (or tricks the victim's browser via login-CSRF) and hijacks the victim's admin workspace. Enforcing `state` + `nonce`, verifying `email_verified === true`, and requiring explicit confirmation before linking an OIDC identity to an existing password account closes both account-takeover vectors.

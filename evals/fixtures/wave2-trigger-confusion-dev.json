@@ -1,0 +1,182 @@
+[
+  {
+    "id": "w2-confusion-b-01",
+    "language": "en",
+    "prompt": "Define the request and response contract for submitting a roster import. Specify how a client gets the row-error report and which status it should expect before processing finishes.",
+    "expected_primary": "shadow-api",
+    "rivals": [
+      "shadow-integrate",
+      "shadow-auth"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-02",
+    "language": "en",
+    "prompt": "Support staff need to act on behalf of one workspace for a short time. Model how delegated authority is issued, checked against the workspace on each request, and revoked.",
+    "expected_primary": "shadow-auth",
+    "rivals": [
+      "shadow-api",
+      "shadow-integrate"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-03",
+    "language": "en",
+    "prompt": "Two parcel-tracking providers disagree on the meaning of delivery exceptions. Design provider adapters that preserve their identifiers and map each confirmation into our service's canonical shipment status.",
+    "expected_primary": "shadow-integrate",
+    "rivals": [
+      "shadow-api",
+      "shadow-auth"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-04",
+    "language": "id",
+    "prompt": "Tetapkan kontrak unduhan laporan yang sudah selesai dibuat. Tentukan kapan respons membawa berkas, kapan mengembalikan metadata, dan cara mendokumentasikan kedua bentuk respons untuk konsumen.",
+    "expected_primary": "shadow-api",
+    "rivals": [
+      "shadow-auth",
+      "shadow-integrate"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-05",
+    "language": "id",
+    "prompt": "Pengguna berpindah unit tetapi akun lama masih aktif. Tentukan cara peran yang sudah dicabut berhenti berlaku di API tanpa menunggu pengguna masuk ulang.",
+    "expected_primary": "shadow-auth",
+    "rivals": [
+      "shadow-api",
+      "shadow-integrate"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-06",
+    "language": "id",
+    "prompt": "Sistem helpdesk mitra mengubah penyajian waktu pada API tiket. Sesuaikan sinkronisasi inkremental agar catatan baru tetap diterima dan perubahan yang sama tidak tercatat dua kali.",
+    "expected_primary": "shadow-integrate",
+    "rivals": [
+      "shadow-api",
+      "shadow-auth"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-07",
+    "language": "en",
+    "prompt": "Review the service's exception handling and log pipeline for accidental disclosure of internal endpoints and secrets. Return defensive code-level mitigations and the trust boundaries they cover.",
+    "expected_primary": "shadow-sec",
+    "rivals": [
+      "shadow-privacy",
+      "shadow-grc"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-08",
+    "language": "en",
+    "prompt": "Before closing an ISO 27001 corrective action, review whether the stated control is in operation, whether the sampling window is sufficient, and what evidence the auditor should retain.",
+    "expected_primary": "shadow-grc",
+    "rivals": [
+      "shadow-sec",
+      "shadow-privacy"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-09",
+    "language": "en",
+    "prompt": "Assess the privacy impact of collecting location points for fleet analytics. Identify the processing purpose, whether coarser locations suffice, and when the original points should be deleted.",
+    "expected_primary": "shadow-privacy",
+    "rivals": [
+      "shadow-sec",
+      "shadow-grc"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-10",
+    "language": "id",
+    "prompt": "Periksa secara defensif cara konfigurasi layanan memilih sertifikat untuk koneksi antarlayanan dan menangani kegagalan verifikasi. Susun temuan teknis dan dampaknya per batas kepercayaan.",
+    "expected_primary": "shadow-sec",
+    "rivals": [
+      "shadow-grc",
+      "shadow-privacy"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-11",
+    "language": "id",
+    "prompt": "Nilai apakah proses peninjauan hak akses sudah dijalankan konsisten di setiap unit. Petakan sampel, pemilik kontrol, kewajiban yang diuji, dan kesenjangan untuk laporan audit.",
+    "expected_primary": "shadow-grc",
+    "rivals": [
+      "shadow-sec",
+      "shadow-privacy"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-12",
+    "language": "id",
+    "prompt": "Pengguna bisa menarik izin pemakaian lokasi untuk analitik. Rancang pencatatan perubahan persetujuan dan pembatasan pemrosesan ke depan, termasuk sinkronisasi kepada pemroses eksternal.",
+    "expected_primary": "shadow-privacy",
+    "rivals": [
+      "shadow-grc",
+      "shadow-sec"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-13",
+    "language": "en",
+    "prompt": "Design the return-request experience from selecting items to viewing a decision. Define the screen sequence, missing-information states, and when the customer can resume a saved draft.",
+    "expected_primary": "shadow-design",
+    "rivals": [
+      "antislop-ui",
+      "shadow-architect"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-14",
+    "language": "en",
+    "prompt": "Set a CI check for imports that cross our established presentation and service boundaries. Report exact violations and how the check distinguishes generated code from handwritten modules.",
+    "expected_primary": "shadow-quality",
+    "rivals": [
+      "shadow-architect",
+      "antislop-ui"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-15",
+    "language": "en",
+    "prompt": "Write an ADR for separating browser-session state and server-side calculations within a single benefits application. Compare module responsibilities, dependency direction, and how callers consume updates.",
+    "expected_primary": "shadow-architect",
+    "rivals": [
+      "shadow-design",
+      "shadow-quality"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-16",
+    "language": "id",
+    "prompt": "Rapikan hierarki visual panel penjadwalan yang sudah dibuat. Perbaiki ukuran judul, jarak antar-kelompok, dan kontras status agar daftar jam mudah dipindai.",
+    "expected_primary": "antislop-ui",
+    "rivals": [
+      "shadow-design",
+      "shadow-accessibility"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-17",
+    "language": "id",
+    "prompt": "Ganti overlay pilihan waktu buatan sendiri dengan Popover API. Jelaskan strategi fallback untuk browser yang belum mendukungnya dan cara mempertahankan perilaku yang sama.",
+    "expected_primary": "modern-web-guidance",
+    "rivals": [
+      "antislop-ui",
+      "shadow-accessibility"
+    ]
+  },
+  {
+    "id": "w2-confusion-b-18",
+    "language": "id",
+    "prompt": "Ketika simpan otomatis selesai, pembaca layar diam pada pesan yang berubah. Evaluasi pengumuman live region, perpindahan fokus, dan cara menguji hasilnya tanpa mouse.",
+    "expected_primary": "shadow-accessibility",
+    "rivals": [
+      "antislop-ui",
+      "shadow-quality"
+    ]
+  }
+]

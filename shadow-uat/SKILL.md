@@ -1,6 +1,6 @@
 ---
 name: shadow-uat
-description: "Staging User Acceptance Testing (UAT) Governance. Use when creating Requirement Traceability Matrices (RTM), Staging UAT scenarios, defect triage logs, test evidence capture, or client UAT sign-off."
+description: "Use when preparing staging acceptance, RTM, client UAT scenarios, defect logs, evidence, or sign-off. Not for unit tests (/shadow-test) or Pre-UAT load profiling (/shadow-perf)."
 ---
 
 # Shadow UAT (`/shadow-uat`) — Requirement Traceability, Staging UAT & Client Sign-Off
@@ -58,6 +58,8 @@ Before handing the Staging environment to client testers, run an internal **Inte
 - [ ] Zero open `Blocker` or `Critical` UAT defects (Severity-First Gate: critical blockers override any numeric score).
 - [ ] All UAT scenarios have verified screenshot/document evidence attached (`NOT TESTED` explicitly labeled if any manual check was skipped).
 - [ ] Formal UAT Sign-Off sheet (`Berita Acara UAT`) ready for client signature.
+
+**Evidence helper:** `python "shadow-uat/scripts/uat_evidence_verifier.py" --batch evidence.json` signs off only when every RTM ID has `PASS` (an empty list never signs off); `--param-drift` flags ignored filters and empty results (`--self-test` for probes).
 
 ## Reference Guide
 

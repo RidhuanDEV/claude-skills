@@ -46,7 +46,7 @@ ORDER BY 1 DESC, total_attempted DESC;
 | Signal Source | What It Reveals | Cadence / Lag |
 | --- | --- | --- |
 | **ESP Webhooks** | Exact `4.x.x` / `5.x.x` SMTP codes, delivery latency, bounces, FBL complaints | Real-time (seconds) |
-| **Google Postmaster Tools** | Gmail spam rate (`< 0.10%` target), IP/domain reputation (`High/Medium/Low/Bad`), SPF/DKIM/DMARC auth % | Daily (~24–48h lag) |
+| **Google Postmaster Tools** | v2 Compliance Status + user-reported spam rate (`< 0.10%` target); the v1 IP/domain reputation dashboards were retired in 2025 | Daily (~24–48h lag) |
 | **Microsoft SNDS / JMRP** | Outlook/Hotmail IP filter status (green/yellow/red), trap hits, complaint feedback | Daily |
 | **DMARC `rua` XML Reports** | Unauthorized senders spoofing your domain + legitimate services missing DKIM/SPF alignment | Daily XML digests |
 
@@ -82,10 +82,10 @@ Customer support escalates: `"Users on @outlook.com and @company.co.id are not r
 - Link every email support ticket directly to `internal_message_id` and `provider_message_id` so engineers trace the exact SMTP transcript in `< 30 seconds`.
 
 ## 11. Authoritative References
-- Google Postmaster Tools Help — *Dashboards & Compliance Status* (`https://support.google.com/mail/answer/9981691`).
+- Google Postmaster Tools Help — *Dashboards & Compliance Status* (`https://support.google.com/mail/answer/16594218`).
 - Microsoft SNDS — *Smart Network Data Services* (`https://sendersupport.olc.protection.outlook.com/snds/`).
-- IETF RFC 7489 — *DMARC Aggregate Reporting (`rua`)*.
+- IETF RFC 9989 — *DMARC* (obsoletes RFC 7489; `pct` tag removed) and RFC 9990 — *DMARC Aggregate Reporting (`rua`)* (`https://www.rfc-editor.org/rfc/rfc9989.html`).
 
 ## 12. Limitations & When NOT to Use
-- Google Postmaster Tools requires a minimum daily Gmail volume (typically several hundred messages/day) before displaying reputation graphs; low-volume domains must supplement with seed-list inbox placement tests and strict webhook bounce/deferral tracking.
-- Do not infer inbox placement from open-tracking pixels (Apple MPP inflates opens artificially); rely on Postmaster reputation, bounce/deferral codes, and seed-list placement instead.
+- Google Postmaster Tools requires a minimum daily Gmail volume (typically several hundred messages/day) before displaying spam-rate data; low-volume domains must supplement with seed-list inbox placement tests and strict webhook bounce/deferral tracking.
+- Do not infer inbox placement from open-tracking pixels (Apple MPP inflates opens artificially); rely on Postmaster Compliance Status and user-reported spam rate, bounce/deferral codes, and seed-list placement instead.

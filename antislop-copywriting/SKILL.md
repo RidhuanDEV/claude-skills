@@ -1,6 +1,6 @@
 ---
 name: antislop-copywriting
-description: "Copywriting and UI text filter. Use when writing or editing headlines, microcopy, CTAs, error messages, or product prose in English or Indonesian."
+description: "Use when editing UI microcopy, CTA labels, onboarding, errors, headlines, or product prose in Indonesian or English."
 allowed-tools: Read Write Edit Glob Grep
 ---
 # antislop-copywriting
@@ -48,6 +48,7 @@ allowed-tools: Read Write Edit Glob Grep
   > Trusted by thousands of teams worldwide. Industry-leading technology loved by customers everywhere.
 - **After:**
   > Used by the support teams at [customer names, only if real]. If there are no real customers to name, cut the claim entirely.
+- **A number already in the draft is still unsourced.** Do not carry "10,000+ teams" into the rewrite on trust. Replace it with a placeholder that names the missing source, such as "Used by [N teams, source: billing count]", or cut the line, and say which you did.
 - **Rule:** R-17 (data and numbers), R-18 (testimonials), R-36 (no fabricated claims), C-5.
 
 ### Weasel Attributions

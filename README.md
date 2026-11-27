@@ -60,7 +60,7 @@ shadow-domain/       /shadow-domain (DDD bounded contexts, aggregate invariants,
 shadow-search/       /shadow-search (Lexical BM25, Indonesian analyzers, vector ANN, hybrid RRF, NDCG & tenant ACL)
 shadow-realtime/     /shadow-realtime (WebSockets, SSE Last-Event-ID resume, token revocation & slow-consumer backpressure)
 shadow-supplychain/  /shadow-supplychain (CycloneDX/SPDX SBOM reconciliation, typosquatting, pinned SHAs & SLSA provenance)
-shadow-eval/         /shadow-eval (AI/RAG Triad Evals & OWASP Top 10 for LLM 2025 / NIST AI 600-1 Red-Teaming)
+shadow-eval/         /shadow-eval (AI/RAG Triad Evals & OWASP Top 10 for LLM 2026 & Agentic Top 10 / NIST AI 600-1 Red-Teaming)
 shadow-sec/          /shadow-sec (STRIDE threat modeling, SBOM & NIST SSDF SP 800-218 / OWASP ASVS 5.0 audit)
 shadow-privacy/      /shadow-privacy (Indonesia UU PDP UU No. 27/2022 & GDPR privacy, consent, DPIA & 72h breach gate)
 shadow-perf/         /shadow-perf (Pre-UAT Gate ONLY: OpenAPI-to-k6 load testing & SQL EXPLAIN profiling)
@@ -186,4 +186,4 @@ The Shadow Army suite integrates and respects the work of open-source authors:
 
 ## License
 
-MIT — copy, fork and adapt freely.
+MIT for original Shadow Army content: copy, fork and adapt freely. Vendored third-party files keep their own licenses and are not covered by the MIT grant. In particular, the OWASP cheat sheets in `shadow-ops/references/vendor` are CC BY-SA 4.0, and the `shadow-design` `ai-product-designer-skill-pack` is internal use only until its license is confirmed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

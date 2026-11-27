@@ -1,6 +1,6 @@
 ---
 name: shadow-discovery
-description: "Requirements Engineering & Discovery. Use when eliciting software requirements, mapping stakeholders, writing PRD/SRS/BRD, defining FR/NFR, Given/When/Then acceptance criteria, or detecting requirement gaps. Do NOT use for tender KAK pricing (/shadow-presales) or CR disputes (/shadow-pmo)."
+description: "Use when eliciting requirements, running requirement workshops (including after a tender win), mapping stakeholders, or drafting PRD/SRS and acceptance criteria. Not for sprint backlog (/shadow-plan)."
 ---
 
 # Shadow Discovery (`/shadow-discovery`) — Requirement Engineering & Scope Gate (SDLC Stage 1)
@@ -72,6 +72,8 @@ Map unverified assumptions across **5 Risk Dimensions** (*Value, Usability, Viab
 - [ ] All P0 requirements have deterministic Given/When/Then acceptance criteria.
 - [ ] Zero unresolved contradictions between business rules (Red-Team PRD check passed).
 - [ ] NFRs (concurrency, latency, security, RPO/RTO) quantified.
+
+**SLA helper:** `python "shadow-discovery/scripts/sla_ambiguity.py" --text "<requirement>"` asks one calendar-vs-business-day question per duration whose basis is unstated, without assuming a basis.
 
 ## Reference Guide
 

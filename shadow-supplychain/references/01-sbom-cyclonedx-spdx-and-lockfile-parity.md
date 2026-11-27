@@ -1,7 +1,7 @@
 # 01 — CycloneDX/SPDX SBOM Generation, Lockfile Parity & Reachability Triage
 
 ## 1. Purpose & Activation Conditions
-Generate accurate **CycloneDX 1.5+ / SPDX 2.3 Software Bills of Materials (SBOMs)** directly from frozen lockfiles, prove **1:1 component parity** across `(ecosystem, name, version, scope)`, enforce **license compliance**, and prioritize vulnerabilities by **production runtime reachability** instead of noisy dev-only alert storms. Activate before every production release (`/shadow-release`), during client delivery (`/shadow-handover`), or when auditing third-party dependencies.
+Generate accurate **CycloneDX 1.5+ (current 1.7) / SPDX 2.3+ (current 3.0.1) Software Bills of Materials (SBOMs)** directly from frozen lockfiles, prove **1:1 component parity** across `(ecosystem, name, version, scope)`, enforce **license compliance**, and prioritize vulnerabilities by **production runtime reachability** instead of noisy dev-only alert storms. Activate before every production release (`/shadow-release`), during client delivery (`/shadow-handover`), or when auditing third-party dependencies.
 
 ## 2. Prerequisites
 - Frozen deterministic lockfile committed to Git (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `go.sum`, `Cargo.lock`, `composer.lock`).
@@ -90,8 +90,8 @@ export function reconcileLockfileAndSbom(
 
 | SBOM Format | Ecosystem Strength | Interop Standard | When to Choose |
 | :--- | :--- | :--- | :--- |
-| **CycloneDX (`1.5` / `1.6` JSON)** | Application security, VEX/reachability, OWASP native | ECMA-424 | **Default** for AppSec, CI release gates & VEX |
-| **SPDX (`2.3` / `3.0` JSON)** | Legal/IP licensing compliance, Linux Foundation | ISO/IEC 5962 | Regulated legal/government contracts requesting SPDX |
+| **CycloneDX (`1.7` current; `1.5`+ minimum, JSON)** | Application security, VEX/reachability, OWASP native | ECMA-424 (2nd edition = 1.7) | **Default** for AppSec, CI release gates & VEX |
+| **SPDX (`3.0.1` current; `2.3` JSON still common)** | Legal/IP licensing compliance, Linux Foundation | ISO/IEC 5962:2021 (= SPDX 2.2.1) | Regulated legal/government contracts requesting SPDX |
 
 ## 7. Real Production Scenario
 During a banking vendor audit, a team submitted a manually typed spreadsheet of 18 top-level `package.json` packages as their "SBOM." Automated scanning of the actual production container with `syft` revealed 312 transitive packages — including an outdated `axios` transitive copy carrying a reachable SSRF vulnerability and an `AGPL-3.0` PDF library prohibited by the client's IP clause! Switching to CI-generated CycloneDX SBOMs reconciled against `package-lock.json` via `supplychain_sbom_gate.py` plus automated license screening prevented both compliance and security failures before client UAT.
@@ -110,8 +110,8 @@ During a banking vendor audit, a team submitted a manually typed spreadsheet of 
 - Archive the exact `sbom.cdx.json` alongside every released container digest so when a new zero-day CVE (like Log4Shell or XZ) drops months later, you can answer "Are we affected?" across all production services in `< 60 seconds`!
 
 ## 11. Authoritative References
-- OWASP CycloneDX Specification (v1.5/v1.6) & Package URL (`purl`) Specification.
-- ISO/IEC 5962 (SPDX) & NTIA Minimum Elements for an SBOM.
+- OWASP CycloneDX Specification (v1.7, `https://cyclonedx.org/news/cyclonedx-v1.7-released`; v1.5+ minimum) & Package URL (`purl`) Specification.
+- SPDX 3.0.1 (ISO/IEC 5962:2021 still equals SPDX 2.2.1) & NTIA Minimum Elements for an SBOM.
 - `shadow-supplychain/methodologies/SBOM-SLSA-PROVENANCE-AND-LOCKFILE-INTEGRITY.md`.
 
 ## 12. Limitations & When NOT to Use

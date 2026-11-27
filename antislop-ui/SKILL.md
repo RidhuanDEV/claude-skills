@@ -1,6 +1,6 @@
 ---
 name: antislop-ui
-description: "UI and visual engineering filter for antislop. Use when building or styling web/mobile interfaces, colors, typography, layout rhythm, motion, and page vitals."
+description: "Use when refining component colors, typography, spacing, alignment, motion, or visual hierarchy. Not for UX flows (/shadow-design)."
 allowed-tools: Read Write Edit Glob Grep
 ---
 # antislop-ui

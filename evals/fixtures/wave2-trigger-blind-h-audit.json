@@ -1,0 +1,66 @@
+[
+ {
+  "id": "antislop-code-h-en-near-01",
+  "issue": "Excluded skill plausibly active: the lint rule targets commented-out code and TODO comments, which is code-comment work.",
+  "old_prompt": "Add an ESLint rule that fails CI when commented-out code blocks or TODOs without a ticket ID appear, then run the linter on the backend package and summarize violations.",
+  "new_prompt": "Configure ESLint in CI to fail on unused variables, dead exports and cyclomatic complexity above 15 in the backend package, then summarize the violations.",
+  "old_expected": "shadow-quality",
+  "new_expected": "shadow-quality"
+ },
+ {
+  "id": "context7-h-en-near-01",
+  "issue": "Excluded skill plausibly active: a Spring Boot version upgrade invites a fetch of official migration notes.",
+  "old_prompt": "Upgrade our core-banking adapter from Spring Boot 3.3 to 3.5 and replay recorded consumer traffic to prove the ISO 8583 message mapping stays backward compatible.",
+  "new_prompt": "Our partner bank is retiring two fields in the ISO 8583 message contract. Replay recorded consumer traffic against the new mapping to prove backward compatibility, and add Deprecation and Sunset headers to the old adapter endpoint.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "shadow-analytics-h-id-near-01",
+  "issue": "Ambiguous owner: star schema warehouse and ETL design is not clearly owned by the database skill in the catalog and can read as analytics warehouse modeling.",
+  "old_prompt": "Buat star schema data warehouse untuk laporan transaksi harian per cabang dan rancang ETL Pentaho dari database core banking ke warehouse.",
+  "new_prompt": "Query rekap transaksi harian per cabang untuk laporan manajemen butuh 8 detik. Dari hasil EXPLAIN ANALYZE-nya, rancang index komposit dan pertimbangkan partisi bulanan untuk tabel transaksi.",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-data-h-id-02",
+  "issue": "Ambiguous owner: deterministic dev seeds are not in the catalog scope of the expected skill and could go to testing.",
+  "old_prompt": "Tolong susun seed data deterministik untuk lingkungan dev aplikasi kursus, 200 siswa dan 30 kelas, supaya hasilnya sama setiap kali dijalankan.",
+  "new_prompt": "Tolong petakan lineage kolom nilai_akhir di SIAKAD dari tabel sumber sampai tabel rekap transkrip, termasuk job mana saja yang mengubah nilainya di sepanjang jalur.",
+  "old_expected": "shadow-data",
+  "new_expected": "shadow-data"
+ },
+ {
+  "id": "shadow-db-h-id-02",
+  "issue": "Ambiguous owner: star schema warehouse and ETL design is outside the catalog scope of the expected skill and overlaps data/analytics.",
+  "old_prompt": "Tolong rancang star schema untuk data warehouse nilai akademik dan ETL Pentaho dari database SIAKAD yang berjalan harian.",
+  "new_prompt": "Koneksi ke database SIAKAD sering habis saat masa pengisian KRS. Bantu hitung ukuran pool PgBouncer untuk 400 koneksi aplikasi dan pilih mode pooling transaction atau session.",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-db-h-id-03",
+  "issue": "Ambiguous owner: auditing SECURITY DEFINER abuse reads as a security review that the security skill could own.",
+  "old_prompt": "Bisa bantu audit fungsi SECURITY DEFINER di Postgres kami? Takutnya search_path tidak dikunci sehingga bisa disalahgunakan.",
+  "new_prompt": "DELETE di tabel pelanggan Postgres kami lambat dan sering menahan lock karena foreign key di tabel tagihan tidak punya index. Cek FK mana saja yang belum ber-index dan rancang index-nya.",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-eval-h-id-02",
+  "issue": "Ambiguous owner: precision/recall probing of a plain regex is not catalog-explicit for evaluation and could go to testing.",
+  "old_prompt": "Kami baru membuat regex deteksi kode voucher di prompt. Tolong uji precision dan recall-nya dengan probe positif dan negatif sebelum dipakai.",
+  "new_prompt": "Tolong jalankan safety eval untuk chatbot layanan nasabah bank: kumpulkan 150 prompt jailbreak dan 150 prompt aman, lalu ukur tingkat penolakan yang benar dan yang salah blokir.",
+  "old_expected": "shadow-eval",
+  "new_expected": "shadow-eval"
+ },
+ {
+  "id": "shadow-realtime-h-id-near-01",
+  "issue": "Excluded skill plausibly active: cancelling a streamed answer is stream transport work the realtime skill covers.",
+  "old_prompt": "Tambahkan tombol stop pada jawaban asisten LLM yang sedang di-stream, dan pastikan request ke provider ikut dibatalkan agar token tidak terus terpakai.",
+  "new_prompt": "Agent asisten akademik perlu mengecek jadwal kuliah secara real-time lewat tool. Rancang skema tool calling dengan validasi argumen JSON Schema dan batas waktu 10 detik per panggilan.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ }
+]

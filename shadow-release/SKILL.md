@@ -1,6 +1,6 @@
 ---
 name: shadow-release
-description: "Production Release & Rollback Management. Use when preparing production deployments, SemVer 2.0.0 changelogs, 8-gate pre-flight checklists, Expand-Only migration-before-code ordering, deterministic canary cohorts, kill-switch flags, `< 2 min` smoke checks, or rollback vs forward-fix runbooks. Do NOT use for infra provisioning (shadow-ops) or SBOM generation (shadow-supplychain)."
+description: "Use when planning SemVer, release preflight, canaries, feature flags, smoke checks, or rollback. Not for provisioning (/shadow-ops)."
 ---
 
 # Shadow Release (`/shadow-release`) — Release Readiness Gates, Versioning & Rollback Verification

@@ -48,7 +48,7 @@ def check_tool_spec(spec: dict[str, Any]) -> dict[str, Any]:
 
     max_steps = int(spec.get("max_steps", 0))
     if max_steps <= 0 or max_steps > 20:
-        errors.append(f"Agent max_steps={max_steps} must be explicitly bounded in [1, 20] (prevents LLM10 runaway loops).")
+        errors.append(f"Agent max_steps={max_steps} must be explicitly bounded in [1, 20] (prevents OWASP LLM06:2026 Unbounded Consumption runaway loops).")
 
     if spec.get("server_injected_tenant_context") is not True:
         errors.append("Agent runtime MUST inject verified tenantId/actorSub server-side rather than trusting LLM tool arguments.")
@@ -75,7 +75,7 @@ def check_tool_spec(spec: dict[str, Any]) -> dict[str, Any]:
             errors.append(f"Tool '{name}' must set bounded timeout_ms in (0, 60000] (got {timeout_ms}).")
         if tool.get("mutating_or_financial") is True:
             if tool.get("requires_hitl_confirmation") is not True:
-                errors.append(f"High-impact mutating/financial tool '{name}' MUST enforce HITL confirmation (OWASP LLM06).")
+                errors.append(f"High-impact mutating/financial tool '{name}' MUST enforce HITL confirmation (OWASP LLM03:2026 Excessive Agency).")
             if tool.get("supports_idempotency_key") is not True:
                 warnings.append(f"Mutating tool '{name}' should carry an idempotency_key to prevent duplicate retries.")
 
@@ -99,7 +99,7 @@ def check_prompt_layout(cfg: dict[str, Any]) -> dict[str, Any]:
 
     max_out = int(cfg.get("max_output_tokens", 0))
     if max_out <= 0 or max_out > 16384:
-        errors.append(f"Explicit bounded max_output_tokens required in (0, 16384] (got {max_out}) to prevent LLM10 unbounded consumption.")
+        errors.append(f"Explicit bounded max_output_tokens required in (0, 16384] (got {max_out}) to prevent OWASP LLM06:2026 unbounded consumption.")
 
     if cfg.get("streaming_enabled", False) and cfg.get("abort_controller_on_disconnect") is not True:
         errors.append("Streaming LLM endpoints MUST wire AbortController on client disconnect to stop burning tokens.")

@@ -1,0 +1,34 @@
+[
+ {
+  "id": "antislop-human-f-id-01",
+  "issue": "Positive ambiguous with antislop-layoutmobile: 24px size plus finger use is a tap-target concern.",
+  "old_prompt": "Tombol ikon hapus di tabel cuma 24px dan nggak ada state fokus pas di-tab. Benerin affordance-nya biar enak di keyboard dan jari.",
+  "new_prompt": "Tombol ikon hapus di tabel nggak ada state fokus pas di-tab, dan hover-nya sama persis kayak default. Benerin affordance interaksinya biar jelas dipakai pakai keyboard.",
+  "old_expected": "antislop-human",
+  "new_expected": "antislop-human"
+ },
+ {
+  "id": "antislop-human-f-id-near-01",
+  "issue": "Near-miss owner ambiguous: 'cek kenapa ... nyangkut' reads as root-cause debugging (shadow-debug) rather than queue design.",
+  "old_prompt": "Tolong cek kenapa state job di queue BullMQ nyangkut di 'active' terus padahal worker udah mati.",
+  "new_prompt": "Job BullMQ nyangkut di state 'active' tiap worker mati sebelum ack. Desain stalled-job recovery dan retry yang idempotent supaya job nggak hilang atau dobel.",
+  "old_expected": "shadow-concurrency",
+  "new_expected": "shadow-concurrency"
+ },
+ {
+  "id": "context7-f-en-near-01",
+  "issue": "expected_primary was null (not a valid skill name) and the PUT/PATCH question could reasonably route to shadow-api; also literally mentioned 'docs'.",
+  "old_prompt": "Quick one, no docs needed: what's the difference between PUT and PATCH, in one line?",
+  "new_prompt": "For our own internal REST convention, should partial updates to /pegawai/{id} use PATCH with JSON Merge Patch? Define the endpoint contract and its error responses.",
+  "old_expected": null,
+  "new_expected": "shadow-api"
+ },
+ {
+  "id": "shadow-ai-eng-f-id-01",
+  "issue": "Positive ambiguous with shadow-realtime: SSE stream cancellation is a realtime-transport concern per catalog.",
+  "old_prompt": "Streaming jawaban LLM ke frontend via SSE suka nyangkut pas user klik stop. Tolong bikin cancellation yang bener sampai ke request provider.",
+  "new_prompt": "Tombol stop di chatbot cuma nyetop tampilan, panggilan ke provider LLM di backend tetap jalan sampai selesai. Bikin cancellation yang diteruskan sampai ke request provider di runtime LLM kita.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ }
+]

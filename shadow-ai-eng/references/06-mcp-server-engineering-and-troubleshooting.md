@@ -68,7 +68,7 @@ python "shadow-ai-eng/scripts/ai_runtime_verifier.py" --check-mcp-config path/to
 | MCP Transport | Best Used For | Key Security & Lifecycle Rule |
 | :--- | :--- | :--- |
 | **`stdio` (Local Subprocess)** | IDE/CLI developer tools (`shadow-db-mcp`, `shadow-api-mcp`) | Zero `stdout` logging; exit cleanly on `stdin` EOF; workspace path jail |
-| **Streamable HTTP (Remote MCP Server)** | Multi-user / enterprise SaaS tool servers | Enforce OAuth 2.1 + PKCE auth (`shadow-auth`), `Origin` validation (DNS-rebinding defense!), per-tenant RBAC, and TLS |
+| **Streamable HTTP (Remote MCP Server)** | Multi-user / enterprise SaaS tool servers | Enforce OAuth 2.1 (still draft-ietf-oauth-v2-1; baseline RFC 9700) + PKCE auth (`shadow-auth`), `Origin` validation (DNS-rebinding defense!), per-tenant RBAC, and TLS |
 
 ## 6. Decision Matrix & Trade-Offs
 | MCP Tool Granularity | LLM Tool-Selection Accuracy | Safety Surface | Verdict |
@@ -87,7 +87,7 @@ A team deploys an internal `stdio` MCP server for querying Postgres. A helper de
 
 ## 9. Testing & Verification
 - Run `python shadow-ai-eng/scripts/ai_runtime_verifier.py --self-test` and `python -m unittest discover -s shadow-ai-eng/tests -v`.
-- Test stdio MCP cleanly: spawn server, pipe a valid JSON-RPC `initialize` request, assert **every single line on `stdout` parses as valid JSON-RPC**, close `stdin`, and assert process exits `0` within `< 2s`!
+- Test stdio MCP cleanly: spawn server, pipe a valid JSON-RPC request (revision 2026-07-28 is stateless with no initialize step, so send `server/discover`; servers that also support the earlier revision 2025-11-25 still need its legacy initialize handshake tested), assert **every single line on `stdout` parses as valid JSON-RPC**, close `stdin`, and assert process exits `0` within `< 2s`!
 
 ## 10. Operational Considerations
 - Version MCP server tool schemas cleanly; never rename or break existing tool parameters silently while multiple IDE clients depend on them.

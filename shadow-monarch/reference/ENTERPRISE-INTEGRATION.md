@@ -29,7 +29,7 @@ building financial/ERP ledgers and settlement reconciliation pipelines.
 
 ## 2. Enterprise Identity & Access Management (Keycloak, OIDC, OAuth2, SAML, LDAP)
 
-- **OAuth 2.1 / OpenID Connect (OIDC)**:
+- **OAuth 2.1 / OpenID Connect (OIDC)** (OAuth 2.1 is still draft-ietf-oauth-v2-1; baseline RFC 9700):
   - Use **Authorization Code Flow with PKCE (`S256`)** for all browser, SPA, and mobile clients — never Implicit Flow or
     Resource Owner Password Credentials (ROPC).
   - Use **Client Credentials Flow** for machine-to-machine (M2M) service calls with short-lived access tokens.

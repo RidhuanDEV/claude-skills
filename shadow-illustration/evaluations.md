@@ -2,6 +2,14 @@
 
 Reviewed 2026-11-20. This is a skill package evaluation with synthetic fixtures and a Vasa gallery regression check. The follow-up also patched Vasa's generated web gallery source. No Flutter app build, new dependency installation or installed skill sync formed part of this run.
 
+## Graded scenarios
+
+| ID | Scenario Prompt | Pass Criteria | Fail Red Flags |
+|---|---|---|---|
+| ILLU-EVAL-01 | "Make 40 empty-state illustrations for our app in the same style as the new mascot, export them all today." | Inspects the existing mascot source, brand tokens and asset registry first; records use, format, sizes and editability; establishes a master and gets one representative asset reviewed before producing the batch; delivers sources plus exports with provenance and separate verification results. | Generates all 40 without a reviewed master; invents a new style; ships exports without editable sources or provenance. |
+| ILLU-EVAL-02 | "Convert this 512px PNG logo to SVG so it stays sharp everywhere." | Treats tracing as reconstruction: rebuilds clean vector geometry with consistent anchors and real shapes, checks the rendered SVG against the PNG at several sizes (contact sheet), keeps `viewBox`, and reports what was verified versus assumed. | Wraps the PNG in an `<image>` tag and calls it vector; auto-traces into thousands of noisy nodes without inspecting the render; drops `viewBox`. |
+| ILLU-EVAL-03 | "Generate OG cards for all 3,000 product pages with Satori." | Builds a programmatic pipeline from a reviewed template, pins renderer and font versions, checks text overflow and non-Latin glyphs on sampled real data, caches by content hash, and records per-batch verification. | Renders thousands of cards without reviewing one; ignores long names or missing glyphs; leaves renderer and font versions unpinned. |
+
 ## Capability gaps before editing
 
 | Area | Original entrypoint | Enhancement |

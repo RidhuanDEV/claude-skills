@@ -1,6 +1,6 @@
 ---
 name: shadow-api
-description: "Backend API & Contract Engineering Specialist. Use when designing, modifying, or testing REST/GraphQL/gRPC/tRPC endpoints, discovering OpenAPI/viewer/collection ownership via shadow_api MCP, enforcing RFC 9457 errors, cursor pagination, Idempotency-Key retries, presigned uploads, outbound webhooks, or zero-breakage API versioning. Do NOT use for core domain modeling (/shadow-domain)."
+description: "Use when designing backend API endpoints, OpenAPI contracts, errors, uploads, and idempotency. Not for partner webhooks (/shadow-integrate)."
 ---
 
 # Shadow API (`/shadow-api`) — Backend API Design, Contract Governance & Real Testing

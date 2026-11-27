@@ -1,0 +1,482 @@
+{
+ "b01": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A plans to repair settings.json; B treats both files as data and leaves settings untouched."
+ },
+ "b03": {
+  "criteria_total": 7,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 9,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 7,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A keeps unsourced 10,000+ claim; B replaces with [N] placeholder."
+ },
+ "b05": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A omits typography clamp; B covers all reflow requirements."
+ },
+ "b07": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "Both v14 sync guidance; only A includes source/version recording step."
+ },
+ "b09": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B lacks @supports anchor-name gating."
+ },
+ "b11": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "note": "B omits streaming/proxy-buffering aspect of TTFT."
+ },
+ "b13": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks v1 wire-compat/deprecation handling during migration."
+ },
+ "b15": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both server-side tenant scoping, 404, tests, audit logging."
+ },
+ "b17": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "note": "Neither records role/focus; B lacks landmark assertion."
+ },
+ "b19": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both block double breaking change with additive or v2 path."
+ },
+ "b21": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both expand-first plus keyset resumable throttled batches."
+ },
+ "b23": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "note": "B lacks disconfirming checks and explicit red-before-green test."
+ },
+ "b25": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "Neither asks one focused question; A ignores soft vs hard delete."
+ },
+ "b27": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both enforce immutability, audited correction, optimistic locking."
+ },
+ "b29": {
+  "criteria_total": 9,
+  "A": {
+   "criteria_met": 7,
+   "red_flags_hit": 1,
+   "score": 6,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 1,
+   "score": 2,
+   "pass": false
+  },
+  "note": "A misses headers and verifier; B misses Postmaster, SNDS, 5.7.x, shared IP."
+ },
+ "b31": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 3,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A proposes proportional split instead of UNATTRIBUTED_SHARED."
+ },
+ "b33": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 4,
+   "pass": false
+  },
+  "note": "A misses ATI/RSTI; B omits PADK 2026 and UU PDP."
+ },
+ "b35": {
+  "criteria_total": 2,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both author SVG and render-inspect it."
+ },
+ "b37": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 4,
+   "pass": false
+  },
+  "note": "B skips evidence capture, schema check, owner and abort condition."
+ },
+ "b39": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "B lacks per-axis evidence_confidence and access limitations."
+ },
+ "b41": {
+  "criteria_total": 8,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 4,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "A lacks traceparent, wide event, RED; neither covers UI Ref ID or queue header."
+ },
+ "b43": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 6,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A adds spans rather than reading existing traces; no dominant-stage prioritization."
+ },
+ "b45": {
+  "criteria_total": 4,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 5,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks CR candidate classification and CCB/PPK routing."
+ },
+ "b47": {
+  "criteria_total": 1,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "Both cover multi-store erasure and backups; B adds per-store receipts."
+ },
+ "b49": {
+  "criteria_total": 7,
+  "A": {
+   "criteria_met": 6,
+   "red_flags_hit": 0,
+   "score": 9,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 7,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A lacks ADR framing; otherwise both recommend SSE correctly."
+ },
+ "b51": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 3,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A treats SBOM as conditional and allows risk acceptance; B blocks."
+ },
+ "b53": {
+  "criteria_total": 5,
+  "A": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 4,
+   "red_flags_hit": 0,
+   "score": 8,
+   "pass": false
+  },
+  "note": "Neither specifies ascii_folding/Sastrawi/stopword analyzer details."
+ },
+ "b55": {
+  "criteria_total": 8,
+  "A": {
+   "criteria_met": 8,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "B": {
+   "criteria_met": 5,
+   "red_flags_hit": 1,
+   "score": 4,
+   "pass": false
+  },
+  "note": "B misses verifier, sitemap sharding, Googlebot log monitoring."
+ },
+ "b57": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 2,
+   "red_flags_hit": 0,
+   "score": 7,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 3,
+   "red_flags_hit": 0,
+   "score": 10,
+   "pass": true
+  },
+  "note": "A misses 200, boundary values, and rollback in failure surface."
+ },
+ "b59": {
+  "criteria_total": 3,
+  "A": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 3,
+   "pass": false
+  },
+  "B": {
+   "criteria_met": 1,
+   "red_flags_hit": 0,
+   "score": 3,
+   "pass": false
+  },
+  "note": "Neither states exit 1 or FAIL-*.png screenshot output."
+ }
+}

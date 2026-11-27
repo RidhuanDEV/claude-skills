@@ -6,23 +6,13 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "shadow-doc" / "scripts"))
 
 import reference_verifier
-
-
-def evaluate_source_record(record: dict[str, str], now: datetime, max_age_days: int = 365) -> dict[str, object]:
-    required = ("owner", "effective_version", "accessed_at", "digest", "revalidation_trigger")
-    missing = [k for k in required if not str(record.get(k, "")).strip()]
-    if missing:
-        return {"status": "UNKNOWN_METADATA", "missing": missing, "stale": True}
-    accessed = datetime.fromisoformat(record["accessed_at"].replace("Z", "+00:00"))
-    stale = (now - accessed) > timedelta(days=max_age_days)
-    return {"status": "STALE" if stale else "VERIFIED_ARCHIVED", "missing": [], "stale": stale}
 
 
 class ReferenceArchiveAndLocalGeneratorTests(unittest.TestCase):
@@ -35,7 +25,7 @@ class ReferenceArchiveAndLocalGeneratorTests(unittest.TestCase):
             self.assertTrue(safety["safe"])
 
             digest = hashlib.sha256(ref_file.read_bytes()).hexdigest()
-            fresh = evaluate_source_record(
+            fresh = reference_verifier.evaluate_source_freshness(
                 {
                     "owner": "LKPP / Setneg",
                     "effective_version": "Perpres 46/2025",
@@ -47,7 +37,7 @@ class ReferenceArchiveAndLocalGeneratorTests(unittest.TestCase):
             )
             self.assertEqual(fresh["status"], "VERIFIED_ARCHIVED")
 
-            stale = evaluate_source_record(
+            stale = reference_verifier.evaluate_source_freshness(
                 {
                     "owner": "OWASP",
                     "effective_version": "ASVS 4.0.3",
@@ -60,8 +50,28 @@ class ReferenceArchiveAndLocalGeneratorTests(unittest.TestCase):
             self.assertEqual(stale["status"], "STALE")
             self.assertTrue(stale["stale"])
 
-            missing = evaluate_source_record({"owner": "Unknown"}, now=now)
+            missing = reference_verifier.evaluate_source_freshness({"owner": "Unknown"}, now=now)
             self.assertEqual(missing["status"], "UNKNOWN_METADATA")
+
+    def test_source_freshness_rejects_malformed_records(self) -> None:
+        now = datetime(2026, 11, 19, tzinfo=timezone.utc)
+        good = {
+            "owner": "OWASP", "effective_version": "ASVS 5.0.0", "accessed_at": "2026-10-01T00:00:00Z",
+            "digest": "a" * 64, "revalidation_trigger": "major_release",
+        }
+        self.assertEqual(reference_verifier.evaluate_source_freshness(good, now)["status"], "VERIFIED_ARCHIVED")
+        for record in (
+            {**good, "accessed_at": "2027-01-01T00:00:00Z"},
+            {**good, "accessed_at": "2026-10-01T00:00:00"},
+            {**good, "accessed_at": "yesterday"},
+            {**good, "digest": "not-a-sha"},
+            {**good, "owner": True},
+            ["not", "a", "record"],
+        ):
+            with self.subTest(record=record):
+                result = reference_verifier.evaluate_source_freshness(record, now)
+                self.assertIn(result["status"], {"INVALID_INPUT", "UNKNOWN_METADATA"})
+                self.assertTrue(result["stale"])
 
     def test_c15_existing_repo_generator_single_paragraph_update_without_new_pipeline(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

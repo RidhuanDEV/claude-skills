@@ -20,17 +20,22 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 RFC9745_DEP_RE = re.compile(r"^@(\d{9,12})$")
 
 
 def check_compat_spec(spec: Any) -> list[dict[str, str]]:
     """Audit deprecation headers and API contract diff rules."""
     violations: list[dict[str, str]] = []
-    if not isinstance(spec, dict) or not spec:
+    if not isinstance(spec, dict) or ("deprecation" not in spec and "contract_diff" not in spec):
         return [{"code": "EMPTY_SPEC", "detail": "Compatibility spec must be a non-empty JSON object."}]
 
     # 1. RFC 9745 / RFC 8594 deprecation policy check
     dep = spec.get("deprecation")
+    if dep is not None and not isinstance(dep, dict):
+        violations.append({"code": "INVALID_DEPRECATION", "detail": "`deprecation` must be a JSON object."})
     if isinstance(dep, dict):
         dep_hdr = str(dep.get("Deprecation", "")).strip()
         sunset_hdr = str(dep.get("Sunset", "")).strip()
@@ -83,6 +88,8 @@ def check_compat_spec(spec: Any) -> list[dict[str, str]]:
 
     # 2. Contract diff breaking-change check
     diff = spec.get("contract_diff")
+    if diff is not None and not isinstance(diff, dict):
+        violations.append({"code": "INVALID_CONTRACT_DIFF", "detail": "`contract_diff` must be a JSON object."})
     if isinstance(diff, dict):
         old_res = diff.get("old_response_fields", {})
         new_res = diff.get("new_response_fields", {})
@@ -99,7 +106,9 @@ def check_compat_spec(spec: Any) -> list[dict[str, str]]:
                     "code": "BREAKING_RESPONSE_TYPE_CHANGED",
                     "detail": f"Response field `{field}` changed type `{old_meta.get('type')}` -> `{new_meta.get('type')}`.",
                 })
-            if not old_meta.get("nullable", False) and new_meta.get("nullable", False):
+            was_nullable = strict_bool(old_meta.get("nullable", False), f"old.response.{field}.nullable")
+            now_nullable = strict_bool(new_meta.get("nullable", False), f"new.response.{field}.nullable")
+            if not was_nullable and now_nullable:
                 violations.append({
                     "code": "BREAKING_RESPONSE_BECAME_NULLABLE",
                     "detail": f"Response field `{field}` became nullable (`null` breaks strict existing mobile/web decoders).",
@@ -108,15 +117,15 @@ def check_compat_spec(spec: Any) -> list[dict[str, str]]:
         old_req = diff.get("old_request_fields", {})
         new_req = diff.get("new_request_fields", {})
         for field, new_meta in new_req.items():
-            was_required = bool(old_req.get(field, {}).get("required", False))
-            now_required = bool(new_meta.get("required", False))
+            was_required = strict_bool(old_req.get(field, {}).get("required", False), f"old.request.{field}.required")
+            now_required = strict_bool(new_meta.get("required", False), "required")
             if now_required and not was_required:
                 violations.append({
                     "code": "BREAKING_NEW_REQUIRED_REQUEST_FIELD",
                     "detail": f"Request field `{field}` became required without server default (breaks existing callers).",
                 })
 
-        if bool(diff.get("added_additional_properties_false", False)):
+        if strict_bool(diff.get("added_additional_properties_false", False), "added_additional_properties_false"):
             violations.append({
                 "code": "BREAKING_STRICT_SCHEMA_TIGHTENING",
                 "detail": "Enabling `additionalProperties: false` breaks forward-compatible tolerant readers/clients.",
@@ -244,4 +253,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

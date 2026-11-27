@@ -1,0 +1,82 @@
+[
+ {
+  "id": "antislop-copywriting-i-en-near-01",
+  "issue": "'titles' are human-readable error text, overlapping the copywriting owner's error-message scope",
+  "old_prompt": "Define RFC 9457 problem+json types for our payout API: type URIs, titles and status codes for insufficient_balance and duplicate_request.",
+  "new_prompt": "Define RFC 9457 problem+json type URIs, status codes and extension members for insufficient_balance and duplicate_request in our payout API.",
+  "old_expected": "shadow-api",
+  "new_expected": "shadow-api"
+ },
+ {
+  "id": "context7-i-en-near-01",
+  "issue": "Express 4->5 library upgrade legitimately needs version-specific migration docs, so the docs lookup would co-activate",
+  "old_prompt": "Move our Express 4 app to Express 5 and list which consumers break because of the path-to-regexp changes.",
+  "new_prompt": "We're removing the `legacy_status` field from our public v2 orders API; list which consumer apps break and plan Deprecation and Sunset headers.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "context7-i-id-near-01",
+  "issue": "Spring Boot BeanCreationException is library-specific debugging where official docs lookup is expected",
+  "old_prompt": "Aplikasi Spring Boot kami error 'BeanCreationException' setelah deploy ke staging padahal di lokal jalan; tolong cari akar masalahnya.",
+  "new_prompt": "Job rekap harian kami menghasilkan total yang selisih Rp1 dibanding laporan manual sejak Senin; tolong cari akar masalahnya.",
+  "old_expected": "shadow-debug",
+  "new_expected": "shadow-debug"
+ },
+ {
+  "id": "shadow-data-i-id-near-01",
+  "issue": "Pentaho/DW ETL is not in the database owner's catalog scope and overlaps the data owner's lineage scope; ambiguous owner",
+  "old_prompt": "Tolong bangun ETL Pentaho ke data warehouse star schema untuk laporan klaim bulanan.",
+  "new_prompt": "Tolong cek kenapa pool koneksi PgBouncer ke database klaim sering habis saat jam sibuk dan sarankan ukuran pool yang tepat.",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-doc-i-en-near-01",
+  "issue": "Writing manuals is a document deliverable that the document generator would plausibly co-own",
+  "old_prompt": "Write the admin and end-user manuals for the BAST transfer of the payroll system to the client.",
+  "new_prompt": "List the server credentials, repository access and domain accounts to transfer to the client in the BAST for the payroll system.",
+  "old_expected": "shadow-handover",
+  "new_expected": "shadow-handover"
+ },
+ {
+  "id": "shadow-ea-i-id-near-01",
+  "issue": "Mentions SPBE, which is in the enterprise-architecture owner's catalog scope",
+  "old_prompt": "Mohon audit tingkat kematangan SPBE dan kontrol Indeks KAMI untuk dinas kominfo kabupaten.",
+  "new_prompt": "Mohon audit kesiapan kontrol ISO 27001 Annex A dan skor Indeks KAMI untuk unit TI rumah sakit daerah.",
+  "old_expected": "shadow-grc",
+  "new_expected": "shadow-grc"
+ },
+ {
+  "id": "shadow-eval-i-id-03",
+  "issue": "Regex precision/recall on NIK is outside the eval catalog wording and overlaps test/privacy owners",
+  "old_prompt": "regex deteksi NIK di prompt kami perlu diuji precision recall-nya, tlg bikin probe positif dan negatif",
+  "new_prompt": "tlg bikin set uji red-team buat chatbot game kami, cek apa dia bisa dipancing prompt injection buat bocorin system prompt",
+  "old_expected": "shadow-eval",
+  "new_expected": "shadow-eval"
+ },
+ {
+  "id": "shadow-perf-i-id-03",
+  "issue": "EXPLAIN query profiling overlaps the database owner's EXPLAIN scope",
+  "old_prompt": "gerbang performa pre-UAT nih, tlg profiling query lambat pake EXPLAIN di staging",
+  "new_prompt": "gerbang performa pre-UAT nih, tlg profiling CPU dan memori service klaim selama load test k6 di staging",
+  "old_expected": "shadow-perf",
+  "new_expected": "shadow-perf"
+ },
+ {
+  "id": "shadow-sec-i-id-near-01",
+  "issue": "Maker-checker segregation of duties is an authorization/security control, so the security topic is present",
+  "old_prompt": "Mohon modelkan aturan eskalasi klaim di atas Rp50 juta: butuh dua approver dan pembuat tidak boleh menyetujui sendiri.",
+  "new_prompt": "Mohon modelkan aturan eskalasi klaim di atas Rp50 juta: status menunggu review senior, batas waktu 3 hari kerja, dan kembali ke antrean bila kedaluwarsa.",
+  "old_expected": "shadow-domain",
+  "new_expected": "shadow-domain"
+ },
+ {
+  "id": "shadow-video-i-en-near-01",
+  "issue": "Lottie animation sits in both illustration and video motion scope; ambiguous",
+  "old_prompt": "Design an SVG mascot with a Lottie animation file for our loading spinner.",
+  "new_prompt": "Design an SVG mascot and a matching 24px icon set for our loading screen.",
+  "old_expected": "shadow-illustration",
+  "new_expected": "shadow-illustration"
+ }
+]

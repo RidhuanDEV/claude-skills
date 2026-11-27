@@ -1,6 +1,6 @@
 ---
 name: shadow-maintain
-description: "Post-Production Maintenance & Incident RCA. Use when triaging live production incidents, conducting blameless postmortems/RCA, managing SLA/Harwat/OMKT backlogs, or shipping hotfixes with regression tests."
+description: "Use when responding to production outages, SEV triage, Harwat SLA, postmortems, or surgical hotfixes. Not for planned rollout (/shadow-release)."
 ---
 
 # Shadow Maintain (`/shadow-maintain`) — Post-Production Maintenance (Harwat), Incident RCA & SLA Governance
@@ -48,6 +48,8 @@ After every `P0` or `P1` incident, generate `docs/incidents/RCA-YYYY-MM-DD-<slug
 - **Corrective Maintenance**: Resolving reported bugs/tickets with commit & screenshot evidence.
 - **Adaptive Maintenance**: OS/runtime security patches, expiring TLS certificate checks, third-party API adjustments.
 - **Perfective Maintenance**: Slow query index tuning (`/shadow-db`), disk/log cleanup, dependency security updates (`npm/pip/composer audit`), and monthly restore drill (`/shadow-resilience`).
+
+**Rollback helper:** `python "shadow-maintain/scripts/rollback_decision.py" --assess incident.json` returns `AWAITING_APPROVAL` until the incident commander approves, and `BLOCKED_INCOMPATIBLE_SCHEMA` when a migration is not expand-only (`--self-test` for probes).
 
 ## Reference Guide
 

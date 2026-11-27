@@ -1,6 +1,6 @@
 ---
 name: shadow-analytics
-description: "Product Analytics & Experimentation Specialist. Use when designing North Star/OEC metrics, event tracking plans, identity resolution, UU PDP/GDPR multi-vendor DSAR consent, PostHog/GA4/Mixpanel hybrid instrumentation, warehouse modeling, data quality, funnels, retention cohorts, behavioral segmentation, A/B tests (SRM, CUPED, Delta Method, mSPRT, switchbacks), causal inference (DiD/SCM/RDD), or ship decisions. Do NOT use for OTel/infra SRE (/shadow-observe) or SEO (/shadow-seo)."
+description: "Use when designing product KPIs, tracking events, funnels, A/B tests, SRM, CUPED, or causal analysis. Not for SLOs (/shadow-observe)."
 ---
 
 # Shadow Analytics (`/shadow-analytics`) — Product Analytics & Experimentation Engineering

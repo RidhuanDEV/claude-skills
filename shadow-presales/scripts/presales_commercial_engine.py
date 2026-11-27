@@ -15,12 +15,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 
 def compute_capacity_scenarios(spec: dict[str, Any]) -> dict[str, Any]:
     """Compute conservative, expected, and stress server sizing from workload classes."""
     workloads = spec.get("workload_classes", [])
-    if not workloads:
+    if not isinstance(workloads, list) or not workloads or not all(isinstance(w, dict) for w in workloads):
         raise ValueError("workload_classes must contain at least one workload definition.")
+    for w in workloads:
+        for field in ("rps_baseline", "cpu_service_demand_sec"):
+            value = w.get(field)
+            if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+                raise InvalidInput(f"workload_classes.{field} must be a finite, positive JSON number.")
 
     target_util = float(spec.get("target_cpu_utilization", 0.60))
     if not (0.10 <= target_util <= 0.85):
@@ -88,12 +96,25 @@ def compute_capacity_scenarios(spec: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _cost_factor(item: dict[str, Any], field: str) -> float:
+    value = item.get(field)
+    if not isinstance(value, (int, float, str)) or isinstance(value, bool):
+        raise InvalidInput(f"{field} requires a finite, nonnegative cost input.")
+    try:
+        numeric = float(value)
+    except (ValueError, OverflowError) as exc:
+        raise InvalidInput(f"{field} requires a finite, nonnegative cost input.") from exc
+    if not math.isfinite(numeric) or numeric < 0:
+        raise InvalidInput(f"{field} requires a finite, nonnegative cost input.")
+    return numeric
+
+
 def compute_tco_and_commercial(spec: dict[str, Any]) -> dict[str, Any]:
     """
     Compute 3-5 year CAPEX/OPEX TCO, NPV, provider commercial margin, and
     Perpres 46/2025 PDN/UMKK compliance without claiming official PPK HPS authority.
     """
-    if spec.get("claim_official_hps_authority", False):
+    if strict_bool(spec.get("claim_official_hps_authority", False), "claim_official_hps_authority"):
         raise PermissionError("HG3_UNAUTHORIZED_PPK_HPS_DETERMINATION: Provider/AI cannot determine or approve official HPS on behalf of PPK.")
 
     years = int(spec.get("years", 3))
@@ -109,13 +130,20 @@ def compute_tco_and_commercial(spec: dict[str, Any]) -> dict[str, Any]:
     support_capex_items = spec.get("support_capex_items", [])
     annual_opex_items = spec.get("annual_opex_items", [])
 
-    personnel_cost = sum(float(i["qty"]) * float(i["months"]) * float(i["unit_rate"]) for i in personnel_items)
-    infra_capex = sum(float(i["qty"]) * float(i["unit_price"]) for i in infra_capex_items)
-    support_capex = sum(float(i["qty"]) * float(i["unit_price"]) for i in support_capex_items)
+    for field, items in (
+        ("personnel_items", personnel_items), ("infra_capex_items", infra_capex_items),
+        ("support_capex_items", support_capex_items), ("annual_opex_items", annual_opex_items),
+    ):
+        if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
+            raise InvalidInput(f"{field} must be an array of cost objects.")
+
+    personnel_cost = sum(_cost_factor(i, "qty") * _cost_factor(i, "months") * _cost_factor(i, "unit_rate") for i in personnel_items)
+    infra_capex = sum(_cost_factor(i, "qty") * _cost_factor(i, "unit_price") for i in infra_capex_items)
+    support_capex = sum(_cost_factor(i, "qty") * _cost_factor(i, "unit_price") for i in support_capex_items)
 
     capex_direct_cost = round(personnel_cost + infra_capex + support_capex, 2)
     margin_pct = float(spec.get("target_margin_pct", 0.20))
-    capex_bid_pre_tax = round(capex_direct_cost / max(0.05, 1.0 - margin_pct), 2) if spec.get("apply_margin_to_capex", True) else capex_direct_cost
+    capex_bid_pre_tax = round(capex_direct_cost / max(0.05, 1.0 - margin_pct), 2) if strict_bool(spec.get("apply_margin_to_capex", True), "apply_margin_to_capex") else capex_direct_cost
     capex_ppn = round(capex_bid_pre_tax * ppn_rate, 2)
     capex_bid_incl_tax = round(capex_bid_pre_tax + capex_ppn, 2)
 
@@ -126,11 +154,11 @@ def compute_tco_and_commercial(spec: dict[str, Any]) -> dict[str, Any]:
         yr_cost = 0.0
         yr_fx_shocked = 0.0
         for item in annual_opex_items:
-            base = float(item["annual_cost"])
+            base = _cost_factor(item, "annual_cost")
             growth = float(item.get("annual_uplift_pct", 0.05))
             escalated = base * ((1.0 + growth) ** (yr - 1))
             yr_cost += escalated
-            if item.get("fx_exposed", False):
+            if strict_bool(item.get("fx_exposed", False), "fx_exposed"):
                 yr_fx_shocked += escalated * (1.0 + fx_shock_pct)
             else:
                 yr_fx_shocked += escalated
@@ -145,14 +173,17 @@ def compute_tco_and_commercial(spec: dict[str, Any]) -> dict[str, Any]:
 
     # Perpres 46/2025 UMKK / PDN compliance ratio on total pre-tax CAPEX items
     all_commercial_items = [
-        *(({"amount": float(i["qty"]) * float(i["months"]) * float(i["unit_rate"]), "is_umkk_pdn": bool(i.get("is_umkk_pdn", False))} for i in personnel_items)),
-        *(({"amount": float(i["qty"]) * float(i["unit_price"]), "is_umkk_pdn": bool(i.get("is_umkk_pdn", False))} for i in infra_capex_items)),
-        *(({"amount": float(i["qty"]) * float(i["unit_price"]), "is_umkk_pdn": bool(i.get("is_umkk_pdn", False))} for i in support_capex_items)),
+        *(({"amount": _cost_factor(i, "qty") * _cost_factor(i, "months") * _cost_factor(i, "unit_rate"), "is_umkk_pdn": strict_bool(i.get("is_umkk_pdn", False), "is_umkk_pdn")} for i in personnel_items)),
+        *(({"amount": _cost_factor(i, "qty") * _cost_factor(i, "unit_price"), "is_umkk_pdn": strict_bool(i.get("is_umkk_pdn", False), "is_umkk_pdn")} for i in infra_capex_items)),
+        *(({"amount": _cost_factor(i, "qty") * _cost_factor(i, "unit_price"), "is_umkk_pdn": strict_bool(i.get("is_umkk_pdn", False), "is_umkk_pdn")} for i in support_capex_items)),
     ]
     total_cost_base = sum(x["amount"] for x in all_commercial_items)
     umkk_amount = sum(x["amount"] for x in all_commercial_items if x["is_umkk_pdn"])
     umkk_share = round(umkk_amount / total_cost_base, 4) if total_cost_base > 0 else 0.0
 
+    direct_cost = capex_direct_cost + total_nominal_opex
+    if not math.isfinite(direct_cost) or direct_cost <= 0:
+        raise InvalidInput("Commercial estimate requires positive, finite CAPEX or OPEX cost evidence.")
     total_nominal_tco = round(capex_bid_pre_tax + total_nominal_opex, 2)
     reconciled = abs((capex_bid_pre_tax + sum(y["opex_pre_tax"] for y in annual_opex_schedule)) - total_nominal_tco) < 0.05
 
@@ -327,4 +358,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

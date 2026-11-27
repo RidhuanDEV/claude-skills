@@ -53,7 +53,7 @@ EVAL_CHECKS_BY_ID: dict[int, list[tuple[str, re.Pattern[str]]]] = {
         ("Requires 3x24h breach notification (Pasal 46) & 2% revenue sanction (Pasal 57)", re.compile(r"(pasal\s*46|3\s*x\s*24|72\s*jam).*(pasal\s*57|2%)", re.IGNORECASE | re.DOTALL)),
     ],
     20: [
-        ("Maps OWASP Top 10 for LLM 2025 (LLM01/LLM05/LLM06/LLM08) & NIST AI 600-1", re.compile(r"LLM0[1568].*(NIST\s*AI\s*600-1|AI\s*600-1)", re.IGNORECASE | re.DOTALL)),
+        ("Maps OWASP Top 10 for LLM 2026 (LLM01/LLM03/LLM09/LLM10) & NIST AI 600-1", re.compile(r"LLM(?:0[139]|10).*(NIST\s*AI\s*600-1|AI\s*600-1)", re.IGNORECASE | re.DOTALL)),
         ("Enforces 100% tenant ACL pre-filtering & Faithfulness/Citation integrity", re.compile(r"(tenant|acl).*(faithfulness|citation)", re.IGNORECASE | re.DOTALL)),
         ("Requires HITL approval on financial tools & zero raw SQL interpolation", re.compile(r"(hitl|human[- ]in[- ]the[- ]loop).*(parameterized|sql)", re.IGNORECASE | re.DOTALL)),
         ("Requires precision probes (negative/topic-switch) and recall probes", re.compile(r"(precision\s*probe|negative).*(recall\s*probe)", re.IGNORECASE | re.DOTALL)),
@@ -329,8 +329,8 @@ def run_self_test() -> dict[str, Any]:
         ),
         (
             20,
-            "RECALL-20 (OWASP LLM 2025 + NIST AI 600-1 + RAG Triad + HITL + probes)",
-            "Audit mengacu pada OWASP LLM01, LLM05, LLM06, LLM08 dan NIST AI 600-1: wajib 100% tenant ACL filter serta pengukuran Faithfulness & Citation integrity, HITL approval untuk refund dengan parameterized SQL, dan precision probe + recall probe.",
+            "RECALL-20 (OWASP LLM 2026 + NIST AI 600-1 + RAG Triad + HITL + probes)",
+            "Audit mengacu pada OWASP LLM01, LLM03, LLM09, LLM10 dan NIST AI 600-1: wajib 100% tenant ACL filter serta pengukuran Faithfulness & Citation integrity, HITL approval untuk refund dengan parameterized SQL, dan precision probe + recall probe.",
             True,
         ),
         (

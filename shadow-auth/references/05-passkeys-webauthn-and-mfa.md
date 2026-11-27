@@ -89,7 +89,7 @@ An admin team relies on password + TOTP MFA. A targeted phishing email sends an 
 - Always support registering `>= 2` authenticators per privileged user and provide a documented identity-verified account recovery procedure (never silently disable MFA via unverified support email!).
 
 ## 11. Authoritative References
-- W3C WebAuthn Level 2 / Level 3 Specification (`https://www.w3.org/TR/webauthn/`).
+- W3C Web Authentication Level 3 — a W3C Recommendation since 2026-08-25; Level 2 is the previous level (`https://www.w3.org/TR/webauthn/`).
 - NIST SP 800-63B-4 — *AAL3 Phishing-Resistant Authenticators* (`https://csrc.nist.gov/pubs/sp/800/63/4/final`).
 - IETF RFC 6238 — *TOTP: Time-Based One-Time Password Algorithm*.
 

@@ -10,11 +10,27 @@ Enforce deterministic JSON contracts and zero-trust tool-calling boundaries so n
 - **Constrained Decoding + Runtime Boundary Validation (Never Regex-Parse JSON!):**
   - Use provider native **Structured Outputs** (JSON Schema constrained decoding) for every machine-consumed response (`extraction`, `routing`, `classification`, `UI cards`).
   - ALWAYS re-validate the parsed JSON through a strict runtime schema (`Zod` / `Pydantic`, zero `as Type` casts!) BEFORE touching business logic, capping schema-repair retries at `<= 1`!
-- **Zero-Trust Tool Trust Boundary (`OWASP LLM01`, `LLM05`, `LLM06`):**
+- **Zero-Trust Tool Trust Boundary (`OWASP LLM01`, `LLM10`, `LLM03` — 2026 numbering):**
   1. **NEVER Expose Identity or Raw Interpreters in LLM Tool Args:** Omit `tenantId`, `userId`, `role`, `sqlQuery`, and `shellCommand` completely from the tool schema given to the model! Inject `session.tenantId` and `session.actorSub` **strictly from the verified server session** inside the tool handler!
   2. **Narrow Intent Tools > Generic God Tools:** Expose `list_my_invoices({ status, limit })` with strict enum validation instead of `query_database({ sql })`.
   3. **Mandatory HITL Confirmation for High-Impact Mutations:** Tools that move money, send external emails, mutate production state, or delete data MUST pause and return a typed `HITL_REQUIRED` confirmation payload for explicit user approval (plus carry an `idempotency_key` so retries never double-execute!).
   4. **Untrusted Tool Output Wrapping:** Treat EVERY external tool response (web fetch, email body, PDF text, database notes) as **untrusted data** (`<tool_output>...</tool_output>`), NEVER as system directives!
+
+### 3.1 OWASP Top 10 for Agentic Applications (for 2026) — Control Map
+Source: `https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/` (published 2025-12-09). Each item maps to a control already in this module or skill.
+
+| ID | Agentic Risk | Control |
+| :--- | :--- | :--- |
+| `ASI01` | Agent Goal Hijack | Untrusted tool output wrapping (rule 4) + typed schemas so injected text cannot redirect actions |
+| `ASI02` | Tool Misuse and Exploitation | Narrow intent tools, strict enum args, no raw interpreters (rules 1–2) |
+| `ASI03` | Identity and Privilege Abuse | Identity injected from the verified server session; per-tool permission check (`FORBIDDEN_PERMISSION`) |
+| `ASI04` | Agentic Supply Chain | Pinned, reviewed MCP servers and tools ([06](06-mcp-server-engineering-and-troubleshooting.md), `/shadow-supplychain`) |
+| `ASI05` | Unexpected Code Execution | No `sqlQuery`/`shellCommand` args; parameterized sinks only |
+| `ASI06` | Memory and Context Poisoning | Tenant-scoped memory and deterministic compaction ([03](03-agent-state-compaction-and-memory-privacy.md)) |
+| `ASI07` | Insecure Inter-Agent Communication | Treat peer-agent messages as untrusted tool output and re-validate with the runtime schema |
+| `ASI08` | Cascading Failures | Bounded `MAX_STEPS`, wall-clock and token caps ([03](03-agent-state-compaction-and-memory-privacy.md)); idempotency keys on retries |
+| `ASI09` | Human-Agent Trust Exploitation | `HITL_REQUIRED` preview shows the exact action before approval (rule 3) |
+| `ASI10` | Rogue Agents | Deterministic RBAC + HITL outside the model; audit log of every mutating tool call (§10) |
 
 ## 4. Architecture & Implementation
 ```typescript
@@ -94,7 +110,8 @@ An enterprise assistant exposes `get_customer_invoices({ tenant_id, customer_id 
 - Log every tool execution (tool name, `actorSub`, `tenantId`, `status`, `latencyMs` — with sensitive args redacted) to the security audit log when mutating state.
 
 ## 11. Authoritative References
-- OWASP Top 10 for LLM Applications 2025 — `LLM01`, `LLM05`, `LLM06` (`https://genai.owasp.org/llm-top-10/`).
+- OWASP Top 10 for LLM Applications 2026 — `LLM01` Prompt Injection, `LLM03` Excessive Agency, `LLM10` Improper Output Handling (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
+- OWASP Top 10 for Agentic Applications for 2026 — `ASI01`–`ASI10` (`https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/`).
 - JSON Schema Draft 2020-12 (`https://json-schema.org/`).
 
 ## 12. Limitations & When NOT to Use

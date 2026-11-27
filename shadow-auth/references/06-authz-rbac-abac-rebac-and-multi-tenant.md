@@ -96,7 +96,7 @@ A multi-tenant billing API properly checks `tenant_id` on `GET /api/v1/invoices`
 - **RIGHT:** Parse request bodies through strict explicit DTO schemas (`Zod`/`Pydantic`) that strip or reject unknown privileged fields.
 
 ## 9. Testing & Verification
-- Run `python shadow-auth/scripts/auth_policy_verifier.py --check-policy-matrix <matrix.json>` and `python -m unittest discover -s shadow-auth/tests -v` (exercises live local HTTP 401/403 cross-tenant isolation in `test_auth_policy_matrix.py`).
+- Run `python shadow-auth/scripts/auth_policy_verifier.py --check-policy-matrix <matrix.json>` and `python -m unittest discover -s shadow-auth/tests -v` (`test_auth_policy_matrix.py` runs the shipped policy gate offline: deny-by-default, tenant-scoped queries, required 401/cross-tenant/role-denial negative tests, session, JWT and SSO configs, and CLI exit codes; no HTTP server).
 - Every new protected route PR MUST ship 3 negative tests: unauthenticated (`401`), cross-tenant access (`403`/`404`), and unauthorized role (`403`).
 
 ## 10. Operational Considerations
@@ -104,7 +104,7 @@ A multi-tenant billing API properly checks `tenant_id` on `GET /api/v1/invoices`
 
 ## 11. Authoritative References
 - OWASP API Security Top 10 (2023) — `API1:2023` (BOLA), `API3:2023` (BOPLA), `API5:2023` (BFLA) (`https://api-security.owasp.org/`).
-- OWASP ASVS 5.0 — *Access Control Verification Requirements* (`https://asvs.owasp.org/`).
+- OWASP ASVS 5.0.0 — *V8 Authorization* (`https://github.com/OWASP/ASVS`).
 - Pang et al. (USENIX ATC 2019) — *Zanzibar: Google's Consistent, Global Authorization System* (Zookie consistency).
 
 ## 12. Limitations & When NOT to Use

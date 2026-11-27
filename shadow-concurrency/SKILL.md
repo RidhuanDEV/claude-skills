@@ -1,6 +1,6 @@
 ---
 name: shadow-concurrency
-description: "Asynchronous & Distributed Workflow Correctness Specialist. Use when designing or fixing message queues, retries/backoff, transactional outbox/inbox deduplication, crash-before-ack recovery, monotonic fencing-token locks, sagas, or DLQ poison messages. Do NOT use for third-party payment HTTP/HMAC adapters (/shadow-integrate), WebSocket/SSE client reconnect UX (/shadow-realtime), or standalone SQL schema design (/shadow-data, /shadow-db)."
+description: "Use when designing durable queues, outbox/inbox, duplicate delivery, job retries, ACK ordering, or locks. Not for streams (/shadow-realtime)."
 ---
 
 # Shadow Concurrency (`/shadow-concurrency`) — Async Workflows, Outbox/Inbox & Distributed Locks

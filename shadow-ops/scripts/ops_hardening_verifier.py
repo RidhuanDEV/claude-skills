@@ -25,6 +25,34 @@ PUBLIC_DB_PORT_RE = re.compile(
     re.MULTILINE,
 )
 LOCALHOST_DB_PORT_RE = re.compile(r"127\.0\.0\.1:")
+PORTS_KEY_RE = re.compile(r"^ports\s*:\s*$")
+LONG_PORT_FIELD_RE = re.compile(r"""^(?:-\s+)?(target|published|host_ip)\s*:\s*["']?([^"'\s#]*)""")
+LOOPBACK_HOST_IPS = {"127.0.0.1", "::1", "localhost"}
+
+
+def _long_form_port_entries(yaml_text: str) -> list[dict[str, str]]:
+    """Collect `target`/`published`/`host_ip` fields of long-form Compose `ports:` list items."""
+    entries: list[dict[str, str]] = []
+    ports_indent: int | None = None
+    current: dict[str, str] | None = None
+    for raw in yaml_text.splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        indent = len(raw) - len(raw.lstrip())
+        if ports_indent is not None and not (indent > ports_indent or (indent == ports_indent and stripped.startswith("-"))):
+            ports_indent, current = None, None
+        if ports_indent is None:
+            if PORTS_KEY_RE.match(stripped):
+                ports_indent = indent
+            continue
+        if stripped.startswith("-"):
+            current = {}
+            entries.append(current)
+        field = LONG_PORT_FIELD_RE.match(stripped)
+        if field and current is not None:
+            current[field.group(1)] = field.group(2)
+    return entries
 LATEST_IMAGE_RE = re.compile(r"^\s*(?:image:|FROM)\s+\S+:latest(?:\s|$)", re.IGNORECASE | re.MULTILINE)
 PRIVILEGED_RE = re.compile(r"^\s*privileged\s*:\s*true\b", re.IGNORECASE | re.MULTILINE)
 DOCKERFILE_USER_RE = re.compile(r"^\s*USER\s+(\S+)", re.IGNORECASE | re.MULTILINE)
@@ -46,6 +74,13 @@ def check_compose_text(yaml_text: str) -> list[dict[str, str]]:
             violations.append({
                 "code": "PUBLIC_INTERNAL_DB_PORT",
                 "detail": f"Internal DB/cache port bound publicly (`{line.strip()}`); Docker bypasses ufw — bind to `127.0.0.1:<port>:<port>` or keep on an `internal: true` network.",
+            })
+
+    for entry in _long_form_port_entries(yaml_text):
+        if entry.get("target") in INTERNAL_DATA_PORTS and entry.get("published") and entry.get("host_ip") not in LOOPBACK_HOST_IPS:
+            violations.append({
+                "code": "PUBLIC_INTERNAL_DB_PORT",
+                "detail": f"Internal DB/cache port {entry['target']} published publicly via long-form `ports:` (host_ip `{entry.get('host_ip', '0.0.0.0')}`); set `host_ip: 127.0.0.1` or drop `published`.",
             })
 
     if LATEST_IMAGE_RE.search(yaml_text):

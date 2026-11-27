@@ -1,6 +1,6 @@
 ---
 name: shadow-accessibility
-description: "Advanced Accessibility QA & Engineering (WCAG 2.2 AA/AAA). Use when auditing or fixing semantic HTML landmarks, ARIA roles, keyboard focus traps & modals, form labels/live regions, WCAG color contrast, reduced-motion, cognitive UX, or i18n/RTL localization layouts. Do NOT use for general visual branding (shadow-design) or SEO hreflang indexing (shadow-seo)."
+description: "Use when auditing WCAG, screen readers, ARIA, focus traps, accessible forms, or live regions. Not for visual refinement (/antislop-ui)."
 ---
 
 # Shadow Accessibility (`/shadow-accessibility`) — Deep WCAG 2.2 AA/AAA, Assistive Tech, Cognitive UX & i18n/RTL

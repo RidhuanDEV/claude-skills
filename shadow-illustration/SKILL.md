@@ -1,6 +1,6 @@
 ---
 name: shadow-illustration
-description: "Full-Spectrum Visual, Illustration & Graphics Engineering. Use when creating, revising, or reviewing product illustrations, mascots, icons, technical diagrams, OG cards, HTML5 Canvas/WebGL/procedural art, raster/PNG/WebP/AVIF or SVG pipelines, print artwork, or Lottie/Rive motion handoffs."
+description: "Use when creating illustrations, SVG, icons, mascots, diagrams, OG art, or tracing PNG. Not for tutorial videos (/shadow-video)."
 ---
 
 # Shadow Illustration

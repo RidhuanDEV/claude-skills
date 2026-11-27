@@ -1,6 +1,7 @@
 """Assess one isolated restore drill from recorded evidence. Performs no network I/O."""
 import argparse
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 
@@ -41,6 +42,16 @@ def assess(record):
         result["rpo_upper_bound_seconds"] = age
     except ValueError:
         result["issues"].append("Recovery point unverified")
+    for measured_key, objective_key, label in (
+        ("rto_seconds", "rto_objective_sec", "RTO"), ("rpo_upper_bound_seconds", "rpo_objective_sec", "RPO")
+    ):
+        if objective_key not in record:
+            continue
+        objective = record[objective_key]
+        if type(objective) not in (int, float) or not math.isfinite(objective) or objective < 0:
+            result["issues"].append(f"Invalid {label} objective")
+        elif result[measured_key] is not None and result[measured_key] > objective:
+            result["issues"].append(f"{label} objective exceeded")
     return result
 
 

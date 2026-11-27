@@ -19,6 +19,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from shadow_input import run_checked_cli, strict_bool
+
 REQUIRED_DECISION_FIELDS = (
     "technology",
     "source",
@@ -66,9 +69,10 @@ def verify_decision_record(payload: dict[str, Any]) -> dict[str, Any]:
         errors.append(f"Invalid `approval`: '{approval}' (must be Required or Not required).")
 
     # 2. Failure Condition: manually recreating framework scaffold when official generator exists
-    if task_class == "new_project" and payload.get("official_generator_available", False):
-        used_gen = bool(payload.get("used_official_generator", False))
-        justified = bool(payload.get("official_generator_unsuitable_justification"))
+    if task_class == "new_project" and strict_bool(payload.get("official_generator_available", False), "official_generator_available"):
+        used_gen = strict_bool(payload.get("used_official_generator", False), "used_official_generator")
+        justification = payload.get("official_generator_unsuitable_justification")
+        justified = isinstance(justification, str) and bool(justification.strip())
         if (decision == "Custom" or not used_gen) and not justified:
             codes.append("BLOCKED_MANUAL_SCAFFOLD_TOKEN_WASTE")
             errors.append(
@@ -76,12 +80,14 @@ def verify_decision_record(payload: dict[str, Any]) -> dict[str, Any]:
             )
 
     # 3. Failure Condition: unverified dependency / install-to-inspect
-    if payload.get("installed_only_to_inspect", False):
+    if strict_bool(payload.get("installed_only_to_inspect", False), "installed_only_to_inspect"):
         codes.append("BLOCKED_UNVERIFIED_DEPENDENCY")
         errors.append("Do not install an unverified package merely to inspect it; use `npm view` / registry metadata first.")
 
     if decision == "Install":
-        if trust_status in {"Unverified", "Blocked"} or payload.get("publisher_verified") is False or payload.get("repository_verified") is False:
+        publisher_verified = strict_bool(payload.get("publisher_verified", False), "publisher_verified")
+        repository_verified = strict_bool(payload.get("repository_verified", False), "repository_verified")
+        if trust_status in {"Unverified", "Blocked"} or not publisher_verified or not repository_verified:
             codes.append("BLOCKED_UNVERIFIED_DEPENDENCY")
             errors.append("Cannot adopt or treat an unverified package as production-ready (`publisher_verified`/`repository_verified`/`trust_status` failed).")
 
@@ -92,7 +98,7 @@ def verify_decision_record(payload: dict[str, Any]) -> dict[str, Any]:
 
     # 5. Reuse before rebuild unless insecure/obsolete/incompatible or justified
     if decision == "Custom":
-        if payload.get("existing_trusted_sdk_available", False) and not payload.get("existing_sdk_insecure_or_incompatible", False):
+        if strict_bool(payload.get("existing_trusted_sdk_available", False), "existing_trusted_sdk_available") and not strict_bool(payload.get("existing_sdk_insecure_or_incompatible", False), "existing_sdk_insecure_or_incompatible"):
             if not str(payload.get("custom_rationale") or "").strip():
                 codes.append("BLOCKED_UNJUSTIFIED_CUSTOM_REBUILD")
                 errors.append("Custom implementation chosen despite available compatible trusted SDK without technical rationale.")
@@ -101,17 +107,16 @@ def verify_decision_record(payload: dict[str, Any]) -> dict[str, Any]:
             errors.append("Custom implementation requires documented rationale explaining why official options are unsuitable.")
 
     # 6. Approval required for major deviation / SDK replacement / infra additions
-    needs_approval = any(
-        bool(payload.get(flag, False))
-        for flag in (
-            "replaces_auth_or_sso_sdk",
-            "introduces_new_framework",
-            "changes_package_manager",
-            "adds_unrequested_infrastructure",
-            "departs_from_existing_conventions",
-        )
+    deviation_flags = (
+        "replaces_auth_or_sso_sdk",
+        "introduces_new_framework",
+        "changes_package_manager",
+        "adds_unrequested_infrastructure",
+        "departs_from_existing_conventions",
     )
-    if needs_approval and not bool(payload.get("user_approval_granted", False)):
+    needs_approval = any([strict_bool(payload.get(field, False), field) for field in deviation_flags])
+    user_approval = strict_bool(payload.get("user_approval_granted", False), "user_approval_granted")
+    if needs_approval and not user_approval:
         codes.append("BLOCKED_UNAUTHORIZED_SDK_OR_ARCH_REPLACEMENT")
         errors.append("Material architecture/SDK/framework/infrastructure deviation requires explicit user approval (`user_approval_granted: true`).")
 
@@ -131,14 +136,15 @@ def verify_auth_sdk_policy(spec: dict[str, Any]) -> dict[str, Any]:
 
     sdk_source = str(spec.get("existing_sdk_source") or "").strip()
     target_source = str(spec.get("proposed_source") or sdk_source).strip()
-    custom_login = bool(spec.get("creates_custom_login_replacement", False))
-    user_approval = bool(spec.get("user_approval_granted", False))
-    trusts_fe_username = bool(spec.get("trusts_frontend_username_without_verified_claims", False))
-    verified_claims = bool(spec.get("verified_authenticated_claims", False))
+    custom_login = strict_bool(spec.get("creates_custom_login_replacement", False), "creates_custom_login_replacement")
+    user_approval = strict_bool(spec.get("user_approval_granted", False), "user_approval_granted")
+    trusts_fe_username = strict_bool(spec.get("trusts_frontend_username_without_verified_claims", False), "trusts_frontend_username_without_verified_claims")
+    verified_claims = strict_bool(spec.get("verified_authenticated_claims", False), "verified_authenticated_claims")
     is_local_sso = ("sso-client" in sdk_source) or ("ridhuan-sso" in str(spec.get("sdk_name") or ""))
 
+    publisher_verified = strict_bool(spec.get("publisher_ownership_verified", False), "publisher_ownership_verified")
     if is_local_sso and target_source and target_source != sdk_source:
-        if not bool(spec.get("publisher_ownership_verified", False)):
+        if not publisher_verified:
             codes.append("BLOCKED_UNVERIFIED_NPM_LOOKALIKE_SUBSTITUTION")
             errors.append(
                 f"Cannot replace `{sdk_source}` with `{target_source}` without verified publisher ownership."
@@ -341,4 +347,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

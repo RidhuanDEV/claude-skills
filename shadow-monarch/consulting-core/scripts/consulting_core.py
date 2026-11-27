@@ -20,6 +20,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 CORE_DIR = Path(__file__).resolve().parent.parent
 REGISTRY_PATH = CORE_DIR / "regulations_registry.json"
 PACKS_PATH = CORE_DIR / "industry_packs.json"
@@ -174,7 +177,7 @@ def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
                     "id": did,
                     "reason": f"Decision references undeclared assumption_id '{aref}'.",
                 })
-        if d.get("requires_human_approval") is False:
+        if not strict_bool(d.get("requires_human_approval"), "requires_human_approval"):
             rec_text = str(d.get("recommendation", ""))
             for gate_id, pat in PROHIBITED_OVERCLAIMS:
                 if pat.search(rec_text):
@@ -231,7 +234,7 @@ def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def score_competency(scores: dict[str, float], bundle: dict[str, Any] | None = None, numerical_reconciled: bool = True) -> dict[str, Any]:
+def score_competency(scores: dict[str, float], bundle: dict[str, Any] | None = None, numerical_reconciled: bool = False) -> dict[str, Any]:
     """
     Compute 6-dimension weighted Consulting Competency Scorecard (0-100)
     with 5 Non-Compensable Hard Gates.
@@ -251,7 +254,7 @@ def score_competency(scores: dict[str, float], bundle: dict[str, Any] | None = N
         weighted_sum += (val / 5.0) * weight
 
     hard_gate_failures: list[str] = []
-    if not numerical_reconciled:
+    if not strict_bool(numerical_reconciled, "numerical_reconciled"):
         hard_gate_failures.append("HG5_NUMERICAL_RECONCILIATION_VALID")
     if bundle is not None:
         val_res = validate_bundle(bundle)
@@ -458,7 +461,7 @@ def main() -> int:
         res = score_competency(
             payload.get("scores", {}),
             bundle=payload.get("bundle"),
-            numerical_reconciled=bool(payload.get("numerical_reconciled", True)),
+            numerical_reconciled=strict_bool(payload.get("numerical_reconciled"), "numerical_reconciled"),
         )
         print(json.dumps(res, indent=2, ensure_ascii=False))
         return 0 if res["enterprise_ready"] else 1
@@ -468,4 +471,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

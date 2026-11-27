@@ -1,6 +1,6 @@
 ---
 name: shadow-pmo
-description: "Contractual IT Delivery & PMO Governance. Use when triaging client requests across contractual hierarchy (Contract/Addendum/KAK/SOW/FSD) as Defect vs Paid CR candidate, computing PERT + CPM + Monte Carlo (P50/P80/P90), EVM (CPI/SPI), or Laporan Proyek."
+description: "Use when classifying contractual defects versus paid changes, or managing PERT/CPM, Monte Carlo, EVM, and delivery governance."
 ---
 
 # `/shadow-pmo` — Contractual & Delivery Governance

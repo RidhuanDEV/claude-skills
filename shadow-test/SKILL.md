@@ -1,6 +1,6 @@
 ---
 name: shadow-test
-description: "Polyglot Automated Unit, Integration & Contract Testing. Use when writing or fixing Vitest/Jest, Pytest, Go test, Pest/PHPUnit, JUnit 5, xUnit, Rust, or Flutter tests, property/mutation tests, contract tests, flaky test fixes, or leak-free Docker test harnesses. Do NOT use for RAG/LLM evals (/shadow-eval) or Pre-UAT k6 load tests (/shadow-perf)."
+description: "Use when writing unit, integration, property, mutation, or contract tests in Vitest, Jest, Pytest, or other project runners, or triaging flaky tests."
 ---
 
 # Shadow Test (`/shadow-test`) — Polyglot Automated Testing, Risk-Based Pyramid & Contract Compatibility
@@ -23,6 +23,7 @@ Load ONLY the 1–2 modular playbooks needed for the active testing subtask:
 | [05-flaky-test-triage-and-deterministic-fixtures.md](references/05-flaky-test-triage-and-deterministic-fixtures.md) | Fake UTC clocks, bounded condition polling (zero `sleep()`), socket blocking, port `0`, order-shuffle stress | Eliminating flaky CI failures instead of masking them with retries |
 | [06-ephemeral-test-containers-and-leak-free-teardown.md](references/06-ephemeral-test-containers-and-leak-free-teardown.md) | Singleton ephemeral DB container, `--rm --label shadow.ephemeral=true`, `try/finally` + `trap EXIT`, `L1` vs `L2`/`L3` | Configuring Docker/Testcontainers test harnesses with zero orphan containers/volumes |
 | [GoldbergYoni_JS_Testing_Best_Practices.md](references/vendor/GoldbergYoni_JS_Testing_Best_Practices.md) | Curated JavaScript/TypeScript/Node.js testing best practices (AAA, black-box assertions, clean fixtures) | Writing or reviewing Node.js/TypeScript backend & frontend test suites |
+| [LICENSES.md](references/vendor/LICENSES.md) | MIT license of the vendored testing guide and the `VENDOR.json` hash lock | Before copying, adapting or redistributing the vendored guide |
 | [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`TEST-EVAL-01..08`) | Auditing test pyramid ROI, flake triage, Docker teardown, strict TS tests, and `L1` scope |
 
 ---

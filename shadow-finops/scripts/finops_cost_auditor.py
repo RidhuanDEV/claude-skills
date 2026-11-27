@@ -110,6 +110,9 @@ def estimate_llm_monthly_cost(
     output_rate_per_1m: float,
     cached_discount: float,
 ) -> dict[str, Any]:
+    for rate_name, rate in (("cache_hit_rate", cache_hit_rate), ("cached_discount", cached_discount)):
+        if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not 0.0 <= rate <= 1.0:
+            raise ValueError(f"{rate_name} must be a number in [0, 1] (got {rate!r})")
     monthly_calls = 30 * calls_per_day
     uncached_in_cost = (monthly_calls * input_tokens * (1.0 - cache_hit_rate) / 1_000_000) * input_rate_per_1m
     cached_in_cost = (monthly_calls * input_tokens * cache_hit_rate / 1_000_000) * (input_rate_per_1m * (1.0 - cached_discount))
@@ -149,11 +152,15 @@ def audit_directory(root: Path) -> dict[str, Any]:
         scanned += 1
         findings.extend(audit_finops_text(text, str(fpath)))
 
+    if scanned == 0:
+        status = "BLOCKED_NO_FILES_SCANNED"
+    else:
+        status = "PASS" if not findings else "FINDINGS_DETECTED"
     return {
         "target": str(root),
         "scanned_files": scanned,
         "finding_count": len(findings),
-        "status": "PASS" if not findings else "FINDINGS_DETECTED",
+        "status": status,
         "findings": findings,
     }
 
@@ -255,23 +262,26 @@ def main() -> int:
         return 0 if res["all_passed"] else 1
 
     if args.estimate_llm:
-        res = estimate_llm_monthly_cost(
-            args.calls_per_day,
-            args.input_tokens,
-            args.output_tokens,
-            args.thinking_tokens,
-            args.cache_hit_rate,
-            args.input_rate,
-            args.output_rate,
-            args.cached_discount,
-        )
+        try:
+            res = estimate_llm_monthly_cost(
+                args.calls_per_day,
+                args.input_tokens,
+                args.output_tokens,
+                args.thinking_tokens,
+                args.cache_hit_rate,
+                args.input_rate,
+                args.output_rate,
+                args.cached_discount,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
         print(json.dumps(res, indent=2))
         return 0
 
     if args.audit:
         res = audit_directory(Path(args.audit))
         print(json.dumps(res, indent=2))
-        return 0 if res["finding_count"] == 0 else 1
+        return 0 if res["status"] == "PASS" else 1
 
     parser.print_help()
     return 0

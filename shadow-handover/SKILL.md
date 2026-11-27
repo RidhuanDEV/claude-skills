@@ -1,6 +1,6 @@
 ---
 name: shadow-handover
-description: "Client Project Delivery & Handover. Use when preparing BAST (Berita Acara Serah Terima), source/SBOM inventory, credential transfer, Admin/Operator/User manuals, and Training of Trainers (ToT). Do NOT use for AI session memory handoff (/handoff)."
+description: "Use when preparing client BAST, credential transfer, admin/user manuals, or ToT. Not for agent session memory (/handoff)."
 ---
 
 # Shadow Handover (`/shadow-handover`) — Client System Delivery, BAST & Operational Independence

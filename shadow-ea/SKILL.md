@@ -1,6 +1,6 @@
 ---
 name: shadow-ea
-description: "Enterprise Architecture & IT Portfolio Intelligence. Use when designing multi-system blueprints (TOGAF 10 ADM), mapping Indonesia 6-Domain SPBE (Perpres 95/2018 & 132/2022) and Satu Data (Perpres 39/2019), rationalizing TIME app portfolios, or defining ABB vs SBB roadmaps."
+description: "Use when mapping enterprise IT portfolios, TOGAF, SPBE, TIME rationalization, or cross-system roadmaps. Not for one app (/shadow-architect)."
 ---
 
 # `/shadow-ea` — Enterprise Architecture & IT Portfolio Intelligence

@@ -70,7 +70,7 @@ These rules protect honesty, function, and accessibility. Breaking any of them i
 
 - **REQUIRED**: all text must meet the minimum WCAG AA contrast standard
   - Normal text: minimum contrast ratio of 4.5:1
-  - Large text (18px+): minimum contrast ratio of 3:1
+  - Large text (at least 24px regular or 18.66px bold, i.e. 18pt / 14pt bold per WCAG 2.2): minimum contrast ratio of 3:1
 - **FORBIDDEN**: light grey text on a grey background
 - **FORBIDDEN**: white text on a gradient that is light in some areas
 - Always test contrast across the entire area the text passes over, not just at a single point

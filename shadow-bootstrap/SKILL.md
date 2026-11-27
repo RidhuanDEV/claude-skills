@@ -1,6 +1,6 @@
 ---
 name: shadow-bootstrap
-description: "Greenfield Project Scaffolder. Use when initializing a new CLI, static site, worker, HTTP service, or library target using preview_scaffold.py, verified official CLI generators, fail-fast startup config, redacted JSON structured logging, and graceful shutdown. Do NOT use for extending mature brownfield repos (shadow-architect) or infrastructure ops (shadow-ops)."
+description: "Use when scaffolding a new app, worker, CLI, or service with a verified official generator. Not for incremental features (/shadow-plan)."
 ---
 
 # Shadow Bootstrap (`/shadow-bootstrap`) — First Runnable Vertical Product Slice

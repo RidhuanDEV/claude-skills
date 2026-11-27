@@ -1,0 +1,17 @@
+{
+  "_comment": "Example only. Merge into ~/.claude/settings.json (user) or .claude/settings.json (project) to enable the Shadow guard. It asks before git commit/push/merge/rebase/reset --hard/clean, recursive deletes, global installs, infra destroys, destructive SQL and blanket kills, and denies piping downloaded scripts into a shell. Schema: https://code.claude.com/docs/en/hooks",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$HOME/.claude/skills/shadow-monarch/hooks/shadow_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

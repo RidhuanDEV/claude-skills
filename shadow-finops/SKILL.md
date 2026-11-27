@@ -1,6 +1,6 @@
 ---
 name: shadow-finops
-description: "Cloud, Kubernetes & AI/LLM Token FinOps. Use when analyzing or optimizing cloud, K8s, database, or LLM token costs under FinOps Framework and FOCUS, configuring prefix prompt caching, or capping thinking/output token budgets."
+description: "Use when reducing cloud, Kubernetes, database, or LLM spend through cost allocation, FOCUS, or token budgets."
 ---
 
 # `/shadow-finops` — Cloud, Kubernetes & AI/LLM Token FinOps Auditor

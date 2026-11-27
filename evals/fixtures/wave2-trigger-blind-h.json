@@ -1,0 +1,3660 @@
+[
+ {
+  "id": "antislop-h-en-01",
+  "language": "en",
+  "prompt": "Our logistics startup's landing page came out of an AI generator: purple gradient hero, \"Revolutionize your deliveries\" headline, emoji bullets, and comments like \"// This function handles stuff\". Review the whole thing for generic tells across visuals, wording and code, and list what to cut.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-en-02",
+  "language": "en",
+  "prompt": "Before the edtech beta, do one combined pass on the onboarding screens in apps/web/src/onboarding. They feel templated: identical cards, vague \"Unlock your potential\" text, boilerplate comments. Flag everything that reads machine-made across design, copy and code.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-en-03",
+  "language": "en",
+  "prompt": "A contributor PR to our Astro 4.15 docs site looks AI-generated end to end. Audit it holistically for visual sameness, filler copy and over-commented components, and give me a keep/reject list per file.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-id-01",
+  "language": "id",
+  "prompt": "Tolong review menyeluruh dashboard portal akademik kampus kami, kesannya generik banget kayak hasil AI: kartu seragam, gradient ungu, teks \"Selamat datang di masa depan\", komentar kode yang cuma ngulang nama fungsi. Cek visual, copy, dan kode sekaligus.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu audit halaman promo tabungan digital bank kami? Tim marketing pakai generator AI, hasilnya klise di semua sisi: ikon emoji, CTA \"Mulai Perjalananmu\", layout template, plus komentar JSX berlebihan. Saya mau satu laporan anti-generik lintas tampilan, copy, dan kode.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-id-03",
+  "language": "id",
+  "prompt": "Sebelum demo ke klien BUMN, cek seluruh modul frontend pengajuan anggaran: apakah tampilan, microcopy, dan komentar di kodenya masih terasa \"AI banget\"? Kasih daftar perbaikan per kategori.",
+  "expected_primary": "antislop",
+  "rationale": "Holistic anti-generic review spanning visuals, copy and code comments together."
+ },
+ {
+  "id": "antislop-h-en-near-01",
+  "language": "en",
+  "prompt": "Our ML team's support chatbot replies sound generic and templated (\"As an AI, I'd be happy to...\"). Build a graded set of 200 transcripts and calibrate an LLM judge that scores filler versus substantive answers.",
+  "expected_primary": "shadow-eval",
+  "exclude": [
+   "antislop"
+  ],
+  "rationale": "Rule 1: no UI, copy or comment work; grading LLM output quality belongs to evaluation."
+ },
+ {
+  "id": "antislop-h-id-near-01",
+  "language": "id",
+  "prompt": "Draf Kajian Kebutuhan Sistem untuk klien BUMN terlalu berbau tulisan AI. Sumber kajian.md sudah kami revisi; tolong generate ulang .docx dan .pdf lewat generator yang ada, lalu cek daftar rujukannya.",
+  "expected_primary": "shadow-doc",
+  "exclude": [
+   "antislop"
+  ],
+  "rationale": "Rule 1: document regeneration from canonical source, no UI or comment work."
+ },
+ {
+  "id": "antislop-code-h-en-01",
+  "language": "en",
+  "prompt": "Strip the noise comments from services/ledger/posting.ts (lines like \"// increment i\" and \"// call the function\") but keep and sharpen the one explaining why we round half-even for IDR.",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-en-02",
+  "language": "en",
+  "prompt": "A contributor PR to our open-source YAML parser adds a comment above every line. Rewrite the comments in src/scanner.rs so only the non-obvious reasons remain, like the BOM handling and the 1024-byte lookahead.",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-en-03",
+  "language": "en",
+  "prompt": "Clean up the docstrings in train/augment.py; they restate parameter names (\"param x: the x\"). Replace them with short comments explaining why we clip at 0.98 and reseed per DataLoader worker.",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-id-01",
+  "language": "id",
+  "prompt": "Tolong rapikan komentar di modul tracking_kurir.go, isinya cuma \"ambil data\", \"loop\", \"return hasil\". Hapus yang redundan, sisakan yang menjelaskan kenapa retry geofence dibatasi 3 kali.",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-id-02",
+  "language": "id",
+  "prompt": "Komentar di file KrsService.java kebanyakan basa-basi (\"Fungsi ini sangat penting untuk...\"). Bisa bantu tulis ulang jadi komentar alasan yang singkat, tanpa mengubah logika sama sekali?",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-id-03",
+  "language": "id",
+  "prompt": "Di repo test otomatis API kami (pytest), setiap assert diberi komentar \"# cek status\". Bersihkan komentar yang cuma mengulang kode, tapi pertahankan catatan soal workaround zona waktu WIB.",
+  "expected_primary": "antislop-code",
+  "rationale": "Task is rewriting or removing source code comments to keep only why-comments."
+ },
+ {
+  "id": "antislop-code-h-en-near-01",
+  "language": "en",
+  "prompt": "Configure ESLint in CI to fail on unused variables, dead exports and cyclomatic complexity above 15 in the backend package, then summarize the violations.",
+  "expected_primary": "shadow-quality",
+  "exclude": [
+   "antislop-code"
+  ],
+  "rationale": "Lint and complexity gate on a backend package; no comment rewriting."
+ },
+ {
+  "id": "antislop-code-h-id-near-01",
+  "language": "id",
+  "prompt": "Dokumen Spesifikasi Teknis API kampus perlu diperbarui: tambahkan penjelasan field baru di sumber spesifikasi.md, lalu generate ulang versi .docx untuk lampiran kontrak.",
+  "expected_primary": "shadow-doc",
+  "exclude": [
+   "antislop-code"
+  ],
+  "rationale": "Technical documentation deliverable, which the catalog excludes from comment hygiene."
+ },
+ {
+  "id": "antislop-copywriting-h-en-01",
+  "language": "en",
+  "prompt": "Rewrite the error messages in our courier app's checkout. \"Oops! Something went wrong 😢\" and \"Invalid input\" are useless. Give specific, calm English copy for card declined, address outside the service zone, and session expired.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-en-02",
+  "language": "en",
+  "prompt": "Our edtech app's onboarding headline says \"Embark on a transformative learning journey\". Draft three plain alternatives plus CTA labels for the 3-step signup, six words max each.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-en-03",
+  "language": "en",
+  "prompt": "Edit the empty-state and toast text on the open-source dashboard: \"Nothing here yet! 🚀\" and \"Success!!\" should say what happened and what the user can do next.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-id-01",
+  "language": "id",
+  "prompt": "Tolong perbaiki microcopy form pembukaan rekening online: label \"Submit Data Anda Sekarang!\" dan pesan error \"Terjadi kesalahan\" terlalu umum. Buat versi Bahasa Indonesia yang jelas dan sopan untuk nasabah.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu tulis ulang teks tombol dan headline halaman pendaftaran wisuda online? Sekarang bunyinya \"Raih Momen Emasmu Bersama Kami\", kepanjangan dan klise. Mau yang lugas, maksimal 5 kata.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-id-03",
+  "language": "id",
+  "prompt": "Teks notifikasi gagal sinkron di aplikasi belajar kami campur aduk (\"Sync failed, coba lagi ya!\"). Seragamkan copy-nya ke Bahasa Indonesia, sekalian buat pesan untuk kondisi offline dan kuota habis.",
+  "expected_primary": "antislop-copywriting",
+  "rationale": "Request is rewriting UI microcopy, CTAs, headlines or error text."
+ },
+ {
+  "id": "antislop-copywriting-h-en-near-01",
+  "language": "en",
+  "prompt": "Write the operator manual chapter for the bank's reconciliation console as part of the client delivery package, with step-by-step procedures and an acknowledgement page.",
+  "expected_primary": "shadow-handover",
+  "exclude": [
+   "antislop-copywriting"
+  ],
+  "rationale": "Operator manual is a client delivery artifact, not UI microcopy; owner never brings copy filter."
+ },
+ {
+  "id": "antislop-copywriting-h-id-near-01",
+  "language": "id",
+  "prompt": "Email notifikasi nilai KHS ke mahasiswa masuk folder spam di Outlook. Subjeknya sudah kami ubah tapi tetap sama; tolong cek DKIM, DMARC p=none, dan header List-Unsubscribe di domain kampus.",
+  "expected_primary": "shadow-email",
+  "exclude": [
+   "antislop-copywriting"
+  ],
+  "rationale": "Spam placement fix is DNS authentication work, not copy editing."
+ },
+ {
+  "id": "antislop-human-h-en-01",
+  "language": "en",
+  "prompt": "The custom dropdown in our transfer form has no visible focus ring, and the disabled \"Send\" button still shows a pointer cursor. Add proper hover, active, focus-visible and disabled states.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-en-02",
+  "language": "en",
+  "prompt": "Our shipment-tracking cards are clickable but nothing signals it: no hover, no pressed state, and keyboard users can't tab to them. Fix the affordances in TrackingCard.tsx.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-en-03",
+  "language": "en",
+  "prompt": "In our open-source component library, the toggle switch thumb has 2.4:1 contrast against its track in dark mode and ignores the Space key. Patch the component so it is visibly operable.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-id-01",
+  "language": "id",
+  "prompt": "Tombol \"Ajukan KRS\" di portal mahasiswa terlihat sama persis saat disabled dan aktif. Tolong tambahkan state disabled yang jelas, cursor not-allowed, dan focus ring dengan kontras 3:1.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-id-02",
+  "language": "id",
+  "prompt": "Kartu kuis di web belajar kami tidak punya state hover dan active, jadi siswa ragu kartunya bisa diklik atau tidak. Tambahkan lima state lengkap di QuizCard.vue.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-id-03",
+  "language": "id",
+  "prompt": "Link \"Lihat detail\" di tabel mutasi rekening tidak kelihatan bisa diklik (warnanya sama dengan teks biasa) dan tidak bisa dijangkau tombol Tab. Perbaiki affordance dan navigasi keyboard-nya.",
+  "expected_primary": "antislop-human",
+  "rationale": "Interaction states, focus visibility and pointer affordances on specific components."
+ },
+ {
+  "id": "antislop-human-h-en-near-01",
+  "language": "en",
+  "prompt": "Our open-source CLI's interactive prompt ignores Ctrl+C and leaves the terminal stuck in raw mode after exit. Find why the SIGINT handler never restores the previous tty state.",
+  "expected_primary": "shadow-debug",
+  "exclude": [
+   "antislop-human"
+  ],
+  "rationale": "Rule 1: terminal CLI signal bug, no UI; debug brings only tests."
+ },
+ {
+  "id": "antislop-human-h-id-near-01",
+  "language": "id",
+  "prompt": "Akun mahasiswa yang statusnya nonaktif di SSO kampus masih bisa masuk lewat refresh token lama. Perbaiki mekanisme pencabutan token dan sesi yang masih aktif.",
+  "expected_primary": "shadow-auth",
+  "exclude": [
+   "antislop-human"
+  ],
+  "rationale": "Rule 1: account disabled state is identity revocation, no UI work."
+ },
+ {
+  "id": "antislop-layoutmobile-h-en-01",
+  "language": "en",
+  "prompt": "At 360px the shipment table on our dispatcher web page causes horizontal scroll and the filter chips wrap into three ragged rows. Make the grid responsive and stack the table into cards below 640px.",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-en-02",
+  "language": "en",
+  "prompt": "The course catalog grid in our edtech web app jumps from four columns straight to one, and the \"Enroll\" links are only 28px tall on phones. Fix the breakpoints and touch sizes.",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-en-03",
+  "language": "en",
+  "prompt": "Our open-source docs sidebar overlaps the content on iPad portrait (820px). Rework the breakpoints in layout.css so the nav collapses properly and code blocks stop overflowing.",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-id-01",
+  "language": "id",
+  "prompt": "Halaman jadwal kuliah di HP (375px) melebar ke samping gara-gara tabel 7 kolom. Tolong bikin layout responsif: di mobile tabelnya jadi list per hari.",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-id-02",
+  "language": "id",
+  "prompt": "Form transfer antar bank di mobile web kepotong tombolnya di bawah, padding kiri-kanan nggak konsisten, dan input nominal kelebaran. Bisa bantu rapikan grid dan breakpoint-nya?",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-id-03",
+  "language": "id",
+  "prompt": "Dashboard monitoring armada kami pakai grid 12 kolom fixed 1280px, jadi di tablet 768px overflow. Ubah ke grid fleksibel yang turun jadi 2 kolom di tablet dan 1 kolom di HP.",
+  "expected_primary": "antislop-layoutmobile",
+  "rationale": "Responsive breakpoints, grids, overflow or tap sizing on web layouts."
+ },
+ {
+  "id": "antislop-layoutmobile-h-en-near-01",
+  "language": "en",
+  "prompt": "Bump targetSdkVersion to 35 for our edtech Android app and resolve the Play Console rejection about undeclared foreground service types before the next store submission.",
+  "expected_primary": "shadow-mobile",
+  "exclude": [
+   "antislop-layoutmobile"
+  ],
+  "rationale": "Rule 1: native store compliance, no web layout; catalog routes native releases elsewhere."
+ },
+ {
+  "id": "antislop-layoutmobile-h-id-near-01",
+  "language": "id",
+  "prompt": "Aplikasi Flutter kurir kami perlu App Links untuk https://track.kurirku.id/r/*. File assetlinks.json sudah dipasang, tapi verifikasi domain tetap gagal di Android 14.",
+  "expected_primary": "shadow-mobile",
+  "exclude": [
+   "antislop-layoutmobile"
+  ],
+  "rationale": "Rule 1: native deep-link verification, no layout or UI work involved."
+ },
+ {
+  "id": "antislop-ui-h-en-01",
+  "language": "en",
+  "prompt": "Our transfer confirmation screen uses five font sizes, three greys and random 13/17/22px gaps. Tighten the type scale, spacing rhythm and visual hierarchy so the amount is the focal point.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-en-02",
+  "language": "en",
+  "prompt": "Polish the parcel status badges: the colors clash with our brand teal, pill radius differs per badge, and the transition is a janky 600ms bounce. Make them consistent and calmer.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-en-03",
+  "language": "en",
+  "prompt": "The hero on our open-source project homepage looks flat, with weak weight contrast between heading and body and misaligned buttons. Refine typography, alignment and spacing token usage in Hero.svelte.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-id-01",
+  "language": "id",
+  "prompt": "Tampilan kartu nilai IPK di portal kampus kurang rapi: judul dan angkanya ukurannya hampir sama, jarak antar elemen acak. Perbaiki hierarki tipografi dan spasinya.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu poles warna dan animasi progress bar di app belajar? Sekarang hijau neon dan gerakannya patah-patah. Mau yang selaras dengan token tema dan easing yang halus.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-id-03",
+  "language": "id",
+  "prompt": "Halaman ringkasan portofolio proyek untuk klien BUMN terlihat ramai: empat warna aksen, shadow tebal di semua kartu, border radius beda-beda. Rapikan visualnya biar bersih dan konsisten.",
+  "expected_primary": "antislop-ui",
+  "rationale": "Visual polish: type scale, color, spacing rhythm, motion and hierarchy."
+ },
+ {
+  "id": "antislop-ui-h-en-near-01",
+  "language": "en",
+  "prompt": "The generated monthly IT report .docx uses three different heading fonts and off-brand heading colors. Fix the style definitions in the generator template and regenerate from report.md.",
+  "expected_primary": "shadow-doc",
+  "exclude": [
+   "antislop-ui"
+  ],
+  "rationale": "Rule 1: generated Word template styling is document work, not UI."
+ },
+ {
+  "id": "antislop-ui-h-id-near-01",
+  "language": "id",
+  "prompt": "Buatkan ilustrasi maskot SVG untuk poster cetak penerimaan mahasiswa baru, palet warna CMYK, ukuran A3 300 dpi, dengan versi hitam-putih untuk fotokopi.",
+  "expected_primary": "shadow-illustration",
+  "exclude": [
+   "antislop-ui"
+  ],
+  "rationale": "Rule 1: print artwork, no interface or frontend work."
+ },
+ {
+  "id": "context7-h-en-01",
+  "language": "en",
+  "prompt": "What's the correct way to configure test projects with defineConfig in Vitest 3.2? Pull the current official docs, not memory, and show a minimal example.",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-en-02",
+  "language": "en",
+  "prompt": "Fetch the official Prisma 6 notes on driver adapters and show the exact schema.prisma and client setup for the Neon serverless adapter.",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-en-03",
+  "language": "en",
+  "prompt": "Look up the official @tanstack/react-query v5 signature for useSuspenseQuery; my teammates keep writing v4-style positional arguments and I need the authoritative reference.",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-id-01",
+  "language": "id",
+  "prompt": "Tolong cek dokumentasi resmi terbaru Laravel 12 soal perubahan struktur bootstrap/app.php untuk registrasi middleware, sekalian contoh kodenya.",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-id-02",
+  "language": "id",
+  "prompt": "Bisa carikan contoh resmi go_router untuk Flutter 3.27 tentang redirect dengan async guard? Saya ragu API-nya sudah berubah dari versi yang saya ingat.",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-id-03",
+  "language": "id",
+  "prompt": "Ambil catatan resmi PyTorch 2.6 soal torch.load yang sekarang default weights_only=True. Apa yang perlu saya ubah di script loading checkpoint?",
+  "expected_primary": "context7",
+  "rationale": "Needs current official, version-specific library documentation or examples."
+ },
+ {
+  "id": "context7-h-en-near-01",
+  "language": "en",
+  "prompt": "Our partner bank is retiring two fields in the ISO 8583 message contract. Replay recorded consumer traffic against the new mapping to prove backward compatibility, and add Deprecation and Sunset headers to the old adapter endpoint.",
+  "expected_primary": "shadow-compat",
+  "exclude": [
+   "context7"
+  ],
+  "rationale": "Consumer replay and deprecation headers with no library or version docs lookup."
+ },
+ {
+  "id": "context7-h-id-near-01",
+  "language": "id",
+  "prompt": "Tolong buatkan dokumentasi OpenAPI 3.1 untuk endpoint /v1/krs di layanan akademik kampus dan sinkronkan ke koleksi Bruno yang sudah ada.",
+  "expected_primary": "shadow-api",
+  "exclude": [
+   "context7"
+  ],
+  "rationale": "Authoring an API contract, not looking up third-party library documentation."
+ },
+ {
+  "id": "handoff-h-en-01",
+  "language": "en",
+  "prompt": "My context window is almost full. Save the current agent session state (branch feat/recon-batch, failing test list, and what's still untested) so another agent can resume cleanly.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-en-02",
+  "language": "en",
+  "prompt": "Resume from the agent session snapshot I saved yesterday labeled \"ml-feature-store\", and check whether the branch SHA drifted before continuing any work.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-en-03",
+  "language": "en",
+  "prompt": "Two parallel agent sessions worked on the courier app under labels \"api-lane\" and \"ui-lane\". Merge their saved contexts into one, keeping the lower readiness level.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-id-01",
+  "language": "id",
+  "prompt": "Konteks sudah hampir penuh, simpan dulu state sesi kerja agent ini ya: progres refactor modul KRS, bagian yang belum dites, dan bukti untuk tiap klaim.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-id-02",
+  "language": "id",
+  "prompt": "Lanjutkan sesi agent kemarin yang disimpan dengan label \"qa-regression\". Baca dulu bagian yang belum dites sebelum menarik kesimpulan apa pun.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-id-03",
+  "language": "id",
+  "prompt": "Tolong tampilkan daftar snapshot sesi agent yang tersimpan untuk repo bank-adapter, lalu muat yang paling baru supaya saya bisa lanjut.",
+  "expected_primary": "handoff",
+  "rationale": "Saving, loading or merging AI agent session context."
+ },
+ {
+  "id": "handoff-h-en-near-01",
+  "language": "en",
+  "prompt": "Prepare the delivery package for the university: BAST draft, credential transfer checklist, and admin manual for the new SIAKAD going live next month.",
+  "expected_primary": "shadow-handover",
+  "exclude": [
+   "handoff"
+  ],
+  "rationale": "Rule 6: client BAST and credential transfer is delivery, not agent session memory."
+ },
+ {
+  "id": "handoff-h-id-near-01",
+  "language": "id",
+  "prompt": "Dua agent kerja paralel di worktree berbeda (feat/ui dan feat/api). Cek potensi konflik dengan merge-tree dry run sebelum keduanya digabung ke branch integrasi.",
+  "expected_primary": "shadow-git",
+  "exclude": [
+   "handoff"
+  ],
+  "rationale": "Parallel worktree conflict check is Git work; no session memory saved or loaded."
+ },
+ {
+  "id": "modern-web-guidance-h-en-01",
+  "language": "en",
+  "prompt": "Replace our hand-rolled modal in BookingDialog.tsx (focus hacks, z-index 9999) with the native dialog element and showModal(), keeping close-on-Escape working.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-en-02",
+  "language": "en",
+  "prompt": "INP on our shipment search page is 480ms; the input handler re-renders the whole list on every keystroke. Fix the interaction latency with modern React patterns and yielding to the main thread.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-en-03",
+  "language": "en",
+  "prompt": "Our course cards should adapt to their container, not the viewport, since they appear in both sidebar and main column. Rewrite the CSS with container queries and use :has() to style cards that contain a badge.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-id-01",
+  "language": "id",
+  "prompt": "LCP halaman beranda portal kampus 4,1 detik karena gambar hero ikut di-lazy-load. Tolong perbaiki pakai fetchpriority=\"high\" dan preload yang tepat.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-id-02",
+  "language": "id",
+  "prompt": "Bisa ganti tooltip custom berbasis JavaScript di tabel mutasi dengan Popover API native? Pastikan masih aman untuk target Baseline 2024.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-id-03",
+  "language": "id",
+  "prompt": "Validasi form pendaftaran kami menampilkan error merah sejak halaman dibuka. Pakai :user-valid dan :user-invalid supaya error baru muncul setelah pengguna berinteraksi.",
+  "expected_primary": "modern-web-guidance",
+  "rationale": "Baseline web API choice or Core Web Vitals fix on frontend code."
+ },
+ {
+  "id": "modern-web-guidance-h-en-near-01",
+  "language": "en",
+  "prompt": "Search Console shows 3,400 course URLs as \"Crawled - currently not indexed\" and wrong canonicals on ?utm variants. Fix the sitemap generator script and canonical rules on the server.",
+  "expected_primary": "shadow-seo",
+  "exclude": [
+   "modern-web-guidance"
+  ],
+  "rationale": "Rule 1: crawl and canonical fixes in a generator script, no UI work."
+ },
+ {
+  "id": "modern-web-guidance-h-id-near-01",
+  "language": "id",
+  "prompt": "Query daftar pengiriman butuh 3 detik; EXPLAIN ANALYZE menunjukkan Seq Scan di tabel shipments untuk filter status dan created_at. Rancang index komposit yang tepat.",
+  "expected_primary": "shadow-db",
+  "exclude": [
+   "modern-web-guidance"
+  ],
+  "rationale": "Rule 1: SQL index design, purely backend with no frontend work."
+ },
+ {
+  "id": "shadow-accessibility-h-en-01",
+  "language": "en",
+  "prompt": "Run a WCAG 2.2 AA audit of the internet-banking login and transfer flows: NVDA announcements, landmark structure, form labels and error live regions. Report findings per success criterion.",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-en-02",
+  "language": "en",
+  "prompt": "Our edtech quiz modal traps focus incorrectly and VoiceOver reads the countdown timer every second. Audit the modal's ARIA, focus management and live-region politeness, then fix it.",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-en-03",
+  "language": "en",
+  "prompt": "Add Arabic RTL support to the demo pages of our open-source form library and verify logical properties, mirrored directional icons, and screen-reader reading order.",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-id-01",
+  "language": "id",
+  "prompt": "Kampus diwajibkan memenuhi WCAG 2.2 AA untuk portal PMB. Tolong audit lengkap: struktur heading, alt text, label form, kontras, dan uji dengan pembaca layar TalkBack.",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-id-02",
+  "language": "id",
+  "prompt": "Form klaim asuransi pengiriman kami sering dikeluhkan pengguna tunanetra karena error tidak diumumkan. Bisa audit ARIA dan live region-nya sesuai kriteria WCAG 3.3.1?",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-id-03",
+  "language": "id",
+  "prompt": "Audit aspek kognitif dan reduced-motion untuk aplikasi belajar anak: animasi autoplay, batas waktu kuis, dan bahasa instruksi. Acu WCAG 2.2 AAA kalau memungkinkan.",
+  "expected_primary": "shadow-accessibility",
+  "rationale": "Full WCAG audit or assistive-technology behavior: ARIA, screen readers, live regions."
+ },
+ {
+  "id": "shadow-accessibility-h-en-near-01",
+  "language": "en",
+  "prompt": "Audit the English wording on our transfer form: labels and placeholders mix \"Account\", \"Acct\" and \"Rekening\". Make the terminology consistent and the helper text shorter.",
+  "expected_primary": "antislop-copywriting",
+  "exclude": [
+   "shadow-accessibility"
+  ],
+  "rationale": "Rule 3 respected: pure wording consistency, accessibility never mentioned."
+ },
+ {
+  "id": "shadow-accessibility-h-id-near-01",
+  "language": "id",
+  "prompt": "Halaman sertifikat kursus kami terlihat murahan: font dekoratif, warna emas mencolok, spasi acak. Tolong poles tipografi, warna, dan ritme spasinya.",
+  "expected_primary": "antislop-ui",
+  "exclude": [
+   "shadow-accessibility"
+  ],
+  "rationale": "Rule 3 respected: visual refinement only, accessibility topic absent."
+ },
+ {
+  "id": "shadow-ai-eng-h-en-01",
+  "language": "en",
+  "prompt": "Build a provider-fallback LLM gateway for our support bot: OpenAI primary, Anthropic secondary, JSON Schema structured output for ticket classification, and a 20s per-call timeout.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-en-02",
+  "language": "en",
+  "prompt": "Implement a tool-calling agent that can look up shipment status and issue refunds, where any refund above Rp500.000 pauses for human approval before execution.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-en-03",
+  "language": "en",
+  "prompt": "Write a TypeScript MCP server exposing read-only tools over our course catalog, with strict input validation, per-tool rate limits and no filesystem access.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-id-01",
+  "language": "id",
+  "prompt": "Rancang tool calling untuk agent HR BUMN yang bisa membaca saldo cuti karyawan, dengan validasi argumen JSON Schema dan larangan menulis data tanpa persetujuan manusia.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-id-02",
+  "language": "id",
+  "prompt": "Tolong implementasikan RAG runtime untuk FAQ produk kredit bank: ambil konteks dari indeks pgvector yang sudah ada, prompt caching untuk system prompt panjang, dan output JSON terstruktur.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-id-03",
+  "language": "id",
+  "prompt": "Agent internal kami sering kehabisan context di percakapan panjang. Rancang context compaction yang menyimpan keputusan penting dan membuang log tool lama.",
+  "expected_primary": "shadow-ai-eng",
+  "rationale": "Building production LLM runtime pieces: gateways, tool calling, MCP, compaction."
+ },
+ {
+  "id": "shadow-ai-eng-h-en-near-01",
+  "language": "en",
+  "prompt": "Our banking FAQ RAG runtime is already built. Grade its answers on the 300-question set for faithfulness and citation integrity and report the failing categories.",
+  "expected_primary": "shadow-eval",
+  "exclude": [
+   "shadow-ai-eng"
+  ],
+  "rationale": "Grading an already-built RAG runtime is evaluation, excluded from LLM engineering."
+ },
+ {
+  "id": "shadow-ai-eng-h-id-near-01",
+  "language": "id",
+  "prompt": "Tagihan API LLM bulan lalu Rp48 juta. Analisis biaya token per fitur, tetapkan batas output token, dan hitung potensi hemat dari prefix caching.",
+  "expected_primary": "shadow-finops",
+  "exclude": [
+   "shadow-ai-eng"
+  ],
+  "rationale": "Token spend analysis and budget caps are cost work, not building the runtime."
+ },
+ {
+  "id": "shadow-analytics-h-en-01",
+  "language": "en",
+  "prompt": "Design the event tracking plan for our courier app's booking funnel in PostHog: event names, properties, identity merge after login, and the North Star metric.",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-en-02",
+  "language": "en",
+  "prompt": "Our checkout A/B test shows a 52/48 split instead of 50/50 across 80k users. Check for sample ratio mismatch and tell me whether the conversion result is still readable.",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-en-03",
+  "language": "en",
+  "prompt": "Apply CUPED to the edtech retention experiment using pre-period lesson counts, and estimate the variance reduction for day-7 retention.",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-id-01",
+  "language": "id",
+  "prompt": "Bisa bantu bikin analisis cohort retensi mahasiswa pengguna aplikasi e-learning per angkatan, plus funnel dari login sampai submit tugas?",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-id-02",
+  "language": "id",
+  "prompt": "Kami menutup fitur cashback di 3 kota. Pakai difference-in-differences untuk mengukur dampaknya ke jumlah transaksi dibanding kota lain.",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-id-03",
+  "language": "id",
+  "prompt": "Tentukan OEC dan guardrail metric untuk eksperimen rekomendasi kursus, termasuk metrik yang tidak boleh turun seperti refund rate.",
+  "expected_primary": "shadow-analytics",
+  "rationale": "Product metrics, tracking plans, experiments and causal analysis."
+ },
+ {
+  "id": "shadow-analytics-h-en-near-01",
+  "language": "en",
+  "prompt": "Define SLIs and a 99.5% SLO for the booking API, with multi-window burn-rate alerts in Prometheus and Alertmanager routing to the on-call channel.",
+  "expected_primary": "shadow-observe",
+  "exclude": [
+   "shadow-analytics"
+  ],
+  "rationale": "Service SLOs and burn-rate alerts are reliability telemetry, explicitly outside product analytics."
+ },
+ {
+  "id": "shadow-analytics-h-id-near-01",
+  "language": "id",
+  "prompt": "Query rekap transaksi harian per cabang untuk laporan manajemen butuh 8 detik. Dari hasil EXPLAIN ANALYZE-nya, rancang index komposit dan pertimbangkan partisi bulanan untuk tabel transaksi.",
+  "expected_primary": "shadow-db",
+  "exclude": [
+   "shadow-analytics"
+  ],
+  "rationale": "Report query tuning via EXPLAIN and indexes; no product KPIs, events, funnels or experiments."
+ },
+ {
+  "id": "shadow-api-h-en-01",
+  "language": "en",
+  "prompt": "Design POST /v1/shipments with an Idempotency-Key header, RFC 9457 problem+json errors, and cursor pagination for GET /v1/shipments. Update the OpenAPI 3.1 spec accordingly.",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-en-02",
+  "language": "en",
+  "prompt": "Add a presigned S3 upload endpoint to our NestJS API for course video submissions: 2GB limit, content-type allowlist, and a completion endpoint the client calls afterwards.",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-en-03",
+  "language": "en",
+  "prompt": "Our gRPC AccountService needs a new ListTransactions RPC with page tokens. Define the proto contract, field numbers and the error codes it returns.",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-id-01",
+  "language": "id",
+  "prompt": "Tambahkan endpoint GET /api/v2/mahasiswa/{nim}/transkrip di layanan akademik, lengkap dengan kontrak OpenAPI, format error yang konsisten, dan contoh request di koleksi Postman.",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu rancang procedure tRPC untuk submit jawaban kuis, termasuk validasi Zod dan perilaku saat request terkirim ulang karena jaringan putus?",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-id-03",
+  "language": "id",
+  "prompt": "Rancang endpoint PATCH /v1/rekening/{id}/limit dengan optimistic concurrency lewat ETag dan If-Match, serta error 412 kalau versinya sudah kedaluwarsa.",
+  "expected_primary": "shadow-api",
+  "rationale": "Designing backend endpoints and their contracts, errors and idempotency."
+ },
+ {
+  "id": "shadow-api-h-en-near-01",
+  "language": "en",
+  "prompt": "Verify Xendit's incoming webhook signature against the raw request body and reject replays older than 5 minutes in our payment callback handler.",
+  "expected_primary": "shadow-integrate",
+  "exclude": [
+   "shadow-api"
+  ],
+  "rationale": "Inbound partner webhook verification belongs to third-party integration per catalog boundary."
+ },
+ {
+  "id": "shadow-api-h-id-near-01",
+  "language": "id",
+  "prompt": "Rancang state machine pengajuan cuti dosen: draf, diajukan, disetujui kaprodi, ditolak, dibatalkan, termasuk aturan kapan pengajuan boleh berlaku mundur.",
+  "expected_primary": "shadow-domain",
+  "exclude": [
+   "shadow-api"
+  ],
+  "rationale": "Business state machine modeling, which the API owner explicitly defers."
+ },
+ {
+  "id": "shadow-architect-h-en-01",
+  "language": "en",
+  "prompt": "Draw a C4 container diagram in Mermaid for our courier platform (web, mobile, API, worker, Postgres, Redis) and write an ADR explaining why we stay a modular monolith.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-en-02",
+  "language": "en",
+  "prompt": "Should our edtech backend split the grading engine into its own service or keep it as a module? Give trade-offs, a capacity estimate for 30k concurrent students, and a decision.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-en-03",
+  "language": "en",
+  "prompt": "Define module public facades for our Laravel monolith so the billing module stops importing enrollment internals, and propose a fitness function that enforces it.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-id-01",
+  "language": "id",
+  "prompt": "Bantu rancang arsitektur aplikasi SIAKAD baru: diagram C4 level 1-2, batas modul, dan ADR pemilihan Postgres vs MySQL.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-id-02",
+  "language": "id",
+  "prompt": "Untuk layanan adapter core-banking kami, mending job rekonsiliasi malam jadi worker terpisah atau tetap di proses API? Tolong buat ADR beserta konsekuensinya.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-id-03",
+  "language": "id",
+  "prompt": "Hitung kebutuhan kapasitas aplikasi tracking armada: 5.000 kendaraan mengirim lokasi tiap 10 detik. Tentukan topologi satu sistem yang cukup tanpa overengineering.",
+  "expected_primary": "shadow-architect",
+  "rationale": "Single-system architecture, C4, ADRs, module boundaries or capacity."
+ },
+ {
+  "id": "shadow-architect-h-en-near-01",
+  "language": "en",
+  "prompt": "Map our bank's 40 applications into a TIME rationalization and build a target-state roadmap across the lending, payments and core systems.",
+  "expected_primary": "shadow-ea",
+  "exclude": [
+   "shadow-architect"
+  ],
+  "rationale": "Multi-application portfolio roadmap is enterprise architecture; owner does not bring single-system design."
+ },
+ {
+  "id": "shadow-architect-h-id-near-01",
+  "language": "id",
+  "prompt": "Susun blueprint arsitektur enterprise untuk 12 sistem informasi universitas mengacu TOGAF 10 ADM, termasuk peta kapabilitas dan roadmap integrasi antar sistem.",
+  "expected_primary": "shadow-ea",
+  "exclude": [
+   "shadow-architect"
+  ],
+  "rationale": "Cross-system TOGAF blueprint for many applications, outside single-system scope."
+ },
+ {
+  "id": "shadow-auth-h-en-01",
+  "language": "en",
+  "prompt": "Add passkey (WebAuthn) login alongside passwords for our internet banking, migrate stored hashes to Argon2id, and require step-up MFA for transfers above Rp25 juta.",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-en-02",
+  "language": "en",
+  "prompt": "Implement OAuth2 authorization code flow with PKCE for our courier mobile app against Keycloak 25, including refresh token rotation and reuse detection.",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-en-03",
+  "language": "en",
+  "prompt": "In our multi-tenant LMS, a teacher from school A can fetch /api/classes/812 owned by school B. Fix tenant isolation in the authorization layer and add per-school RBAC.",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-id-01",
+  "language": "id",
+  "prompt": "JWKS kami mau rotasi kunci tiap 90 hari tanpa bikin token lama langsung invalid. Bisa bantu rancang alurnya untuk layanan SSO kampus?",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-id-02",
+  "language": "id",
+  "prompt": "Tolong review desain sesi cookie admin panel: SameSite, HttpOnly, token CSRF, dan idle timeout 15 menit untuk operator bank.",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-id-03",
+  "language": "id",
+  "prompt": "Integrasikan aplikasi e-office BUMN dengan SDK SSO internal yang sudah ada tanpa menggantinya, plus mapping role ABAC berdasarkan unit kerja.",
+  "expected_primary": "shadow-auth",
+  "rationale": "Login, MFA, OAuth/OIDC, sessions, JWT or tenant authorization design."
+ },
+ {
+  "id": "shadow-auth-h-en-near-01",
+  "language": "en",
+  "prompt": "Run Semgrep SAST over the login service repository looking for SSRF and injection sinks, and grade the findings against ASVS 5.0 Level 2.",
+  "expected_primary": "shadow-sec",
+  "exclude": [
+   "shadow-auth"
+  ],
+  "rationale": "Generic SAST and SSRF audit is AppSec, explicitly outside identity engineering."
+ },
+ {
+  "id": "shadow-auth-h-id-near-01",
+  "language": "id",
+  "prompt": "Audit kontrol akses logis bank kami sesuai Annex A ISO 27001:2022 (A.5.15 sampai A.5.18) dan susun Statement of Applicability beserta buktinya.",
+  "expected_primary": "shadow-grc",
+  "exclude": [
+   "shadow-auth"
+  ],
+  "rationale": "ISO 27001 SoA evidence is governance assurance, not designing authentication."
+ },
+ {
+  "id": "shadow-bootstrap-h-en-01",
+  "language": "en",
+  "prompt": "Scaffold a new Go HTTP service for courier ETA predictions with the standard toolchain layout, fail-fast env config, JSON logging and graceful shutdown on SIGTERM.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-en-02",
+  "language": "en",
+  "prompt": "Start a fresh Vite + React + TypeScript project for the QA team's internal test-report viewer using the official create command, with no extra libraries yet.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-en-03",
+  "language": "en",
+  "prompt": "Create a new Python CLI package for our ML feature-validation tool: pyproject.toml, an entry point, typed config, and one first runnable command.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-id-01",
+  "language": "id",
+  "prompt": "Bikin proyek worker Node.js baru untuk mengirim pengingat jadwal ujian, pakai generator resmi, config fail-fast, dan shutdown yang rapi.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-id-02",
+  "language": "id",
+  "prompt": "Tolong inisialisasi layanan NestJS baru untuk modul rekonsiliasi bank dari nol pakai Nest CLI, plus health endpoint pertamanya.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-id-03",
+  "language": "id",
+  "prompt": "Kami butuh library TypeScript open-source baru untuk memformat nomor resi. Siapkan struktur awal, build, dan satu fungsi pertama yang bisa dites.",
+  "expected_primary": "shadow-bootstrap",
+  "rationale": "Scaffolding a brand-new runnable project with an official generator."
+ },
+ {
+  "id": "shadow-bootstrap-h-en-near-01",
+  "language": "en",
+  "prompt": "The SRS for the course-bundle feature is approved. Break it into epics, stories and sprint tasks with Definition of Ready and Done for each story.",
+  "expected_primary": "shadow-plan",
+  "exclude": [
+   "shadow-bootstrap"
+  ],
+  "rationale": "Approved SRS decomposition into backlog is planning, not new-project scaffolding."
+ },
+ {
+  "id": "shadow-bootstrap-h-id-near-01",
+  "language": "id",
+  "prompt": "Bikin Dockerfile multi-stage dan docker-compose untuk layanan Go yang sudah berjalan, plus pipeline GitHub Actions yang build image-nya.",
+  "expected_primary": "shadow-ops",
+  "exclude": [
+   "shadow-bootstrap"
+  ],
+  "rationale": "Containerizing and CI for an existing service is infrastructure work."
+ },
+ {
+  "id": "shadow-browser-h-en-01",
+  "language": "en",
+  "prompt": "Run Playwright against staging and check the shipment booking flow at 375, 768 and 1440px for horizontal overflow, console errors, or pageerror events.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-en-02",
+  "language": "en",
+  "prompt": "Mock /api/transfer to return 429 and then 500 in a real browser session and verify the UI shows the retry banner instead of a blank screen.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-en-03",
+  "language": "en",
+  "prompt": "Click through the course enrollment flow on the live preview with Playwright and capture a screenshot of each step for the QA report.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-id-01",
+  "language": "id",
+  "prompt": "Tolong jalankan browser nyata ke portal KRS di staging: login, isi KRS, lalu cek apakah ada error di console atau request yang gagal.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-id-02",
+  "language": "id",
+  "prompt": "Bisa uji pakai Playwright apakah dashboard rekonsiliasi tetap benar saat API membalas 401 karena sesi habis? Harusnya langsung diarahkan ke halaman login.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-id-03",
+  "language": "id",
+  "prompt": "Ambil baseline screenshot halaman tarif ongkir di Chromium lalu bandingkan setelah perubahan CSS kemarin, dengan masking area tanggal yang dinamis.",
+  "expected_primary": "shadow-browser",
+  "rationale": "Real-browser Playwright verification, screenshots, console and network faults."
+ },
+ {
+  "id": "shadow-browser-h-en-near-01",
+  "language": "en",
+  "prompt": "Write Maestro E2E flows for our Flutter edtech app covering login and quiz submission on an Android emulator before the Play Store build.",
+  "expected_primary": "shadow-mobile",
+  "exclude": [
+   "shadow-browser"
+  ],
+  "rationale": "Rule 3 respected: native Maestro flows, no web browser run mentioned."
+ },
+ {
+  "id": "shadow-browser-h-id-near-01",
+  "language": "id",
+  "prompt": "Tulis contract test Pact antara layanan tracking dan layanan notifikasi supaya perubahan payload status kiriman langsung ketahuan di CI.",
+  "expected_primary": "shadow-test",
+  "exclude": [
+   "shadow-browser"
+  ],
+  "rationale": "Rule 3 respected: Pact contract tests, no real-browser run involved."
+ },
+ {
+  "id": "shadow-cache-h-en-01",
+  "language": "en",
+  "prompt": "Add a Redis cache for exchange-rate lookups in our core-banking adapter: 60s TTL, singleflight so 500 concurrent misses hit upstream once, and negative caching for unknown currencies.",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-en-02",
+  "language": "en",
+  "prompt": "Our CDN serves stale course pages after edits. Set Cache-Control and Surrogate-Key headers so publishing a course purges only that course's pages.",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-en-03",
+  "language": "en",
+  "prompt": "Tenant A saw tenant B's dashboard numbers because the cache key is stats:${date}. Redesign the key partitioning and invalidation for our multi-tenant cache.",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-id-01",
+  "language": "id",
+  "prompt": "Tolong rancang cache L1 in-memory LRU plus L2 Valkey untuk data tarif ongkir, dengan batas memori dan strategi invalidasi saat admin mengubah tarif.",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-id-02",
+  "language": "id",
+  "prompt": "TanStack Query di aplikasi kampus menampilkan jadwal lama setelah mahasiswa pindah kelas. Atur staleTime, invalidation, dan optimistic update yang benar.",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-id-03",
+  "language": "id",
+  "prompt": "Saat cache produk kredit kedaluwarsa bersamaan jam 08.00, database langsung kena 3.000 query. Bisa bantu cegah cache stampede-nya?",
+  "expected_primary": "shadow-cache",
+  "rationale": "Cache layers, TTLs, invalidation, key partitioning or stampede defense."
+ },
+ {
+  "id": "shadow-cache-h-en-near-01",
+  "language": "en",
+  "prompt": "Reindex our course catalog in OpenSearch with a new Indonesian stemming analyzer, using an alias swap so the live index never goes offline.",
+  "expected_primary": "shadow-search",
+  "exclude": [
+   "shadow-cache"
+  ],
+  "rationale": "Index rebuild and analyzer change are search engineering; search brings only DB."
+ },
+ {
+  "id": "shadow-cache-h-id-near-01",
+  "language": "id",
+  "prompt": "Antrian job pengiriman notifikasi kadang memproses pesan yang sama dua kali. Rancang inbox deduplication dan retry backoff yang aman.",
+  "expected_primary": "shadow-concurrency",
+  "exclude": [
+   "shadow-cache"
+  ],
+  "rationale": "Duplicate job processing needs inbox dedup in queues, not caching."
+ },
+ {
+  "id": "shadow-compat-h-en-01",
+  "language": "en",
+  "prompt": "We're renaming amount to amount_minor in the transfer webhook payload. Find which consumers break and plan Deprecation and Sunset headers per RFC 9745 and RFC 8594.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-en-02",
+  "language": "en",
+  "prompt": "Move our open-source library's supported runtime from Node 18 to Node 22: list breaking runtime changes, update the support matrix, and replay downstream consumers' test suites.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-en-03",
+  "language": "en",
+  "prompt": "CI on Linux passes but Windows contributors fail because imports use ./Utils while the file is utils.ts. Audit filename casing compatibility across the repo.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-id-01",
+  "language": "id",
+  "prompt": "Kami mau naik dari Laravel 10 ke 12 untuk SIAKAD. Tolong petakan breaking change yang relevan, urutan upgrade, dan cara memastikan kompatibilitasnya.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-id-02",
+  "language": "id",
+  "prompt": "Endpoint /v1/kurs lama akan dimatikan bulan Maret. Pasang header Deprecation dan Sunset, balas 410 Gone setelah tanggal itu, dan daftar consumer yang masih memanggil.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-id-03",
+  "language": "id",
+  "prompt": "Apakah mengubah enum status kiriman dari DELIVERED menjadi COMPLETED akan merusak aplikasi mitra yang sudah ada? Cek kompatibilitas wire dan semantiknya.",
+  "expected_primary": "shadow-compat",
+  "rationale": "Backward compatibility, deprecation headers, upgrades and consumer replay."
+ },
+ {
+  "id": "shadow-compat-h-en-near-01",
+  "language": "en",
+  "prompt": "Design a brand-new API for the scholarship module from scratch: resources, request validation, error format, and pagination for the applicant list.",
+  "expected_primary": "shadow-api",
+  "exclude": [
+   "shadow-compat"
+  ],
+  "rationale": "Rule 3 respected: greenfield contract design with no upgrade or compatibility topic."
+ },
+ {
+  "id": "shadow-compat-h-id-near-01",
+  "language": "id",
+  "prompt": "Buatkan SBOM CycloneDX untuk image aplikasi bank dan verifikasi provenance SLSA dari pipeline build GitHub Actions.",
+  "expected_primary": "shadow-supplychain",
+  "exclude": [
+   "shadow-compat"
+  ],
+  "rationale": "Rule 3 respected: SBOM and provenance, no upgrade or compatibility mention."
+ },
+ {
+  "id": "shadow-concurrency-h-en-01",
+  "language": "en",
+  "prompt": "Our order-created events are published after the DB commit and sometimes lost on crash. Implement a transactional outbox with a relay worker and consumer-side dedup.",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-en-02",
+  "language": "en",
+  "prompt": "BullMQ settlement jobs retry forever on a malformed payload. Add bounded exponential backoff with jitter and route poison messages to a dead-letter queue.",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-en-03",
+  "language": "en",
+  "prompt": "Two schedulers acquire the same Redis lock for the nightly grade-publishing job after a GC pause. Add fencing tokens so the stale holder can't write results.",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-id-01",
+  "language": "id",
+  "prompt": "Consumer RabbitMQ kami crash sebelum ack, pesan diproses ulang dan saldo poin jadi ganda. Bantu rancang inbox deduplication yang aman.",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-id-02",
+  "language": "id",
+  "prompt": "Tolong desain saga untuk proses pemesanan kurir: reservasi armada, potong saldo, kirim notifikasi, lengkap dengan kompensasi kalau satu langkah gagal.",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-id-03",
+  "language": "id",
+  "prompt": "Job antrian rekalkulasi nilai mahasiswa kadang jalan dobel di dua worker. Bisa bantu bikin locking terdistribusi yang benar?",
+  "expected_primary": "shadow-concurrency",
+  "rationale": "Durable queues, outbox/inbox, retries, DLQ and distributed locks."
+ },
+ {
+  "id": "shadow-concurrency-h-en-near-01",
+  "language": "en",
+  "prompt": "Our WebSocket clients lose driver location updates on reconnect. Add resume cursors so each client replays the messages it missed while offline.",
+  "expected_primary": "shadow-realtime",
+  "exclude": [
+   "shadow-concurrency"
+  ],
+  "rationale": "WebSocket resume cursors are stream transport; realtime brings auth and observe, not queues."
+ },
+ {
+  "id": "shadow-concurrency-h-id-near-01",
+  "language": "id",
+  "prompt": "Callback Midtrans kadang datang dua kali dan urutannya terbalik. Verifikasi signature-nya dan cegah status pembayaran ter-update ganda di handler kami.",
+  "expected_primary": "shadow-integrate",
+  "exclude": [
+   "shadow-concurrency"
+  ],
+  "rationale": "Payment gateway callback signature and ordering is third-party integration."
+ },
+ {
+  "id": "shadow-data-h-en-01",
+  "language": "en",
+  "prompt": "Rename column customer_nm to customer_name on a 90M-row Postgres table with zero downtime using expand-contract, including the dual-write window.",
+  "expected_primary": "shadow-data",
+  "rationale": "Zero-downtime migrations, backfills, seeds and data lifecycle jobs."
+ },
+ {
+  "id": "shadow-data-h-en-02",
+  "language": "en",
+  "prompt": "Write a resumable keyset backfill to populate shipments.region_id for 40M rows in batches of 5,000, with throttling and progress checkpoints.",
+  "expected_primary": "shadow-data",
+  "rationale": "Zero-downtime migrations, backfills, seeds and data lifecycle jobs."
+ },
+ {
+  "id": "shadow-data-h-en-03",
+  "language": "en",
+  "prompt": "Add a foreign key on enrollments.course_id without locking the table: NOT VALID first, then VALIDATE CONSTRAINT, with lock_timeout set to 3s.",
+  "expected_primary": "shadow-data",
+  "rationale": "Zero-downtime migrations, backfills, seeds and data lifecycle jobs."
+ },
+ {
+  "id": "shadow-data-h-id-01",
+  "language": "id",
+  "prompt": "Bikin migrasi tanpa downtime untuk memecah tabel mahasiswa jadi mahasiswa dan biodata, termasuk tahapan expand, backfill, dan contract.",
+  "expected_primary": "shadow-data",
+  "rationale": "Zero-downtime migrations, backfills, seeds and data lifecycle jobs."
+ },
+ {
+  "id": "shadow-data-h-id-02",
+  "language": "id",
+  "prompt": "Tolong petakan lineage kolom nilai_akhir di SIAKAD dari tabel sumber sampai tabel rekap transkrip, termasuk job mana saja yang mengubah nilainya di sepanjang jalur.",
+  "expected_primary": "shadow-data",
+  "rationale": "Data lineage across the application data lifecycle."
+ },
+ {
+  "id": "shadow-data-h-id-03",
+  "language": "id",
+  "prompt": "Data log mutasi lebih dari 10 tahun harus diarsip lalu dihapus bertahap. Bantu rancang job lifecycle-nya tanpa mengunci tabel produksi.",
+  "expected_primary": "shadow-data",
+  "rationale": "Zero-downtime migrations, backfills, seeds and data lifecycle jobs."
+ },
+ {
+  "id": "shadow-data-h-en-near-01",
+  "language": "en",
+  "prompt": "This shipments report query takes 12 seconds. Read the EXPLAIN ANALYZE output I pasted and propose the right composite index.",
+  "expected_primary": "shadow-db",
+  "exclude": [
+   "shadow-data"
+  ],
+  "rationale": "Query plan tuning and indexing is database tuning, excluded from data lifecycle."
+ },
+ {
+  "id": "shadow-data-h-id-near-01",
+  "language": "id",
+  "prompt": "Kami mewarisi aplikasi penggajian Delphi 7 dengan Oracle 9i. Nilai risikonya dan bandingkan strangler fig vs rewrite total, termasuk biaya jalan paralel.",
+  "expected_primary": "shadow-modernize",
+  "exclude": [
+   "shadow-data"
+  ],
+  "rationale": "Legacy due diligence and rewrite TCO, not a schema migration."
+ },
+ {
+  "id": "shadow-db-h-en-01",
+  "language": "en",
+  "prompt": "Connect to the staging Postgres, inspect the ledger database schema, and generate a DBML file plus a Mermaid ERD.",
+  "expected_primary": "shadow-db",
+  "rationale": "Live DB inspection, query plans, indexes, RLS, pooling or warehouse schema."
+ },
+ {
+  "id": "shadow-db-h-en-02",
+  "language": "en",
+  "prompt": "Our Supabase RLS policy auth.uid() = owner_id makes the course list query 40x slower. Rewrite it with (SELECT auth.uid()) and add the supporting index.",
+  "expected_primary": "shadow-db",
+  "rationale": "Live DB inspection, query plans, indexes, RLS, pooling or warehouse schema."
+ },
+ {
+  "id": "shadow-db-h-en-03",
+  "language": "en",
+  "prompt": "Size PgBouncer for 600 app connections against Postgres with max_connections=200, choose transaction or session pooling, and partition the events table by month.",
+  "expected_primary": "shadow-db",
+  "rationale": "Live DB inspection, query plans, indexes, RLS, pooling or warehouse schema."
+ },
+ {
+  "id": "shadow-db-h-id-01",
+  "language": "id",
+  "prompt": "Query laporan pengiriman per kota butuh 9 detik. Ini hasil EXPLAIN ANALYZE-nya; tolong rancang index komposit atau partial yang tepat.",
+  "expected_primary": "shadow-db",
+  "rationale": "Live DB inspection, query plans, indexes, RLS, pooling or warehouse schema."
+ },
+ {
+  "id": "shadow-db-h-id-02",
+  "language": "id",
+  "prompt": "Koneksi ke database SIAKAD sering habis saat masa pengisian KRS. Bantu hitung ukuran pool PgBouncer untuk 400 koneksi aplikasi dan pilih mode pooling transaction atau session.",
+  "expected_primary": "shadow-db",
+  "rationale": "PgBouncer sizing and pooling mode against a live database."
+ },
+ {
+  "id": "shadow-db-h-id-03",
+  "language": "id",
+  "prompt": "DELETE di tabel pelanggan Postgres kami lambat dan sering menahan lock karena foreign key di tabel tagihan tidak punya index. Cek FK mana saja yang belum ber-index dan rancang index-nya.",
+  "expected_primary": "shadow-db",
+  "rationale": "Missing foreign-key indexes and lock behavior in the database."
+ },
+ {
+  "id": "shadow-db-h-en-near-01",
+  "language": "en",
+  "prompt": "Backfill the new ledger_entries.currency column for 120M rows from the application side, resumable and idempotent, without blocking writes.",
+  "expected_primary": "shadow-data",
+  "exclude": [
+   "shadow-db"
+  ],
+  "rationale": "Application-side resumable backfill belongs to data lifecycle; owner is not search."
+ },
+ {
+  "id": "shadow-db-h-id-near-01",
+  "language": "id",
+  "prompt": "Rencanakan penambahan kolom NOT NULL ke tabel transaksi berisi 50 juta baris tanpa downtime, lengkap dengan lock_timeout dan tahapan validasinya.",
+  "expected_primary": "shadow-data",
+  "exclude": [
+   "shadow-db"
+  ],
+  "rationale": "Lock-safe online DDL migration plan is data lifecycle, not query tuning."
+ },
+ {
+  "id": "shadow-debug-h-en-01",
+  "language": "en",
+  "prompt": "Our courier API returns intermittent 500s with \"TypeError: Cannot read properties of undefined (reading 'lat')\" only for some drivers. Find the root cause.",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-en-02",
+  "language": "en",
+  "prompt": "The Node worker's RSS grows from 300MB to 2.1GB over six hours and then OOMs. Help me isolate the memory leak with heap snapshots.",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-en-03",
+  "language": "en",
+  "prompt": "Model training hangs at epoch 3 with DataLoader num_workers=8 but runs fine with 0. Diagnose why the process freezes.",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-id-01",
+  "language": "id",
+  "prompt": "Endpoint /api/transfer kadang lambat 30 detik lalu timeout, tapi log tidak menunjukkan error apa pun. Bantu telusuri akar masalahnya, saya curiga event loop ke-block.",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-id-02",
+  "language": "id",
+  "prompt": "Kode yang sama jalan normal di laptop dev, tapi di server staging SIAKAD muncul \"SQLSTATE[HY000] [2002] Connection refused\". Kenapa ya? Mungkin environment drift?",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-id-03",
+  "language": "id",
+  "prompt": "Stack trace dari aplikasi bank menunjuk ke library logging, tapi saya curiga itu menyesatkan. Bantu cari sumber sebenarnya dari NullPointerException ini.",
+  "expected_primary": "shadow-debug",
+  "rationale": "Root-causing an unexpected runtime error, leak, hang or drift."
+ },
+ {
+  "id": "shadow-debug-h-en-near-01",
+  "language": "en",
+  "prompt": "The Cypress spec checkout.cy.ts fails about 1 in 6 CI runs with \"element is detached from the DOM\". Triage the flakiness and stabilize it.",
+  "expected_primary": "shadow-test",
+  "exclude": [
+   "shadow-debug"
+  ],
+  "rationale": "Rule 5: flaky test triage belongs to testing; test never brings debug."
+ },
+ {
+  "id": "shadow-debug-h-id-near-01",
+  "language": "id",
+  "prompt": "Produksi aplikasi tracking down sejak 09.12, SEV-1, ratusan kurir tidak bisa update status. Pimpin triase insiden dan siapkan update berkala ke klien.",
+  "expected_primary": "shadow-maintain",
+  "exclude": [
+   "shadow-debug"
+  ],
+  "rationale": "Live SEV-1 outage command belongs to maintenance per catalog boundary."
+ },
+ {
+  "id": "shadow-design-h-en-01",
+  "language": "en",
+  "prompt": "Design the user flow and wireframes for a courier rescheduling feature: entry points, the nine states of the reschedule card, and edge cases like a closed hub.",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-en-02",
+  "language": "en",
+  "prompt": "Create design tokens for color, spacing, radius and typography in our edtech design system so the web app and Flutter app share one source.",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-en-03",
+  "language": "en",
+  "prompt": "Define the UX states for an AI tutor answer panel: thinking, streaming, cited, refused, low-confidence, and user-corrected.",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-id-01",
+  "language": "id",
+  "prompt": "Rancang alur pengguna pengajuan cuti akademik dari mahasiswa sampai approval dekan, dalam bentuk wireframe low-fi dan diagram alur.",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu bikin kontrak komponen Kartu Transaksi untuk design system bank: props, varian, dan 9 state lengkap termasuk skeleton dan error?",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-id-03",
+  "language": "id",
+  "prompt": "Kami mau redesign onboarding aplikasi kurir untuk mitra baru. Tolong petakan journey, titik drop-off, dan wireframe tiap langkahnya.",
+  "expected_primary": "shadow-design",
+  "rationale": "User flows, wireframes, UX state contracts or design tokens."
+ },
+ {
+  "id": "shadow-design-h-en-near-01",
+  "language": "en",
+  "prompt": "The design tokens are already done. Just fix the CSS so the pricing card's button padding, font weights and drop shadow look less cramped.",
+  "expected_primary": "antislop-ui",
+  "exclude": [
+   "shadow-design"
+  ],
+  "rationale": "Catalog sends CSS polish away from design; tokens already exist."
+ },
+ {
+  "id": "shadow-design-h-id-near-01",
+  "language": "id",
+  "prompt": "Wawancarai stakeholder bagian akademik dan susun kebutuhan fungsional fitur cuti akademik dalam format SRS beserta kriteria penerimaannya.",
+  "expected_primary": "shadow-discovery",
+  "exclude": [
+   "shadow-design"
+  ],
+  "rationale": "Stakeholder interviews and SRS drafting are requirements work, not UX design."
+ },
+ {
+  "id": "shadow-discovery-h-en-01",
+  "language": "en",
+  "prompt": "We just won the university's SIAKAD tender. Plan the requirement workshops, map stakeholders (BAAK, faculties, students), and outline the SRS.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-en-02",
+  "language": "en",
+  "prompt": "Turn these dispatcher interview notes into a PRD for route optimization with FR/NFR and Given/When/Then acceptance criteria.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-en-03",
+  "language": "en",
+  "prompt": "Review this BRD for the bank's virtual-account feature and list requirement gaps, ambiguous terms, and missing non-functional requirements.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-id-01",
+  "language": "id",
+  "prompt": "Bantu susun pertanyaan elisitasi untuk workshop kebutuhan dengan divisi treasury BUMN, termasuk peta stakeholder dan prioritas MoSCoW.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-id-02",
+  "language": "id",
+  "prompt": "Tulis kebutuhan pengguna dan kriteria penerimaan format Given/When/Then untuk fitur absensi online berbasis lokasi di aplikasi kampus.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-id-03",
+  "language": "id",
+  "prompt": "PRD fitur kelas live aplikasi belajar kami masih kabur. Tolong deteksi celah kebutuhan dan NFR yang belum didefinisikan, misalnya latensi, kapasitas, dan mode offline.",
+  "expected_primary": "shadow-discovery",
+  "rationale": "Requirement elicitation, stakeholder mapping, PRD/SRS and acceptance criteria."
+ },
+ {
+  "id": "shadow-discovery-h-en-near-01",
+  "language": "en",
+  "prompt": "The SRS is signed off. Decompose it into epics and user stories with story points, then lay out a three-sprint plan with dependencies.",
+  "expected_primary": "shadow-plan",
+  "exclude": [
+   "shadow-discovery"
+  ],
+  "rationale": "Signed-off SRS turned into sprints is planning, excluded from elicitation."
+ },
+ {
+  "id": "shadow-discovery-h-id-near-01",
+  "language": "id",
+  "prompt": "Kami sedang menimbang ikut tender SIAKAD Universitas X. Analisis KAK-nya, beri skor Bid/No-Bid, dan estimasi RAB penyedia.",
+  "expected_primary": "shadow-presales",
+  "exclude": [
+   "shadow-discovery"
+  ],
+  "rationale": "Rule 6: pre-award tender analysis belongs to presales, not requirement discovery."
+ },
+ {
+  "id": "shadow-doc-h-en-01",
+  "language": "en",
+  "prompt": "Regenerate the Software Design Document .docx and .pdf from sdd.md after the chapter 4 edits, using our existing document pipeline rather than editing the Word file.",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-en-02",
+  "language": "en",
+  "prompt": "Verify every citation in the bank's IT policy draft (policy.md) with the reference verifier and flag any that are dead links or unreviewed preprints.",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-en-03",
+  "language": "en",
+  "prompt": "Convert the university's SOP Layanan TI from its Markdown source into a formatted .docx with numbered headings and a table of contents via the established generator.",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-id-01",
+  "language": "id",
+  "prompt": "Tolong update dokumen Kajian Teknis untuk klien BUMN: edit sumber .md bab 3, lalu generate ulang .docx dan .pdf. Jangan edit file .docx-nya langsung.",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu buat lampiran glosarium istilah dan singkatan dokumen SKPL dalam .xlsx dari sumber JSON kanonik?",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-id-03",
+  "language": "id",
+  "prompt": "Cek keterlacakan dokumen DPPL: setiap rujukan ke SKPL harus valid dan nomor bagiannya sesuai. Laporkan rujukan yang putus.",
+  "expected_primary": "shadow-doc",
+  "rationale": "Generating DOCX/XLSX/PDF from canonical sources or verifying citations."
+ },
+ {
+  "id": "shadow-doc-h-en-near-01",
+  "language": "en",
+  "prompt": "Write the admin and operator manuals for the logistics dashboard as part of the client delivery, plus the credential transfer list for their IT team.",
+  "expected_primary": "shadow-handover",
+  "exclude": [
+   "shadow-doc"
+  ],
+  "rationale": "Admin and operator manuals plus credentials are client delivery, not document generation."
+ },
+ {
+  "id": "shadow-doc-h-id-near-01",
+  "language": "id",
+  "prompt": "Docstring di modul ekspor_laporan.py terlalu panjang dan mengulang isi kode. Rapikan jadi komentar alasan yang singkat saja.",
+  "expected_primary": "antislop-code",
+  "exclude": [
+   "shadow-doc"
+  ],
+  "rationale": "Docstring trimming inside source code is comment hygiene, not document engineering."
+ },
+ {
+  "id": "shadow-domain-h-en-01",
+  "language": "en",
+  "prompt": "Model the loan application lifecycle as a state machine (draft, submitted, under review, approved, disbursed, cancelled), including who may cancel after approval and the backdating rules.",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-en-02",
+  "language": "en",
+  "prompt": "Define aggregate boundaries for Shipment and Parcel: can a parcel be re-routed after the shipment is sealed? Enforce that invariant in the domain layer with optimistic locking.",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-en-03",
+  "language": "en",
+  "prompt": "Our enrollment context keeps leaking the legacy SIAKAD's status codes. Design an anti-corruption layer and the domain events between the Enrollment and Billing bounded contexts.",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-id-01",
+  "language": "id",
+  "prompt": "Rancang aturan bisnis pembatalan kiriman: gratis sebelum pickup, kena biaya setelah pickup, tidak bisa batal setelah sampai hub. Modelkan sebagai invariant domain.",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu modelkan state machine persetujuan anggaran berjenjang di BUMN (unit, divisi, direksi), termasuk revisi dan penolakan sebagian?",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-id-03",
+  "language": "id",
+  "prompt": "Siswa boleh pause langganan kursus maksimal 2 kali setahun dan tidak boleh saat ujian berlangsung. Tolong tentukan agregat dan invariant-nya.",
+  "expected_primary": "shadow-domain",
+  "rationale": "Business invariants, state machines, aggregates and bounded contexts."
+ },
+ {
+  "id": "shadow-domain-h-en-near-01",
+  "language": "en",
+  "prompt": "Interview the loan officers and branch managers, then write the PRD for the loan application module with acceptance criteria.",
+  "expected_primary": "shadow-discovery",
+  "exclude": [
+   "shadow-domain"
+  ],
+  "rationale": "Stakeholder interviews and PRD drafting are discovery, excluded from domain modeling."
+ },
+ {
+  "id": "shadow-domain-h-id-near-01",
+  "language": "id",
+  "prompt": "Query daftar pengajuan kredit berdasarkan status dan tanggal_ajukan lambat sekali. Rancang index yang tepat dari hasil EXPLAIN-nya.",
+  "expected_primary": "shadow-db",
+  "exclude": [
+   "shadow-domain"
+  ],
+  "rationale": "SQL index design for a status filter, excluded from domain modeling."
+ },
+ {
+  "id": "shadow-ea-h-en-01",
+  "language": "en",
+  "prompt": "Inventory the bank's 63 applications, classify each as Tolerate, Invest, Migrate or Eliminate, and draft a three-year cross-system roadmap.",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-en-02",
+  "language": "en",
+  "prompt": "Map the university's 18 information systems onto the six SPBE architecture domains and identify capabilities duplicated across faculties.",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-en-03",
+  "language": "en",
+  "prompt": "Define ABBs versus SBBs for the state-owned enterprise's integration capability spanning HR, finance and procurement systems, aligned with TOGAF 10 ADM phases B to D.",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-id-01",
+  "language": "id",
+  "prompt": "Susun arsitektur SPBE untuk Pemda mengacu Perpres 95/2018 dan 132/2022, mencakup proses bisnis, data, aplikasi, infrastruktur, keamanan, dan layanan.",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-id-02",
+  "language": "id",
+  "prompt": "Bantu rasionalisasi portofolio aplikasi grup BUMN: 120 aplikasi dengan banyak duplikasi HRIS. Mana yang dipertahankan, dimigrasi, atau dihentikan?",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-id-03",
+  "language": "id",
+  "prompt": "Kampus diminta menyelaraskan data dengan Satu Data Indonesia. Petakan aliran data antar sistem informasi yang ada dan roadmap integrasinya.",
+  "expected_primary": "shadow-ea",
+  "rationale": "Multi-system portfolio, TOGAF, SPBE mapping or TIME rationalization."
+ },
+ {
+  "id": "shadow-ea-h-en-near-01",
+  "language": "en",
+  "prompt": "Design the architecture of our single loan-origination app: containers, internal modules, and an ADR for choosing a message queue.",
+  "expected_primary": "shadow-architect",
+  "exclude": [
+   "shadow-ea"
+  ],
+  "rationale": "Rule 3 respected: one application's design, no portfolio topic."
+ },
+ {
+  "id": "shadow-ea-h-id-near-01",
+  "language": "id",
+  "prompt": "Buat diagram C4 khusus untuk aplikasi e-office BUMN saja, plus ADR untuk pilihan penyimpanan dokumen di object storage.",
+  "expected_primary": "shadow-architect",
+  "exclude": [
+   "shadow-ea"
+  ],
+  "rationale": "Rule 3 respected: single e-office system diagram, no portfolio mention."
+ },
+ {
+  "id": "shadow-email-h-en-01",
+  "language": "en",
+  "prompt": "Our OTP emails via Amazon SES land in Gmail spam with \"dmarc=fail (p=quarantine)\". Fix SPF and DKIM alignment for mail.bankku.co.id.",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-en-02",
+  "language": "en",
+  "prompt": "Build the transactional email pipeline for course receipts: an outbox table, SES as primary with Postmark failover, and hard-bounce suppression from DSNs.",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-en-03",
+  "language": "en",
+  "prompt": "Add RFC 8058 one-click List-Unsubscribe to our weekly newsletter sent through Resend, and make sure our MIME builder doesn't drop the header.",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-id-01",
+  "language": "id",
+  "prompt": "Template email notifikasi resi berbasis MJML tampil berantakan di Outlook 2019 dan dark mode iOS Mail. Bantu perbaiki templatenya.",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-id-02",
+  "language": "id",
+  "prompt": "Bisa set up MTA-STS dan TLS-RPT untuk domain kampus, sekalian baca laporan agregat DMARC yang menunjukkan banyak spoofing?",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-id-03",
+  "language": "id",
+  "prompt": "Form kontak kami disalahgunakan untuk header injection (ada \\r\\nBcc: di field nama). Perbaiki validasi dan pengiriman SMTP-nya.",
+  "expected_primary": "shadow-email",
+  "rationale": "SMTP/MIME, sender authentication, templates, bounces and ESP failover."
+ },
+ {
+  "id": "shadow-email-h-en-near-01",
+  "language": "en",
+  "prompt": "Our payment gateway posts a receipt-notification webhook. Verify its HMAC over the raw body before marking the invoice paid, and ignore duplicate deliveries.",
+  "expected_primary": "shadow-integrate",
+  "exclude": [
+   "shadow-email"
+  ],
+  "rationale": "Gateway receipt webhook HMAC is third-party integration, outside email infrastructure."
+ },
+ {
+  "id": "shadow-email-h-id-near-01",
+  "language": "id",
+  "prompt": "Ganti login OTP lewat email untuk nasabah menjadi passkey plus TOTP sebagai cadangan, termasuk alur pemulihan akun.",
+  "expected_primary": "shadow-auth",
+  "exclude": [
+   "shadow-email"
+  ],
+  "rationale": "Replacing email OTP with passkeys is authentication design."
+ },
+ {
+  "id": "shadow-eval-h-en-01",
+  "language": "en",
+  "prompt": "Evaluate our RAG chatbot for the bank's product FAQ: build a 250-question gold set and measure context recall, faithfulness and citation integrity.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Measuring RAG, judge, agent-trace or heuristic quality and red-teaming."
+ },
+ {
+  "id": "shadow-eval-h-en-02",
+  "language": "en",
+  "prompt": "Calibrate an LLM-as-judge for grading tutor explanations against 120 human-labeled samples; report Cohen's kappa and any bias toward longer answers.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Measuring RAG, judge, agent-trace or heuristic quality and red-teaming."
+ },
+ {
+  "id": "shadow-eval-h-en-03",
+  "language": "en",
+  "prompt": "Red-team our logistics support agent against the OWASP LLM Top 10 2025: prompt injection through shipment notes and excessive agency on the refund tool.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Measuring RAG, judge, agent-trace or heuristic quality and red-teaming."
+ },
+ {
+  "id": "shadow-eval-h-id-01",
+  "language": "id",
+  "prompt": "Bantu nilai trace tool-call agent customer service kami: apakah urutan pemanggilan tool benar dan berhenti saat butuh persetujuan manusia.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Measuring RAG, judge, agent-trace or heuristic quality and red-teaming."
+ },
+ {
+  "id": "shadow-eval-h-id-02",
+  "language": "id",
+  "prompt": "Tolong jalankan safety eval untuk chatbot layanan nasabah bank: kumpulkan 150 prompt jailbreak dan 150 prompt aman, lalu ukur tingkat penolakan yang benar dan yang salah blokir.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Safety evaluation of an LLM assistant with attack and benign probes."
+ },
+ {
+  "id": "shadow-eval-h-id-03",
+  "language": "id",
+  "prompt": "Kami ganti model embedding; ukur apakah jawaban RAG asisten akademik jadi kurang faithful dibanding versi lama, pakai dataset 300 pertanyaan.",
+  "expected_primary": "shadow-eval",
+  "rationale": "Measuring RAG, judge, agent-trace or heuristic quality and red-teaming."
+ },
+ {
+  "id": "shadow-eval-h-en-near-01",
+  "language": "en",
+  "prompt": "Tune hybrid retrieval for the course search, BM25 plus vectors fused with RRF, and measure nDCG@10 on our labeled query log.",
+  "expected_primary": "shadow-search",
+  "exclude": [
+   "shadow-eval"
+  ],
+  "rationale": "Rule 3 respected: retrieval ranking metrics, no LLM evaluation mentioned."
+ },
+ {
+  "id": "shadow-eval-h-id-near-01",
+  "language": "id",
+  "prompt": "Implementasikan structured output JSON Schema untuk ekstraksi data faktur dari LLM, dengan fallback ke provider kedua kalau yang pertama timeout.",
+  "expected_primary": "shadow-ai-eng",
+  "exclude": [
+   "shadow-eval"
+  ],
+  "rationale": "Rule 3 respected: building structured extraction, no evaluation topic."
+ },
+ {
+  "id": "shadow-finops-h-en-01",
+  "language": "en",
+  "prompt": "Our AWS bill jumped from $18k to $31k this month. Break down cost by service and tag, find idle RDS and unattached EBS, and propose savings.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-en-02",
+  "language": "en",
+  "prompt": "Allocate the shared EKS cluster's cost to five product teams using namespace labels, and export the result in FOCUS format.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-en-03",
+  "language": "en",
+  "prompt": "LLM spend for the tutor feature is $9k a month. Cap max output tokens, set thinking budgets, and estimate savings from prefix prompt caching.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-id-01",
+  "language": "id",
+  "prompt": "Biaya GCP kampus membengkak karena VM riset yang lupa dimatikan. Bantu analisis biaya per proyek dan rekomendasi penghematannya.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-id-02",
+  "language": "id",
+  "prompt": "Tolong hitung unit cost per pengiriman dari tagihan cloud bulan lalu dan cari komponen yang paling boros.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-id-03",
+  "language": "id",
+  "prompt": "Database Aurora bank kami over-provisioned. Analisis utilisasi dan biayanya, lalu sarankan rightsizing dan reserved instance.",
+  "expected_primary": "shadow-finops",
+  "rationale": "Cloud, Kubernetes, database or LLM spend analysis and reduction."
+ },
+ {
+  "id": "shadow-finops-h-en-near-01",
+  "language": "en",
+  "prompt": "Provision a new GCP Cloud SQL instance with private IP, IAM database authentication and enforced TLS using our existing Terraform modules.",
+  "expected_primary": "shadow-ops",
+  "exclude": [
+   "shadow-finops"
+  ],
+  "rationale": "Rule 3 respected: provisioning with Terraform, no cost topic."
+ },
+ {
+  "id": "shadow-finops-h-id-near-01",
+  "language": "id",
+  "prompt": "Tambahkan fallback dari GPT-4.1 ke model kedua bila provider pertama timeout di gateway LLM kami, dengan batas waktu 15 detik per panggilan.",
+  "expected_primary": "shadow-ai-eng",
+  "exclude": [
+   "shadow-finops"
+  ],
+  "rationale": "Rule 3 respected: provider fallback engineering, no spend topic."
+ },
+ {
+  "id": "shadow-git-h-en-01",
+  "language": "en",
+  "prompt": "Before I merge, check whether feature/recon-v2 conflicts with origin/main using a merge-tree dry run and list the semantically risky files.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-en-02",
+  "language": "en",
+  "prompt": "Set up three git worktrees so parallel agents can work on the api, worker and web lanes without stepping on each other.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-en-03",
+  "language": "en",
+  "prompt": "I hit merge conflicts in package-lock.json and src/ledger/rules.ts after pulling main. Resolve them while preserving both sides' contracts.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-id-01",
+  "language": "id",
+  "prompt": "Tolong cek status branch saya dibanding origin/develop: berapa commit yang masuk, file apa saja yang berubah, dan apakah bisa fast-forward.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-id-02",
+  "language": "id",
+  "prompt": "Tim kampus sebenarnya pakai GitFlow atau trunk-based? Deteksi strategi branching dari history repo dan sarankan cara sync yang aman.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-id-03",
+  "language": "id",
+  "prompt": "Integrasikan dua branch fitur independen (fitur-kuis dan fitur-sertifikat) ke branch integrasi tanpa merusak salah satunya.",
+  "expected_primary": "shadow-git",
+  "rationale": "Branch comparison, merge-tree checks, worktrees or conflict resolution."
+ },
+ {
+  "id": "shadow-git-h-en-near-01",
+  "language": "en",
+  "prompt": "Tag v2.4.0 with a SemVer justification, write the changelog, and prepare the rollback plan for our open-source library's next version.",
+  "expected_primary": "shadow-release",
+  "exclude": [
+   "shadow-git"
+  ],
+  "rationale": "SemVer tagging, changelog and rollback plan are release governance."
+ },
+ {
+  "id": "shadow-git-h-id-near-01",
+  "language": "id",
+  "prompt": "Pin semua GitHub Actions di folder .github/workflows ke commit SHA lengkap dan pastikan digest base image juga dipin.",
+  "expected_primary": "shadow-supplychain",
+  "exclude": [
+   "shadow-git"
+  ],
+  "rationale": "Pinning CI actions to SHAs is build supply-chain integrity."
+ },
+ {
+  "id": "shadow-grc-h-en-01",
+  "language": "en",
+  "prompt": "Assess our bank against POJK 11/2022 IT risk management requirements and list evidence gaps per control.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-en-02",
+  "language": "en",
+  "prompt": "Build the ISO/IEC 27001:2022 Statement of Applicability for all 93 Annex A controls covering the university data center, with justification for each exclusion.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-en-03",
+  "language": "en",
+  "prompt": "Score COBIT 2019 capability levels for APO12 and DSS05 at the BUMN client, keeping capability separate from maturity, with evidence references.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-id-01",
+  "language": "id",
+  "prompt": "Bantu siapkan penilaian Indeks KAMI BSSN untuk Biro TI kampus, beserta bukti tiap area.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-id-02",
+  "language": "id",
+  "prompt": "Tolong petakan pemenuhan bank terhadap PADK OJK 1/2026 untuk layanan cloud pihak ketiga dan buat daftar temuannya.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-id-03",
+  "language": "id",
+  "prompt": "Evaluasi SPBE domain tata kelola untuk instansi klien: indikator mana yang skornya rendah dan bukti apa yang kurang.",
+  "expected_primary": "shadow-grc",
+  "rationale": "Regulatory and framework assurance: POJK, ISO 27001 SoA, COBIT, Indeks KAMI."
+ },
+ {
+  "id": "shadow-grc-h-en-near-01",
+  "language": "en",
+  "prompt": "Threat model our transfer API with STRIDE, mark the trust boundaries, and list the top five attack paths with mitigations.",
+  "expected_primary": "shadow-sec",
+  "exclude": [
+   "shadow-grc"
+  ],
+  "rationale": "Rule 3 respected: hands-on threat model, no governance audit mentioned."
+ },
+ {
+  "id": "shadow-grc-h-id-near-01",
+  "language": "id",
+  "prompt": "Klien bank minta laporan tambahan yang tidak ada di SOW. Ini termasuk defect atau kandidat CR berbayar berdasarkan kontrak dan addendum?",
+  "expected_primary": "shadow-pmo",
+  "exclude": [
+   "shadow-grc"
+  ],
+  "rationale": "Rule 3 respected: contractual scope triage, no governance audit topic."
+ },
+ {
+  "id": "shadow-handover-h-en-01",
+  "language": "en",
+  "prompt": "Prepare the BAST for the university SIAKAD project: deliverables list, source code and SBOM inventory, and the sign-off fields.",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-en-02",
+  "language": "en",
+  "prompt": "Draft the credential transfer plan for the bank client: which secrets rotate at delivery, who receives what, and the acknowledgement log.",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-en-03",
+  "language": "en",
+  "prompt": "Write the Training of Trainers plan for the client's 12 operators of the fleet tracking system, plus the operator manual outline.",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-id-01",
+  "language": "id",
+  "prompt": "Susun Berita Acara Serah Terima aplikasi e-procurement BUMN beserta lampiran daftar aset dan manual admin.",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bantu bikin user manual untuk dosen dan mahasiswa aplikasi e-learning yang akan diserahkan ke kampus?",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-id-03",
+  "language": "id",
+  "prompt": "Proyek selesai minggu depan. Buatkan checklist serah terima ke klien: repo, dokumentasi, akun, lisensi, dan jadwal ToT.",
+  "expected_primary": "shadow-handover",
+  "rationale": "Client BAST, credential transfer, manuals and Training of Trainers."
+ },
+ {
+  "id": "shadow-handover-h-en-near-01",
+  "language": "en",
+  "prompt": "Save this agent session's context (branch, open TODOs, untested surfaces) so a new agent can continue the reconciliation script tomorrow.",
+  "expected_primary": "handoff",
+  "exclude": [
+   "shadow-handover"
+  ],
+  "rationale": "Rules 3 and 6: agent session context only, no client delivery topic."
+ },
+ {
+  "id": "shadow-handover-h-id-near-01",
+  "language": "id",
+  "prompt": "Muat snapshot sesi agent terakhir untuk repo e-procurement, cek drift SHA branch-nya, lalu lanjutkan pekerjaan dari situ.",
+  "expected_primary": "handoff",
+  "exclude": [
+   "shadow-handover"
+  ],
+  "rationale": "Rules 3 and 6: loading agent session memory, not client delivery."
+ },
+ {
+  "id": "shadow-illustration-h-en-01",
+  "language": "en",
+  "prompt": "Create an SVG mascot for our courier app, a friendly scooter character, in three poses, each optimized to under 8KB for the web.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-en-02",
+  "language": "en",
+  "prompt": "Design a 1200x630 Open Graph card template for our open-source project's blog posts, exported as PNG and WebP.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-en-03",
+  "language": "en",
+  "prompt": "Draw a technical diagram of the ISO 8583 message flow between ATM, switch and core banking as clean SVG for our internal docs.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-id-01",
+  "language": "id",
+  "prompt": "Bikin set ikon custom 24px untuk menu aplikasi belajar (kuis, materi, sertifikat, forum) dengan gaya outline konsisten, format SVG.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-id-02",
+  "language": "id",
+  "prompt": "Tolong buatkan ilustrasi untuk halaman \"belum ada tugas\" di portal kampus, ekspor ke AVIF dengan fallback PNG.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-id-03",
+  "language": "id",
+  "prompt": "Trace logo lama kampus dari PNG resolusi rendah jadi SVG vektor yang bersih untuk kebutuhan cetak spanduk.",
+  "expected_primary": "shadow-illustration",
+  "rationale": "Creating illustrations, icons, mascots, diagrams or raster/SVG assets."
+ },
+ {
+  "id": "shadow-illustration-h-en-near-01",
+  "language": "en",
+  "prompt": "Produce a narrated three-minute tutorial video of the courier app's booking flow with TTS voiceover and burned-in SRT subtitles.",
+  "expected_primary": "shadow-video",
+  "exclude": [
+   "shadow-illustration"
+  ],
+  "rationale": "Narrated TTS tutorial video is excluded from illustration by catalog."
+ },
+ {
+  "id": "shadow-illustration-h-id-near-01",
+  "language": "id",
+  "prompt": "Bikin video motion Remotion 30 detik untuk peluncuran fitur sertifikat, dengan animasi teks dan ekspor MP4 1080p.",
+  "expected_primary": "shadow-video",
+  "exclude": [
+   "shadow-illustration"
+  ],
+  "rationale": "Programmatic motion video rendering belongs to video production."
+ },
+ {
+  "id": "shadow-integrate-h-en-01",
+  "language": "en",
+  "prompt": "Integrate SNAP BI virtual account inquiry and payment into our core-banking adapter, with asymmetric signatures, X-TIMESTAMP checks and bounded timeouts.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-en-02",
+  "language": "en",
+  "prompt": "A Midtrans charge request timed out and we don't know if the customer was charged. Implement UNKNOWN-state handling and a status-check reconciliation.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-en-03",
+  "language": "en",
+  "prompt": "Add a circuit breaker and full-jitter retries around the third-party geocoding API our dispatch service calls, with a 2-second timeout.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-id-01",
+  "language": "id",
+  "prompt": "Tolong verifikasi webhook Xendit di handler kami pakai HMAC atas raw body, tolak replay lebih dari 5 menit, dan tangani event yang datang tidak berurutan.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-id-02",
+  "language": "id",
+  "prompt": "Buat job rekonsiliasi harian antara ledger internal dan laporan settlement Stripe, tandai selisih dan transaksi yang belum match.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-id-03",
+  "language": "id",
+  "prompt": "Integrasi API PDDikti untuk sinkron data mahasiswa sering timeout. Bantu pasang timeout, retry yang wajar, dan fallback.",
+  "expected_primary": "shadow-integrate",
+  "rationale": "Payment gateways, partner webhooks, third-party retries and reconciliation."
+ },
+ {
+  "id": "shadow-integrate-h-en-near-01",
+  "language": "en",
+  "prompt": "Our internal Kafka consumer for payment-settled events redelivers after every rebalance. Add inbox dedup keyed by event ID and commit offsets only after processing.",
+  "expected_primary": "shadow-concurrency",
+  "exclude": [
+   "shadow-integrate"
+  ],
+  "rationale": "Internal Kafka consumer dedup is queue internals, excluded from partner integration."
+ },
+ {
+  "id": "shadow-integrate-h-id-near-01",
+  "language": "id",
+  "prompt": "Bounce dari Postmark tidak pernah diproses. Tangani DSN hard bounce dan soft bounce, lalu kelola suppression list supaya reputasi domain tidak turun.",
+  "expected_primary": "shadow-email",
+  "exclude": [
+   "shadow-integrate"
+  ],
+  "rationale": "ESP bounce processing is email deliverability, excluded from integration."
+ },
+ {
+  "id": "shadow-maintain-h-en-01",
+  "language": "en",
+  "prompt": "Production is down: the transfer service has returned 503 since 14:05 and the bank's SLA is 4 hours. Run SEV-1 triage and coordinate the response.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-en-02",
+  "language": "en",
+  "prompt": "Write a blameless postmortem for last night's 47-minute outage of the courier tracking API, with timeline, contributing factors and action items.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-en-03",
+  "language": "en",
+  "prompt": "Ship a surgical hotfix for the production bug where certificates show the wrong graduation date, with a regression test and a minimal diff.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-id-01",
+  "language": "id",
+  "prompt": "Bantu kelola backlog Harwat untuk klien BUMN: 23 tiket, klasifikasi prioritas sesuai SLA kontrak, dan target penyelesaiannya.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-id-02",
+  "language": "id",
+  "prompt": "Insiden produksi pagi ini: SIAKAD tidak bisa login saat masa KRS. Susun RCA lengkap dan laporan untuk pimpinan.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-id-03",
+  "language": "id",
+  "prompt": "Susun laporan OMKT bulan ini: rekap insiden, waktu respons dibanding SLA, dan rekomendasi pencegahan untuk aplikasi tracking armada.",
+  "expected_primary": "shadow-maintain",
+  "rationale": "Live incident triage, postmortems, Harwat SLA backlog and hotfixes."
+ },
+ {
+  "id": "shadow-maintain-h-en-near-01",
+  "language": "en",
+  "prompt": "Plan the canary rollout of v3.2 to 10% of drivers behind feature flags, with an automated rollback trigger on error-rate breach.",
+  "expected_primary": "shadow-release",
+  "exclude": [
+   "shadow-maintain"
+  ],
+  "rationale": "Planned canary rollout is release work, excluded from incident maintenance."
+ },
+ {
+  "id": "shadow-maintain-h-id-near-01",
+  "language": "id",
+  "prompt": "Di staging, hitungan IPK salah untuk mahasiswa pindahan yang punya nilai konversi. Cari akar masalahnya di modul penilaian.",
+  "expected_primary": "shadow-debug",
+  "exclude": [
+   "shadow-maintain"
+  ],
+  "rationale": "Staging logic bug root cause is debugging, not production incident handling."
+ },
+ {
+  "id": "shadow-mobile-h-en-01",
+  "language": "en",
+  "prompt": "Our Flutter edtech app was rejected by the App Store for missing required-reason API declarations in PrivacyInfo.xcprivacy. Fix the manifest and prepare the resubmission.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-en-02",
+  "language": "en",
+  "prompt": "Harden the bank's React Native app against MASVS v2.1.0: root detection, certificate pinning, and server-side Play Integrity verdict checks.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-en-03",
+  "language": "en",
+  "prompt": "Set up Android release signing with Play App Signing and an upload key in CI for the courier app, targeting SDK 35.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-id-01",
+  "language": "id",
+  "prompt": "Universal Links iOS untuk https://belajar.id/kelas/* tidak membuka aplikasi. Cek apple-app-site-association dan konfigurasi entitlements-nya.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-id-02",
+  "language": "id",
+  "prompt": "Tolong siapkan gate rilis store untuk aplikasi kurir: versi build, checklist Play Console, dan E2E Maestro sebelum submit.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-id-03",
+  "language": "id",
+  "prompt": "Aplikasi mobile nasabah perlu integrasi Play Integrity API untuk mendeteksi perangkat yang dimodifikasi. Bantu desain alur verifikasinya.",
+  "expected_primary": "shadow-mobile",
+  "rationale": "Native mobile hardening, signing and store release gates."
+ },
+ {
+  "id": "shadow-mobile-h-en-near-01",
+  "language": "en",
+  "prompt": "The mobile web checkout overflows horizontally at 360px and the coupon field pushes the pay button off-screen. Fix the responsive layout.",
+  "expected_primary": "antislop-layoutmobile",
+  "exclude": [
+   "shadow-mobile"
+  ],
+  "rationale": "Mobile web overflow is responsive layout, not native release work."
+ },
+ {
+  "id": "shadow-mobile-h-id-near-01",
+  "language": "id",
+  "prompt": "Jalankan Playwright ke halaman pendaftaran kursus versi web di viewport 375px dan cek apakah ada overflow atau error console.",
+  "expected_primary": "shadow-browser",
+  "exclude": [
+   "shadow-mobile"
+  ],
+  "rationale": "Real-browser viewport run on a web page, not a native app."
+ },
+ {
+  "id": "shadow-modernize-h-en-01",
+  "language": "en",
+  "prompt": "We inherited a 15-year-old COBOL and DB2 loan system. Do technical due diligence: risk vectors, undocumented business rules, and strangler fig versus rewrite TCO including coexistence costs.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-en-02",
+  "language": "en",
+  "prompt": "Reverse-engineer the business rules hidden in the legacy PHP 5.6 grading scripts, which have no tests and no docs, before we decide whether to replace them.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-en-03",
+  "language": "en",
+  "prompt": "Our startup acquired a competitor's Rails 4 logistics platform. Score its technical risk across code, infra, data and team, and give a keep-or-replace recommendation.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-id-01",
+  "language": "id",
+  "prompt": "Kampus mau ganti SIAKAD lama berbasis VB6. Bandingkan opsi strangler fig dan rewrite total, hitung TCO 5 tahun termasuk biaya jalan paralel.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-id-02",
+  "language": "id",
+  "prompt": "Bantu audit sistem warisan e-office BUMN yang vendornya sudah tutup: risiko, ketergantungan, dan rekomendasi modernisasi.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-id-03",
+  "language": "id",
+  "prompt": "Lakukan arkeologi aturan bisnis dari stored procedure Oracle 11g sistem kredit lama; dokumentasikan rumus denda yang tersembunyi.",
+  "expected_primary": "shadow-modernize",
+  "rationale": "Legacy due diligence, rule archaeology, strangler versus rewrite TCO."
+ },
+ {
+  "id": "shadow-modernize-h-en-near-01",
+  "language": "en",
+  "prompt": "Extract the tariff calculation from our 2,000-line OrderController into its own class behind characterization tests, keeping behavior identical.",
+  "expected_primary": "shadow-refactor",
+  "exclude": [
+   "shadow-modernize"
+  ],
+  "rationale": "Scoped behavior-preserving extraction is refactoring, excluded from modernization assessment."
+ },
+ {
+  "id": "shadow-modernize-h-id-near-01",
+  "language": "id",
+  "prompt": "Dari 40 aplikasi di grup BUMN, tentukan mana yang dipensiunkan, dikonsolidasi, atau dikembangkan, lalu susun roadmap lintas sistem 3 tahun.",
+  "expected_primary": "shadow-ea",
+  "exclude": [
+   "shadow-modernize"
+  ],
+  "rationale": "Group-wide application retirement roadmap is enterprise portfolio work."
+ },
+ {
+  "id": "shadow-monarch-h-en-01",
+  "language": "en",
+  "prompt": "We need to launch a new payment feature end to end: API contract, DB migration, partner webhook, auth checks and release plan. Coordinate the specialists and give me one accountable plan with owners.",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-en-02",
+  "language": "en",
+  "prompt": "The agent wants to run a k6 stress test against staging and push a hotfix branch. Tell me which of these actions need my explicit approval and at what level, and hold everything until then.",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-en-03",
+  "language": "en",
+  "prompt": "For this quarter's courier-app work, decide which specialist areas are involved (caching, realtime tracking, mobile release, analytics) and sequence them into one routed plan.",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-id-01",
+  "language": "id",
+  "prompt": "Tolong orkestrasi pekerjaan lintas bidang untuk modul beasiswa: kebutuhan, arsitektur, database, keamanan, dan UAT. Siapa memegang apa dan bagaimana urutannya?",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-id-02",
+  "language": "id",
+  "prompt": "Sub-agent tadi menyarankan deploy ke produksi dan menghapus tabel lama. Itu termasuk level persetujuan apa? Jangan jalankan apa pun sebelum batas eksekusinya jelas.",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-id-03",
+  "language": "id",
+  "prompt": "Proyek ML kami menyentuh pipeline data, evaluasi model, biaya GPU, dan privasi data siswa. Tentukan satu pemilik keputusan dan pembagian kerja ke tiap spesialis.",
+  "expected_primary": "shadow-monarch",
+  "rationale": "Coordination across several specialists or the execution-approval boundary."
+ },
+ {
+  "id": "shadow-monarch-h-en-near-01",
+  "language": "en",
+  "prompt": "Coordinate merging three parallel agent branches into the integration branch, running merge-tree conflict checks before each step.",
+  "expected_primary": "shadow-git",
+  "exclude": [
+   "shadow-monarch"
+  ],
+  "rationale": "Merging parallel agent branches is a single Git concern, no cross-domain coordination."
+ },
+ {
+  "id": "shadow-monarch-h-id-near-01",
+  "language": "id",
+  "prompt": "Pecah fitur beasiswa yang sudah disetujui menjadi epic dan story, lalu bagi tugasnya ke empat developer untuk sprint depan.",
+  "expected_primary": "shadow-plan",
+  "exclude": [
+   "shadow-monarch"
+  ],
+  "rationale": "Story decomposition and task assignment is one planning domain."
+ },
+ {
+  "id": "shadow-observe-h-en-01",
+  "language": "en",
+  "prompt": "Instrument the transfer service with OpenTelemetry traces across the API, the core-banking adapter and Kafka, propagating trace context through message headers.",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-en-02",
+  "language": "en",
+  "prompt": "Our Prometheus holds 4M active series because http metrics carry a user_id label. Fix the cardinality while keeping the dashboards useful.",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-en-03",
+  "language": "en",
+  "prompt": "Define SLIs and SLOs for the course video playback service and set multi-window burn-rate alerts at 1h/5m and 6h/30m.",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-id-01",
+  "language": "id",
+  "prompt": "Pasang structured JSON logging dengan redaksi PII (NIK, nomor HP) di layanan tracking, satu wide-event per request.",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-id-02",
+  "language": "id",
+  "prompt": "Bisa bikin dashboard-as-code Grafana untuk API SIAKAD (latency p95, error rate, saturasi) yang dikelola di repo?",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-id-03",
+  "language": "id",
+  "prompt": "Saat insiden kemarin kami buta karena log tidak punya trace_id. Rapikan korelasi log dan trace di layanan pembayaran.",
+  "expected_primary": "shadow-observe",
+  "rationale": "SLOs, burn-rate alerts, tracing, structured logs, metric cardinality."
+ },
+ {
+  "id": "shadow-observe-h-en-near-01",
+  "language": "en",
+  "prompt": "Define the product event plan for the quiz feature in Mixpanel and build a funnel from quiz start to completion, segmented by grade level.",
+  "expected_primary": "shadow-analytics",
+  "exclude": [
+   "shadow-observe"
+  ],
+  "rationale": "Rule 3 respected: product event funnel, no metrics, tracing or logging stack."
+ },
+ {
+  "id": "shadow-observe-h-id-near-01",
+  "language": "id",
+  "prompt": "Jalankan load test k6 dengan 1.000 VU ke endpoint /api/krs sebelum UAT dan laporkan p95 serta tingkat error-nya.",
+  "expected_primary": "shadow-perf",
+  "exclude": [
+   "shadow-observe"
+  ],
+  "rationale": "Rule 3 respected: requested k6 load test, no telemetry stack mentioned."
+ },
+ {
+  "id": "shadow-ops-h-en-01",
+  "language": "en",
+  "prompt": "Write a multi-stage Dockerfile and docker-compose for the courier API with Postgres and Redis, a non-root user and healthchecks.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-en-02",
+  "language": "en",
+  "prompt": "Configure Nginx as a reverse proxy for the university portal with Let's Encrypt auto-renewal, HTTP/2, and upstreams to two app servers.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-en-03",
+  "language": "en",
+  "prompt": "Create Terraform modules for a VPC, an EKS cluster and an RDS instance for the edtech staging environment.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-id-01",
+  "language": "id",
+  "prompt": "Bantu bikin pipeline GitHub Actions: build image, push ke registry, lalu deploy ke VPS via SSH dengan restart PM2.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-id-02",
+  "language": "id",
+  "prompt": "Set up unit systemd untuk worker rekonsiliasi di server Ubuntu 24.04 milik bank, dengan auto-restart dan batas memori.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-id-03",
+  "language": "id",
+  "prompt": "Tolong konfigurasi rotasi secret database tiap 30 hari di Kubernetes pakai External Secrets Operator dan Vault.",
+  "expected_primary": "shadow-ops",
+  "rationale": "Docker, Kubernetes, Terraform, proxies, VPS and CI/CD infrastructure."
+ },
+ {
+  "id": "shadow-ops-h-en-near-01",
+  "language": "en",
+  "prompt": "Write the release preflight checklist and rollback verification steps for Friday's v5.1 deploy of the bank API.",
+  "expected_primary": "shadow-release",
+  "exclude": [
+   "shadow-ops"
+  ],
+  "rationale": "Release preflight and rollback verification is rollout governance, excluded from ops."
+ },
+ {
+  "id": "shadow-ops-h-id-near-01",
+  "language": "id",
+  "prompt": "Rancang alert burn-rate SLO untuk layanan kurir yang berjalan di Kubernetes, dengan dua jendela waktu dan routing ke tim on-call.",
+  "expected_primary": "shadow-observe",
+  "exclude": [
+   "shadow-ops"
+  ],
+  "rationale": "SLO burn-rate alert design is excluded from ops per catalog."
+ },
+ {
+  "id": "shadow-perf-h-en-01",
+  "language": "en",
+  "prompt": "We're at the Pre-UAT gate. Write and run a k6 load test for the transfer API: ramp to 800 VUs over 10 minutes with thresholds p95 under 400ms and errors under 0.5%.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-en-02",
+  "language": "en",
+  "prompt": "Run a spike test on the KRS registration endpoint simulating 20,000 students in the first five minutes, and decompose where the latency goes.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-en-03",
+  "language": "en",
+  "prompt": "Before UAT, profile CPU and memory of the route-optimization service under a 30-minute soak on staging and identify the top hotspots.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-id-01",
+  "language": "id",
+  "prompt": "Sebelum UAT, lakukan stress test k6 ke API tracking sampai titik patahnya dan laporkan throughput maksimalnya.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-id-02",
+  "language": "id",
+  "prompt": "Gate performa pra-UAT untuk aplikasi kursus: uji beban 2.000 pengguna bersamaan pada endpoint video dan kuis.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-id-03",
+  "language": "id",
+  "prompt": "Tolong jalankan load test pada layanan rekonsiliasi bank dengan 1 juta transaksi, plus profiling query lewat EXPLAIN saat beban puncak.",
+  "expected_primary": "shadow-perf",
+  "rationale": "Explicit Pre-UAT gate or requested load/stress/profiling runs."
+ },
+ {
+  "id": "shadow-perf-h-en-near-01",
+  "language": "en",
+  "prompt": "The import worker crashes with \"JavaScript heap out of memory\" after reading a 2GB CSV. Find why it buffers the whole file.",
+  "expected_primary": "shadow-debug",
+  "exclude": [
+   "shadow-perf"
+  ],
+  "rationale": "Rule 3 respected: crash root cause, no load-testing topic."
+ },
+ {
+  "id": "shadow-perf-h-id-near-01",
+  "language": "id",
+  "prompt": "Tulis test unit Vitest untuk fungsi hitung ongkir dengan 20 kasus batas, termasuk berat 0 kg dan zona di luar jangkauan.",
+  "expected_primary": "shadow-test",
+  "exclude": [
+   "shadow-perf"
+  ],
+  "rationale": "Rule 3 respected: unit tests only, no performance or load topic."
+ },
+ {
+  "id": "shadow-plan-h-en-01",
+  "language": "en",
+  "prompt": "The PRD for driver earnings is approved. Break it into epics, user stories with acceptance criteria, sprint tasks, and a dependency graph.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-en-02",
+  "language": "en",
+  "prompt": "Define Definition of Ready and Definition of Done for our QA automation team's stories, then slot the 14 approved stories into two sprints.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-en-03",
+  "language": "en",
+  "prompt": "From the signed-off SRS for the scholarship module, produce a backlog ordered by dependency with story points.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-id-01",
+  "language": "id",
+  "prompt": "SRS fitur kelas online sudah disetujui. Pecah jadi epic dan user story, lalu susun rencana 3 sprint.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-id-02",
+  "language": "id",
+  "prompt": "Bantu urutkan tugas pengembangan modul rekonsiliasi berdasarkan ketergantungan: mana yang harus duluan dan mana yang bisa paralel.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-id-03",
+  "language": "id",
+  "prompt": "Ubah daftar kebutuhan aplikasi kurir yang sudah disepakati jadi backlog sprint lengkap dengan estimasi dan DoD.",
+  "expected_primary": "shadow-plan",
+  "rationale": "Turning approved requirements into epics, stories, sprints and dependencies."
+ },
+ {
+  "id": "shadow-plan-h-en-near-01",
+  "language": "en",
+  "prompt": "Compute PERT estimates and a Monte Carlo P80 finish date for the scholarship project, and report current CPI and SPI.",
+  "expected_primary": "shadow-pmo",
+  "exclude": [
+   "shadow-plan"
+  ],
+  "rationale": "PERT and Monte Carlo P80 forecasting is PMO; pmo brings architect, not planning."
+ },
+ {
+  "id": "shadow-plan-h-id-near-01",
+  "language": "id",
+  "prompt": "Klien minta fitur ekspor PDF yang tidak tercantum di KAK. Ini dihitung defect atau CR berbayar?",
+  "expected_primary": "shadow-pmo",
+  "exclude": [
+   "shadow-plan"
+  ],
+  "rationale": "Contractual defect versus paid change triage is PMO governance."
+ },
+ {
+  "id": "shadow-pmo-h-en-01",
+  "language": "en",
+  "prompt": "The bank says the missing bulk-transfer screen is a defect; we think it's a paid change. Classify it against the contract, addendum, KAK and FSD hierarchy.",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-en-02",
+  "language": "en",
+  "prompt": "Run a Monte Carlo schedule simulation for the SIAKAD project and give P50, P80 and P90 completion dates from these three-point task estimates.",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-en-03",
+  "language": "en",
+  "prompt": "Calculate EVM for month 4: planned value Rp1.2B, earned value Rp950M, actual cost Rp1.1B. Give CPI, SPI and the estimate at completion.",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-id-01",
+  "language": "id",
+  "prompt": "Susun Laporan Proyek bulanan untuk klien BUMN: progres, EVM, risiko, dan status permintaan perubahan.",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-id-02",
+  "language": "id",
+  "prompt": "Bantu hitung critical path (CPM) jadwal implementasi aplikasi kurir untuk 3 kota; daftar tugas dan durasinya terlampir.",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-id-03",
+  "language": "id",
+  "prompt": "Kampus minta tambahan modul alumni di tengah proyek. Telusuri SOW dan addendum: masuk lingkup atau kandidat CR berbayar?",
+  "expected_primary": "shadow-pmo",
+  "rationale": "Contractual defect vs paid CR, PERT/CPM, Monte Carlo, EVM, project reports."
+ },
+ {
+  "id": "shadow-pmo-h-en-near-01",
+  "language": "en",
+  "prompt": "Split the approved alumni module into user stories with acceptance criteria and assign them to the next two sprints.",
+  "expected_primary": "shadow-plan",
+  "exclude": [
+   "shadow-pmo"
+  ],
+  "rationale": "Sprint story split for an approved module is planning; planning never brings PMO."
+ },
+ {
+  "id": "shadow-pmo-h-id-near-01",
+  "language": "id",
+  "prompt": "Hitung RAB penyedia dan TCO 5 tahun untuk proposal tender aplikasi kepegawaian yang ditutup bulan depan.",
+  "expected_primary": "shadow-presales",
+  "exclude": [
+   "shadow-pmo"
+  ],
+  "rationale": "Pre-award provider RAB and TCO for a bid is presales."
+ },
+ {
+  "id": "shadow-presales-h-en-01",
+  "language": "en",
+  "prompt": "Analyze this KAK for the provincial e-government tender and give a Bid/No-Bid score with the main risks.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-en-02",
+  "language": "en",
+  "prompt": "Build the provider RAB and BoQ for our SIAKAD tender bid under Perpres 46/2025, kept separate from the client's HPS.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-en-03",
+  "language": "en",
+  "prompt": "Size the workload in conservative, expected and stress scenarios for the bank's RFP, and model five-year TCO and NPV for our proposed solution.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-id-01",
+  "language": "id",
+  "prompt": "Ada RFP dari BUMN logistik untuk sistem tracking armada. Analisis kebutuhan dari dokumen TOR dan putuskan layak ikut atau tidak.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-id-02",
+  "language": "id",
+  "prompt": "Tolong susun estimasi kapasitas dan biaya 5 tahun untuk proposal penawaran LMS ke universitas, dengan tiga skenario beban.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-id-03",
+  "language": "id",
+  "prompt": "Bantu bikin BoQ perangkat dan jasa untuk penawaran pengadaan data center kampus sesuai Perpres 46/2025.",
+  "expected_primary": "shadow-presales",
+  "rationale": "Pre-award tender analysis, Bid/No-Bid, BoQ/RAB, capacity and TCO/NPV."
+ },
+ {
+  "id": "shadow-presales-h-en-near-01",
+  "language": "en",
+  "prompt": "We won the bank tender last week. Plan the requirement workshops with their operations division and draft the SRS outline.",
+  "expected_primary": "shadow-discovery",
+  "exclude": [
+   "shadow-presales"
+  ],
+  "rationale": "Rule 6: after award, requirement work belongs to discovery."
+ },
+ {
+  "id": "shadow-presales-h-id-near-01",
+  "language": "id",
+  "prompt": "Kontrak sudah ditandatangani. Susun peta stakeholder dan jadwal elisitasi kebutuhan untuk sistem tracking armada klien.",
+  "expected_primary": "shadow-discovery",
+  "exclude": [
+   "shadow-presales"
+  ],
+  "rationale": "Rule 6: contract signed, so stakeholder elicitation is discovery."
+ },
+ {
+  "id": "shadow-privacy-h-en-01",
+  "language": "en",
+  "prompt": "Classify the personal data fields in our courier app (name, phone, GPS history, KTP photo) under UU PDP and map the lawful basis for each.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-en-02",
+  "language": "en",
+  "prompt": "Design the DSAR workflow so an edtech parent can request access to and erasure of their child's data across Postgres, S3 backups and the support ticketing system.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-en-03",
+  "language": "en",
+  "prompt": "Draft the DPIA for the bank's new face-recognition onboarding and the cross-border transfer assessment for the Singapore-hosted vendor.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-id-01",
+  "language": "id",
+  "prompt": "Susun ROPA (catatan aktivitas pemrosesan) untuk sistem informasi kampus: data mahasiswa, dosen, alumni, tujuan, retensi, dan penerima.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-id-02",
+  "language": "id",
+  "prompt": "Kalau terjadi kebocoran data nasabah, apa kewajiban notifikasi 3x24 jam menurut UU PDP? Bantu buat runbook penanganannya.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-id-03",
+  "language": "id",
+  "prompt": "Rancang mekanisme persetujuan dan penarikan persetujuan untuk fitur lokasi real-time di aplikasi kurir.",
+  "expected_primary": "shadow-privacy",
+  "rationale": "Personal data classification, consent, DPIA/ROPA, DSAR, breach handling."
+ },
+ {
+  "id": "shadow-privacy-h-en-near-01",
+  "language": "en",
+  "prompt": "Scan the repository history for committed API keys and rotate the Midtrans server key we found in .env.example.",
+  "expected_primary": "shadow-sec",
+  "exclude": [
+   "shadow-privacy"
+  ],
+  "rationale": "Rule 3 respected: leaked API keys, no personal-data topic."
+ },
+ {
+  "id": "shadow-privacy-h-id-near-01",
+  "language": "id",
+  "prompt": "Rancang job arsip tabel audit_log yang lebih dari 2 tahun ke cold storage tanpa mengunci tabel produksi.",
+  "expected_primary": "shadow-data",
+  "exclude": [
+   "shadow-privacy"
+  ],
+  "rationale": "Rule 3 respected: archiving audit logs, no personal data mentioned."
+ },
+ {
+  "id": "shadow-quality-h-en-01",
+  "language": "en",
+  "prompt": "Run tsc --noEmit and ESLint across the monorepo, then summarize the errors by package and severity.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-en-02",
+  "language": "en",
+  "prompt": "Our orders module now imports from billing/internal. Detect this architectural drift with dependency-cruiser rules and fail the gate when it reappears.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-en-03",
+  "language": "en",
+  "prompt": "Report cyclomatic complexity hotspots above 15 in the Python ML pipeline and gate PRs on ruff plus mypy --strict.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-id-01",
+  "language": "id",
+  "prompt": "Tolong jalankan pemeriksaan statis PHPStan level 8 dan Pint di repo SIAKAD, lalu laporkan pelanggaran utamanya.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-id-02",
+  "language": "id",
+  "prompt": "Siapkan gate deterministik sebelum klaim siap merge: typecheck, lint, dan pengecekan sisa container Docker test.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-id-03",
+  "language": "id",
+  "prompt": "Review kualitas kode PR #233 di adapter core-banking: duplikasi, fungsi terlalu panjang, dan pelanggaran konvensi modul.",
+  "expected_primary": "shadow-quality",
+  "rationale": "Typecheck, lint, complexity, architecture drift or the deterministic gate."
+ },
+ {
+  "id": "shadow-quality-h-en-near-01",
+  "language": "en",
+  "prompt": "Write Pytest integration tests for the feature-store loader against a throwaway Postgres testcontainer, covering empty and malformed partitions.",
+  "expected_primary": "shadow-test",
+  "exclude": [
+   "shadow-quality"
+  ],
+  "rationale": "Rule 3 respected: integration tests, no lint or code-quality topic."
+ },
+ {
+  "id": "shadow-quality-h-id-near-01",
+  "language": "id",
+  "prompt": "Tentukan batas modul dan facade publik untuk modul KRS dan pembayaran di SIAKAD, lalu tuangkan keputusannya dalam ADR.",
+  "expected_primary": "shadow-architect",
+  "exclude": [
+   "shadow-quality"
+  ],
+  "rationale": "Rule 3 respected: module boundary ADR, no lint or quality mention."
+ },
+ {
+  "id": "shadow-realtime-h-en-01",
+  "language": "en",
+  "prompt": "Design the WebSocket channel for live driver locations: reconnect with resume cursor, backpressure when a client is slow, and token revocation mid-connection.",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-en-02",
+  "language": "en",
+  "prompt": "Build presence for the edtech live class (who's online, typing indicators) over SSE with heartbeats and reconnection.",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-en-03",
+  "language": "en",
+  "prompt": "Two teachers editing the same lesson plan offline overwrite each other. Add CRDT-based sync with Yjs so edits merge without conflicts.",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-id-01",
+  "language": "id",
+  "prompt": "Tolong rancang SSE untuk notifikasi mutasi rekening real-time di internet banking, termasuk Last-Event-ID untuk resume setelah koneksi putus.",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-id-02",
+  "language": "id",
+  "prompt": "Koneksi WebSocket papan antrean layanan kampus sering putus di jaringan seluler. Bantu desain reconnect dengan backoff dan sinkron ulang state.",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-id-03",
+  "language": "id",
+  "prompt": "Kalau token pengguna dicabut, koneksi WebSocket tracking harus diputus dalam 30 detik. Bagaimana desain revokasinya di sisi server?",
+  "expected_primary": "shadow-realtime",
+  "rationale": "WebSocket/SSE transport, presence, reconnect, backpressure, CRDT sync."
+ },
+ {
+  "id": "shadow-realtime-h-en-near-01",
+  "language": "en",
+  "prompt": "Driver location events must be processed exactly once by the billing worker queue. Design dedup, retries and the dead-letter path.",
+  "expected_primary": "shadow-concurrency",
+  "exclude": [
+   "shadow-realtime"
+  ],
+  "rationale": "Durable exactly-once job processing is queue work; it brings test, not realtime."
+ },
+ {
+  "id": "shadow-realtime-h-id-near-01",
+  "language": "id",
+  "prompt": "Agent asisten akademik perlu mengecek jadwal kuliah secara real-time lewat tool. Rancang skema tool calling dengan validasi argumen JSON Schema dan batas waktu 10 detik per panggilan.",
+  "expected_primary": "shadow-ai-eng",
+  "exclude": [
+   "shadow-realtime"
+  ],
+  "rationale": "LLM tool calling design; 'real-time' is only wording, no WebSocket/SSE transport."
+ },
+ {
+  "id": "shadow-refactor-h-en-01",
+  "language": "en",
+  "prompt": "Refactor the 1,800-line ShipmentService into smaller units without changing behavior, writing characterization tests first.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-en-02",
+  "language": "en",
+  "prompt": "Use branch-by-abstraction to swap our homegrown PDF renderer for a library, keeping both paths live behind a toggle until outputs match.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-en-03",
+  "language": "en",
+  "prompt": "Extract a seam around the static CoreBankingClient.call() usages so the transfer module becomes unit-testable, with behavior preserved.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-id-01",
+  "language": "id",
+  "prompt": "Rapikan modul penilaian di SIAKAD yang penuh duplikasi tanpa mengubah perilaku; mulai dari characterization test.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-id-02",
+  "language": "id",
+  "prompt": "Bantu pecah QuizScreen.dart yang 1.200 baris jadi widget-widget kecil, dengan perilaku yang harus tetap identik.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-id-03",
+  "language": "id",
+  "prompt": "Hapus kode mati dan helper yang tidak dipakai di paket utilitas open-source kami, pastikan API publiknya tetap sama.",
+  "expected_primary": "shadow-refactor",
+  "rationale": "Behavior-preserving restructuring with characterization tests and seams."
+ },
+ {
+  "id": "shadow-refactor-h-en-near-01",
+  "language": "en",
+  "prompt": "Assess whether to rewrite or strangle our legacy Struts 1 student portal, with a TCO comparison over four years.",
+  "expected_primary": "shadow-modernize",
+  "exclude": [
+   "shadow-refactor"
+  ],
+  "rationale": "Rewrite versus strangler TCO is modernization assessment; it never brings refactor."
+ },
+ {
+  "id": "shadow-refactor-h-id-near-01",
+  "language": "id",
+  "prompt": "Setelah refactor kemarin, endpoint /nilai melempar NullPointerException untuk mahasiswa angkatan 2019. Cari akar masalahnya.",
+  "expected_primary": "shadow-debug",
+  "exclude": [
+   "shadow-refactor"
+  ],
+  "rationale": "Post-change exception root cause is debugging; debug brings only tests."
+ },
+ {
+  "id": "shadow-release-h-en-01",
+  "language": "en",
+  "prompt": "Plan the v4.0.0 release of our open-source library: SemVer justification, changelog, release preflight, and rollback steps.",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-en-02",
+  "language": "en",
+  "prompt": "Set up a 5%, 25%, 100% canary for the bank's mobile backend release with smoke checks and automatic rollback on error-rate breach.",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-en-03",
+  "language": "en",
+  "prompt": "Put the new courier pricing behind a feature flag, define the kill switch, and write the post-deploy smoke test checklist.",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-id-01",
+  "language": "id",
+  "prompt": "Susun checklist kesiapan rilis SIAKAD versi 2.3: preflight, migrasi, smoke test, dan rencana rollback yang sudah diverifikasi.",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-id-02",
+  "language": "id",
+  "prompt": "Bantu tentukan nomor versi berikutnya: ada fitur baru dan satu perbaikan bug tanpa perubahan API. Lalu buat catatan rilisnya.",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-id-03",
+  "language": "id",
+  "prompt": "Rilis Jumat ini perlu keputusan go/no-go. Kriteria apa saja dan bagaimana verifikasi rollback-nya di staging?",
+  "expected_primary": "shadow-release",
+  "rationale": "SemVer, release preflight, canaries, feature flags, smoke checks, rollback."
+ },
+ {
+  "id": "shadow-release-h-en-near-01",
+  "language": "en",
+  "prompt": "Provision the staging Kubernetes namespace with Terraform and configure ingress TLS certificates through cert-manager.",
+  "expected_primary": "shadow-ops",
+  "exclude": [
+   "shadow-release"
+  ],
+  "rationale": "Rule 3 respected: namespace provisioning and TLS, no rollout topic."
+ },
+ {
+  "id": "shadow-release-h-id-near-01",
+  "language": "id",
+  "prompt": "Sinkronkan branch develop saya dengan origin dan cek potensi konflik sebelum digabung ke branch integrasi.",
+  "expected_primary": "shadow-git",
+  "exclude": [
+   "shadow-release"
+  ],
+  "rationale": "Rule 3 respected: branch sync and conflict check, no rollout mentioned."
+ },
+ {
+  "id": "shadow-resilience-h-en-01",
+  "language": "en",
+  "prompt": "Run a restore drill: take last night's pg_dump of the ledger DB, restore it into an ephemeral container, and measure actual RTO against our 2-hour target.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-en-02",
+  "language": "en",
+  "prompt": "Define RPO and RTO per service for the courier platform and design graceful degradation for when the routing engine is down.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-en-03",
+  "language": "en",
+  "prompt": "Add bulkheads so the slow PDF certificate generator can't exhaust the connection pool used by the quiz API.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-id-01",
+  "language": "id",
+  "prompt": "Uji DR: failover database SIAKAD ke site sekunder dan ukur RPO aktual, laporkan gap terhadap target 15 menit.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-id-02",
+  "language": "id",
+  "prompt": "Kalau layanan core-banking mati, aplikasi mobile tetap harus bisa cek saldo terakhir yang tersimpan. Rancang degradasi yang aman.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-id-03",
+  "language": "id",
+  "prompt": "Verifikasi bahwa backup bucket S3 materi kursus benar-benar bisa direstore, bukan cuma ada filenya.",
+  "expected_primary": "shadow-resilience",
+  "rationale": "Restore drills, RPO/RTO, DR, bulkheads and graceful degradation."
+ },
+ {
+  "id": "shadow-resilience-h-en-near-01",
+  "language": "en",
+  "prompt": "Wrap the Xendit disbursement API call with a circuit breaker and full-jitter retries, and mark ambiguous results for reconciliation.",
+  "expected_primary": "shadow-integrate",
+  "exclude": [
+   "shadow-resilience"
+  ],
+  "rationale": "Rule 3 respected: third-party circuit breaker, no backup or restore topic."
+ },
+ {
+  "id": "shadow-resilience-h-id-near-01",
+  "language": "id",
+  "prompt": "Layanan pembayaran SPP down 40 menit tadi siang. Pimpin triase insidennya dan tulis postmortem tanpa menyalahkan individu.",
+  "expected_primary": "shadow-maintain",
+  "exclude": [
+   "shadow-resilience"
+  ],
+  "rationale": "Rule 3 respected: live outage triage and postmortem, no backup mention."
+ },
+ {
+  "id": "shadow-search-h-en-01",
+  "language": "en",
+  "prompt": "Tune course search by combining BM25 and pgvector ANN with reciprocal rank fusion, and evaluate nDCG@10 on 500 labeled queries.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-en-02",
+  "language": "en",
+  "prompt": "Add ACL prefiltering to the document search so staff only see results from their own faculty before ranking, not after.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-en-03",
+  "language": "en",
+  "prompt": "Reindex 12M shipment records in Elasticsearch 8 with a new mapping through an alias swap, with zero downtime.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-id-01",
+  "language": "id",
+  "prompt": "Pencarian nama nasabah tidak menemukan \"Muhamad\" saat diketik \"Muhammad\". Bantu atur analyzer, fuzzy, dan sinonim di OpenSearch.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-id-02",
+  "language": "id",
+  "prompt": "Bantu tingkatkan relevansi pencarian materi kuliah: hasil teratas sering tidak relevan. Ukur dengan MRR lalu perbaiki ranking-nya.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-id-03",
+  "language": "id",
+  "prompt": "Recall index HNSW pgvector kami turun setelah data mencapai 5 juta baris. Atur ef_search dan m yang tepat.",
+  "expected_primary": "shadow-search",
+  "rationale": "Retrieval and ranking tuning, analyzers, ANN, reindexing, ACL prefilters."
+ },
+ {
+  "id": "shadow-search-h-en-near-01",
+  "language": "en",
+  "prompt": "Grade the RAG assistant's answers for faithfulness to the retrieved passages on 200 questions and flag hallucinated citations.",
+  "expected_primary": "shadow-eval",
+  "exclude": [
+   "shadow-search"
+  ],
+  "rationale": "Rule 3 n/a; grading RAG answers is excluded from search by catalog."
+ },
+ {
+  "id": "shadow-search-h-id-near-01",
+  "language": "id",
+  "prompt": "Cache hasil pencarian populer di Redis dengan TTL 5 menit dan invalidasi otomatis saat katalog kursus berubah.",
+  "expected_primary": "shadow-cache",
+  "exclude": [
+   "shadow-search"
+  ],
+  "rationale": "Caching popular result pages with TTL and invalidation is cache design."
+ },
+ {
+  "id": "shadow-sec-h-en-01",
+  "language": "en",
+  "prompt": "Threat model the new bulk-transfer feature with STRIDE: data flows, trust boundaries, and the top abuse cases with mitigations.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-en-02",
+  "language": "en",
+  "prompt": "Review the courier API against OWASP ASVS 5.0 Level 2 and run Semgrep SAST; list findings by severity.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-en-03",
+  "language": "en",
+  "prompt": "Someone committed an AWS access key to our open-source repo three months ago. Assess the exposure, rotate it, and plan the history purge.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-id-01",
+  "language": "id",
+  "prompt": "Sebelum install MCP server pihak ketiga untuk tim QA, audit dulu instruksi, permission, dan kodenya.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-id-02",
+  "language": "id",
+  "prompt": "Bantu cek endpoint upload sertifikat kampus terhadap SSRF dan path traversal, lengkap dengan PoC aman dan perbaikannya.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-id-03",
+  "language": "id",
+  "prompt": "Lakukan review keamanan aplikasi untuk modul pinjaman BUMN sesuai ASVS: validasi input, otorisasi server-side, dan manajemen rahasia.",
+  "expected_primary": "shadow-sec",
+  "rationale": "Threat modeling, ASVS review, SAST, secrets, third-party skill vetting."
+ },
+ {
+  "id": "shadow-sec-h-en-near-01",
+  "language": "en",
+  "prompt": "Run PHPStan level 9 on the reporting module and summarize the type errors by file.",
+  "expected_primary": "shadow-quality",
+  "exclude": [
+   "shadow-sec"
+  ],
+  "rationale": "Rule 3 respected: static type checking only, no security topic."
+ },
+ {
+  "id": "shadow-sec-h-id-near-01",
+  "language": "id",
+  "prompt": "Jalankan mypy --strict dan ruff di repo pipeline ML, lalu ringkas error-nya per modul.",
+  "expected_primary": "shadow-quality",
+  "exclude": [
+   "shadow-sec"
+  ],
+  "rationale": "Rule 3 respected: lint and type gates, no security mention."
+ },
+ {
+  "id": "shadow-seo-h-en-01",
+  "language": "en",
+  "prompt": "Search Console reports 2,100 \"Duplicate, Google chose different canonical than user\" on our course pages. Fix the canonical URLs and the sitemap.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-en-02",
+  "language": "en",
+  "prompt": "Add hreflang for the id-ID and en-US versions of our open-source docs and validate the return links.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-en-03",
+  "language": "en",
+  "prompt": "Implement JSON-LD Course and Organization structured data for the catalog and check it passes the Rich Results Test.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-id-01",
+  "language": "id",
+  "prompt": "Halaman cek ongkir kami tidak terindeks Google padahal sudah 3 bulan. Audit robots.txt, noindex, dan internal linking-nya.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-id-02",
+  "language": "id",
+  "prompt": "Bantu buat sitemap.xml dinamis untuk 40.000 halaman program studi dan berita kampus, dipecah per 10.000 URL.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-id-03",
+  "language": "id",
+  "prompt": "Trafik organik turun setelah migrasi domain kampus. Cek redirect 301, canonical, dan status indexing di Search Console.",
+  "expected_primary": "shadow-seo",
+  "rationale": "Crawl, indexing, canonicals, hreflang, JSON-LD, sitemaps, search visibility."
+ },
+ {
+  "id": "shadow-seo-h-en-near-01",
+  "language": "en",
+  "prompt": "Fix the CLS of 0.31 on our course page caused by a late-loading web font and images without width and height.",
+  "expected_primary": "modern-web-guidance",
+  "exclude": [
+   "shadow-seo"
+  ],
+  "rationale": "Layout shift fix is Core Web Vitals frontend work, not crawl SEO."
+ },
+ {
+  "id": "shadow-seo-h-id-near-01",
+  "language": "id",
+  "prompt": "Pencarian internal di situs kampus tidak menampilkan berita terbaru. Perbaiki proses reindex dan ranking-nya.",
+  "expected_primary": "shadow-search",
+  "exclude": [
+   "shadow-seo"
+  ],
+  "rationale": "Internal site search reindex and ranking is retrieval engineering."
+ },
+ {
+  "id": "shadow-supplychain-h-en-01",
+  "language": "en",
+  "prompt": "Generate a CycloneDX SBOM for the courier API image and attach SLSA provenance from our GitHub Actions build.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-en-02",
+  "language": "en",
+  "prompt": "Check whether our private npm scope @bankku is exposed to dependency confusion and lock registry resolution accordingly.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-en-03",
+  "language": "en",
+  "prompt": "Pin all third-party GitHub Actions in our workflows to full commit SHAs and verify the base image is referenced by digest.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-id-01",
+  "language": "id",
+  "prompt": "Audit dependensi transitif proyek Python ML kami: paket mana yang tidak dipin, tanpa hash, atau berasal dari index tidak resmi.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-id-02",
+  "language": "id",
+  "prompt": "Buat SBOM SPDX untuk aplikasi SIAKAD sesuai permintaan kampus, dan cek lisensi komponen yang GPL.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-id-03",
+  "language": "id",
+  "prompt": "Verifikasi bahwa artefak library open-source kami ditandatangani sigstore dan provenance-nya cocok dengan commit sumbernya.",
+  "expected_primary": "shadow-supplychain",
+  "rationale": "SBOM, provenance, dependency confusion, pinned CI artifacts."
+ },
+ {
+  "id": "shadow-supplychain-h-en-near-01",
+  "language": "en",
+  "prompt": "Upgrade axios from 0.27 to 1.7 across the monorepo and check every call site for breaking behavior changes.",
+  "expected_primary": "shadow-compat",
+  "exclude": [
+   "shadow-supplychain"
+  ],
+  "rationale": "Dependency upgrade breaking-change check is compatibility, which defers SBOM work."
+ },
+ {
+  "id": "shadow-supplychain-h-id-near-01",
+  "language": "id",
+  "prompt": "Bikin pipeline CI yang build image Docker dan push ke registry internal setiap merge ke main.",
+  "expected_primary": "shadow-ops",
+  "exclude": [
+   "shadow-supplychain"
+  ],
+  "rationale": "Building and pushing images in CI is infrastructure, no provenance work."
+ },
+ {
+  "id": "shadow-test-h-en-01",
+  "language": "en",
+  "prompt": "Write Vitest unit tests for the shipping-fee calculator covering weight tiers, zone boundaries and rounding to the nearest Rp100.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-en-02",
+  "language": "en",
+  "prompt": "The Jest test transfer.spec.ts passes locally but fails roughly 1 in 8 runs on CI with a timeout. Triage the flakiness.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-en-03",
+  "language": "en",
+  "prompt": "Add Pact consumer-driven contract tests between the mobile BFF and the course service.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-id-01",
+  "language": "id",
+  "prompt": "Bantu tulis property-based test Hypothesis untuk fungsi normalisasi nomor rekening agar input acak tidak bikin crash.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-id-02",
+  "language": "id",
+  "prompt": "Test suite pytest kami flaky karena bergantung pada urutan eksekusi; kadang lulus kadang gagal di CI. Bantu triase.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-id-03",
+  "language": "id",
+  "prompt": "Ukur mutation score modul validasi KRS dengan Stryker dan tambah test sampai skornya di atas 75%.",
+  "expected_primary": "shadow-test",
+  "rationale": "Writing unit/integration/property/mutation/contract tests or triaging flaky tests."
+ },
+ {
+  "id": "shadow-test-h-en-near-01",
+  "language": "en",
+  "prompt": "Write the client acceptance scenarios for the transfer module with expected results, evidence columns, and a sign-off row.",
+  "expected_primary": "shadow-uat",
+  "exclude": [
+   "shadow-test"
+  ],
+  "rationale": "Client acceptance scenarios belong to UAT; UAT never brings unit testing."
+ },
+ {
+  "id": "shadow-test-h-id-near-01",
+  "language": "id",
+  "prompt": "Klik-tembus alur pendaftaran kursus di browser nyata pada staging dan ambil screenshot tiap langkah untuk laporan.",
+  "expected_primary": "shadow-browser",
+  "exclude": [
+   "shadow-test"
+  ],
+  "rationale": "Live real-browser click-through belongs to browser verification."
+ },
+ {
+  "id": "shadow-uat-h-en-01",
+  "language": "en",
+  "prompt": "Prepare the staging UAT pack for the bank's virtual-account feature: scenarios mapped to requirement IDs, expected results, and the sign-off sheet.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-en-02",
+  "language": "en",
+  "prompt": "Build the requirement traceability matrix linking FR-01 to FR-48 with UAT scenarios, and log the six defects found in session 2.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-en-03",
+  "language": "en",
+  "prompt": "The client's UAT is next Tuesday. Draft the evidence capture template and the defect log with severity and retest status.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-id-01",
+  "language": "id",
+  "prompt": "Susun skenario UAT untuk modul KRS bersama perwakilan BAAK, termasuk data uji dan kolom tanda tangan.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-id-02",
+  "language": "id",
+  "prompt": "Bantu rekap hasil UAT hari ke-3 aplikasi kurir: defect terbuka, yang sudah retest, dan rekomendasi sign-off.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-id-03",
+  "language": "id",
+  "prompt": "Buat lembar sign-off UAT untuk klien BUMN berdasarkan RTM dan bukti pengujian yang sudah terkumpul.",
+  "expected_primary": "shadow-uat",
+  "rationale": "Staging acceptance, RTM, client scenarios, defect logs and sign-off."
+ },
+ {
+  "id": "shadow-uat-h-en-near-01",
+  "language": "en",
+  "prompt": "Write Pytest integration tests for requirement FR-12, the daily transfer limit, using a disposable test database.",
+  "expected_primary": "shadow-test",
+  "exclude": [
+   "shadow-uat"
+  ],
+  "rationale": "Rule 3 respected: automated integration tests, no acceptance-testing topic."
+ },
+ {
+  "id": "shadow-uat-h-id-near-01",
+  "language": "id",
+  "prompt": "Tulis kriteria penerimaan Given/When/Then untuk fitur rekening bersama, termasuk skenario saat salah satu pemilik menolak transaksi.",
+  "expected_primary": "shadow-discovery",
+  "exclude": [
+   "shadow-uat"
+  ],
+  "rationale": "Rule 3 respected: acceptance criteria drafting is requirements work, not UAT."
+ },
+ {
+  "id": "shadow-video-h-en-01",
+  "language": "en",
+  "prompt": "Record a narrated tutorial of the university portal's KRS flow with an Indonesian TTS voiceover, and export MP4 plus SRT.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-en-02",
+  "language": "en",
+  "prompt": "Make a 45-second Remotion product video for the courier app launch with animated stats and a voiceover track.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-en-03",
+  "language": "en",
+  "prompt": "Capture a short WebM clip of our open-source CLI's interactive init wizard for the README.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-id-01",
+  "language": "id",
+  "prompt": "Bikin video demo aplikasi mobile belajar di emulator Android, durasi 2 menit, dengan narasi dan subtitle.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-id-02",
+  "language": "id",
+  "prompt": "Tolong buat GIF pendek yang menunjukkan cara memfilter mutasi di internet banking untuk halaman bantuan.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-id-03",
+  "language": "id",
+  "prompt": "Rekam ulang video tutorial admin dashboard armada karena label tombolnya berubah; sinkronkan narasi dan subtitle SRT-nya.",
+  "expected_primary": "shadow-video",
+  "rationale": "Narrated tutorials, demo recordings, motion videos, GIF/WebM clips."
+ },
+ {
+  "id": "shadow-video-h-en-near-01",
+  "language": "en",
+  "prompt": "Create a Lottie-ready animated icon set for the app's loading and success states, with layered SVG source files.",
+  "expected_primary": "shadow-illustration",
+  "exclude": [
+   "shadow-video"
+  ],
+  "rationale": "Lottie-ready icon animation assets are illustration and motion handoff work."
+ },
+ {
+  "id": "shadow-video-h-id-near-01",
+  "language": "id",
+  "prompt": "Siapkan modul pelatihan ToT dan manual operator aplikasi kurir untuk diserahkan ke klien minggu depan.",
+  "expected_primary": "shadow-handover",
+  "exclude": [
+   "shadow-video"
+  ],
+  "rationale": "ToT modules and operator manual for client delivery belong to handover."
+ }
+]

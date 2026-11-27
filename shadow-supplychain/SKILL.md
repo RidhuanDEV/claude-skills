@@ -1,6 +1,6 @@
 ---
 name: shadow-supplychain
-description: "Dependency, Build & Artifact Supply-Chain Integrity. Use when generating or verifying CycloneDX/SPDX SBOMs against resolved lockfiles, detecting typosquatting/dependency confusion, auditing transitive dependency reachability, enforcing pinned CI/container digests, checking license policies, or validating SLSA provenance attestations. Do NOT use for general AppSec STRIDE/SAST (shadow-sec), server operations (shadow-ops), or SemVer changelogs (shadow-release)."
+description: "Use when verifying SBOM, CycloneDX/SPDX, SLSA provenance, dependency confusion, transitive packages, or pinned CI artifacts."
 ---
 
 # `/shadow-supplychain` — Dependency, Build & Artifact Supply-Chain Integrity

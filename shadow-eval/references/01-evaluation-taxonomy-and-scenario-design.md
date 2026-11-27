@@ -12,7 +12,7 @@ Design rigorous, leak-free evaluation suites for LLM features, RAG pipelines, pr
   2. **Ambiguous / Underspecified:** Requests requiring clarification or safe assumption declaration.
   3. **Out-of-Scope / Abstention (`must_refuse: true`):** Queries where the correct behavior is `"Insufficient evidence"` or refusal rather than fabrication.
   4. **Negative / Contrast & Topic-Switch Probes:** Inputs that look lexically similar to triggers (e.g., Indonesian `hanya`/`punya`/`bertanya` in `-nya` follow-up heuristics) that **must NOT** fire.
-  5. **Adversarial / Security (`OWASP LLM01–LLM10`):** Prompt injection, indirect retrieved-doc injection, cross-tenant probe, unauthorized tool call attempt.
+  5. **Adversarial / Security (`OWASP LLM01–LLM10` 2026, `ASI01`–`ASI10`):** Prompt injection, indirect retrieved-doc injection, cross-tenant probe, unauthorized tool call attempt.
   6. **Incident / Regression & Cross-Skill:** Reproduction fixtures from real production bugs locked permanently into CI.
 - **Immutable Dataset Versioning & Split Hygiene:** Tag every dataset snapshot with a semantic version + SHA-256 hash (`dataset_v1.2_<sha>`). Enforce a strict **Dev/Tuning Split** vs **Blind Held-Out Acceptance Split** — engineers tuning prompts must NEVER overfit directly against held-out acceptance items!
 - **Per-Category Non-Compensatory Reporting:** Report scores separately per category (`normal`, `abstention`, `tenant_isolation`, `adversarial`). A `95%` overall score MUST NOT mask a single `0%` cross-tenant ACL leak!

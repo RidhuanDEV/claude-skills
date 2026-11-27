@@ -22,9 +22,17 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from shadow_input import run_checked_cli, strict_bool
+from skill_retrieval import (
+    Candidate, body_index, read_description, request_clauses, retrieve, retrieve_body, skill_index,
+)
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKIP_ROOT_DIRS = {"evals", "mcp-servers", "reports", "docs", "scripts", "node_modules"}
 
+DESCRIPTION_CHARACTER_LIMIT = 250
+DESCRIPTION_CATALOG_LIMIT = 9000
 USE_WHEN_RE = re.compile(r"\buse\s+(?:only\s+)?when\b", re.IGNORECASE)
 CODE_REVIEW_RE = re.compile(
     r"\b(?:(?:only\s+review|hanya\s+(?:review|tinjau))\s+(?:(?:this|the)\s+)?(?:API|endpoint|webhook|handler|kode|code|diff|PR)\b|"
@@ -32,17 +40,63 @@ CODE_REVIEW_RE = re.compile(
     re.IGNORECASE,
 )
 READ_ONLY_SCOPE_RE = re.compile(
+    r"(?:^\s*(?:read[- ]only\s+(?:inspection|review|audit)|inspeksi\s+baca\s+saja)\b|"
     r"\b(?:secara\s+read[- ]only|read[- ]only\s*\(\s*jangan\s+ubah\s+file|"
-    r"only\s+(?:inspect|review)\b[^\n]*\bread[- ]only)\b",
+    r"from\s+(?:the\s+)?(?:existing\s+)?(?:source|config|configuration|logs)\s+only|"
+    r"only\s+(?:inspect|review)\b[^\n]*\bread[- ]only)\b)",
     re.IGNORECASE,
 )
+SCOPE_DENIAL = r"\b(?:do\s+not|don't|never|without|jangan|tanpa|tidak\s+(?:menyetujui|boleh|perlu))\s+"
+DENIAL_CLAUSE = r"(?:(?!\b(?:but|except|instead|tapi|kecuali|namun)\b)[^;\n.!?]){0,130}?"
 LOAD_TEST_DENIAL_RE = re.compile(
-    r"\b(?:tidak\s+menyetujui|do\s+not\s+approve|(?:jangan|do\s+not)\s+(?:jalankan|run))\s+"
-    r"(?:k6|(?:a\s+)?(?:load|stress|soak)\s+test)\b",
+    SCOPE_DENIAL + DENIAL_CLAUSE + r"\b(?:k6|(?:load|stress|spike|soak)\s+test(?:ing)?|load\s+(?:profile|scenario)|uji\s+beban|profil\s+beban|[/\$]?shadow-perf)\b",
+    re.IGNORECASE,
+)
+BROWSER_DENIAL_RE = re.compile(
+    SCOPE_DENIAL + DENIAL_CLAUSE + r"\b(?:launch|open|run|test|verify|use|enable|activate|aktifkan|jalankan|buka|gunakan|uji)\s+"
+    r"(?:(?:a|the)\s+)?(?:browser|Playwright|Chrome|Chromium|Firefox|WebKit|peramban|(?:[/\$])?shadow-browser)\b",
+    re.IGNORECASE,
+)
+OUTAGE_STATUS_RE = re.compile(
+    r"^\s*(?:(?:urgent|help|darurat)\s*[:!,]?\s*|(?:our|the|layanan)\s+)?"
+    r"(?:prod(?:uction)?|produksi)\s+(?:(?:is|sedang)\s+)?(?:down|outage|mati|lumpuh)\b"
+    r"|\b(?:triage|investigate|mitigate|stabili[sz]e|respond\s+to|tangani|pulihkan)\s+(?:an?\s+|the\s+)?"
+    r"(?:production\s+(?:(?:login|auth(?:entication)?|SSO)\s+)?(?:outage|incident)|"
+    r"insiden\s+(?:(?:login|SSO|autentikasi)\s+)?produksi)\b",
+    re.IGNORECASE,
+)
+PRODUCTION_CONTEXT_RE = re.compile(
+    r"\b(?:prod(?:uction)?|produksi|live\s+(?:service|portal|site|users?|customers?)|"
+    r"public\s+(?:portal|site)|portal\s+publik)\b", re.IGNORECASE,
+)
+INCIDENT_IMPACT_RE = re.compile(
+    r"\b(?:outage|incident|unavailable|failing|fails?|failed|(?:cannot|can['’]t|unable\s+to)\s+(?:log\s+in|sign\s+in|access)|locked\s+out|blocked|stopped\s+working|"
+    r"insiden|gagal|terhenti|terblokir|terkunci|tidak\s+bisa\s+(?:login|masuk|akses)|lumpuh|SEV[- ]?[1-4])\b", re.IGNORECASE,
+)
+INCIDENT_OPERATIONS_RE = re.compile(
+    r"\b(?:incident\s+response|incident\s+command|on[- ]call\s+escalation|restore\s+(?:service|access)|"
+    r"(?:lead|coordinate|run)\s+(?:an?\s+|the\s+)?(?:incident|triage|rollback|recovery)|"
+    r"koordinasi\s+(?:insiden|pemulihan|rollback)|pulihkan\s+(?:layanan|akses)|eskalasi\s+on[- ]call|assess\s+(?:a\s+)?rollback|(?:prior|previous)\s+(?:stable\s+)?(?:build|artifact|release)|artefak\s+stabil\s+sebelumnya)\b",
+    re.IGNORECASE,
+)
+OUTAGE_COPY_RE = re.compile(
+    r"\b(?:copy|wording|headline|heading|microcopy|teks|judul)\b[^\n.]{0,55}"
+    r"\b(?:outage|production\s+down|gangguan\s+produksi)\b"
+    r"|\b(?:rewrite|edit|polish|perbaiki|ubah)\s+(?:that\s+|the\s+)?(?:wording|heading|headline|teks|judul)\b",
+    re.IGNORECASE,
+)
+AUTH_CHANGE_REQUEST = re.compile(
+    r"\b(?:design|implement|change|modify|rotate|rancang|ubah|tambah|rotasi)\b[^\n.!?]{0,45}"
+    r"\b(?:JWT|JWKS|OAuth|OIDC|SSO|session|cookie|RBAC|login|auth(?:entication)?|autentikasi|sesi)\b",
+    re.IGNORECASE,
+)
+NEGATED_OUTAGE_RE = re.compile(
+    r"\b(?:no|without|tanpa|tidak\s+ada)\s+(?:an?\s+)?(?:production|prod|produksi)\s+(?:outage|incident|down|mati)\b",
     re.IGNORECASE,
 )
 QUOTED_LOG_RE = re.compile(
     r"```[\s\S]*?```|"
+    r"(?:^|\n)[ \t]*~{3,}[^\n]*\n[\s\S]*?(?:\n[ \t]*~{3,}[ \t]*(?=\n|$)|\Z)|"
     r"(?:\b(?:log|error|stderr|stdout|paste|output|stack\s*trace|traceback)\s*[:=]\s*)(?:\"[^\"]*\"|'[^']*')|"
     r"\"[^\"]*(?:failed|timeout|exception|traceback|stack\s*trace|/shadow-[a-z-]+)[^\"]*\"|"
     r"'[^']*(?:failed|timeout|exception|traceback|stack\s*trace|/shadow-[a-z-]+)[^']*'",
@@ -119,18 +173,54 @@ EXTENSION_AUDIT_PLAYBOOKS = [
 ]
 
 # Ordered by domain specificity so primary ownership resolves cleanly before general helpers.
+class _PostAwardSignal:
+    """Detect requirement work after a tender or contract award, ignoring conditional future wins."""
+
+    AWARD = re.compile(
+        r"\b(?:(?:we\s+(?:just\s+|have\s+|recently\s+)?)?won\s+(?:[\w'.-]+\s+){0,4}?(?:tender|bid|contract|procurement)|"
+        r"(?:menang(?:kan)?|memenangkan|dimenangkan)\s+(?:[\w'.-]+\s+){0,4}?tender|"
+        r"tender\s+(?:[\w'.-]+\s+){0,3}?(?:sudah|telah)\s+(?:dimenangkan|menang|kami\s+menangkan)|"
+        r"after\s+(?:the\s+)?(?:award|contract\s+signing)|pasca[- ]?(?:tender|kontrak|award)|"
+        r"setelah\s+(?:menang|kontrak\s+(?:ditandatangani|diteken)|tender\s+dimenangkan)|"
+        r"contract\s+(?:was|is|has\s+been)\s+signed|kontrak\s+(?:sudah|telah)\s+(?:ditandatangani|diteken))\b",
+        re.IGNORECASE,
+    )
+    CONDITIONAL = re.compile(
+        r"\b(?:kalau|jika|apabila|bila|seandainya|supaya|agar|biar|untuk|demi|if|whether|to)\s+(?:\w+\s+){0,2}?"
+        r"(?:menang|memenangkan|win|won)\b",
+        re.IGNORECASE,
+    )
+
+    def search(self, text: str) -> re.Match[str] | None:
+        if self.CONDITIONAL.search(text):
+            return None
+        return self.AWARD.search(text)
+
+
+POST_AWARD_RE = _PostAwardSignal()
+
 ROUTING_RULES: list[dict[str, Any]] = [
     {
         "skill": "handoff",
         "layer": "task",
         "references": ["TOKEN-EFFICIENCY.md"],
         "include": re.compile(
-            r"\b(?:lanjut\s+handoff|load\s+handoff|merge\s+handoff|session\s+handoff|simpan\s+handoff|"
+            r"\b(?:lanjut\s+handoff|load\s+handoff|merge\s+handoff|save\s+handoff|session\s+handoff|simpan\s+handoff|"
             r"(?:tolong|minta|lakukan)\s+handoff|context\s+(?:udah|sudah|full|penuh|compaction)\s*(?:penuh)?|simpan\s+sesi)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
             r"\b(?:BAST|serah\s+terima\s+klien|admin\s+manual|operator\s+manual|training\s+of\s+trainers|client\s+handover)\b",
+            re.IGNORECASE,
+        ),
+    },
+    {
+        "skill": "shadow-monarch",
+        "layer": "task",
+        "references": ["CROSS-SKILL-OWNERSHIP-MATRIX.md"],
+        "include": re.compile(
+            r"\b(?:bagi|petakan)\s+kepemilikan\b[^\n.!?]{0,30}\blintas\b|"
+            r"\b(?:assign|coordinate)\s+(?:task\s+)?ownership\s+across\s+(?:specialists|domains|workstreams)\b",
             re.IGNORECASE,
         ),
     },
@@ -172,7 +262,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["REFACTORING.md", "CONSULTING-INTELLIGENCE-CORE.md"],
         "include": re.compile(
             r"\b(?:technical\s+due\s+diligence|strangler\s+fig|business[- ]rule\s+archaeology|refactor\s+vs\s+rewrite|"
-            r"coexistence\s+cost|EOL\s+runtime|legacy\s+modernization|dual[- ]run\s+TCO|full\s+rewrite\s+vs|monolith\s+modernization)\b",
+            r"coexistence\s+cost|EOL\s+runtime|legacy\s+modernization|dual[- ]run\s+TCO|full\s+rewrite\s+vs|monolith\s+modernization|"
+            r"\b(?:inherited|legacy)\b[^\n.!?]{0,45}\b(?:hidden|undocumented)\s+(?:business\s+)?rules?\b|(?:inventarisasi|petakan)\s+aturan\s+(?:tersembunyi|sistem\s+lama))\b",
             re.IGNORECASE,
         ),
     },
@@ -205,8 +296,9 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"diagnos(?:e|ing)\s+[^\n]{0,40}\b(?:bug|error|500|failure|crash)|intermittent\s+(?:500|bug|failure|error)|"
             r"database\s+deadlock|deadlock|root[- ]cause|stack\s+trace|memory\s+leak|heap\s+leak|heap\s+snapshot|"
             r"flamegraph|pprof|clinic\.js|CPU\s+profiling|goroutine\s+leak|OOMKilled|flaky\s+test|"
-            r"git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug|"
-            r"(?:ada|fix|perbaiki)\s+bug\b|sering\s+timeout|tidak\s+(?:mengirim|berfungsi|bekerja)\s+\w+)\b",
+            r"git\s+bisect|repro\s+bug|race\s+(?:condition|symptom)|production\s+bug|(?:temukan|selidiki|cari)\s+(?:mengapa|kenapa|penyebab)\b[^\n.!?]{0,70}\b(?:dua\s+kali|gagal|galat|error|bug)|"
+            r"(?:ada|fix|perbaiki)\s+bug\b|sering\s+timeout|tidak\s+(?:mengirim|berfungsi|bekerja)\s+\w+|"
+            r"\b(?:isolate|trace\s+(?:why|where)|telusuri)\b[^\n.!?]{0,42}\b(?:diverg\w*|root\s+cause|penyebab)\b)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:typo[- ]only|only\s+typo|README\s+typo|pure\s+formatting)\b", re.IGNORECASE),
@@ -232,7 +324,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:refactor\s+(?:old|legacy|module|feature|service|controller|handler|component|helper|function|kode|code|class|[a-z0-9_-]+\s+(?:service|module|handler|controller|component))|"
             r"refactoring\s+(?:legacy|module|service)|behavior\s+unchanged|characterization\s+test|Golden\s+Master\s+test|seam\s+extraction|"
-            r"branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam|safe\s+refactor)\b",
+            r"branch[- ]by[- ]abstraction|semantic\s+equivalence|incremental\s+refactor|behavior[- ]preserving|extract\s+seam|safe\s+refactor|"
+            r"\b(?:pecah|ekstrak)\b[^\n.!?]{0,68}\bfungsi\b[^\n.!?]{0,35}\btanpa\s+mengubah\b)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -263,7 +356,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:search\s+relevance|relevansi\s+pencarian|BM25|lexical\s+search|vector\s+ANN|hybrid\s+(?:RRF|search)|reciprocal\s+rank\s+fusion|"
             r"cross[- ]encoder\s+rerank|NDCG@|MRR@|Recall@\d+|zero[- ]downtime\s+alias|Indonesian\s+analyzer|search_after|PIT\s+pagination|"
-            r"retrieval\s+ACL\s+prefilter|tenant\s+ACL\s+pre[- ]filter|searchDocumentsForTenant|Meilisearch|Typesense|OpenSearch|pgvector|Qdrant|HNSW)\b",
+            r"retrieval\s+ACL\s+prefilter|tenant\s+ACL\s+pre[- ]filter|searchDocumentsForTenant|Meilisearch|Typesense|OpenSearch|pgvector|Qdrant|HNSW|"
+            r"typo[- ]tolerant\s+(?:search|candidate|ranking)|(?:typo|salah\s+eja)\b[^\n.!?]{0,35}\bperingkat\b)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Context\s+Recall\s*,?\s*(?:dan|and)\s*.*prompt\s+injection)\b", re.IGNORECASE),
@@ -276,7 +370,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:realtime\s+(?:notification|transport|dashboard|disconnect)|WebSocket|Server[- ]Sent\s+Events|SSE|"
             r"EventSource|Last[- ]Event[- ]ID|slow[- ]consumer\s+backpressure|mid[- ]connection\s+(?:auth|revocation)|"
             r"pub/sub\s+fan[- ]out|socket\s+reconnect|WebRTC|STUN/TURN|WebTransport|MQTT|CRDT|Yjs|Automerge|"
-            r"collaborative\s+edit(?:ing|or))\b",
+            r"collaborative\s+edit(?:ing|or)|"
+            r"\b(?:revoke|cabut)\b[^\n.!?]{0,45}\b(?:channel|kanal)\s+(?:subscription|access|langganan|akses)\b|mid[- ]session\s+revocation)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:duplicat(?:ed?|es)\s+(?:notification|email)|emails?\s+duplicated\s+after\s+retries)\b", re.IGNORECASE),
@@ -298,7 +393,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["SECURITY.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
-            r"\b(?:UU\s*PDP|UU\s*(?:No\.?\s*)?27\s*(?:Tahun\s*)?2022|GDPR|DPIA|ROPA|DSAR|data\s+(?:spesifik|pribadi)|cross[- ]border\s+transfer|PII\s+(?:redaction|masking)|NIK\s+log|kebocoran\s+data|erasure[-_]tombstones|legal[-_ ]?hold|3\s*x\s*24)\b",
+            r"\b(?:UU\s*PDP|UU\s*(?:No\.?\s*)?27\s*(?:Tahun\s*)?2022|GDPR|DPIA|ROPA|DSAR|penghapusan\s+(?:catatan|data)\s+pengguna|hak\s+(?:subjek|penghapusan)\s+data|data\s+(?:spesifik|pribadi)|cross[- ]border\s+transfer|PII\s+(?:redaction|masking)|NIK\s+log|kebocoran\s+data|erasure[-_]tombstones|legal[-_ ]?hold|3\s*x\s*24|"
+            r"\b(?:obtain|access)\s+and\s+correct\s+(?:(?:their|personal)\s+)?records?\b|\b(?:subject|rights?)\s+request\b|hak\s+(?:akses|koreksi)\s+data\s+pribadi)\b",
             re.IGNORECASE,
         ),
     },
@@ -340,7 +436,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["MOBILE.md", "sub-FRONTEND-MOBILE-STACKS.md"],
         "include": re.compile(
-            r"\b(?:OWASP\s*MASVS|PrivacyInfo\.xcprivacy|Play\s+Integrity|targetSdkVersion|AndroidManifest|App\s+Store\s+Connect|Play\s+Console|\.aab|Universal\s+Links|App\s+Links|assetlinks\.json|apple-app-site-association|Flutter\s+release|React\s+Native\s+signing)\b",
+            r"\b(?:OWASP\s*MASVS|PrivacyInfo\.xcprivacy|ITMS-91053|Play\s+Integrity|target\s*SDK(?:Version)?|AndroidManifest|App\s+Store\s+Connect|Play\s+Console|\.aab|Universal\s+Links|App\s+Links|assetlinks\.json|apple-app-site-association|Flutter\s+release|React\s+Native\s+signing)\b",
             re.IGNORECASE,
         ),
     },
@@ -349,7 +445,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["sub-OBSERVABILITY-PROFILING.md", "sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:pre[- ]UAT\s+(?:perf|load)|k6\s+load|load\s+test|stress\s+test|spike\s+test|EXPLAIN\s+ANALYZE|query\s+profiling|bottleneck\s+audit)\b",
+            r"\b(?:pre[- ]UAT\s+(?:perf|load)|uji\s+penerimaan\s+kinerja|(?:rancang|jalankan|siapkan)\b[^\n.!?]{0,24}\bskenario\s+beban|k6\s+load|load\s+test|stress\s+test|spike\s+test|EXPLAIN\s+ANALYZE|query\s+profiling|bottleneck\s+audit|"
+            r"\b(?:staging\s+acceptance|pre[- ]UAT)\b[^\n.!?]{0,95}\b(?:arrival[- ]rate|virtual[- ]users?|load\s+(?:profile|scenario))\b)\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(
@@ -367,7 +464,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"endpoint\s+(?:Express|FastAPI|NestJS|Hono|Laravel|Go|REST)|\b(?:GET|POST|PUT|PATCH|DELETE)\s+/[a-z0-9_/:.-]+|"
             r"OpenAPI|openapi\.yaml|Swagger|Postman|Bruno|\.bru\b|Scalar|Redoc|Insomnia|TypeSpec|"
             r"HTTP\s+(?:route|controller)|GraphQL\s+(?:schema|contract)|AsyncAPI|gRPC\s+contract|RFC\s*9457|"
-            r"tRPC|multipart\s+upload|presigned\s+URL|tus\s+resumable|S3\s+multipart|cursor\s+pagination)\b",
+            r"tRPC|multipart\s+upload|presigned\s+URL|tus\s+resumable|S3\s+multipart|cursor\s+pagination|"
+            r"gRPC\s+(?:interface|service|endpoint)|protobuf\s+(?:messages?|schemas?))\b",
             re.IGNORECASE,
         ),
     },
@@ -377,7 +475,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["SECURITY.md", "BACKEND.md"],
         "include": re.compile(
             r"\b(?:login|authentication|AuthN|AuthZ|RBAC|ABAC|ReBAC|OpenFGA|SpiceDB|Zanzibar|Passkeys?|WebAuthn|FIDO2|"
-            r"MFA|TOTP|OAuth2|OIDC|SSO|mTLS|DPoP|API\s+key\s+(?:lifecycle|rotation)|JWT\s+refresh|session\s+rotation|"
+            r"MFA|TOTP|OAuth2?|OIDC|SSO|mTLS|DPoP|API\s+key\s+(?:lifecycle|rotation)|JWT\s+(?:refresh|signing\s+keys?)|rotat\w*\s+(?:JWT|JWKS)|session\s+rotation|"
             r"tenant\s+isolation|multi[- ]tenant\s+auth|confused\s+deputy)\b",
             re.IGNORECASE,
         ),
@@ -388,10 +486,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DATABASE.md", "DATA-ANALYTICS-ML.md"],
         "include": re.compile(
             r"\b(?:inspect\s+(?:live\s+)?database|DBML|ERD|schema\s+diff|Star\s+Schema|Data\s+Warehouse|Pentaho|\.ktr|\.kjb|"
-            r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|slow\s+query|query\s+[^\n]{0,35}\blambat|N\+1|SELECT\s+\*\s+FROM|"
+            r"read[- ]only\s+query|MVCC\s+bloat|query\s+planner|slow\s+query|query\s+[^\n]{0,35}\b(?:lambat|slow|EXPLAIN)|N\+1|SELECT\s+\*\s+FROM|"
             r"Prisma\s+(?:query|N\+1|backend|schema)|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|database\s+deadlock|"
             r"PgBouncer|transaction\s+pooling|SQLite\s+WAL|MongoDB|TimescaleDB|ClickHouse|connection\s+pool\s+sizing|"
-            r"Row[- ]Level\s+Security|\bRLS\b\s+(?:policy|policies|index)|auth\.uid\(\)|SECURITY\s+DEFINER|Supabase\s+(?:Postgres|RLS|index))\b",
+            r"Row[- ]Level\s+Security|\bRLS\b\s+(?:policy|policies|index)|auth\.uid\(\)|SECURITY\s+DEFINER|Supabase\s+(?:Postgres|RLS|index)|"
+            r"(?:partial|covering|composite)\s+index(?:es)?|indeks\s+(?:parsial|penutup|gabungan))\b",
             re.IGNORECASE,
         ),
     },
@@ -400,7 +499,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DATABASE.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:database\s+migration|migrasi\s+(?:database|skema|DB)|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|backfill|"
+            r"\b(?:database\s+migration|migrasi\s+(?:database|skema|DB)|ETL\s+dari\s+SQLite\s+ke\s+PostgreSQL|Expand[- ]Contract|zero[- ]downtime\s+migration|(?:migrat\w*|migrasi)\s+column\s+[^\n.]{1,45}\bNOT\s+NULL|backfill|"
             r"deterministic\s+seed|bulk\s+(?:import|export)|ACID\s+lock|isolation\s+anomal|database\s+deadlock|"
             r"Debezium|CDC\s+pipeline|online\s+DDL|pg_repack|gh-ost|NOT\s+VALID\s+constraint|CONCURRENTLY\s+index)\b",
             re.IGNORECASE,
@@ -411,9 +510,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["FRONTEND.md", "sub-DATA-STORES.md"],
         "include": re.compile(
-            r"\b(?:TanStack\s+Query|SWR|Redis\s+cach|cache\s+stampede|singleflight|request\s+coalescing|Bloom\s+filter|"
+            r"\b(?:TanStack\s+Query|SWR|Redis\s+cach(?:e|es|ing)|cache\s+stampede|singleflight|request\s+coalescing|Bloom\s+filter|"
             r"negative\s+cach(?:e|ing)|CDN\s+cach(?:e|ing)|Surrogate-Key|ETag\s+cach|optimistic\s+UI|Idempotency[- ]Key|"
-            r"stale[- ]while[- ]revalidate|cache\s+coherency)\b",
+            r"stale[- ]while[- ]revalidate|cache\s+coherency|"
+            r"\b(?:ETag|304)\b[^\n.!?]{0,55}\brevalidat\w*)\b",
             re.IGNORECASE,
         ),
     },
@@ -424,7 +524,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:payment\s+gateway|SNAP\s+BI|Midtrans|Xendit|Stripe|QRIS|webhook|webhook\s+replay|HMAC\s+signature|"
             r"Transactional\s+Outbox|circuit\s+breaker|reconciliation\s+job|provider\s+inquiry|"
-            r"third[- ]party\s+API\s+(?:retry|timeout|integration)|WhatsApp\s+gateway|SMTP|emails?\s+duplicated)\b",
+            r"third[- ]party\s+API\s+(?:retry|timeout|integration)|WhatsApp\s+gateway|SMTP|emails?\s+duplicated|"
+            r"(?:payment|refund)\s+providers?|penyedia\s+(?:pembayaran|refund)|vendor\s+refund\s+(?:status|identifiers?))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:SMTP\s+250|Postmaster\s+Tools|email\s+header\s+injection)\b", re.IGNORECASE),
@@ -436,7 +537,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:React\s+Email|MJML|transactional\s+email|email\s+(?:template|deliverability|bounce|suppression|rendering|outbox)|"
             r"SPF|DKIM|DMARC|BIMI|MTA-STS|TLS-RPT|RFC\s*8058|List-Unsubscribe(?:-Post)?|one[- ]click\s+unsubscribe|"
-            r"Outlook\s+VML|Gmail\s+102\s*KB|IP\s+warm[- ]?up|Mailpit|Resend|Postmark|Amazon\s+SES|SendGrid|"
+            r"Outlook\s+VML|Gmail\s+102\s*KB|IP\s+warm[- ]?up|OTP\s+(?:mail|email)\b[^\n.]{0,30}\bspam|Mailpit|Resend|Postmark|Amazon\s+SES|SendGrid|"
             r"SMTP\s+250|Postmaster\s+Tools|DSN\s+bounce|email\s+header\s+injection)\b",
             re.IGNORECASE,
         ),
@@ -462,7 +563,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"Plausible|Sample\s+Ratio\s+Mismatch|\bSRM\b|CUPED|power\s+analysis|A/B\s+(?:test(?:ing)?|experiment)|"
             r"funnel\s+tracking|identity\s+stitching|cohort\s+retention|North\s+Star\s+Metric|"
             r"Difference[- ]in[- ]Differences|\bDiD\b|causal\s+inference|Synthetic\s+Control|mSPRT|delta\s+method|"
-            r"sequential\s+testing|assignment\s+vs\s+exposure|switchback\s+experiment)\b",
+            r"sequential\s+testing|assignment\s+vs\s+exposure|switchback\s+experiment|"
+            r"minimum\s+detectable\s+effect|\bunit\s+(?:of\s+)?randomi[sz]ation\b|unit\s+randomisasi)\b",
             re.IGNORECASE,
         ),
     },
@@ -471,9 +573,10 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["SECURITY.md", "SECOPS-PENTEST.md"],
         "include": re.compile(
-            r"\b(?:STRIDE|threat\s+model|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|SQLi|"
+            r"\b(?:STRIDE|threat\s+model|model\s+ancaman|batas\s+kepercayaan|OWASP\s*ASVS|NIST\s*SSDF|VAPT|SAST|DAST|secret\s+scan|SQL\s+injection|SQLi|"
             r"IDOR|SSRF|XSS|CSRF|CSP|CSP\s+nonce|HSTS|CORS|security\s+headers|path\s+traversal|169\.254\.169\.254|"
-            r"BOLA|broken\s+access|clickjacking|kerentanan|celah\s+keamanan|audit\s+keamanan|transitive\s+dependency|attack[- ]surface)\b",
+            r"BOLA|broken\s+access|clickjacking|kerentanan|celah\s+keamanan|audit\s+keamanan|transitive\s+dependency|attack[- ]surface|"
+            r"(?:review|audit)\s+defensif\b[^\n.!?]{0,35}\b(?:lampiran|berkas|unduhan)\b|directory\s+allowlist\b[^\n.!?]{0,30}\battachments?\b)\b",
             re.IGNORECASE,
         ),
     },
@@ -482,7 +585,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "risk",
         "references": ["FRONTEND.md", "sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:Playwright|browser\s+E2E|375px|mobile\s+viewport\s+overflow|console\s+error\s+in\s+browser|UI\s+click[- ]through|"
+            r"\b(?:Playwright|browser\s+E2E|(?:coba|uji|buka)\b[^\n.!?]{0,32}\b(?:di\s+peramban|browser\s+nyata)|375px|mobile\s+viewport\s+overflow|console\s+error\s+in\s+browser|UI\s+click[- ]through|"
             r"visual\s+regression|toHaveScreenshot|HAR\s+recording|Playwright\s+trace|storageState)\b",
             re.IGNORECASE,
         ),
@@ -495,7 +598,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
             r"\b(?:video\s+tutorial|tutorial\s+video|narasi\s+TTS|TTS\s+narration|narrated\s+video|video-pipeline|"
             r"rekam(?:an)?\s+layar|screen\s+recording|Azure\s+(?:AI\s+)?Speech|kartu\s+judul|title\s+cards?|"
             r"video\s+panduan|Remotion|programmatic\s+video|motion\s+product\s+video|mobile\s+app\s+demo\s+video|"
-            r"docs\s+GIF|LUFS\s+loudness)\b",
+            r"docs\s+GIF|LUFS\s+loudness|"
+            r"\b(?:captioned|narrated)\b[^\n.!?]{0,30}\b(?:walkthrough|footage|screencast|demo)\b|sinkronkan\s+narasi\s+video)\b",
             re.IGNORECASE,
         ),
     },
@@ -520,7 +624,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:modern[- ]web[- ]guidance|popover\s+API|anchor\s+positioning|container\s+quer(?:y|ies)|"
             r"@container|:has\(|:user-valid|view\s+transitions?\s+API|scroll[- ]driven\s+animations?|"
-            r"content-visibility|fetchpriority|core\s+web\s+vitals|native\s+<dialog>|"
+            r"content-visibility|fetchpriority|core\s+web\s+vitals|native\s+<dialog>|(?:fix|optimi[sz]e|improve)\s+(?:the\s+)?(?:LCP|INP|CLS)|"
             r"async\s+waterfalls?|barrel\s+imports?|React\.cache|RSC\s+(?:serialization|performance|bundle)|react-best-practices)\b",
             re.IGNORECASE,
         ),
@@ -532,7 +636,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
             r"\b(?:WCAG|screen\s+reader|ARIA\s+live|aria-label|aria-describedby|focus\s+trap|"
-            r"keyboard\s+navigation|tab\s+order|kontras\s+warna|color\s+contrast|aksesibilitas|lansia\s+contrast|"
+            r"keyboard\s+navigation|tab\s+order|focus\s+order|accessible\s+names?|kontras\s+warna|color\s+contrast|aksesibilitas|lansia\s+contrast|"
             r"i18n|internationalization|RTL\s+layout|ICU\s+MessageFormat|pseudo[- ]localization)\b",
             re.IGNORECASE,
         ),
@@ -542,7 +646,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DESIGN.md", "UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md"],
         "include": re.compile(
-            r"\b(?:design\s+systems?|wireframes?|UI/UX|user\s+flows?|thumb\s+zone|design\s+tokens?|9[- ]state\s+(?:component|machine)|"
+            r"\b(?:design\s+systems?|(?:design|rancang)\s+(?:a\s+|the\s+)?(?:pricing\s+page|hero\s+section)|wireframes?|UI/UX|user\s+flows?|thumb\s+zone|design\s+tokens?|9[- ]state\s+(?:component|machine)|"
             r"visual\s+(?:hierarchy|refinement)|hierarki\s+visual|competing\s+emphasis|anti[- ]slop\s+review|"
             r"Human[- ]AI\s+(?:UX|HITL)|komponen\s+UI|antarmuka|interview-script|task[- ]usability)\b",
             re.IGNORECASE,
@@ -553,7 +657,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["TESTING.md", "sub-QA-AUTOMATION.md"],
         "include": re.compile(
-            r"\b(?:unit\s+test|integration\s+test|contract\s+test|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit|regression\s+test|property[- ]based\s+test|mutation\s+test|characterization\s+test)\b",
+            r"\b(?:unit\s+tests?|integration\s+tests?|contract\s+tests?|(?:tulis|tambahkan|buat)\s+(?:pengujian|tes\s+unit|uji\s+regresi)|(?:deterministic|flaky)\s+(?:test\s+)?(?:harness|assertion)|(?:fixed\s+pause|event\s+wait)\b[^\n.!?]{0,50}\btest\s+harness|(?:writes?|creates?|adds?|tulis|buat)\b[^\n.!?]{0,38}\bPlaywright\b[^\n.!?]{0,24}\btests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit|regression\s+test|property[- ]based\s+test|mutation\s+test|characterization\s+test)\b",
             re.IGNORECASE,
         ),
     },
@@ -564,7 +668,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:static\s+analysis|lint|typecheck|dead\s+code|cyclomatic\s+complexity|shadow_gate|"
             r"fitness\s+function|architectural\s+fitness|ESLint\s+boundary|noUncheckedIndexedAccess|strict\s+tsconfig|convention\s+drift|"
-            r"pure\s+formatting\s+refactor|formatting[- ]only)\b",
+            r"pure\s+formatting\s+refactor|formatting[- ]only|"
+            r"import\s+boundar(?:y|ies)|(?:larang|aturan|gagalkan)\b[^\n.!?]{0,60}\bimpor\b[^\n.!?]{0,75}\b(?:domain|infrastruktur|CI)\b)\b",
             re.IGNORECASE,
         ),
     },
@@ -573,7 +678,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DEVOPS.md"],
         "include": re.compile(
-            r"\b(?:git\s+merge-tree|merge\s+conflict|git\s+worktree|sync\s+branch|pull\s+branch|branching\s+strategy)\b",
+            r"\b(?:git\s+merge-tree|merge\s+conflict|git\s+worktree|sync\s+branch|pull\s+branch|branching\s+strategy|(?:compare|bandingkan)\s+(?:(?:our|the|dua)\s+)?(?:release\s+branches|cabang)|common\s+base\s+.*\bconflict|"
+            r"squash\b[^\n.!?]{0,40}\b(?:branch|cabang|commit)\b|(?:patch|commit)\b[^\n.!?]{0,33}\balready\s+(?:in|on)\s+upstream)\b",
             re.IGNORECASE,
         ),
     },
@@ -582,7 +688,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "layer": "task",
         "references": ["DOCS-PIPELINE.md", "sub-SPECS-DOCX-CODE.md"],
         "include": re.compile(
-            r"\b(?:document\s+generator|document\s+engine|doc_orchestrator|build_doc\.py|(?:regenerasi|regenerate)\s+(?:output\s+)?(?:dokumen|document)|export\s+(?:to\s+)?(?:docx|pdf|html|xlsx)|render\s+(?:handover|grc|presales|pmo|architecture)\s+(?:report|document|proposal)|build-manifest|\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
+            r"\b(?:document\s+generator|document\s+engine|doc_orchestrator|build_doc\.py|(?:regenerasi|regenerate)\s+(?:output\s+)?(?:dokumen|document|SRS\s+docx|PRD\s+docx)|export\s+(?:to\s+)?(?:docx|pdf|html|xlsx)|render\s+(?:handover|grc|presales|pmo|architecture)\s+(?:report|document|proposal)|build-manifest|\.docx|\.xlsx|Canonical\s+AST|generate\s+document|SRS\s+doc|SDD\s+doc|reference_verifier)\b",
             re.IGNORECASE,
         ),
     },
@@ -596,9 +702,11 @@ ROUTING_RULES: list[dict[str, Any]] = [
             re.IGNORECASE,
         ),
         "exclude": re.compile(
-            r"\b(?:KAK|tender|RAB|HPS|paid\s+CR|decompose\s+(?:the\s+)?(?:approved\s+)?(?:PRD|SRS|BRD)\s+into)\b",
+            r"\b(?:KAK|tender|RAB|HPS|paid\s+CR|decompose\s+(?:the\s+)?(?:approved\s+)?(?:PRD|SRS|BRD)\s+into|(?:pecah|turunkan)\s+kebutuhan\s+(?:ke|jadi|menjadi)\s+backlog)\b",
             re.IGNORECASE,
         ),
+        # After an award, requirement work belongs to discovery even when the tender is mentioned.
+        "exclude_unless": POST_AWARD_RE,
     },
     {
         "skill": "shadow-architect",
@@ -617,7 +725,7 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["PRODUCT-ANALYSIS.md", "IT-PMO-GOVERNANCE.md"],
         "include": re.compile(
             r"\b(?:epics?|user\s+stor(?:y|ies)|sprint\s+tasks?|DoR|DoD|task\s+breakdown|vertical\s+slic(?:e|ing)|"
-            r"sprint\s+planning|story\s+decomposition|dependency\s+graph)\b",
+            r"sprint\s+planning|story\s+decomposition|(?:pecah|turunkan)\s+kebutuhan\s+(?:ke|jadi|menjadi)\s+backlog|dependency\s+graph|(?:susun|buat|urai)\s+(?:rencana\s+)?(?:backlog|sprint)|pecah\s+(?:kebutuhan|fitur)\b[^\n.!?]{0,35}\b(?:cerita|tugas)|bagi\s+(?:pekerjaan|fitur)\s+(?:menjadi|ke)\s+paket\s+(?:dua\s+mingguan|sprint))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:paid\s+CR|monte\s+carlo|EVM|CPI|SPI)\b", re.IGNORECASE),
@@ -641,7 +749,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["sub-QA-AUTOMATION.md"],
         "include": re.compile(
             r"\b(?:Staging\s+UAT|UAT\s+scenario|Berita\s+Acara\s+UAT|UAT\s+sign[- ]off|UAT\s+defect\s+triage|UAT\s+exit\s+gate|"
-            r"tim\s+QA\s+melaporkan|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off)\b",
+            r"tim\s+QA\s+melaporkan|Requirement\s+Traceability\s+Matrix|RTM|client\s+sign[- ]off|"
+            r"\bperwakilan\b[^\n.!?]{0,27}\bpengguna\b[^\n.!?]{0,32}\bstaging\b)\b",
             re.IGNORECASE,
         ),
     },
@@ -651,7 +760,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["DEVOPS.md", "CLOUD-SRE.md"],
         "include": re.compile(
             r"\b(?:production\s+(?:release|deploy)|SemVer|changelog|rollback\s+runbook|kriteria\s+rollback\s+aman|feature\s+flag\s+rollout|"
-            r"kill[- ]switch\s+(?:flag|feature\s+flag)|canary\s+cohort|pre[- ]flight\s+release|release\s+checklist|deployment\s+rollback|roll\s+forward\s+vs\s+rollback)\b",
+            r"kill[- ]switch\s+(?:flag|feature\s+flag)|canary\s+cohort|pre[- ]flight\s+release|release\s+checklist|runbook\s+rilis|(?:promosi|promosikan)\s+versi\b[^\n.!?]{0,35}\bproduksi|deployment\s+rollback|roll\s+forward\s+vs\s+rollback|"
+            r"\b(?:promote|promotion)\b[^\n.!?]{0,55}\bartifact\b[^\n.!?]{0,45}\b(?:staging|production)\b|go\s*[/ -]\s*no[- ]go\s+release)\b",
             re.IGNORECASE,
         ),
     },
@@ -662,7 +772,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:backward\s+compatib|dependency\s+upgrade|breaking\s+change|cross[- ]browser\s+matrix|behavior\s+unchanged|schema\s+evolution|"
             r"RFC\s*9745|RFC\s*8594|Deprecation\s+header|Sunset\s+header|410\s+Gone|deprecat(?:e|ing)\s+(?:an?\s+)?(?:API|endpoint|route)|"
-            r"consumer[- ]driven\s+contract|tolerant\s+reader|API\s+versioning)\b",
+            r"consumer[- ]driven\s+contract|tolerant\s+reader|API\s+versioning|"
+            r"\b(?:breaks?|breaking|merusak)\b[^\n.!?]{0,30}\b(?:existing|older|lama)\b[^\n.!?]{0,36}\b(?:clients?|consumers?|klien)\b|change\s+compatibility\s+window)\b",
             re.IGNORECASE,
         ),
     },
@@ -673,7 +784,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "include": re.compile(
             r"\b(?:Docker|Dockerfile|Kubernetes|Nginx|Caddy|systemd|PM2|CI/CD|GitHub\s+Actions|GitLab\s+CI|canary\s+rollout|blue[- ]green|secret\s+rotation|"
             r"orphan(?:ed)?\s+(?:MCP|process(?:es)?)|proses\s+(?:MCP|yatim)|leftover\s+(?:dev\s+server|process(?:es)?)|dev\s+server\s+(?:nyangkut|sisa)|"
-            r"resource_cleanup|bounded_exec|watchdog|anti[- ]stuck|(?:script|command|idle)\s+timeout|SSH\s+stuck|port\s+conflict|bersihkan\s+proses)\b",
+            r"resource_cleanup|bounded_exec|watchdog|anti[- ]stuck|(?:script|command|idle)\s+timeout|SSH\s+stuck|port\s+conflict|bersihkan\s+proses|"
+            r"Terraform\s+state|state\s+Terraform|reverse[- ]proxy\s+(?:TLS|configuration)|configure\b[^\n.!?]{0,28}\breverse[- ]proxy\b|Helm\s+(?:deployment|manifest|chart))\b",
             re.IGNORECASE,
         ),
         "exclude": re.compile(r"\b(?:Redis\s+vs\s+queue\s+semantics|queue\s+semantics\s+vs\s+Redis)\b", re.IGNORECASE),
@@ -695,7 +807,8 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "references": ["CLOUD-SRE.md"],
         "include": re.compile(
             r"\b(?:disaster\s+recovery|restore\s+drill|RPO|RTO|chaos\s+engineering|backup\s+restore|bulkhead\s+(?:isolation|pattern|semaphore|pool)|"
-            r"graceful\s+degradation|feature\s+shedding|load\s+shedding|stale[- ]cache\s+fallback|business\s+continuity|fault\s+injection)\b",
+            r"graceful\s+degradation|feature\s+shedding|load\s+shedding|stale[- ]cache\s+fallback|business\s+continuity|fault\s+injection|"
+            r"(?:rate[- ]limited|bounded)\s+(?:DLQ\s+)?replay|(?:latihan|simulasi)\s+staging\b[^\n.!?]{0,55}\b(?:laju|replay)\b)\b",
             re.IGNORECASE,
         ),
     },
@@ -713,19 +826,18 @@ ROUTING_RULES: list[dict[str, Any]] = [
         "skill": "context7",
         "layer": "task",
         "references": [],
-        "include": re.compile(r"\b(?:latest\s+(?:library|framework|SDK)\s+docs|Context7|breaking\s+API\s+in\s+v\d+)\b", re.IGNORECASE),
+        "include": re.compile(r"\b(?:latest\s+(?:library|framework|SDK)\s+docs|Context7|breaking\s+API\s+in\s+v\d+|Prisma\s+v?\d+[^\n.]{1,40}(?:syntax|sintaks))\b", re.IGNORECASE),
     },
 ]
 
 # Contextual co-activation bundles for §5.1 multi-skill ownership pairs without forcing false positives.
 CO_ACTIVATION_MAP: dict[str, dict[str, list[str]]] = {
     "shadow-debug": {"supporting": ["shadow-test"], "risk": []},
-    "shadow-refactor": {"supporting": ["shadow-test"], "risk": ["shadow-compat", "shadow-quality"]},
+    "shadow-refactor": {"supporting": ["shadow-test"], "risk": ["shadow-compat"]},
     "shadow-concurrency": {"supporting": ["shadow-test"], "risk": []},
     "shadow-domain": {"supporting": ["shadow-test"], "risk": []},
-    "shadow-search": {"supporting": ["shadow-db"], "risk": ["shadow-eval"]},
-    "shadow-realtime": {"supporting": ["shadow-auth", "shadow-concurrency", "shadow-observe"], "risk": []},
-    "shadow-supplychain": {"supporting": [], "risk": ["shadow-sec", "shadow-release"]},
+    "shadow-search": {"supporting": ["shadow-db"], "risk": []},
+    "shadow-realtime": {"supporting": ["shadow-auth", "shadow-observe"], "risk": []},
     "shadow-pmo": {"supporting": ["shadow-architect"], "risk": []},
     "shadow-architect": {"supporting": ["shadow-domain"], "risk": ["shadow-sec"]},
 }
@@ -762,7 +874,8 @@ UI_STRONG_SIGNAL_RE = re.compile(
 NON_UI_HOMOGRAPH_RE = re.compile(
     r"\b(?:"
     r"(?:HTTP|request|response|email|auth(?:orization)?|security|CORS|cache|deprecation|sunset|custom|MIME)\s+headers?|"
-    r"headers?\s+(?:injection|Authorization|X-[A-Za-z0-9-]+|validation)|"
+    r"headers?\s+(?:injection|Authorization|X-[A-Za-z0-9-]+|validation|Cache-Control|Surrogate-Key|ETag|"
+    r"Content-[A-Za-z-]+|CORS|HTTP|HSTS|CSP|Set-Cookie|Vary|Location)|"
     r"(?:credit|debit|payment|gift|smart|id|sim|loyalty|business)\s+cards?|"
     r"(?:validasi|validate|validat\w*|sanitiz\w*|untrusted|client|user|API|DTO|Zod|schema|malformed|invalid|raw|prompt)\s+inputs?|"
     r"inputs?\s+(?:validation|Zod|schema|DTO|sanitiz\w*)|"
@@ -770,16 +883,29 @@ NON_UI_HOMOGRAPH_RE = re.compile(
     r"SELECT\s+(?:\*|[a-z0-9_.,\s]{1,40})\s+FROM\b|"
     r"(?:orders|users|products|invoices|payments|audit|logs|database|SQL|Postgres|PostgreSQL|MySQL|SQLite)\s+tables?|"
     r"tables?\s+(?:index|lock|migration|schema|bloat|partition|column)|"
-    r"SEO\s+halaman|halaman\s+[^\n]{0,40}\b(?:SEO|JSON-LD|sitemap\.xml|robots\.txt|canonical|hreflang)"
+    r"SEO\s+halaman|halaman\s+[^\n]{0,40}\b(?:SEO|JSON-LD|sitemap\.xml|robots\.txt|canonical|hreflang)|"
+    r"(?:SEO|JSON-LD|sitemap(?:\.xml)?|robots\.txt|canonical|hreflang|Search\s+Console)\b[^\n]{0,80}\b(?:halaman|pages?)\b|"
+    r"(?:halaman|pages?)\s+(?:[\w-]+\s+){0,3}?(?:tidak\s+|belum\s+|not\s+)?(?:terindeks|diindeks|indexed|crawled|dirayapi)|"
+    r"(?:frontend|front-end|UI)\s+(?:package|repo(?:sitory)?|workspace|monorepo|build|bundle|pipeline|CI|"
+    r"dependenc(?:y|ies)|deps|lockfile|container|image|Dockerfile|deploy(?:ment)?)"
     r")\b",
     re.IGNORECASE,
 )
-SQL_BACKEND_CONTEXT_RE = re.compile(
-    r"\b(?:PostgreSQL|Postgres|MySQL|SQLite|SQL\s+query|CTE|EXPLAIN\s+ANALYZE|PgBouncer|MVCC\s+bloat|database\s+schema|RLS\s+polic(?:y|ies)|Prisma\s+(?:query|N\+1|backend)|N\+1)\b",
+NON_UI_CONTEXT_RE = re.compile(
+    r"\b(?:PostgreSQL|Postgres|MySQL|SQLite|SQL\s+query|CTE|EXPLAIN\s+ANALYZE|PgBouncer|"
+    r"MVCC\s+bloat|database\s+schema|RLS\s+polic(?:y|ies)|Prisma\s+(?:query|N\+1|backend)|N\+1|"
+    r"CLI|command[- ]line|terminal|stdin|stdout|stderr|compiler|"
+    r"ESLint|tsc|typecheck|type[- ]check|lint(?:er|ing)?|Prettier|Ruff|mypy|CI\s+gate)\b",
     re.IGNORECASE,
 )
 COPYWRITING_RE = re.compile(
     r"\b(?:copywriting|microcopy|headline|CTA|call[- ]to[- ]action|pesan\s+error|UX\s+writing|product\s+prose)\b",
+    re.IGNORECASE,
+)
+# Mail authentication and deliverability work is not UI copy, even when it mentions a newsletter headline.
+EMAIL_DELIVERABILITY_RE = re.compile(
+    r"\b(?:SPF|DKIM|DMARC|MTA-STS|BIMI|spam\s+folder|folder\s+spam|masuk\s+spam|deliverability|bounce[sd]?|"
+    r"Postmaster|sender\s+reputation|reputasi\s+pengirim)\b",
     re.IGNORECASE,
 )
 CODE_COMMENT_RE = re.compile(
@@ -795,6 +921,10 @@ TRIVIAL_FACT_RE = re.compile(
     r"^\s*(?:apa\s+itu|apa\s+bedanya|bedanya|what\s+is|difference\s+between|jelaskan\s+singkat|berapa|bagi\s+benchmark|knp|kenapa)\b",
     re.IGNORECASE,
 )
+# A question about a specific library version or code identifier needs version-accurate docs.
+VERSIONED_API_RE = re.compile(
+    r"\b[A-Za-z][\w.+-]*\s+v?\d+\.\d+(?:\.\d+)?\b|\bv\d+(?:\.\d+)*\b|`[^`\n]+`|@\d+\.\d+",
+)
 NON_TRIVIAL_INCIDENT_RE = re.compile(
     r"\b(?:API|error|500|40[0-9]|timeout|crash|bug|gagal|production|staging|DB|database|server|query|endpoint|"
     r"slow|lambat|tagihan|cost|token|cloud|K8s)\b",
@@ -807,48 +937,43 @@ PROD_ACCESS_UNAUTH_RE = re.compile(
 
 
 def audit_descriptions(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
-    """Audit all skill SKILL.md frontmatter descriptions for explicit 'Use when...' triggers."""
-    skill_dirs = sorted(
-        [p for p in repo_root.iterdir() if p.is_dir() and not p.name.startswith(".") and p.name not in SKIP_ROOT_DIRS],
-        key=lambda p: p.name,
+    """Check the local frontmatter budget. Hosts apply their own listing limits."""
+    directories = sorted(
+        path for path in repo_root.iterdir()
+        if path.is_dir() and not path.name.startswith(".") and path.name not in SKIP_ROOT_DIRS
     )
-
-    missing_use_when: list[str] = []
-    oversized_desc: list[dict[str, Any]] = []
-    missing_frontmatter: list[str] = []
-
-    for sdir in skill_dirs:
-        sfile = sdir / "SKILL.md"
-        if not sfile.is_file():
-            missing_frontmatter.append(sdir.name)
+    missing: list[str] = []
+    missing_trigger: list[str] = []
+    lengths: dict[str, int] = {}
+    for directory in directories:
+        metadata = directory / "SKILL.md"
+        description = read_description(metadata) if metadata.is_file() else None
+        if description is None:
+            missing.append(directory.name)
             continue
-        txt = sfile.read_text(encoding="utf-8")
-        m = re.search(r"^---\s*\n(.*?)\n---", txt, re.DOTALL)
-        if not m:
-            missing_frontmatter.append(sdir.name)
-            continue
-        desc = ""
-        for line in m.group(1).splitlines():
-            if line.startswith("description:"):
-                desc = line[len("description:") :].strip().strip('"').strip("'")
-                break
-        if not USE_WHEN_RE.search(desc):
-            missing_use_when.append(sdir.name)
-        if len(desc) > 500:
-            oversized_desc.append({"skill": sdir.name, "length": len(desc)})
+        if not USE_WHEN_RE.search(description):
+            missing_trigger.append(directory.name)
+        lengths[directory.name] = len(description)
 
-    passed = (
-        len(skill_dirs) > 0
-        and len(missing_frontmatter) == 0
-        and len(missing_use_when) == 0
-        and len(oversized_desc) == 0
-    )
+    total_chars = sum(lengths.values())
+    oversized = [
+        {"skill": skill, "length": size}
+        for skill, size in lengths.items() if size > DESCRIPTION_CHARACTER_LIMIT
+    ]
     return {
-        "total_skills": len(skill_dirs),
-        "missing_frontmatter": missing_frontmatter,
-        "missing_use_when_trigger": missing_use_when,
-        "oversized_descriptions_gt_500": oversized_desc,
-        "all_passed": passed,
+        "total_skills": len(directories),
+        "missing_frontmatter": missing,
+        "missing_use_when_trigger": missing_trigger,
+        "oversized_descriptions_gt_500": [
+            row for row in oversized if row["length"] > 500
+        ],
+        "oversized_descriptions": oversized,
+        "description_character_limit": DESCRIPTION_CHARACTER_LIMIT,
+        "catalog_character_limit": DESCRIPTION_CATALOG_LIMIT,
+        "total_description_characters": total_chars,
+        "longest_description_characters": max(lengths.values(), default=0),
+        "all_passed": bool(directories) and not (missing or missing_trigger or oversized)
+                      and total_chars <= DESCRIPTION_CATALOG_LIMIT,
     }
 
 
@@ -887,6 +1012,12 @@ def _artifact_audit_owners(prompt: str) -> tuple[str, ...]:
             and DOCUMENT_SAFETY_CONTEXT_RE.search(active)
         ):
             has_document_audit = True
+    if (
+        EXTENSION_ARTIFACT_RE.search(prompt) and EXTERNAL_ARTIFACT_RE.search(prompt)
+        and re.search(SCOPE_DENIAL + DENIAL_CLAUSE + r"\b(?:install|activate|pasang|aktifkan)\b", prompt, re.IGNORECASE)
+        and re.search(r"\b(?:review|inspect|audit|tinjau|periksa)\b[^;\n.!?]{0,30}\bmanifest\b", prompt, re.IGNORECASE)
+    ):
+        return ("shadow-sec", "shadow-supplychain")
     return ("shadow-doc",) if has_document_audit else ()
 
 
@@ -949,7 +1080,16 @@ def _recommend_skill_playbooks(
 
         if not candidates:
             continue
-        candidates.sort(key=lambda item: (-item[0], item[1]))
+        preferred = None
+        if skill == "shadow-integrate" and "webhook" in prompt_tokens and (
+            {"signature", "hmac", "tanda", "replay"} & prompt_tokens
+        ):
+            preferred = "02-hmac-webhooks-replay-and-ordering.md"
+        if skill == "shadow-db" and {"erd", "dbml"} & prompt_tokens:
+            preferred = "01-relational-design-and-integrity-invariants.md"
+        candidates.sort(key=lambda item: (
+            Path(item[2]).name != preferred if preferred else False, -item[0], item[1]
+        ))
         per_skill_limit = 2 if skill == primary_skill else 1
         picked = 0
         for score, _, full_rel in candidates:
@@ -990,15 +1130,174 @@ def _compute_disclosure_metrics(
     }
 
 
+EXECUTION_SENSITIVE = frozenset({"shadow-browser", "shadow-perf"})
+
+REQUEST_PREFIX = r"^(?:(?:now|next|please|tolong|sekarang|lalu)\s+)*"
+BROWSER_REQUEST = re.compile(
+    REQUEST_PREFIX + r"(?:"
+    r"(?:launch|open|navigate|run|buka|jalankan)\b[^\n.!?]{0,72}"
+    r"\b(?:browser|Chrome|Chromium|Firefox|WebKit|peramban|Playwright)\b"
+    r"(?!\s+(?:docs?|documentation|reference|support|dokumentasi)\b)|"
+    r"(?:verify|uji|cek)\b[^\n.!?]{0,58}\b(?:in|di)\s+(?:(?:a|the|real|live)\s+)*"
+    r"(?:browser|Chrome|Chromium|Firefox|WebKit|peramban)\b)",
+    re.IGNORECASE,
+)
+PERFORMANCE_REQUEST = re.compile(
+    REQUEST_PREFIX + r"(?:run|draft|plan|design|prepare|jalankan|siapkan|rancang|uji)\b[^\n.!?]{0,75}"
+    r"\b(?:k6|load\s+(?:test|scenario|profile)|uji\s+beban|skenario\s+beban)\b",
+    re.IGNORECASE,
+)
+PLAYWRIGHT_AUTHORING = re.compile(
+    REQUEST_PREFIX + r"(?:write|create|add|draft|tulis|buat|tambahkan)\b[^\n.!?]{0,45}\bPlaywright\b"
+    r"[^\n.!?]{0,25}\btests?\b",
+    re.IGNORECASE,
+)
+PHYSICAL_QUERY_PLAN = re.compile(
+    r"\b(?:partial|covering|composite)\s+index(?:es)?\b|\bindeks\s+(?:parsial|penutup|gabungan)\b",
+    re.IGNORECASE,
+)
+REQUESTED_PROFILING = re.compile(
+    r"\b(?:pre[- ]?UAT|k6|stress\s+test|load\s+test|uji\s+beban|query\s+profiling|"
+    r"profil(?:e|ing)\s+(?:the\s+)?query|profil\s+kinerja)\b",
+    re.IGNORECASE,
+)
+
+
+def _strong_candidate(ranked: list[Candidate]) -> Candidate | None:
+    if not ranked:
+        return None
+    first = ranked[0]
+    if not (first.phrases or (first.terms >= 2 and first.rare_terms >= 1)):
+        return None
+    if len(ranked) > 1:
+        runner_up = ranked[1]
+        if first.score < 1.23 * runner_up.score and first.phrases <= runner_up.phrases:
+            return None
+    return first
+
+
+OWNER_WEIGHTS: dict[str, float] = {
+    "lexical": 1.0,
+    "phrase": 0.6,
+    "requested_phrase": 0.6,
+    "requested_terms": 0.15,
+    "rare_terms": 0.1,
+    "rank": 0.5,
+    "rule": 1.0,
+    "rule_first": 0.3,
+    "requested_rule": 0.8,
+    "risk_penalty": 0.6,
+    "minimum": 1.0,
+}
+
+
+def _owner_score(
+    skill: str,
+    lexical: dict[str, tuple[int, Candidate]],
+    top_score: float,
+    rule_order: list[str],
+    risk: list[str],
+    requested: list[str],
+    weights: dict[str, float],
+) -> float:
+    """Combine rule and lexical evidence for one candidate owner into a comparable score."""
+    score = 0.0
+    if skill in lexical:
+        rank, candidate = lexical[skill]
+        score += weights["lexical"] * (candidate.score / top_score if top_score > 0 else 0.0)
+        score += weights["phrase"] * min(candidate.phrases, 2)
+        score += weights["requested_phrase"] * min(candidate.requested_phrases, 2)
+        score += weights["requested_terms"] * min(candidate.requested_terms, 4)
+        score += weights["rare_terms"] * min(candidate.rare_terms, 4)
+        score += weights["rank"] / (1 + rank)
+    if skill in rule_order:
+        score += weights["rule"]
+        if rule_order[0] == skill:
+            score += weights["rule_first"]
+        if skill in risk:
+            score -= weights["risk_penalty"]
+    if skill in requested:
+        score += weights["requested_rule"]
+    return score
+
+
+SHORTLIST_SIZE = 10
+# Owners that never author product UI: they verify, record, draw, document, index, build, ship or
+# version it. With one of them as owner, framework or page names in the request do not load the UI bundle.
+NON_AUTHORING_VISUAL_OWNERS = frozenset({
+    "shadow-browser", "shadow-doc", "shadow-git", "shadow-illustration", "shadow-ops", "shadow-release",
+    "shadow-seo", "shadow-supplychain", "shadow-video",
+})
+UI_OWNERS = frozenset({
+    "antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "antislop-copywriting", "antislop-code",
+    "modern-web-guidance", "shadow-design", "shadow-accessibility", "shadow-monarch",
+})
+ANTISLOP_FAMILY = frozenset({
+    "antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "antislop-copywriting", "antislop-code",
+})
+NO_OWNER = "none"
+ORCHESTRATOR = "shadow-monarch"
+
+
+def _owner_shortlist(
+    signal_text: str,
+    ranked: list[Candidate],
+    rule_order: list[str],
+    risk: list[str],
+    requested: list[str],
+    excluded: set[str],
+    fixed: bool,
+) -> list[str]:
+    """Return the safe owner candidates a model may choose from, best deterministic guess first.
+
+    Scope blocks, negative boundaries and explicit skill mentions are applied here, so a
+    model selection can never activate a skill the deterministic layer has excluded.
+    """
+    if fixed:
+        return [skill for skill in rule_order if skill not in excluded][:SHORTLIST_SIZE]
+    known = tuple(sorted(get_known_skill_names()))
+    translated = retrieve(signal_text, skill_index(REPO_ROOT, known, translate=True))
+    allowed = [candidate for candidate in translated if candidate.skill not in excluded]
+    lexical = {candidate.skill: (rank, candidate) for rank, candidate in enumerate(allowed)}
+    top_score = allowed[0].score if allowed else 0.0
+    pool = sorted((set(lexical) | set(rule_order)) - excluded)
+    by_evidence = sorted(
+        pool,
+        key=lambda skill: (-_owner_score(skill, lexical, top_score, rule_order, risk, requested, OWNER_WEIGHTS), skill),
+    )
+    body = [
+        skill for skill, _ in retrieve_body(signal_text, body_index(REPO_ROOT, known))
+        if skill not in excluded
+    ]
+    fused: dict[str, float] = {}
+    for order in (by_evidence, body):
+        for position, skill in enumerate(order):
+            fused[skill] = fused.get(skill, 0.0) + 1.0 / (60 + position)
+    ordered = sorted(fused, key=lambda skill: (-fused[skill], skill))
+    lead = [rule_order[0]] if rule_order and rule_order[0] not in excluded else []
+    shortlist = list(dict.fromkeys(lead + ordered))[:SHORTLIST_SIZE]
+    if ORCHESTRATOR not in shortlist and ORCHESTRATOR not in excluded:
+        shortlist.append(ORCHESTRATOR)
+    return shortlist
+
+
 def route_prompt(
     prompt: str,
     max_companion_skills: int = 4,
     task_id: str = "TASK-AUTO",
     repo_context: dict[str, Any] | None = None,
+    selected_owner: str | None = None,
 ) -> dict[str, Any]:
     """Route a natural-language task prompt to required skills, references & §2.2 Decision Record."""
     stripped = prompt.strip()
-    signal_text = _strip_non_authoritative_signals(stripped)
+    signal_text = NEGATED_OUTAGE_RE.sub(" ", _strip_non_authoritative_signals(stripped))
+    outage_copy = OUTAGE_COPY_RE.search(signal_text)
+    active_outage = not outage_copy and bool(
+        OUTAGE_STATUS_RE.search(signal_text) or (
+            PRODUCTION_CONTEXT_RE.search(signal_text) and INCIDENT_IMPACT_RE.search(signal_text)
+            and INCIDENT_OPERATIONS_RE.search(signal_text)
+        )
+    )
     known_skills = get_known_skill_names()
 
     mentions = re.findall(r"(?<![\w/.:])[/\$]([a-z][a-z0-9-]+)(?![\w/-])", signal_text.lower())
@@ -1006,7 +1305,15 @@ def route_prompt(
     unquoted = QUOTED_LOG_RE.sub(" ", stripped)
     is_code_review = bool(CODE_REVIEW_RE.search(signal_text) or READ_ONLY_SCOPE_RE.search(unquoted))
     is_load_test_denied = bool(LOAD_TEST_DENIAL_RE.search(unquoted))
-    is_unit_test_only = bool(re.search(r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", signal_text, re.IGNORECASE))
+    is_browser_denied = bool(BROWSER_DENIAL_RE.search(unquoted))
+    directives = request_clauses(signal_text)
+    auth_change_requested = any(AUTH_CHANGE_REQUEST.search(clause) for clause in directives)
+    browser_requested = any(BROWSER_REQUEST.search(clause) for clause in directives)
+    performance_requested = any(PERFORMANCE_REQUEST.search(clause) for clause in directives)
+    test_context = bool(re.search(
+        r"\b(?:unit\s+tests?|Vitest|Jest|Pytest|Pest|PHPUnit|JUnit|xUnit)\b", signal_text, re.IGNORECASE
+    )) or any(PLAYWRIGHT_AUTHORING.search(clause) for clause in directives)
+    is_unit_test_only = test_context and not (browser_requested or performance_requested)
 
     is_typo_only = bool(TYPO_ONLY_RE.search(signal_text)) and not explicit_skills
     is_definitional_query = bool(
@@ -1016,15 +1323,23 @@ def route_prompt(
         bool(TRIVIAL_FACT_RE.match(signal_text))
         and not explicit_skills
         and (is_definitional_query or not NON_TRIVIAL_INCIDENT_RE.search(signal_text))
+        and not VERSIONED_API_RE.search(signal_text)
     )
 
     artifact_audit_owners = () if is_typo_only or is_definitional_query else _artifact_audit_owners(signal_text)
     is_code_review = is_code_review or bool(artifact_audit_owners)
-    blocked_by_scope = (
-        {"shadow-browser", "shadow-perf"} if is_code_review or is_unit_test_only else set()
-    )
-    if is_load_test_denied:
+    blocked_by_scope = set(EXECUTION_SENSITIVE) if is_code_review else set()
+    if is_load_test_denied or (test_context and not performance_requested):
         blocked_by_scope.add("shadow-perf")
+    if is_browser_denied or (test_context and not browser_requested):
+        blocked_by_scope.add("shadow-browser")
+    if PHYSICAL_QUERY_PLAN.search(signal_text) and not REQUESTED_PROFILING.search(signal_text):
+        blocked_by_scope.add("shadow-perf")
+
+    ranked = []
+    if not (is_typo_only or is_trivial_fact or explicit_skills or artifact_audit_owners):
+        index = skill_index(REPO_ROOT, tuple(sorted(known_skills)))
+        ranked = retrieve(signal_text, index)
 
     matched_ordered: list[str] = []
     matched_task: list[str] = []
@@ -1032,6 +1347,9 @@ def route_prompt(
     matched_refs: list[str] = []
     excluded_records: list[dict[str, str]] = []
 
+    matched_negative_rules: set[str] = set()
+    requested_rule_owners: list[str] = []
+    ranked_names = {candidate.skill for candidate in ranked}
     selected_skills = explicit_skills
     if artifact_audit_owners:
         requested_helpers = ARTIFACT_AUDIT_HELPER_RE.findall(signal_text.lower())
@@ -1049,13 +1367,33 @@ def route_prompt(
             sname = rule["skill"]
             if sname not in known_skills or sname in blocked_by_scope:
                 continue
-            if rule["include"].search(signal_text) or (sname == "shadow-quality" and is_code_review):
-                excl = rule.get("exclude")
-                if excl and excl.search(signal_text):
+            matches_rule = (
+                rule["include"].search(signal_text)
+                or (sname == "shadow-quality" and is_code_review)
+                or (sname == "shadow-maintain" and active_outage)
+                or (sname == "shadow-browser" and browser_requested)
+                or (sname == "shadow-perf" and performance_requested)
+            )
+            excl = rule.get("exclude")
+            unless = rule.get("exclude_unless")
+            if (
+                (excl and excl.search(signal_text) and not (unless and unless.search(signal_text)))
+                or (sname == "shadow-maintain" and outage_copy)
+                or (sname == "shadow-auth" and active_outage and not auth_change_requested)
+            ):
+                matched_negative_rules.add(sname)
+                if matches_rule or sname in ranked_names:
                     excluded_records.append(
                         {"skill": sname, "reason": "Excluded by sibling disambiguation or negative trigger boundary."}
                     )
-                    continue
+                continue
+            if matches_rule:
+                if (
+                    any(rule["include"].search(clause) for clause in directives)
+                    or (sname == "shadow-browser" and browser_requested)
+                    or (sname == "shadow-perf" and performance_requested)
+                ):
+                    requested_rule_owners.append(sname)
                 target_bucket = matched_risk if rule.get("layer") == "risk" else matched_task
                 if sname not in matched_ordered:
                     matched_ordered.append(sname)
@@ -1063,16 +1401,21 @@ def route_prompt(
                     target_bucket.append(sname)
 
     always_on_ui: list[str] = []
+    weak_ui_only = True
     if not is_typo_only and not artifact_audit_owners:
         ui_signal_text = NON_UI_HOMOGRAPH_RE.sub(" ", signal_text)
-        is_pure_sql_without_ui = bool(SQL_BACKEND_CONTEXT_RE.search(signal_text)) and not bool(
+        is_non_ui_work = bool(NON_UI_CONTEXT_RE.search(signal_text)) and not bool(
             UI_STRONG_SIGNAL_RE.search(ui_signal_text)
         )
-        if UI_ANTISLOP_RE.search(ui_signal_text) and not is_pure_sql_without_ui:
+        weak_ui_only = not UI_STRONG_SIGNAL_RE.search(ui_signal_text)
+        if UI_ANTISLOP_RE.search(ui_signal_text) and not is_non_ui_work:
             for ui_skill in ("antislop", "antislop-ui", "antislop-layoutmobile", "antislop-human", "modern-web-guidance"):
-                if ui_skill in known_skills and ui_skill not in matched_ordered and ui_skill not in always_on_ui:
+                if ui_skill in known_skills and ui_skill not in matched_ordered and ui_skill not in matched_negative_rules:
                     always_on_ui.append(ui_skill)
-        if COPYWRITING_RE.search(signal_text) and "antislop-copywriting" in known_skills:
+        if (
+            COPYWRITING_RE.search(signal_text) and "antislop-copywriting" in known_skills
+            and not EMAIL_DELIVERABILITY_RE.search(signal_text)
+        ):
             if "antislop" not in always_on_ui and "antislop" in known_skills:
                 always_on_ui.append("antislop")
             if "antislop-copywriting" not in always_on_ui:
@@ -1080,6 +1423,49 @@ def route_prompt(
         if CODE_COMMENT_RE.search(signal_text) and "antislop-code" in known_skills:
             if "antislop-code" not in always_on_ui:
                 always_on_ui.append("antislop-code")
+
+    eligible = [
+        candidate for candidate in ranked
+        if candidate.skill not in matched_negative_rules and candidate.skill not in blocked_by_scope
+        and (candidate.skill not in EXECUTION_SENSITIVE or candidate.skill in matched_ordered)
+    ]
+    lexical_winner = _strong_candidate(eligible)
+    used_retrieval = False
+    directed_owner = (
+        requested_rule_owners[0] if not selected_skills and not is_code_review
+        and len(requested_rule_owners) == 1 else None
+    )
+    if directed_owner and directed_owner != matched_ordered[0]:
+        matched_ordered.remove(directed_owner)
+        matched_ordered.insert(0, directed_owner)
+    mixed_copy_and_comments = bool(CODE_COMMENT_RE.search(signal_text) and COPYWRITING_RE.search(signal_text))
+    if not (selected_skills or is_code_review or directed_owner or mixed_copy_and_comments) and lexical_winner:
+        owner = lexical_winner.skill
+        if not matched_ordered:
+            matched_ordered.append(owner)
+            matched_task.append(owner)
+            used_retrieval = True
+        elif owner != matched_ordered[0] and owner not in EXECUTION_SENSITIVE:
+            current = next((candidate for candidate in eligible if candidate.skill == matched_ordered[0]), None)
+            existing_rule_match = (
+                owner in matched_ordered and lexical_winner.phrases
+                and (current is None or (not current.phrases and lexical_winner.score >= 2 * current.score))
+            )
+            clear_request = (
+                matched_ordered[0] not in EXECUTION_SENSITIVE
+                and lexical_winner.requested_terms >= 2 and lexical_winner.requested_phrases
+                and (current is None or (
+                    not current.requested_phrases and current.requested_terms <= 1
+                    and lexical_winner.score >= 1.75 * current.score
+                ))
+            )
+            if existing_rule_match or clear_request:
+                if owner in matched_ordered:
+                    matched_ordered.remove(owner)
+                else:
+                    matched_task.append(owner)
+                matched_ordered.insert(0, owner)
+                used_retrieval = True
 
     # Guard against accidental shadow-perf loading during routine implementation
     if "shadow-perf" not in matched_ordered and "shadow-perf" not in blocked_by_scope and re.search(r"\b(?:build|implement|create|buat|tambah)\b", signal_text, re.IGNORECASE):
@@ -1093,7 +1479,58 @@ def route_prompt(
             {"skill": "shadow-architect/shadow-sec/shadow-browser", "reason": "Negative trigger §5.3: typo-only README edit uses Layer 1 minimal safeguards."}
         )
 
+    owner_fixed = bool(selected_skills) or is_typo_only or is_trivial_fact
+    rule_matches_before_selection = tuple(matched_ordered)
+    owner_candidates = _owner_shortlist(
+        signal_text, ranked, matched_ordered, matched_risk, requested_rule_owners,
+        excluded=matched_negative_rules | blocked_by_scope, fixed=owner_fixed,
+    )
+    selection_status = "not_requested"
+    if selected_owner is not None:
+        if selected_owner == NO_OWNER and not selected_skills:
+            matched_ordered.clear()
+            matched_task.clear()
+            matched_risk.clear()
+            used_retrieval = False
+            selection_status = "accepted_no_owner"
+        elif selected_owner in owner_candidates or (
+            not owner_fixed and selected_owner in known_skills
+            and selected_owner not in matched_negative_rules and selected_owner not in blocked_by_scope
+        ):
+            # The model's choice replaces the deterministic guess. Keep only safety reviews;
+            # topical rule matches were part of that guess.
+            kept = [skill for skill in matched_ordered if skill != selected_owner and skill in matched_risk]
+            matched_ordered[:] = [selected_owner, *kept]
+            matched_task[:] = [selected_owner, *(skill for skill in kept if skill not in matched_risk)]
+            if selected_owner in matched_risk:
+                matched_risk.remove(selected_owner)
+            used_retrieval = False
+            selection_status = "accepted" if selected_owner in owner_candidates else "accepted_outside_shortlist"
+        else:
+            selection_status = (
+                "rejected_unknown" if selected_owner not in known_skills
+                else "rejected_fixed_owner" if owner_fixed else "rejected_excluded"
+            )
+
+    if not selected_skills and "shadow-maintain" in matched_ordered and active_outage:
+        matched_ordered.remove("shadow-maintain")
+        matched_ordered.insert(0, "shadow-maintain")
+        used_retrieval = False
+
     primary_skill = matched_ordered[0] if matched_ordered else "shadow-monarch"
+    if primary_skill in NON_AUTHORING_VISUAL_OWNERS:
+        always_on_ui = [skill for skill in always_on_ui if skill in matched_ordered]
+    model_selected = selection_status in {"accepted", "accepted_outside_shortlist"} and primary_skill == selected_owner
+    # Skills the prompt itself supports: rule matches before selection, or strong lexical evidence.
+    prompt_evidence = set(rule_matches_before_selection) | {
+        candidate.skill for candidate in ranked if candidate.phrases or candidate.rare_terms >= 2
+    }
+    # Weak UI words (table, card, form, input, header) are ambiguous; with only those, the UI bundle
+    # follows a selected owner that works on product UI.
+    if model_selected and weak_ui_only and primary_skill not in UI_OWNERS:
+        always_on_ui = [skill for skill in always_on_ui if skill in matched_ordered]
+    if model_selected and primary_skill in ANTISLOP_FAMILY:
+        always_on_ui = [skill for skill in always_on_ui if skill in {"antislop", primary_skill} or skill not in ANTISLOP_FAMILY]
 
     for skill in sorted(blocked_by_scope):
         excluded_records.append({"skill": skill, "reason": "Execution skill is outside the requested scope."})
@@ -1102,6 +1539,8 @@ def route_prompt(
     if primary_skill in CO_ACTIVATION_MAP and not is_trivial:
         bundle = CO_ACTIVATION_MAP[primary_skill]
         for sup in bundle["supporting"]:
+            if model_selected and sup not in prompt_evidence:
+                continue
             if sup in known_skills and sup != primary_skill and sup not in excluded_names and sup not in matched_ordered:
                 matched_ordered.append(sup)
                 matched_task.append(sup)
@@ -1201,14 +1640,22 @@ def route_prompt(
         prohibited_actions.extend(["execute_candidate_code", "install_candidate", "activate_candidate", "load_candidate_as_instructions"])
     if is_load_test_denied:
         prohibited_actions.append("run_explicitly_denied_load_test")
+    if is_browser_denied:
+        prohibited_actions.append("launch_explicitly_denied_browser")
     if intent_mode in {"debug", "unit_test", "ui_implementation"}:
         prohibited_actions.append("stress_or_load_test_without_l3_approval")
 
+    if not (is_trivial or matched_ordered):
+        routing_signal = "Layer 1 fallback without a confident specialist."
+    elif used_retrieval:
+        routing_signal = f"Primary owner `{primary_skill}` selected from lexical candidates"
+    else:
+        routing_signal = f"Primary owner `{primary_skill}` selected via topic/intent signal"
     activation_reason = (
         f"Layer 1 minimal edit only ({'typo-only' if is_typo_only else 'trivial query'})."
         if is_trivial
         else (
-            f"Primary owner `{primary_skill}` selected via topic/intent signal"
+            routing_signal
             + (f"; paired with supporting {supporting_skills}" if supporting_skills else "")
             + (f"; risk gates {risk_review_skills}" if risk_review_skills else "")
             + "."
@@ -1216,8 +1663,8 @@ def route_prompt(
     )
 
     ctx = repo_context or {}
-    has_active_api_doc_gen = bool(ctx.get("has_active_generator", False))
-    readme_summary_only = bool(ctx.get("readme_summary_only", False))
+    has_active_api_doc_gen = strict_bool(ctx.get("has_active_generator", False), "has_active_generator")
+    readme_summary_only = strict_bool(ctx.get("readme_summary_only", False), "readme_summary_only")
     asks_generic_api_docs = bool(API_DOCS_GENERIC_RE.search(signal_text)) and not bool(
         API_DOCS_EXPLICIT_FORMAT_RE.search(signal_text)
     )
@@ -1237,7 +1684,16 @@ def route_prompt(
     if artifact_audit_owners:
         denied_actions.extend(["global_install", "execute_candidate_code", "install_candidate", "activate_candidate", "load_candidate_as_instructions"])
 
+    primary_source = (
+        "artifact_audit" if artifact_audit_owners else "explicit" if primary_skill in explicit_skills
+        else "model_selected" if selection_status in {"accepted", "accepted_outside_shortlist"}
+        and primary_skill == selected_owner
+        else "retrieval" if used_retrieval else "rule" if matched_ordered else "fallback"
+    )
     decision_record = {
+        "primary_source": primary_source,
+        "owner_candidates": owner_candidates,
+        "owner_selection": {"requested": selected_owner, "status": selection_status},
         "task_id": task_id,
         "intent": stripped,
         "primary_skill": primary_skill,
@@ -1278,6 +1734,10 @@ def route_prompt(
     return {
         "prompt": prompt,
         "core_orchestrator": "shadow-monarch",
+        "retrieval_candidates": [
+            {"skill": candidate.skill, "score": round(candidate.score, 4)}
+            for candidate in eligible[:5]
+        ],
         "companion_skills": companion_skills,
         "always_on_ui_skills": always_on_ui,
         "reference_modules": final_refs,
@@ -1294,7 +1754,7 @@ def run_self_test() -> dict[str, Any]:
     known_skills = get_known_skill_names()
     results: list[dict[str, Any]] = [
         {
-            "probe": "AUDIT-1: All 59 SKILL.md have 'Use when...' triggers & <=500 chars",
+            "probe": "AUDIT-1: Skill descriptions use explicit triggers, <=250 chars each and <=9,000 in total",
             "passed": audit["all_passed"] and audit["total_skills"] >= 59,
             "details": audit,
         }
@@ -1424,8 +1884,8 @@ def run_self_test() -> dict[str, Any]:
         (
             "S51-2: Refactor old feature behavior unchanged -> shadow-refactor (no bootstrap)",
             "Refactor old billing module so behavior unchanged using characterization tests.",
-            ["shadow-refactor", "shadow-compat", "shadow-quality"],
-            ["shadow-bootstrap", "shadow-perf"],
+            ["shadow-refactor", "shadow-compat"],
+            ["shadow-bootstrap", "shadow-perf", "shadow-quality"],
             "shadow-refactor",
         ),
         (
@@ -1445,22 +1905,22 @@ def run_self_test() -> dict[str, Any]:
         (
             "S51-5: Search relevance poor (BM25/hybrid RRF) -> shadow-search",
             "Search relevance poor with Indonesian slang on BM25 and hybrid RRF; tune NDCG@10 and retrieval ACL prefilter.",
-            ["shadow-search", "shadow-db", "shadow-eval"],
-            ["shadow-perf"],
+            ["shadow-search", "shadow-db"],
+            ["shadow-perf", "shadow-eval"],
             "shadow-search",
         ),
         (
             "S51-6: Realtime notifications disconnect -> shadow-realtime",
             "Realtime notifications disconnect on mobile clients; fix SSE Last-Event-ID resume and slow-consumer backpressure.",
-            ["shadow-realtime", "shadow-auth", "shadow-concurrency", "shadow-observe"],
-            ["shadow-perf"],
+            ["shadow-realtime", "shadow-auth", "shadow-observe"],
+            ["shadow-perf", "shadow-concurrency"],
             "shadow-realtime",
         ),
         (
             "S51-7: Unsafe transitive dependency -> shadow-supplychain",
             "Audit unsafe transitive dependency, generate CycloneDX SBOM against lockfile, check typosquatting and SLSA provenance.",
-            ["shadow-supplychain", "shadow-sec", "shadow-release"],
-            ["shadow-perf"],
+            ["shadow-supplychain", "shadow-sec"],
+            ["shadow-perf", "shadow-release"],
             "shadow-supplychain",
         ),
         (
@@ -1758,8 +2218,8 @@ def run_self_test() -> dict[str, Any]:
         (
             "SUPPLY-COSIGN-1: SLSA v1.2 Cosign Sigstore & GitHub Actions SHA pinning routes shadow-supplychain",
             "Verify SLSA v1.2 provenance attestation using Cosign Sigstore and enforce GitHub Actions SHA pinning.",
-            ["shadow-supplychain", "shadow-sec", "shadow-release"],
-            ["shadow-perf"],
+            ["shadow-supplychain"],
+            ["shadow-perf", "shadow-sec", "shadow-release"],
             "shadow-supplychain",
         ),
         (
@@ -1807,8 +2267,8 @@ def run_self_test() -> dict[str, Any]:
         (
             "SEARCH-VEC-1: pgvector HNSW & Meilisearch hybrid search route shadow-search",
             "Build hybrid search with pgvector HNSW and Meilisearch for Indonesian catalog.",
-            ["shadow-search", "shadow-db", "shadow-eval"],
-            ["shadow-perf"],
+            ["shadow-search", "shadow-db"],
+            ["shadow-perf", "shadow-eval"],
             "shadow-search",
         ),
         (
@@ -2444,6 +2904,10 @@ def main() -> int:
     parser.add_argument("--audit-descriptions", action="store_true")
     parser.add_argument("--route", default=None, help="Natural language prompt to route")
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument(
+        "--select-owner", default=None,
+        help="Stage two: the owner chosen from owner_candidates (or 'none'); the router validates it.",
+    )
     args = parser.parse_args()
 
     if args.audit_descriptions:
@@ -2451,7 +2915,7 @@ def main() -> int:
         print(json.dumps(res, indent=2))
         return 0 if res["all_passed"] else 1
     if args.route is not None:
-        print(json.dumps(route_prompt(args.route), indent=2, ensure_ascii=False))
+        print(json.dumps(route_prompt(args.route, selected_owner=args.select_owner), indent=2, ensure_ascii=False))
         return 0
     if args.self_test:
         res = run_self_test()
@@ -2463,4 +2927,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

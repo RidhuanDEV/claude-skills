@@ -1,6 +1,6 @@
 ---
 name: shadow-doc
-description: "Enterprise & Government SDLC Document Engineering. Use when generating or updating .docx, .pdf, .xlsx, or .csv deliverables from Canonical JSON AST v2.0 or .md sources, verifying citations with reference_verifier.py, or checking document traceability."
+description: "Use when generating DOCX, XLSX or PDF deliverables from canonical sources, checking citations, or auditing reference files."
 ---
 
 # Shadow Doc v2.0 (`/shadow-doc`) — Enterprise & Institutional SDLC Document Engineering System

@@ -23,6 +23,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
 SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$")
 FLOATING_TAG_RE = re.compile(r"(?::latest\b|@main\b|@master\b|\blatest\b)", re.IGNORECASE)
 DESTRUCTIVE_DDL_RE = re.compile(r"\b(?:DROP\s+(?:TABLE|COLUMN)|ALTER\s+TABLE\s+\S+\s+DROP|TRUNCATE)\b", re.IGNORECASE)
@@ -46,12 +49,13 @@ def check_release_manifest(manifest: Any) -> list[dict[str, str]]:
     prev_version = str(manifest.get("previous_version", "")).strip()
     cur_sv = _parse_semver(version)
     prev_sv = _parse_semver(prev_version) if prev_version else None
+    breaking_changes = strict_bool(manifest.get("has_breaking_changes", False), "has_breaking_changes")
     if cur_sv is None:
         violations.append({"code": "INVALID_SEMVER", "detail": f"Release `version` (`{version}`) is not valid SemVer 2.0.0."})
     elif prev_sv is not None:
         if cur_sv <= prev_sv:
             violations.append({"code": "NON_MONOTONIC_VERSION", "detail": f"`version` ({version}) must exceed `previous_version` ({prev_version})."})
-        if bool(manifest.get("has_breaking_changes", False)) and cur_sv[0] <= prev_sv[0]:
+        if breaking_changes and cur_sv[0] <= prev_sv[0]:
             violations.append({
                 "code": "BREAKING_CHANGE_WITHOUT_MAJOR_BUMP",
                 "detail": f"Release declares `has_breaking_changes: true` but did not bump SemVer MAJOR ({prev_version} -> {version}).",
@@ -81,27 +85,32 @@ def check_release_manifest(manifest: Any) -> list[dict[str, str]]:
         ("sbom_and_provenance_verified", "GATE_8_SUPPLYCHAIN_BLOCKED", "Gate 8 (CycloneDX/SPDX SBOM & provenance attestation) not verified."),
     ]
     for field, code, msg in required_bool_gates:
-        if gates.get(field) is not True:
+        if not strict_bool(gates.get(field, False), f"gates.{field}"):
             violations.append({"code": code, "detail": msg})
 
     # Gate 5: Migration-before-code & expand-only during rolling deploy
-    migration = manifest.get("migration")
-    if isinstance(migration, dict) and migration.get("has_schema_change"):
+    migration = manifest.get("migration", {})
+    if not isinstance(migration, dict):
+        raise InvalidInput("migration must be a JSON object.")
+    destructive = strict_bool(migration.get("destructive", False), "migration.destructive")
+    if strict_bool(migration.get("has_schema_change", False), "migration.has_schema_change"):
         if migration.get("order") != "before_code":
             violations.append({
                 "code": "GATE_5_MIGRATION_ORDER_BLOCKED",
                 "detail": "Gate 5 requires Expand-Only migrations to run `before_code` so N-1 rollback remains safe.",
             })
         ddl = str(migration.get("sql_preview", ""))
-        if migration.get("destructive") is True or DESTRUCTIVE_DDL_RE.search(ddl):
+        if destructive or DESTRUCTIVE_DDL_RE.search(ddl):
             violations.append({
                 "code": "GATE_5_DESTRUCTIVE_DDL_IN_DEPLOY",
                 "detail": "Destructive DDL (`DROP COLUMN`/`DROP TABLE`) breaks N-1 binary rollback; defer to post-drain Contract release.",
             })
 
     # Canary policy validation (if canary enabled)
-    canary = manifest.get("canary")
-    if isinstance(canary, dict) and canary.get("enabled"):
+    canary = manifest.get("canary", {})
+    if not isinstance(canary, dict):
+        raise InvalidInput("canary must be a JSON object.")
+    if strict_bool(canary.get("enabled", False), "canary.enabled"):
         if str(canary.get("bucketing", "")).lower() != "deterministic_hash":
             violations.append({
                 "code": "NON_DETERMINISTIC_CANARY",
@@ -201,4 +210,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

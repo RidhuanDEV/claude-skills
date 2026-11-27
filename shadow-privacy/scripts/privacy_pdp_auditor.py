@@ -146,7 +146,7 @@ def scan_path(target: Path) -> dict[str, Any]:
         "target": str(target),
         "scanned_files": scanned_files,
         "finding_count": len(findings),
-        "status": "PASS" if not findings else "FINDINGS_DETECTED",
+        "status": "BLOCKED_NO_FILES_SCANNED" if scanned_files == 0 else "PASS" if not findings else "FINDINGS_DETECTED",
         "findings": findings,
     }
 
@@ -246,7 +246,7 @@ def main() -> int:
     if args.scan:
         res = scan_path(Path(args.scan))
         print(json.dumps(res, indent=2))
-        return 0 if res["finding_count"] == 0 else 1
+        return 0 if res["status"] == "PASS" else 1
 
     parser.print_help()
     return 0

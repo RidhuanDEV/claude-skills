@@ -1,6 +1,6 @@
 ---
 name: shadow-email
-description: "Email Infrastructure & Deliverability Engineering Specialist. Use when designing SMTP/MIME pipelines, SPF/DKIM/DMARC/MTA-STS authentication, React Email/MJML Outlook & dark-mode templates, transactional outbox queues, DSN bounce handling, RFC 8058 bulk unsubscribe, abuse/header-injection defense, multi-ESP failover (SES/Resend/Postmark/SendGrid), Postmaster incident response, or Mailpit testing. Do NOT use for generic REST/payment webhooks (/shadow-integrate)."
+description: "Use when fixing SMTP/MIME, OTP spam, SPF, DKIM, DMARC, bounces, bulk unsubscribe, or ESP failover. Not for REST webhooks (/shadow-integrate)."
 ---
 
 # Shadow Email (`/shadow-email`) — Email Infrastructure & Deliverability Engineering

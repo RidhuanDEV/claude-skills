@@ -1,6 +1,6 @@
 ---
 name: shadow-perf
-description: "Pre-UAT Performance & Load Testing Gate. Use ONLY when entering the Pre-UAT/Staging performance gate or when explicitly asked for k6 load/stress/spike testing, latency decomposition, SQL EXPLAIN profiling, or runtime CPU/memory profiling. Do NOT use automatically during feature coding."
+description: "Use only when running Pre-UAT performance gates or requested load tests, k6 latency benchmarks, or runtime profiling. Not for feature work."
 ---
 
 # Shadow Perf (`/shadow-perf`) — Pre-UAT Load Testing (`k6`), Latency Diagnosis & Bottleneck Profiler

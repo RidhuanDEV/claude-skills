@@ -16,6 +16,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
+
+def _number(container: dict[str, Any], field: str, owner: str) -> float:
+    value = container.get(field)
+    if type(value) not in (int, float) or not math.isfinite(value):
+        raise ValueError(f"{owner}.{field} must be a finite JSON number.")
+    return float(value)
+
 
 def _topological_order(tasks: list[dict[str, Any]]) -> list[str]:
     by_id = {t["id"]: t for t in tasks}
@@ -52,9 +62,9 @@ def analyze_schedule_and_evm(spec: dict[str, Any]) -> dict[str, Any]:
     by_id: dict[str, dict[str, Any]] = {}
     succs: dict[str, list[str]] = {t["id"]: [] for t in tasks}
     for t in tasks:
-        o = float(t["optimistic"])
-        m = float(t["most_likely"])
-        p = float(t["pessimistic"])
+        o = _number(t, "optimistic", str(t["id"]))
+        m = _number(t, "most_likely", str(t["id"]))
+        p = _number(t, "pessimistic", str(t["id"]))
         if not (0 <= o <= m <= p):
             raise ValueError(f"Task '{t['id']}' must satisfy 0 <= optimistic <= most_likely <= pessimistic.")
         expected = (o + 4.0 * m + p) / 6.0
@@ -106,6 +116,8 @@ def analyze_schedule_and_evm(spec: dict[str, Any]) -> dict[str, Any]:
 
     # Seeded Monte Carlo simulation (triangular distribution across DAG)
     iterations = int(spec.get("monte_carlo_iterations", 2000))
+    if iterations < 1:
+        raise ValueError("monte_carlo_iterations must be at least 1.")
     seed = int(spec.get("seed", 42))
     rng = random.Random(seed)
     durations: list[float] = []
@@ -127,13 +139,14 @@ def analyze_schedule_and_evm(spec: dict[str, Any]) -> dict[str, Any]:
     evm_out: dict[str, Any] = {}
     if "evm" in spec:
         evm = spec["evm"]
-        bac = float(evm["bac"])
-        pv = float(evm["pv"])
-        ev = float(evm["ev"])
-        ac = float(evm["ac"])
-        cpi = round(ev / ac, 4) if ac > 0 else 1.0
-        spi = round(ev / pv, 4) if pv > 0 else 1.0
-        eac = round(bac / cpi, 2) if cpi > 0 else bac
+        bac = _number(evm, "bac", "evm")
+        pv = _number(evm, "pv", "evm")
+        ev = _number(evm, "ev", "evm")
+        ac = _number(evm, "ac", "evm")
+        # Undefined ratios stay None instead of reporting a healthy 1.0.
+        cpi = round(ev / ac, 4) if ac > 0 else None
+        spi = round(ev / pv, 4) if pv > 0 else None
+        eac = round(bac / cpi, 2) if cpi else None
         evm_out = {
             "bac": bac, "pv": pv, "ev": ev, "ac": ac,
             "cv": round(ev - ac, 2), "sv": round(ev - pv, 2),
@@ -151,12 +164,12 @@ def analyze_schedule_and_evm(spec: dict[str, Any]) -> dict[str, Any]:
 
 def evaluate_change_request(req: dict[str, Any]) -> dict[str, Any]:
     """Classify a client request using contractual hierarchy and mandate human CCB sign-off."""
-    violates_signed_ac = bool(req.get("violates_signed_acceptance_criteria", False))
-    within_warranty = bool(req.get("within_warranty_period", False))
-    statutory_in_scope = bool(req.get("required_for_signed_statutory_compliance", False))
-    explicitly_excluded = bool(req.get("listed_in_exclusion_register", False))
-    net_new_capability = bool(req.get("introduces_net_new_workflow_or_integration", False))
-    ambiguous_clause = bool(req.get("contract_clause_ambiguous", False))
+    violates_signed_ac = strict_bool(req.get("violates_signed_acceptance_criteria", False), "violates_signed_acceptance_criteria")
+    within_warranty = strict_bool(req.get("within_warranty_period", False), "within_warranty_period")
+    statutory_in_scope = strict_bool(req.get("required_for_signed_statutory_compliance", False), "required_for_signed_statutory_compliance")
+    explicitly_excluded = strict_bool(req.get("listed_in_exclusion_register", False), "listed_in_exclusion_register")
+    net_new_capability = strict_bool(req.get("introduces_net_new_workflow_or_integration", False), "introduces_net_new_workflow_or_integration")
+    ambiguous_clause = strict_bool(req.get("contract_clause_ambiguous", False), "contract_clause_ambiguous")
 
     if explicitly_excluded or (net_new_capability and not violates_signed_ac):
         classification = "PAID_CHANGE_REQUEST_CANDIDATE"
@@ -313,4 +326,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

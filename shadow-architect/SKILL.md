@@ -1,6 +1,6 @@
 ---
 name: shadow-architect
-description: "Single-System Architecture & Design. Use when designing one application architecture, C4 Mermaid diagrams, ADRs, module public facades, architectural fitness functions, capacity sizing, brownfield convention preservation, or deciding Monolith vs Modular Monolith vs Workers vs Microservices. Do NOT use for multi-app enterprise portfolios or 6-Domain SPBE (/shadow-ea)."
+description: "Use when designing single-system architecture, C4, ADRs, module boundaries, or capacity. Not for enterprise portfolios (/shadow-ea)."
 ---
 
 # Shadow Architect (`/shadow-architect`) — Single-System Architecture, C4/ADRs & Boundary Gate (SDLC Stage 2)
@@ -33,6 +33,8 @@ Load ONLY the 1–2 modular playbooks needed for the active architecture subtask
 4. **Calibrate Deliverables to Decision Scope:** For reversible module-local changes, answer concisely inline (precedent, transaction boundary, coupling, rollback). Reserve C4 diagrams and formal ADRs (`docs/adr/ADR-XXX-*.md`) for shared contracts, deployment boundaries, or data-ownership shifts.
 
 ---
+
+**Topology helper:** `python "shadow-architect/scripts/topology_decision.py" --assess drivers.json` applies the right-sized default (modular monolith until scaling or isolation is proven). Its thresholds are heuristics that feed an ADR, not a substitute for one.
 
 ## 2. Brownfield Preservation & Official-First Gate
 

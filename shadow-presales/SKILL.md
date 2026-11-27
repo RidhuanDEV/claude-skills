@@ -1,6 +1,6 @@
 ---
 name: shadow-presales
-description: "Enterprise IT Solutions & Commercial Pre-Sales. Use when analyzing RFP/TOR/KAK, scoring Bid/No-Bid, sizing 3-scenario workload capacity (conservative/expected/stress), modeling 3-5 yr TCO/NPV, or building Provider RAB/BoQ under Perpres 46/2025 (distinct from PPK HPS)."
+description: "Use when assessing RFP/TOR/KAK tenders, Bid/No-Bid, capacity estimates, provider BoQ/RAB, or multiyear TCO and NPV. Not for post-award PRD/SRS (/shadow-discovery)."
 ---
 
 # `/shadow-presales` — Enterprise Solution & Commercial Engineering

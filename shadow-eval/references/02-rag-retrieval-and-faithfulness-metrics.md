@@ -102,7 +102,7 @@ A legal-doc RAG system passed a legacy regex check showing `"100% of answers inc
 
 ## 11. Authoritative References
 - NIST AI 600-1 (2024) — *Confabulation & Information Integrity* (`https://doi.org/10.6028/NIST.AI.600-1`).
-- OWASP Top 10 for LLM Applications 2025 — `LLM08:2025` (Vector/Embedding Weaknesses) & `LLM09:2025` (Misinformation).
+- OWASP Top 10 for LLM Applications 2026 — `LLM09:2026` (Vector and Embedding Weaknesses) & `LLM07:2026` (Misinformation) (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
 - RAGAS / TruLens RAG Triad Evaluation Methodology.
 
 ## 12. Limitations & When NOT to Use

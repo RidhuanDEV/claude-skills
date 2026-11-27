@@ -17,8 +17,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
-WEAK_HASH_ALGOS = {"md5", "sha1", "sha256", "sha512", "plaintext", "none", "aes", "base64"}
-FORBIDDEN_JWT_ALGOS = {"none", "hs256_weak"}
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import InvalidInput, run_checked_cli, strict_bool
+
+ACCEPTED_HASH_ALGOS = {"argon2id", "bcrypt", "scrypt"}
+ACCEPTED_JWT_ALGOS = {
+    "hs256", "hs384", "hs512", "rs256", "rs384", "rs512", "ps256", "ps384", "ps512",
+    "es256", "es384", "es512", "es256k", "eddsa",
+}
 
 
 def check_session_config(cfg: dict[str, Any]) -> dict[str, Any]:
@@ -26,15 +32,17 @@ def check_session_config(cfg: dict[str, Any]) -> dict[str, Any]:
     warnings: list[str] = []
 
     pw_algo = str(cfg.get("password_hash_algo", "")).strip().lower()
-    if pw_algo in WEAK_HASH_ALGOS or not pw_algo:
+    if pw_algo not in ACCEPTED_HASH_ALGOS:
         errors.append(
-            f"Insecure or missing password_hash_algo '{pw_algo}'; require 'argon2id' (preferred) or 'bcrypt' (cost >= 12)."
+            f"Insecure or missing password_hash_algo '{pw_algo}'; require 'argon2id' (preferred), 'bcrypt' (cost >= 12), or 'scrypt'."
         )
     elif pw_algo == "bcrypt" and int(cfg.get("bcrypt_cost", 0)) < 12:
         errors.append(f"bcrypt_cost={cfg.get('bcrypt_cost')} is below minimum 12.")
 
     cookie = cfg.get("cookie", {})
-    if isinstance(cookie, dict) and cookie.get("enabled", True):
+    if not isinstance(cookie, dict):
+        raise InvalidInput("cookie must be a JSON object.")
+    if strict_bool(cookie.get("enabled", True), "cookie.enabled"):
         if cookie.get("http_only") is not True:
             errors.append("Session/refresh cookie MUST set HttpOnly=true.")
         if cookie.get("secure") is not True:
@@ -46,14 +54,18 @@ def check_session_config(cfg: dict[str, Any]) -> dict[str, Any]:
             errors.append("SameSite=None requires Secure=true.")
 
     jwt_cfg = cfg.get("jwt", {})
-    if isinstance(jwt_cfg, dict) and jwt_cfg.get("enabled", False):
+    if not isinstance(jwt_cfg, dict):
+        raise InvalidInput("jwt must be a JSON object.")
+    if strict_bool(jwt_cfg.get("enabled", False), "jwt.enabled"):
         alg = str(jwt_cfg.get("alg", "")).strip().lower()
-        if not alg or alg == "none" or alg in FORBIDDEN_JWT_ALGOS:
+        if alg not in ACCEPTED_JWT_ALGOS:
             errors.append(f"Forbidden or missing JWT signing algorithm '{alg}'.")
         allowed_algs = [str(a).strip().lower() for a in jwt_cfg.get("allowed_algs", [])]
-        if "none" in allowed_algs or (len(allowed_algs) == 0):
-            errors.append("JWT verifier MUST explicitly pin non-empty allowed_algs excluding 'none'.")
-        access_ttl = int(jwt_cfg.get("access_ttl_sec", 999999))
+        if len(allowed_algs) == 0 or any(a not in ACCEPTED_JWT_ALGOS for a in allowed_algs):
+            errors.append("JWT verifier MUST explicitly pin non-empty allowed_algs of registered JWS algorithms (never 'none').")
+        access_ttl = jwt_cfg.get("access_ttl_sec", 999999)
+        if isinstance(access_ttl, bool) or not isinstance(access_ttl, int):
+            raise InvalidInput("jwt.access_ttl_sec must be a JSON integer.")
         if access_ttl > 900:
             errors.append(f"JWT access_ttl_sec={access_ttl} exceeds 900s (15 min) ceiling.")
         if jwt_cfg.get("refresh_rotation_family_revocation") is not True:
@@ -61,7 +73,7 @@ def check_session_config(cfg: dict[str, Any]) -> dict[str, Any]:
         if jwt_cfg.get("jwks_kid_rollover_supported") is not True:
             warnings.append("Enable dual-key JWKS kid rollover so signing key rotation causes zero downtime.")
 
-    if cfg.get("trust_frontend_username_claim") is True:
+    if strict_bool(cfg.get("trust_frontend_username_claim", False), "trust_frontend_username_claim"):
         errors.append("CRITICAL: Backend MUST NEVER trust frontend-supplied username/role/tenant_id without server-verified token claims.")
     if cfg.get("revoke_on_password_or_role_change") is not True:
         errors.append("Password change, role downgrade, or deactivation MUST revoke active sessions/refresh tokens immediately.")
@@ -83,23 +95,28 @@ def check_policy_matrix(matrix: dict[str, Any]) -> dict[str, Any]:
 
     for r in routes:
         if not isinstance(r, dict):
-            continue
+            raise InvalidInput("Each routes entry must be a JSON object.")
         path = str(r.get("path", "<unknown>"))
-        public = bool(r.get("public", False))
+        public = strict_bool(r.get("public", False), "public")
+        privileged = strict_bool(r.get("privileged", False), "privileged")
+        multi_tenant = strict_bool(r.get("multi_tenant", True), "multi_tenant")
+        derives_tenant_from_body = strict_bool(r.get("derives_tenant_from_request_body", False), "derives_tenant_from_request_body")
+        if derives_tenant_from_body:
+            errors.append(f"Route '{path}' derives tenant_id or role from untrusted request body/params (confused deputy risk).")
         if public:
+            if privileged:
+                errors.append(f"Route '{path}' cannot be both public and privileged.")
             continue
         if r.get("server_auth_enforced") is not True:
             errors.append(f"Route '{path}' lacks server-side authentication enforcement (UI guard alone is insufficient).")
-        if r.get("multi_tenant", True) and r.get("tenant_scoped_in_query") is not True:
+        if multi_tenant and r.get("tenant_scoped_in_query") is not True:
             errors.append(f"Multi-tenant route '{path}' must scope DB queries by authenticated tenant_id / RLS (anti-IDOR).")
-        if r.get("derives_tenant_from_request_body") is True:
-            errors.append(f"Route '{path}' derives tenant_id or role from untrusted request body/params (confused deputy risk).")
         tests = r.get("negative_tests", {})
         if not isinstance(tests, dict) or tests.get("unauth_401") is not True:
             errors.append(f"Route '{path}' missing negative test asserting 401 for unauthenticated caller.")
-        if r.get("multi_tenant", True) and (not isinstance(tests, dict) or tests.get("cross_tenant_denied") is not True):
+        if multi_tenant and (not isinstance(tests, dict) or tests.get("cross_tenant_denied") is not True):
             errors.append(f"Route '{path}' missing cross-tenant IDOR denial test (403/404).")
-        if r.get("privileged", False) and (not isinstance(tests, dict) or tests.get("role_denied_403") is not True):
+        if privileged and (not isinstance(tests, dict) or tests.get("role_denied_403") is not True):
             errors.append(f"Privileged route '{path}' missing role-denial negative test (403).")
 
     return {"check": "policy_matrix", "passed": len(errors) == 0, "errors": errors, "warnings": warnings}
@@ -113,9 +130,9 @@ def check_sso_coexistence(cfg: dict[str, Any]) -> dict[str, Any]:
         errors.append("OIDC Authorization Code flow MUST enforce PKCE S256.")
     if cfg.get("state_and_nonce_verified") is not True:
         errors.append("OIDC flow MUST verify single-use state (CSRF) and nonce (ID-token replay).")
-    if cfg.get("tenant_bound_from_email_domain_only") is True:
+    if strict_bool(cfg.get("tenant_bound_from_email_domain_only", False), "tenant_bound_from_email_domain_only"):
         errors.append("NEVER bind enterprise tenant solely from unverified email domain suffix; bind via verified IdP connection metadata.")
-    if cfg.get("local_sdk_replaced_with_unverified_npm") is True:
+    if strict_bool(cfg.get("local_sdk_replaced_with_unverified_npm", False), "local_sdk_replaced_with_unverified_npm"):
         errors.append("CRITICAL: Do NOT replace an existing local SSO SDK (e.g., file:../sdk/sso-client) with an unverified npm package.")
     if cfg.get("coexisting_cookie_and_jwks_unified_principal") is not True:
         errors.append("Coexisting external SSO, local cookie session, and JWKS JWT must resolve into one canonical server principal + tenant context.")
@@ -290,4 +307,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

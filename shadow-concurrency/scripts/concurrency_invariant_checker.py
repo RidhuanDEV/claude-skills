@@ -18,21 +18,24 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 
 def simulate_at_least_once_replay(spec: dict[str, Any]) -> dict[str, Any]:
     """Deterministically simulate crash-after-side-effect / concurrent claim / poison DLQ."""
-    has_durable_dedup = bool(spec.get("uses_durable_idempotency_store", False))
-    ack_before_commit = bool(spec.get("ack_before_durable_commit", False))
-    atomic_claim = bool(spec.get("uses_atomic_claim_or_lock", False))
+    has_durable_dedup = strict_bool(spec.get("uses_durable_idempotency_store", False), "uses_durable_idempotency_store")
+    ack_before_commit = strict_bool(spec.get("ack_before_durable_commit", True), "ack_before_durable_commit")
+    atomic_claim = strict_bool(spec.get("uses_atomic_claim_or_lock", False), "uses_atomic_claim_or_lock")
     max_attempts = int(spec.get("max_attempts", 0))
-    has_dlq = bool(spec.get("has_dlq", False))
-    claims_unassisted_exactly_once = bool(spec.get("claims_unassisted_exactly_once_external", False))
+    has_dlq = strict_bool(spec.get("has_dlq", False), "has_dlq")
+    claims_unassisted_exactly_once = strict_bool(spec.get("claims_unassisted_exactly_once_external", False), "claims_unassisted_exactly_once_external")
 
     errors: list[str] = []
     if claims_unassisted_exactly_once:
         errors.append("Forbidden claim: external side effects cannot guarantee unassisted exactly-once without receiver/outbox idempotency.")
     if ack_before_commit:
-        errors.append("Data-loss invariant violation: broker ACK executed before durable state commit.")
+        errors.append("Data-loss invariant not verified: broker ACK must follow durable state commit.")
     if not has_durable_dedup:
         errors.append("Duplicate-side-effect violation: replay after ack failure executes side effect multiple times without durable idempotency store.")
     if not atomic_claim:
@@ -151,4 +154,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

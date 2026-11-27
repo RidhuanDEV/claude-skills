@@ -16,16 +16,21 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 
 def verify_domain_model(spec: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     if not isinstance(spec, dict) or not spec:
         return {"status": "FAIL", "valid": False, "errors": ["Domain specification must be a non-empty JSON object."]}
 
-    if spec.get("is_simple_crud") and spec.get("use_full_ddd"):
+    is_simple_crud = strict_bool(spec.get("is_simple_crud", False), "is_simple_crud")
+    use_full_ddd = strict_bool(spec.get("use_full_ddd", False), "use_full_ddd")
+    if is_simple_crud and use_full_ddd:
         errors.append("Overengineering violation: avoid full DDD aggregate/event ceremony for simple CRUD.")
 
-    if spec.get("invented_policy_for_ambiguous_rule"):
+    if strict_bool(spec.get("invented_policy_for_ambiguous_rule", False), "invented_policy_for_ambiguous_rule"):
         errors.append("Escalation violation: ambiguous/contradictory policy must be escalated instead of invented.")
 
     transitions: dict[str, list[str]] = spec.get("state_transitions", {})
@@ -40,7 +45,7 @@ def verify_domain_model(spec: dict[str, Any]) -> dict[str, Any]:
     for tx in spec.get("simulated_commands", []):
         from_state = str(tx.get("from_state", ""))
         to_state = str(tx.get("to_state", ""))
-        expected_allowed = bool(tx.get("expected_allowed", True))
+        expected_allowed = strict_bool(tx.get("expected_allowed", True), "expected_allowed")
         allowed_targets = transitions.get(from_state, [])
         actual_allowed = to_state in allowed_targets
         if actual_allowed != expected_allowed:
@@ -48,7 +53,8 @@ def verify_domain_model(spec: dict[str, Any]) -> dict[str, Any]:
                 f"Transition mismatch {from_state}->{to_state}: expected_allowed={expected_allowed}, actual_allowed={actual_allowed}."
             )
 
-    if spec.get("unresolved_policy_conflicts") and not spec.get("escalated_to_owner"):
+    escalated_to_owner = strict_bool(spec.get("escalated_to_owner", False), "escalated_to_owner")
+    if spec.get("unresolved_policy_conflicts") and not escalated_to_owner:
         errors.append("Unresolved policy conflicts exist without escalation marker ('escalated_to_owner: true').")
 
     return {
@@ -140,4 +146,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

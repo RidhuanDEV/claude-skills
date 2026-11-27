@@ -1,0 +1,66 @@
+[
+ {
+  "id": "context7-k-en-near-01",
+  "issue": "Excluded skill would legitimately co-activate: a Next.js major-version move needs official migration notes/version docs.",
+  "old_prompt": "Move the news CMS from Next.js 14 to 15: inventory the breaking changes that hit our 40 routes and plan a staged path with consumer checks.",
+  "new_prompt": "Our public payments API v1 is renaming `amount` to `amount_minor`; find which mobile app versions still send the old field and stage the change so none of them break.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "context7-k-id-near-01",
+  "issue": "Excluded skill would legitimately co-activate: an Express 4->5 library upgrade needs version-specific official docs.",
+  "old_prompt": "Kami mau naik dari Express 4 ke 5 di layanan POS; petakan perubahan yang memutus kompatibilitas dan rencana upgrade bertahap.",
+  "new_prompt": "Field `status` di payload webhook POS akan berubah dari angka ke string; putar ulang rekaman request dari tiga konsumen mitra dan susun tahapan perubahannya agar tidak memutus mereka.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "shadow-ai-eng-k-id-02",
+  "issue": "Ambiguous primary: SSE streaming/cancellation framing overlaps the realtime-transport owner.",
+  "old_prompt": "Jawaban asisten AI di dashboard lalu lintas harus bisa dibatalkan pengguna; implementasikan streaming SSE dengan AbortController dan pembatalan panggilan model di server.",
+  "new_prompt": "Jawaban asisten AI di dashboard lalu lintas harus bisa dihentikan pengguna: batalkan panggilan model di runtime LLM saat Stop ditekan, lalu alihkan ke provider cadangan bila model utama timeout.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ },
+ {
+  "id": "shadow-auth-k-id-near-01",
+  "issue": "Excluded skill would legitimately co-activate: password-reset flow is core identity/AuthN scope.",
+  "old_prompt": "Lakukan threat modeling STRIDE untuk alur reset password aplikasi koperasi sebelum sprint dimulai.",
+  "new_prompt": "Lakukan threat modeling STRIDE untuk fitur impor file CSV mutasi bank di aplikasi koperasi sebelum sprint dimulai.",
+  "old_expected": "shadow-sec",
+  "new_expected": "shadow-sec"
+ },
+ {
+  "id": "shadow-doc-k-en-near-01",
+  "issue": "Excluded skill would legitimately co-activate: writing admin/operator manuals is document deliverable production.",
+  "old_prompt": "Write the admin and operator manuals plus the credential transfer checklist for passing the POS system to the pharmacy chain's IT team.",
+  "new_prompt": "Plan the operational independence handover of the POS system to the pharmacy chain's IT team: credential transfer with post-transfer rotation and a ToT session for their admins.",
+  "old_expected": "shadow-handover",
+  "new_expected": "shadow-handover"
+ },
+ {
+  "id": "shadow-eval-k-id-02",
+  "issue": "Ambiguous primary: regex precision/recall on account numbers overlaps generic test-writing and personal-data detection.",
+  "old_prompt": "Uji regex deteksi nomor rekening di output chatbot dengan probe presisi dan recall; tunjukkan yang lolos dan yang salah tangkap.",
+  "new_prompt": "Bangun set uji keamanan untuk chatbot koperasi berisi 120 prompt berbahaya, lalu nilai tingkat penolakan yang benar dan kasus penolakan berlebihan.",
+  "old_expected": "shadow-eval",
+  "new_expected": "shadow-eval"
+ },
+ {
+  "id": "shadow-video-k-en-near-01",
+  "issue": "Excluded skill's topic present: thumbnail for a tutorial video invites video-production activation.",
+  "old_prompt": "Draw an SVG illustration of the koperasi mascot for the tutorial thumbnail.",
+  "new_prompt": "Draw an SVG illustration of the koperasi mascot waving for the help-center banner.",
+  "old_expected": "shadow-illustration",
+  "new_expected": "shadow-illustration"
+ },
+ {
+  "id": "shadow-video-k-id-near-01",
+  "issue": "Excluded skill's topic present: OG card for a tutorial video invites video-production activation.",
+  "old_prompt": "Buat kartu OG untuk video tutorial yang dibagikan di media sosial.",
+  "new_prompt": "Buat kartu OG 1200x630 untuk halaman panduan anggota koperasi yang dibagikan di media sosial.",
+  "old_expected": "shadow-illustration",
+  "new_expected": "shadow-illustration"
+ }
+]

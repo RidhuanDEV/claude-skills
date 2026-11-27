@@ -1,6 +1,6 @@
 ---
 name: shadow-debug
-description: "Systematic Root-Cause Debugging Engineering. Use when diagnosing unexpected bugs, 500 errors, flaky tests, memory leaks, CPU/event-loop freezes, deadlocks, race conditions, environment drift, or misleading stack traces. Do NOT use for post-prod SLA/Harwat process (shadow-maintain), telemetry setup (shadow-observe), load benchmarking (shadow-perf), or broad code restructuring (shadow-refactor)."
+description: "Use when isolating an unexpected error, intermittent runtime failure, memory leak, deadlock, or root cause. Not for flaky test triage (/shadow-test) or outage command (/shadow-maintain)."
 ---
 
 # `/shadow-debug` — Systematic Debugging, Production Forensics & Root-Cause Engineering

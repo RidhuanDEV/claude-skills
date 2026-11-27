@@ -11,20 +11,29 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 TENANT_SEGMENT_RE = re.compile(r"(?:tenant[_a-z0-9-]*|\{tenant[_a-z]*\}|user[_a-z0-9-]*|\{user[_a-z]*\})", re.IGNORECASE)
 VERSION_SEGMENT_RE = re.compile(r":v(?:\d+|\{[a-z_]+\})(?::|$)", re.IGNORECASE)
 DANGEROUS_REDIS_CMD_RE = re.compile(r"\b(?:KEYS\s+\*|KEYS\s+['\"]?\*|FLUSHDB|FLUSHALL)\b", re.IGNORECASE)
+AUDITED_SECTIONS = ("redis_keys", "redis_commands", "http_routes", "l1_caches")
+
+
+def _positive_number(value: object) -> bool:
+    return not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value) and value > 0
 
 
 def check_cache_config(config: Any) -> list[dict[str, str]]:
     """Validate multi-tier cache configuration (Redis L2, HTTP/CDN L0, in-process L1)."""
     violations: list[dict[str, str]] = []
-    if not isinstance(config, dict) or not config:
+    if not isinstance(config, dict) or not any(config.get(section) for section in AUDITED_SECTIONS):
         return [{"code": "EMPTY_CONFIG", "detail": "Cache configuration must be a non-empty JSON object."}]
 
     # 1. Redis / Valkey L2 keys & commands
@@ -38,7 +47,7 @@ def check_cache_config(config: Any) -> list[dict[str, str]]:
                 continue
             pattern = str(entry.get("pattern", "")).strip()
             scope = str(entry.get("scope", "tenant")).lower()
-            multi_tenant = bool(entry.get("multi_tenant", scope != "public"))
+            multi_tenant = strict_bool(entry.get("multi_tenant", scope != "public"), "multi_tenant")
 
             if not pattern:
                 violations.append({"code": "EMPTY_KEY_PATTERN", "detail": f"redis_keys[{idx}] missing `pattern`."})
@@ -56,34 +65,32 @@ def check_cache_config(config: Any) -> list[dict[str, str]]:
                     "detail": f"Redis key `{pattern}` lacks explicit schema version segment (e.g. `:v1:`) for safe deploy rollouts.",
                 })
 
-            persistent = bool(entry.get("persistent_structure", False))
+            persistent = strict_bool(entry.get("persistent_structure", False), "persistent_structure")
             ttl_sec = entry.get("ttl_sec")
             if not persistent:
-                if not isinstance(ttl_sec, (int, float)) or ttl_sec <= 0:
+                if not _positive_number(ttl_sec):
                     violations.append({
                         "code": "MISSING_OR_ZERO_TTL",
                         "detail": f"Redis key `{pattern}` must set a positive finite `ttl_sec`.",
                     })
 
-            bulk_or_hot = bool(entry.get("bulk_warmed", False) or entry.get("high_traffic", False))
+            bulk_warmed = strict_bool(entry.get("bulk_warmed", False), "bulk_warmed")
+            high_traffic = strict_bool(entry.get("high_traffic", False), "high_traffic")
+            bulk_or_hot = bulk_warmed or high_traffic
             jitter_ratio = entry.get("jitter_ratio", 0)
-            if bulk_or_hot and (not isinstance(jitter_ratio, (int, float)) or jitter_ratio <= 0):
+            if bulk_or_hot and not _positive_number(jitter_ratio):
                 violations.append({
                     "code": "MISSING_TTL_JITTER",
                     "detail": f"Bulk-warmed/high-traffic key `{pattern}` requires positive `jitter_ratio` (e.g. 0.1–0.2) to prevent cache avalanche.",
                 })
 
-            if bool(entry.get("expensive_loader", False)):
-                has_defense = bool(
-                    entry.get("singleflight", False)
-                    or entry.get("mutex_lock", False)
-                    or entry.get("stale_while_revalidate", False)
-                )
-                if not has_defense:
-                    violations.append({
-                        "code": "MISSING_STAMPEDE_DEFENSE",
-                        "detail": f"Expensive hot key `{pattern}` lacks `singleflight`, `mutex_lock`, or `stale_while_revalidate` stampede protection.",
-                    })
+            defenses = ("singleflight", "mutex_lock", "stale_while_revalidate")
+            has_defense = any([strict_bool(entry.get(field, False), field) for field in defenses])
+            if strict_bool(entry.get("expensive_loader", False), "expensive_loader") and not has_defense:
+                violations.append({
+                    "code": "MISSING_STAMPEDE_DEFENSE",
+                    "detail": f"Expensive hot key {pattern!r} lacks singleflight, mutex_lock, or stale_while_revalidate stampede protection.",
+                })
 
             inv_cmd = str(entry.get("invalidation_command", ""))
             if inv_cmd and DANGEROUS_REDIS_CMD_RE.search(inv_cmd):
@@ -92,7 +99,11 @@ def check_cache_config(config: Any) -> list[dict[str, str]]:
                     "detail": f"Redis key `{pattern}` uses blocking/destructive command `{inv_cmd}`; use explicit key deletion, generation tokens, or SCAN.",
                 })
 
-    for raw_cmd in config.get("redis_commands", []):
+    redis_commands = config.get("redis_commands", [])
+    if not isinstance(redis_commands, list):
+        violations.append({"code": "INVALID_REDIS_COMMANDS", "detail": "`redis_commands` must be an array."})
+        redis_commands = []
+    for raw_cmd in redis_commands:
         if isinstance(raw_cmd, str) and DANGEROUS_REDIS_CMD_RE.search(raw_cmd):
             violations.append({
                 "code": "FORBIDDEN_REDIS_COMMAND",
@@ -110,8 +121,8 @@ def check_cache_config(config: Any) -> list[dict[str, str]]:
                 continue
             path = str(route.get("path", f"http_routes[{idx}]"))
             cc = str(route.get("cache_control", "")).lower()
-            authenticated = bool(route.get("authenticated", False))
-            contains_pii = bool(route.get("contains_pii", False))
+            authenticated = strict_bool(route.get("authenticated", False), "authenticated")
+            contains_pii = strict_bool(route.get("contains_pii", False), "contains_pii")
 
             if authenticated or contains_pii:
                 if "public" in cc or "s-maxage" in cc:
@@ -149,13 +160,13 @@ def check_cache_config(config: Any) -> list[dict[str, str]]:
                 continue
             name = str(cache.get("name", f"l1_caches[{idx}]"))
             max_entries = cache.get("max_entries")
-            if not isinstance(max_entries, int) or max_entries <= 0:
+            if isinstance(max_entries, bool) or not isinstance(max_entries, int) or max_entries <= 0:
                 violations.append({
                     "code": "UNBOUNDED_L1_CACHE",
                     "detail": f"In-process L1 cache `{name}` lacks a positive `max_entries` LRU cap (OOM leak risk).",
                 })
             ttl_sec = cache.get("ttl_sec")
-            if not isinstance(ttl_sec, (int, float)) or ttl_sec <= 0:
+            if not _positive_number(ttl_sec):
                 violations.append({
                     "code": "UNBOUNDED_L1_TTL",
                     "detail": f"In-process L1 cache `{name}` must declare a bounded positive `ttl_sec`.",
@@ -293,4 +304,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

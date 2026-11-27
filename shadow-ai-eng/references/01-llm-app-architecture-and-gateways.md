@@ -11,7 +11,7 @@ Design resilient, version-pinned LLM application architectures and multi-provide
   1. **Pinned Model Snapshots:** Pin exact immutable version IDs (never floating `latest` aliases in regulated/tested production paths — silent model swaps break structured outputs and evals!).
   2. **Explicit Timeouts & Bounded Retries:** Set TTFT/total timeouts (`<= 30s` non-streaming, `<= 15s` TTFT streaming), retry ONLY `408`/`429` (honoring `Retry-After`)/`502`/`503`/`504` max `2` times with Full Jitter, and NEVER retry `400`/`401`/`403`!
   3. **Circuit Breaker & Verified Fallback Tiers:** Trip provider circuit breaker on sustained `5xx`/`429` bursts and route ONLY to an **eval-verified** fallback model (confirming structured-output & safety parity via `/shadow-eval` beforehand!).
-  4. **Per-Tenant Token & Cost Quotas (`OWASP LLM10:2025`):** Enforce per-tenant rate limits, `max_output_tokens`, and `thinking_budget` caps at the gateway before forwarding upstream.
+  4. **Per-Tenant Token & Cost Quotas (`OWASP LLM06:2026` Unbounded Consumption):** Enforce per-tenant rate limits, `max_output_tokens`, and `thinking_budget` caps at the gateway before forwarding upstream.
 - **Prompt & Model Version Governance:** Store prompt templates as versioned code in Git (`prompt_id`, `prompt_version`, `model_id`, `temperature`, `schema_hash`) and log these exact coordinates on every trace (`shadow-observe`) so quality regressions bisect cleanly!
 
 ## 4. Architecture & Implementation
@@ -83,7 +83,7 @@ During a regional primary-model `503` spike, a copilot app with no circuit break
 
 ## 11. Authoritative References
 - NIST AI RMF (`AI 100-1` & `AI 600-1`) — *Manage & Govern* (`https://www.nist.gov/itl/ai-risk-management-framework`).
-- OWASP Top 10 for LLM Applications 2025 — `LLM10:2025` Unbounded Consumption (`https://genai.owasp.org/llm-top-10/`).
+- OWASP Top 10 for LLM Applications 2026 — `LLM06:2026` Unbounded Consumption (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
 
 ## 12. Limitations & When NOT to Use
 - Do NOT use an LLM at all for deterministic tasks that pure code, SQL, regex, or a lightweight classical classifier solves faster, cheaper, and with 100% repeatability!

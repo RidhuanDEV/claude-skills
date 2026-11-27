@@ -1,6 +1,6 @@
 ---
 name: antislop
-description: "Anti Slop: Rules for AI Coding Agents. Use when building, editing, or reviewing any UI, frontend layout, copywriting, or component states; loads alongside UI skills to stop generic AI slop."
+description: "Use when checking frontend work for generic AI output across visual design, responsiveness, accessibility, and copy."
 allowed-tools: Read Write Edit Glob Grep
 ---
 # antislop
@@ -35,6 +35,8 @@ The folder this skill sits in holds a `VERSION` file naming the release it came 
 Skills load when a session starts, so the session asking the question keeps the old rules either way. Say so, and tell the user to start a new one.
 
 ---
+
+**Settings helper:** `python "antislop/scripts/antislop_settings.py" --settings .antislop.json` falls back to `during` on corrupt, unknown or injected settings.
 
 ## Two Usage Modes
 

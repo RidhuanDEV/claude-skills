@@ -14,7 +14,7 @@ Deliver snappy, cancellable token-streaming UX over **Server-Sent Events (`text/
   - `X-Accel-Buffering: no` (disables Nginx proxy buffering!)
   - Periodic SSE heartbeat comments (`: keepalive\n\n` every `15s`) so idle reasoning pauses never trip `30s` load-balancer idle timeouts!
 - **Typed Streaming Event Protocol (Never Stream Raw Unframed Text):** Emit explicit typed JSON frames (`event: status`, `event: token`, `event: citation`, `event: tool_preview`, `event: done`, `event: error`) with monotonic `seq` IDs so the frontend cleanly renders tool progress, citations, HITL approval buttons, and partial-failure recovery without corrupting Markdown!
-- **Bounded Token & Thinking Ceilings (`OWASP LLM10`):** Cap BOTH `max_output_tokens` AND `thinking_budget` per request tier (remember: reasoning/thinking tokens bill at expensive output-token rates — `/shadow-finops`!).
+- **Bounded Token & Thinking Ceilings (`OWASP LLM06:2026` Unbounded Consumption):** Cap BOTH `max_output_tokens` AND `thinking_budget` per request tier (remember: reasoning/thinking tokens bill at expensive output-token rates — `/shadow-finops`!).
 
 ## 4. Architecture & Implementation
 ```typescript

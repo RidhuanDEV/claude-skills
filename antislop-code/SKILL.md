@@ -1,6 +1,6 @@
 ---
 name: antislop-code
-description: "Code comment hygiene for AI coding agents. Use when writing or refactoring source code comments to strip generic AI-slop filler while keeping non-obvious why-comments."
+description: "Use when removing redundant code comments or rewriting comments to explain why. Not for technical documentation (/shadow-doc)."
 allowed-tools: Read Write Edit Glob Grep
 ---
 # antislop-code

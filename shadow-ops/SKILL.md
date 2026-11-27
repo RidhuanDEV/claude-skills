@@ -1,6 +1,6 @@
 ---
 name: shadow-ops
-description: "DevOps, Docker, Kubernetes & Infrastructure Operations. Use when configuring Docker/Compose, Kubernetes/Terraform IaC, Nginx/Caddy reverse proxies, Linux systemd/PM2/VPS, CI/CD pipelines, SSL/TLS, secret rotation, or 3-2-1 backup infrastructure. Do NOT use for SLO alert design (shadow-observe) or SemVer release checklists (shadow-release)."
+description: "Use when configuring Docker, Kubernetes, Terraform, TLS, reverse proxies, VPS, or CI/CD infrastructure. Not for rollout governance (/shadow-release)."
 ---
 
 # Shadow Ops (`/shadow-ops`) — Full-Spectrum DevOps, Immutable Deployments & Infrastructure Hardening
@@ -33,6 +33,7 @@ Load ONLY the 1–2 playbooks or vendored OWASP/H5BP standards needed for the ac
 | [OWASP_Logging_Cheat_Sheet.md](references/vendor/OWASP_Logging_Cheat_Sheet.md) | Vendored OWASP operational logging hygiene | Securing log shippers, storage, and PII scrubbing at infra layer |
 | [OWASP_Secrets_Management_Cheat_Sheet.md](references/vendor/OWASP_Secrets_Management_Cheat_Sheet.md) | Vendored OWASP secrets lifecycle & rotation | Designing secret managers and zero-downtime dual-key rotation |
 | Vendored H5BP Nginx Configs | [H5BP_nginx_main.conf](references/vendor/H5BP_nginx_main.conf), [H5BP_nginx_ssl_engine.conf](references/vendor/H5BP_nginx_ssl_engine.conf), [H5BP_nginx_compression.conf](references/vendor/H5BP_nginx_compression.conf) | Referencing battle-tested H5BP Nginx TLS & compression directives |
+| [LICENSES.md](references/vendor/LICENSES.md) | Upstream licenses for the vendored files (OWASP cheat sheets: CC BY-SA 4.0; H5BP: MIT) and the `VENDOR.json` hash lock | Before copying, adapting or redistributing any vendored text |
 | [evaluations.md](evaluations.md) | Graded specialist evaluation scenarios (`OPS-EVAL-01..08`) | Auditing Docker ufw traps, shared-hosting fit, SDK portability, and `L4` gates |
 
 ---

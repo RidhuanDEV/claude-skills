@@ -15,6 +15,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 HIGH_CARDINALITY_LABELS = frozenset({
     "user_id",
     "userid",
@@ -98,8 +101,9 @@ def check_metrics_config(config: Any) -> list[dict[str, str]]:
                 continue
             name = str(alert.get("name", f"alerts[{idx}]"))
             severity = str(alert.get("severity", "")).lower()
-            paging = bool(alert.get("paging", severity in {"critical", "p1", "page"}))
+            paging = strict_bool(alert.get("paging", severity in {"critical", "p1", "page"}), "paging")
 
+            symptom_based = strict_bool(alert.get("symptom_based", True), "symptom_based")
             if paging:
                 runbook = str(alert.get("runbook_url", "") or alert.get("triage_command", "")).strip()
                 if not runbook:
@@ -110,8 +114,7 @@ def check_metrics_config(config: Any) -> list[dict[str, str]]:
 
                 alert_type = str(alert.get("type", "")).lower()
                 expr = str(alert.get("expr", "")).lower()
-                symptom_based = alert.get("symptom_based")
-                if symptom_based is False or (
+                if not symptom_based or (
                     ("cpu" in expr or "memory" in expr)
                     and "5xx" not in expr
                     and "error" not in expr
@@ -142,13 +145,15 @@ def check_metrics_config(config: Any) -> list[dict[str, str]]:
         else:
             head_rate = sampling.get("head_sample_rate", 1.0)
             tail_policy = sampling.get("tail_sampling", {})
-            if isinstance(head_rate, (int, float)) and head_rate < 1.0:
-                if not isinstance(tail_policy, dict) or not (
-                    tail_policy.get("keep_5xx") and tail_policy.get("keep_slow_traces")
-                ):
+            if not isinstance(tail_policy, dict):
+                violations.append({"code": "INVALID_SAMPLING", "detail": "tail_sampling must be an object."})
+            else:
+                keep_5xx = strict_bool(tail_policy.get("keep_5xx", False), "tail_sampling.keep_5xx")
+                keep_slow = strict_bool(tail_policy.get("keep_slow_traces", False), "tail_sampling.keep_slow_traces")
+                if isinstance(head_rate, (int, float)) and head_rate < 1.0 and not (keep_5xx and keep_slow):
                     violations.append({
                         "code": "HEAD_SAMPLING_DROPS_ERRORS",
-                        "detail": "Head sampling < 1.0 without tail-based `keep_5xx: true` and `keep_slow_traces: true` risks dropping critical incident traces.",
+                        "detail": "Head sampling < 1.0 requires tail-based retention of errors and slow traces.",
                     })
 
     return violations
@@ -391,4 +396,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

@@ -1,6 +1,6 @@
 ---
 name: shadow-observe
-description: "Production Observability & SRE. Use when defining SLIs/SLOs, multi-window error budget burn-rate alerts, OpenTelemetry tracing, structured JSON wide-event logging with PII redaction, Prometheus cardinality control, dashboards-as-code, or incident telemetry triage. Do NOT use for infra provisioning (shadow-ops) or product analytics (shadow-analytics)."
+description: "Use when instrumenting SLI/SLO, burn-rate alerts, OpenTelemetry traces, logs, or metric cardinality. Not for load testing (/shadow-perf)."
 ---
 
 # Shadow Observe (`/shadow-observe`) — Production Observability, SLOs, Tracing & Telemetry Hygiene

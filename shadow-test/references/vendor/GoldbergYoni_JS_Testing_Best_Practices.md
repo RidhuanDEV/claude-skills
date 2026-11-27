@@ -1,3 +1,10 @@
+<!--
+Vendored third-party content. Source: https://github.com/goldbergyoni/javascript-testing-best-practices
+Copyright (c) 2019 Yoni Goldberg. License: MIT; full text in LICENSES.md in this folder.
+Modified: this notice was added; the text below is otherwise as vendored.
+Upstream revision was not recorded when the file was vendored; re-check the source before relying on it.
+-->
+
 <img src="/assets/jtbp-header-blue.png" width="1920px"/>
 
 

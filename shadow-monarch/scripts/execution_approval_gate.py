@@ -16,6 +16,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from shadow_input import run_checked_cli, strict_bool
+
 LEVEL_ORDER: dict[str, int] = {
     "L0_READ_ONLY": 0,
     "L1_SAFE_VERIFICATION": 1,
@@ -102,7 +105,7 @@ def _infer_required_level(req: dict[str, Any]) -> tuple[str, list[str]]:
     env = _norm_env(req.get("environment"))
     target_paths: list[str] = [str(x) for x in (req.get("target_paths") or [])]
     allowed_paths: list[str] = [str(x) for x in (req.get("requested_modules") or req.get("allowed_paths") or [])]
-    is_mutation = bool(req.get("is_mutation", False)) or action_type in {
+    is_mutation = strict_bool(req.get("is_mutation", False), "is_mutation") or action_type in {
         "edit_file",
         "write_file",
         "delete_file",
@@ -114,7 +117,7 @@ def _infer_required_level(req: dict[str, Any]) -> tuple[str, list[str]]:
         "git_push",
         "global_install",
     }
-    is_destructive = bool(req.get("is_destructive", False))
+    is_destructive = strict_bool(req.get("is_destructive", False), "is_destructive")
 
     # Unknown or restricted target environment fails conservatively
     if env == "unknown":
@@ -255,7 +258,7 @@ def evaluate_execution_request(req: dict[str, Any], approval: dict[str, Any] | N
     intent_max = INTENT_MAX_AUTO_LEVEL.get(user_intent, "L1_SAFE_VERIFICATION")
     boundary_violation: str | None = None
     action_type = str(req.get("action_type") or "").strip().lower()
-    if user_intent == "code_review" and (bool(req.get("is_mutation")) or required_level != "L0_READ_ONLY"):
+    if user_intent == "code_review" and (strict_bool(req.get("is_mutation", False), "is_mutation") or required_level != "L0_READ_ONLY"):
         boundary_violation = "Testing/Intent boundary violation: `code_review` is strictly `L0_READ_ONLY`; modifications are prohibited."
 
     if boundary_violation is None and env in SAFE_AUTO_ENVS and LEVEL_ORDER[required_level] <= LEVEL_ORDER[intent_max]:
@@ -644,4 +647,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

@@ -92,16 +92,17 @@ class IdempotencyRecoveryTests(unittest.TestCase):
             RECONCILE["decide"]({"operation_id": "ord-900", "state": "UNKNOWN", "inquiry_supported": True}),
             "QUERY_STATUS",
         )
-        self.assertEqual(
-            RECONCILE["decide"](
-                {
-                    "operation_id": "ord-900",
-                    "state": "UNKNOWN",
-                    "inquiry": {"verified": True, "operation_id": "ord-900", "state": "CONFIRMED"},
-                }
-            ),
-            "RECORD_CONFIRMED",
-        )
+        details = {"account": "merchant-1", "currency": "IDR", "provider_tx_id": "tx-900", "amount_minor": 75000}
+        inquiry = dict(details, verified=True, operation_id="ord-900", state="CONFIRMED")
+        record = dict(details, operation_id="ord-900", state="UNKNOWN", inquiry=inquiry)
+        self.assertEqual(RECONCILE["decide"](record), "RECORD_CONFIRMED")
+        for field, wrong_value in {
+            "account": "merchant-2", "currency": "USD",
+            "provider_tx_id": "tx-901", "amount_minor": 75000.0,
+        }.items():
+            with self.subTest(field=field):
+                mismatched = dict(record, inquiry=dict(inquiry, **{field: wrong_value}))
+                self.assertEqual(RECONCILE["decide"](mismatched), "MANUAL_RECONCILIATION")
 
 
 if __name__ == "__main__":

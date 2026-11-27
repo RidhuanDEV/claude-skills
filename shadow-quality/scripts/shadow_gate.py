@@ -449,7 +449,7 @@ def run_shadow_gate(
                 check=False,
             )
             gate_data = json.loads(proc.stdout) if proc.returncode == 0 and proc.stdout.strip() else {}
-            approval_gate_verified = proc.returncode == 0 and bool(gate_data.get("all_passed"))
+            approval_gate_verified = proc.returncode == 0 and (gate_data.get("all_passed") is True)
             if not approval_gate_verified:
                 violations.append({
                     "severity": "CRITICAL",
@@ -480,7 +480,7 @@ def run_shadow_gate(
                 check=False,
             )
             of_data = json.loads(proc_of.stdout) if proc_of.returncode == 0 and proc_of.stdout.strip() else {}
-            official_first_verified = proc_of.returncode == 0 and bool(of_data.get("all_passed"))
+            official_first_verified = proc_of.returncode == 0 and (of_data.get("all_passed") is True)
             if not official_first_verified:
                 violations.append({
                     "severity": "CRITICAL",
@@ -511,7 +511,7 @@ def run_shadow_gate(
                 check=False,
             )
             doc_data = json.loads(proc_doc.stdout) if proc_doc.returncode == 0 and proc_doc.stdout.strip() else {}
-            doc_engine_verified = proc_doc.returncode == 0 and bool(doc_data.get("all_passed"))
+            doc_engine_verified = proc_doc.returncode == 0 and (doc_data.get("all_passed") is True)
             if not doc_engine_verified:
                 violations.append({
                     "severity": "CRITICAL",
@@ -528,6 +528,27 @@ def run_shadow_gate(
                 "file": "shadow-doc/scripts/doc_orchestrator.py",
                 "message": f"Failed executing doc orchestrator self-test: {exc}",
                 "corrective_action": "Inspect Python environment and `doc_orchestrator.py`.",
+            })
+
+    wave1_tests = root / "shadow-quality" / "tests" / "test_wave1_evidence.py"
+    if wave1_tests.is_file():
+        try:
+            evidence_probes = subprocess.run(
+                [sys.executable, "-B", str(wave1_tests), "-q"],
+                capture_output=True, text=True, encoding="utf-8", timeout=30, check=False,
+            )
+            failure = ""
+            if evidence_probes.returncode:
+                failure = (evidence_probes.stderr or evidence_probes.stdout).strip() or f"Exit {evidence_probes.returncode}."
+        except (OSError, subprocess.SubprocessError) as exc:
+            failure = str(exc)
+        if failure:
+            violations.append({
+                "severity": "CRITICAL",
+                "code": "WAVE1_EVIDENCE_REGRESSION",
+                "file": str(wave1_tests.relative_to(root)),
+                "message": failure,
+                "corrective_action": "Run test_wave1_evidence.py and fix verifier evidence regressions.",
             })
 
     blocking = [v for v in violations if v.get("severity") in ("CRITICAL", "HIGH")]

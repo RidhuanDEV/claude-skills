@@ -1,6 +1,6 @@
 ---
 name: modern-web-guidance
-description: "Modern Web Platform & Baseline Guidance (GoogleChrome modern-web-guidance). Use when building or styling HTML, CSS, React/Vue/Angular/Svelte components, native dialogs/popovers, container queries, `:has()`, `:user-valid`, animations, scroll effects, or Core Web Vitals (LCP/INP/CLS) & React/Next.js performance optimizations. Do NOT use for backend SQL/ORMs, Docker/CI pipelines, or local Python/Go CLI scripts."
+description: "Use when choosing Baseline web APIs, native dialog/popover, container queries, or fixing LCP, INP, and CLS. Not for crawl SEO (/shadow-seo)."
 ---
 
 # Modern Web Guidance (`/modern-web-guidance`) — Baseline Web Platform & Frontend Performance

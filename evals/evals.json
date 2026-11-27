@@ -263,12 +263,12 @@
       "id": 20,
       "name": "ai-rag-eval-owasp-llm-2025",
       "prompt": "Audit dan buatkan gerbang evaluasi (/shadow-eval) untuk chatbot RAG multi-tenant kami yang juga memanggil tool refund otomatis via SQL.",
-      "expected_output": "Menerapkan OWASP Top 10 for LLM Applications (2025) dan NIST AI 600-1: menguji LLM01 Prompt Injection, LLM05 Improper Output Handling (parameterized SQL), LLM06 Excessive Agency (HITL approval untuk refund), LLM08 Vector Weaknesses (100% tenant ACL pre-filtering), serta mengukur RAG Triad (Context Recall, Faithfulness, Citation Integrity) dan precision/recall probes.",
+      "expected_output": "Menerapkan OWASP Top 10 for LLM Applications (edisi 2026) dan NIST AI 600-1: menguji LLM01 Prompt Injection, LLM10 Improper Output Handling (parameterized SQL), LLM03 Excessive Agency (HITL approval untuk refund), LLM09 Vector and Embedding Weaknesses (100% tenant ACL pre-filtering), serta mengukur RAG Triad (Context Recall, Faithfulness, Citation Integrity) dan precision/recall probes.",
       "files": [],
       "assertions": [
-        "Maps controls to OWASP Top 10 for LLM Applications 2025 (LLM01, LLM05, LLM06, LLM08) and NIST AI 600-1",
-        "Enforces 100% tenant ACL pre-filtering inside vector retrieval (LLM08) and Faithfulness / Citation Integrity scoring",
-        "Requires Human-in-the-Loop (HITL) approval for financial refund tools (LLM06) and zero raw LLM-to-SQL interpolation (LLM05)",
+        "Maps controls to OWASP Top 10 for LLM Applications 2026 (LLM01, LLM03, LLM09, LLM10) and NIST AI 600-1",
+        "Enforces 100% tenant ACL pre-filtering inside vector retrieval (LLM09) and Faithfulness / Citation Integrity scoring",
+        "Requires Human-in-the-Loop (HITL) approval for financial refund tools (LLM03) and zero raw LLM-to-SQL interpolation (LLM10)",
         "Includes precision probes (negative/out-of-scope/topic-switch) alongside recall probes"
       ]
     },

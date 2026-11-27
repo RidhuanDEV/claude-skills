@@ -1,3 +1,10 @@
+<!--
+Vendored third-party content. Source: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+Creator: OWASP Cheat Sheet Series contributors (OWASP Foundation). License: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), provided without warranty.
+Modified: this notice was added; the text below is otherwise as vendored. Adaptations must stay under CC BY-SA 4.0.
+Upstream revision was not recorded when the file was vendored; re-check the source before relying on it.
+-->
+
 # Secrets Management Cheat Sheet
 
 ## 1 Introduction

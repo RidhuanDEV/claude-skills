@@ -8,7 +8,7 @@ Use these 9 graded real-world scenarios to evaluate whether an agent executing `
 - **Prompt:** "Our app logs show SMTP `250 OK` from SES, yet 40% of corporate customers report never receiving invoices. How do you diagnose and resolve this?"
 - **Required Reasoning Checkpoints (4/4):**
   - [ ] Explains that SMTP `250 OK` from the relay/ESP only confirms queue acceptance — NOT inbox placement.
-  - [ ] Inspects full `Authentication-Results` headers (`SPF`, `DKIM`, `DMARC` alignment), ESP delivery/bounce/deferral webhook logs, and Google Postmaster / Microsoft SNDS reputation.
+  - [ ] Inspects full `Authentication-Results` headers (`SPF`, `DKIM`, `DMARC` alignment), ESP delivery/bounce/deferral webhook logs, Google Postmaster v2 Compliance Status / user-reported spam rate, and Microsoft SNDS reputation.
   - [ ] Checks for `5.7.x` policy rejections, missing custom-domain alignment, or spam-folder filtering on shared/new IPs.
   - [ ] Verifies DNS alignment via `email_deliverability_verifier.py --check-dns` before recommending code changes.
 

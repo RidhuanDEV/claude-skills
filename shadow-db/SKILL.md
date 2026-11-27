@@ -1,6 +1,6 @@
 ---
 name: shadow-db
-description: "Database Architecture, Live Inspection & SQL Performance Specialist. Use when inspecting live DBs via shadow_db MCP, diagnosing EXPLAIN ANALYZE/locks/deadlocks, designing composite/partial/FK indexes, hardening Postgres RLS ((SELECT auth.uid())) & SECURITY DEFINER, sizing PgBouncer/partitioning, generating DBML/Mermaid ERDs, or drafting Star Schema DW/Pentaho ETL. Do NOT use for app backfill workflows (/shadow-data)."
+description: "Use when inspecting databases, query plans, EXPLAIN, indexes, RLS, ERDs, or PgBouncer. Not for app data backfills (/shadow-data)."
 ---
 
 # Shadow DB (`/shadow-db`) — Multi-Engine Database Engineering, Inspection & SQL Tuning

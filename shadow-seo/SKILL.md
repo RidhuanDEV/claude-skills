@@ -1,6 +1,6 @@
 ---
 name: shadow-seo
-description: "Technical SEO Engineering & Organic Growth Specialist. Use when auditing or implementing search architecture, JSON-LD Schema.org, JavaScript SSR/ISR rendering, crawl budget/sitemaps, international hreflang, domain migrations, Core Web Vitals (CrUX), internal linking, e-commerce/programmatic SEO, AI search visibility (GEO), Search Console diagnostics, or CI SEO gates. Do NOT use for OG artwork (/shadow-illustration) or product analytics (/shadow-analytics)."
+description: "Use when checking crawl/indexing, hreflang, canonical URLs, JSON-LD, sitemaps, CrUX, or search visibility."
 ---
 
 # Shadow SEO (`/shadow-seo`) — Technical SEO Engineering & Organic Growth

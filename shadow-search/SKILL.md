@@ -1,6 +1,6 @@
 ---
 name: shadow-search
-description: "Search, Retrieval & Ranking Engineering. Use when designing or tuning lexical BM25, Indonesian morphology/analyzers, vector ANN, hybrid RRF fusion, cross-encoder reranking, PIT/search_after pagination, zero-downtime alias reindexing, Recall@K/MRR@K/NDCG@K benchmarks, or search tenant ACL prefiltering. Do NOT use for LLM answer faithfulness (shadow-eval), general Redis cache (shadow-cache), or arbitrary SQL tuning (shadow-db)."
+description: "Use when tuning search retrieval, BM25, vector ANN, RRF, rank metrics, reindexing, or ACL prefilters. Not for RAG answer grading (/shadow-eval)."
 ---
 
 # `/shadow-search` — Search, Retrieval & Ranking Engineering

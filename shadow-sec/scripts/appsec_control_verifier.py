@@ -77,7 +77,7 @@ def _parse_numeric_ipv4(host: str) -> ipaddress.IPv4Address | None:
     parts = clean.split(".")
     if len(parts) == 4 and all(re.fullmatch(r"(?:0x[0-9a-fA-F]+|0[0-7]+|\d+)", p) for p in parts):
         try:
-            octets = [int(p, 0) for p in parts]
+            octets = [int(p, 16) if p.lower().startswith("0x") else int(p, 8) if len(p) > 1 and p.startswith("0") else int(p) for p in parts]
             if all(0 <= o <= 255 for o in octets):
                 return ipaddress.IPv4Address(bytes(octets))
         except ValueError:
@@ -149,8 +149,11 @@ def check_ssrf_url(
 
 def check_finding_report(report: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
-    if report.get("unapproved_live_probing_executed") is True:
+    live_probing = report.get("unapproved_live_probing_executed")
+    if live_probing is True:
         errors.append("SAFETY_VIOLATION: Active live security probing/fuzzing executed without explicit L3/L4 approval.")
+    elif live_probing is not None and live_probing is not False:
+        errors.append("'unapproved_live_probing_executed' must be a JSON boolean.")
 
     findings = report.get("findings", [])
     if not isinstance(findings, list) or len(findings) == 0:

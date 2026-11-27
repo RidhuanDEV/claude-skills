@@ -1,6 +1,6 @@
 ---
 name: shadow-resilience
-description: "Disaster Recovery & Business Continuity. Use when running automated DB backup restore drills (RPO/RTO verification), UU PDP erasure tombstone replay after restore, bulkhead isolation, circuit breakers, graceful degradation, rate-limited DLQ replay, or scoped staging fault injection. Do NOT use for infra provisioning (shadow-ops) or durable queue design (shadow-concurrency)."
+description: "Use when validating backup restores, RPO/RTO, DR drills, bulkheads, or graceful degradation. Not for backup provisioning (/shadow-ops)."
 ---
 
 # Shadow Resilience (`/shadow-resilience`) — Disaster Recovery Drills, RPO/RTO, Bulkheads & Graceful Degradation

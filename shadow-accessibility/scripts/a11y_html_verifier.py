@@ -40,6 +40,8 @@ def _channel_to_linear(hex_val: int) -> float:
 
 
 def relative_luminance(hex_color: str) -> float:
+    if not isinstance(hex_color, str):
+        raise ValueError(f"Invalid hex color: {hex_color!r}")
     cleaned = hex_color.strip().lstrip("#")
     if len(cleaned) == 3:
         cleaned = "".join(c * 2 for c in cleaned)

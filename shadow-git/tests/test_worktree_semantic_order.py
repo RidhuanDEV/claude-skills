@@ -1,87 +1,140 @@
+"""Exercise the shipped git_orchestrator against real temporary repositories (no network, no pushes)."""
+
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_HALF_UP
+import importlib.util
+from pathlib import Path
+import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
-from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "git_orchestrator.py"
+_spec = importlib.util.spec_from_file_location("git_orchestrator", SCRIPT)
+assert _spec is not None and _spec.loader is not None
+git_orchestrator = importlib.util.module_from_spec(_spec)
+sys.modules["git_orchestrator"] = git_orchestrator
+_spec.loader.exec_module(git_orchestrator)
+
+GIT_AVAILABLE = shutil.which("git") is not None
 
 
 def git(cwd: Path, *args: str) -> str:
-    proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True)
-    return proc.stdout.strip()
+    completed = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True, timeout=60)
+    return completed.stdout.strip()
 
 
-def apply_discount_cents(subtotal_cents: int, pct: Decimal) -> int:
-    discount = (Decimal(subtotal_cents) * pct / Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
-    return max(0, subtotal_cents - int(discount))
+def init_repo(root: Path) -> Path:
+    repo = root / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "test@example.invalid")
+    git(repo, "config", "user.name", "Shadow Test")
+    git(repo, "config", "commit.gpgsign", "false")
+    (repo / "app.py").write_text("VALUE = 1\n", encoding="utf-8")
+    git(repo, "add", "app.py")
+    git(repo, "commit", "-q", "-m", "initial")
+    return repo
 
 
-class WorktreeAndSemanticOrderTests(unittest.TestCase):
-    def test_t03_target_branch_advance_invalidates_stale_merge_tree_preview(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            repo = root / "repo"
-            repo.mkdir()
-            git(repo, "init", "-b", "main")
-            git(repo, "config", "user.email", "test@shadow.local")
-            git(repo, "config", "user.name", "Shadow Test")
-            (repo / "app.txt").write_text("v1\n", encoding="utf-8")
-            git(repo, "add", "app.txt")
-            git(repo, "commit", "-m", "init")
+def commit_on(repo: Path, branch: str, filename: str, content: str, base: str = "main") -> None:
+    git(repo, "checkout", "-q", "-B", branch, base)
+    (repo / filename).parent.mkdir(parents=True, exist_ok=True)
+    (repo / filename).write_text(content, encoding="utf-8")
+    git(repo, "add", filename)
+    git(repo, "commit", "-q", "-m", f"change {filename} on {branch}")
+    git(repo, "checkout", "-q", "main")
 
-            wt_a = root / "wt-a"
-            wt_b = root / "wt-b"
-            git(repo, "worktree", "add", "-b", "feat/a", str(wt_a))
-            git(repo, "worktree", "add", "-b", "feat/b", str(wt_b))
 
-            (wt_a / "a.txt").write_text("feature a\n", encoding="utf-8")
-            git(wt_a, "add", "a.txt")
-            git(wt_a, "commit", "-m", "add a")
+class RedactionTests(unittest.TestCase):
+    def test_credentials_are_redacted(self) -> None:
+        cases = (
+            "remote https://user:s3cr3tpass@github.com/acme/app.git",
+            "token ghp_" + "A" * 30,
+            "key AKIA" + "B" * 16,
+        )
+        for text in cases:
+            with self.subTest(text=text):
+                out = git_orchestrator.redact_secrets(text)
+                self.assertIn("[REDACTED", out)
+                self.assertNotIn("s3cr3tpass", out)
 
-            preview_base_sha = git(repo, "rev-parse", "main")
-            # Advance main independently
-            (repo / "main.txt").write_text("main advance\n", encoding="utf-8")
-            git(repo, "add", "main.txt")
-            git(repo, "commit", "-m", "advance main")
-            current_main_sha = git(repo, "rev-parse", "main")
+    def test_ordinary_text_is_untouched(self) -> None:
+        for text in ("https://github.com/acme/app.git", "branch feature/ghp-docs", "AKIA is a prefix"):
+            with self.subTest(text=text):
+                self.assertEqual(git_orchestrator.redact_secrets(text), text)
 
-            self.assertNotEqual(preview_base_sha, current_main_sha)
-            # Clean worktrees before tempdir cleanup on Windows
-            git(repo, "worktree", "remove", "--force", str(wt_a))
-            git(repo, "worktree", "remove", "--force", str(wt_b))
 
-    def test_t16_e09_semantic_event_ordering_catches_pre_commit_publish_but_allows_safe_refactor(self) -> None:
-        def run_pipeline(events: list[str], publish_before_commit: bool, use_new_serializer: bool) -> list[str]:
-            log: list[str] = []
-            payload = "v2-serialized" if use_new_serializer else "v1-serialized"
-            if publish_before_commit:
-                log.append(f"PUBLISH:{payload}")
-                log.append("DB_COMMIT")
-            else:
-                log.append("DB_COMMIT")
-                log.append(f"PUBLISH:{payload}")
-            events.extend(log)
-            return log
+@unittest.skipUnless(GIT_AVAILABLE, "git is not installed")
+class WorktreeGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = init_repo(Path(self._tmp.name))
 
-        bad_trace: list[str] = []
-        run_pipeline(bad_trace, publish_before_commit=True, use_new_serializer=False)
-        self.assertLess(bad_trace.index("PUBLISH:v1-serialized"), bad_trace.index("DB_COMMIT"))
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
 
-        good_trace: list[str] = []
-        run_pipeline(good_trace, publish_before_commit=False, use_new_serializer=True)
-        self.assertLess(good_trace.index("DB_COMMIT"), good_trace.index("PUBLISH:v2-serialized"))
+    def test_status_distinguishes_clean_untracked_staged_and_missing(self) -> None:
+        self.assertTrue(git_orchestrator.inspect_worktree_status(self.repo)["clean"])
+        (self.repo / "notes.txt").write_text("wip\n", encoding="utf-8")
+        untracked = git_orchestrator.inspect_worktree_status(self.repo)
+        self.assertEqual((untracked["dirty"], untracked["untracked_count"]), (True, 1))
+        git(self.repo, "add", "notes.txt")
+        self.assertEqual(git_orchestrator.inspect_worktree_status(self.repo)["staged_count"], 1)
+        self.assertFalse(git_orchestrator.inspect_worktree_status(self.repo / "missing")["exists"])
 
-    def test_t22_discount_rounding_boundaries_and_storage_idempotency(self) -> None:
-        self.assertEqual(apply_discount_cents(100, Decimal("0")), 100)
-        self.assertEqual(apply_discount_cents(100, Decimal("100")), 0)
-        self.assertEqual(apply_discount_cents(105, Decimal("10")), 94)  # 10.5 -> 11 half-up
-        self.assertEqual(apply_discount_cents(100, Decimal("150")), 0)
+    def test_ongoing_merge_is_detected(self) -> None:
+        self.assertEqual(git_orchestrator.detect_ongoing_operations(self.repo), [])
+        head = git(self.repo, "rev-parse", "HEAD")
+        (self.repo / ".git" / "MERGE_HEAD").write_text(head + "\n", encoding="utf-8")
+        self.assertIn("MERGE_IN_PROGRESS", git_orchestrator.detect_ongoing_operations(self.repo))
 
-        store: dict[str, int] = {}
-        for _ in range(3):
-            store["order-1"] = apply_discount_cents(105, Decimal("10"))
-        self.assertEqual(store, {"order-1": 94})
+    def test_conflict_prediction_separates_real_conflicts_from_clean_merges(self) -> None:
+        commit_on(self.repo, "feature-a", "app.py", "VALUE = 2\n")
+        commit_on(self.repo, "feature-b", "app.py", "VALUE = 3\n")
+        commit_on(self.repo, "feature-c", "other.py", "OTHER = 1\n")
+        conflict = git_orchestrator.predict_conflicts_and_risks(self.repo, "feature-a", "feature-b")
+        self.assertTrue(conflict["has_git_conflicts"])
+        self.assertFalse(conflict["safe_to_merge_automatically"])
+        self.assertIn("app.py", conflict["both_modified_files"])
+        clean = git_orchestrator.predict_conflicts_and_risks(self.repo, "feature-c", "main")
+        self.assertFalse(clean["has_git_conflicts"])
+        self.assertTrue(clean["safe_to_merge_automatically"])
+
+    def test_parallel_migrations_are_a_semantic_risk_even_without_conflicts(self) -> None:
+        commit_on(self.repo, "feature-a", "migrations/0002_a.sql", "ALTER TABLE t ADD a int;\n")
+        commit_on(self.repo, "feature-b", "migrations/0002_b.sql", "ALTER TABLE t ADD b int;\n")
+        result = git_orchestrator.predict_conflicts_and_risks(self.repo, "feature-a", "feature-b")
+        self.assertFalse(result["has_git_conflicts"])
+        self.assertIn("PARALLEL_SCHEMA_MIGRATIONS", {risk["type"] for risk in result["semantic_risks"]})
+        self.assertFalse(result["safe_to_merge_automatically"])
+
+    def test_unknown_ref_is_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            git_orchestrator.predict_conflicts_and_risks(self.repo, "does-not-exist", "main")
+
+    def test_cleanup_previews_without_approval_and_blocks_unmerged_dirty_work(self) -> None:
+        commit_on(self.repo, "feature-x", "x.py", "X = 1\n")
+        worktree = Path(self._tmp.name) / "wt-x"
+        git(self.repo, "worktree", "add", "-q", str(worktree), "feature-x")
+        (worktree / "scratch.txt").write_text("unsaved\n", encoding="utf-8")
+        preview = git_orchestrator.safe_cleanup(self.repo, "feature-x", target_branch="main")
+        self.assertEqual(preview["mode"], "READ_ONLY_PREVIEW")
+        self.assertFalse(preview["safe_to_clean"])
+        self.assertTrue(preview["blockers"])
+        with self.assertRaises(RuntimeError):
+            git_orchestrator.safe_cleanup(self.repo, "feature-x", target_branch="main", approve=True, delete_branch=True)
+        self.assertTrue((worktree / "scratch.txt").exists())
+
+
+@unittest.skipUnless(GIT_AVAILABLE, "git is not installed")
+class AcceptanceSuiteTests(unittest.TestCase):
+    def test_shipped_acceptance_suite_passes(self) -> None:
+        report = git_orchestrator.run_acceptance_suite()
+        failed = [result["test_id"] for result in report["results"] if result["status"] != "PASS"]
+        self.assertTrue(report["all_passed"], failed)
+        self.assertGreaterEqual(report["total_tests"], 13)
 
 
 if __name__ == "__main__":

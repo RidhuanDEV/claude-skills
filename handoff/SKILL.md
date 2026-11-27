@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: "Save, load, or merge AI coding session context (\"handoff\", \"lanjut handoff\", \"load handoff\") via shadow_handoff MCP. Use when context memory is full or switching/merging agent sessions. Do NOT use for client BAST project delivery (/shadow-handover)."
+description: "Use when saving, loading, or merging AI coding session context via shadow_handoff. Not for client delivery or BAST (/shadow-handover)."
 ---
 
 # /handoff — Cross-Agent Session Handoff (Shadow Army)

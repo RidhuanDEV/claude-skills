@@ -1,6 +1,6 @@
 ---
 name: antislop-human
-description: "Human and accessibility filter for UI interfaces. Use when implementing or reviewing contrast, keyboard navigation, focus states, or interactive affordances."
+description: "Use when checking component contrast, keyboard navigation, focus, pointer, pressed or disabled states. Not for tap-target size (/antislop-layoutmobile) or full audits (/shadow-accessibility)."
 allowed-tools: Bash(python *) Bash(python3 *) Read Write Edit Glob Grep
 ---
 # antislop-human
@@ -23,7 +23,7 @@ allowed-tools: Bash(python *) Bash(python3 *) Read Write Edit Glob Grep
 
 - **Tell:** light grey text on a white or near-white background, thin body text, muted labels chosen because they look "elegant" but are hard to read.
 - **Why:** it excludes low-vision users and everyone in bright light. It is a visual choice made without checking the standard, which is exactly the kind of default the filter exists to catch.
-- **Fix:** meet WCAG AA minimums (R-25): 4.5:1 for normal text, 3:1 for large text (18px+). Compute the ratio; do not eyeball it.
+- **Fix:** meet WCAG AA minimums (R-25): 4.5:1 for normal text, 3:1 for large text (at least 24px regular or 18.66px bold). Compute the ratio; do not eyeball it.
 
 ### Text Over a Photo or Gradient
 
@@ -62,7 +62,7 @@ If the `${CLAUDE_SKILL_DIR}` variable is not available in this agent, point the 
 1. Contrast ratio = (L1 + 0.05) / (L2 + 0.05), where L1 is the lighter relative luminance and L2 the darker.
 2. Relative luminance L of one color: convert each channel to 0-1 (`c = hex / 255`), then linearize: if `c <= 0.03928`, `c_lin = c / 12.92`; otherwise `c_lin = ((c + 0.055) / 1.055)^2.4`.
 3. `L = 0.2126*R + 0.7152*G + 0.0722*B`.
-4. Compare the unrounded ratio: 4.5:1 for normal text, 3:1 for large text (18px+, per R-25). Round only for display, so a pairing at 4.498:1 prints as 4.50 and still fails 4.5:1. The maximum ratio is 21.0 (black on white).
+4. Compare the unrounded ratio: 4.5:1 for normal text, 3:1 for large text (at least 24px regular or 18.66px bold, per R-25). Round only for display, so a pairing at 4.498:1 prints as 4.50 and still fails 4.5:1. The maximum ratio is 21.0 (black on white).
 
 **The reference table** (common pairings, computed with the formula):
 

@@ -21,6 +21,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 APPROVAL_GATED_TIERS = {
     "L2",
     "L3",
@@ -163,7 +166,7 @@ def audit_sprint_plan(plan: dict[str, Any]) -> dict[str, Any]:
         # L2/L3/L4 [APPROVAL-REQUIRED] gate check
         tier = str(task.get("approval_tier", "L1")).strip().upper()
         title = str(task.get("title", "")).strip()
-        approval_required = bool(task.get("approval_required", False))
+        approval_required = strict_bool(task.get("approval_required", False), "approval_required")
         if tier in APPROVAL_GATED_TIERS:
             has_tag = "[APPROVAL-REQUIRED" in title.upper()
             if not (approval_required and has_tag):
@@ -443,4 +446,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

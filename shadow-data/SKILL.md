@@ -1,6 +1,6 @@
 ---
 name: shadow-data
-description: "Application Data Lifecycle & Zero-Downtime Migrations Specialist. Use when writing Expand-Contract migrations, lock-safe online DDL (lock_timeout, CONCURRENTLY, NOT VALID, pg_repack/gh-ost), resumable keyset backfills, ACID money locking, CDC/outbox pipelines, deterministic seeds, or streaming bulk I/O. Do NOT use for live DB introspection or Pentaho/DW ETL (/shadow-db)."
+description: "Use when planning zero-downtime migrations, large backfills, expand-contract, retention, or lineage. Not for query tuning (/shadow-db)."
 ---
 
 # Shadow Data (`/shadow-data`) — Zero-Downtime Migrations, Backfills & Data Lifecycle

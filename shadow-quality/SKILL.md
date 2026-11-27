@@ -1,6 +1,6 @@
 ---
 name: shadow-quality
-description: "Code Quality, Static Analysis & Drift Gate. Use when running strict typechecks, lint, shadow_gate.py, complexity reduction, dead code cleanup, or brownfield convention drift audits."
+description: "Use when running typecheck/lint, checking code quality, complexity, architectural drift, or the deterministic shadow_gate.py."
 ---
 
 # Shadow Quality (`/shadow-quality`) — Static Analysis, Architecture Conformance & Code Review Gate
@@ -71,6 +71,8 @@ When asked to review code or a PR, report findings ordered by severity:
 - `[MEDIUM]` Missing edge-case handling, missing validation, architectural boundary violation, or convention drift.
 - `[LOW / NIT]` Naming clarity, dead code removal, or minor readability improvement.
 *(Every finding must include exact `file:line`, impact explanation, and concrete replacement code).*
+
+**Mutation smoke (`L1`, stdlib only):** `python "shadow-quality/scripts/mutation_smoke.py" --repo . --skill <skill>` flips one comparison, `and`/`or`, `not` or boolean at a time in `<skill>/scripts/*.py`, reruns that skill's tests and restores the file. A skill whose mutants all survive has tests that cannot catch regressions. Run it on a clean working copy, because it edits scripts in place.
 
 ## 2. Execution Approval & Intent Boundary (`L0`–`L2`)
 - Lint, strict typecheck, and `shadow_gate.py` are `L0`/`L1` on verified local workspaces, whereas **code review requests are strictly `L0_READ_ONLY`** (`0` source file mutations during review). Unrequested cross-module edits/cleanup require `L2` Monarch approval (`shadow-monarch/scripts/execution_approval_gate.py`).

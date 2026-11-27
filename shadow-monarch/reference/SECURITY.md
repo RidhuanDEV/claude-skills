@@ -26,7 +26,7 @@ Always write abuse cases, not only use cases.
 
 ## 3. Authentication
 
-- Standard protocols (OAuth 2.1/OIDC, SAML for enterprise SSO); do not invent auth schemes or crypto.
+- Standard protocols (OAuth 2.0 per RFC 9700 BCP 240 — OAuth 2.1 is still a draft — /OIDC, SAML for enterprise SSO); do not invent auth schemes or crypto.
 - Passwords: Argon2id (preferred), bcrypt or scrypt with sane cost; never MD5/SHA-x alone. Check breached-password lists; length over complexity rules.
 - MFA for admins and high-privilege roles. Rate limit + progressive delay/lockout on login, OTP, password reset.
 - Reset tokens: random, single-use, short-lived, stored hashed; same response whether the account exists or not.

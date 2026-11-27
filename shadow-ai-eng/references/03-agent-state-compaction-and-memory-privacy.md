@@ -7,7 +7,7 @@ Architect bounded, predictable multi-step agent loops with deterministic context
 - Bounded tool boundaries (`02`), database persistence for conversation state (`shadow-db`), and privacy retention rules (`shadow-privacy`).
 
 ## 3. Technical Principles & Constraints
-- **Bounded Execution Loops (`MAX_STEPS` & Token Budgets):** Never write `while (response.hasToolCalls)` with no hard ceiling! Enforce strict `MAX_STEPS` (typically `<= 6–10`), `MAX_WALL_CLOCK_MS`, duplicate-call loop detection (if the agent calls the exact same `(tool, args)` twice consecutively -> break and return best partial explanation!), and cumulative token caps (`OWASP LLM10:2025`).
+- **Bounded Execution Loops (`MAX_STEPS` & Token Budgets):** Never write `while (response.hasToolCalls)` with no hard ceiling! Enforce strict `MAX_STEPS` (typically `<= 6–10`), `MAX_WALL_CLOCK_MS`, duplicate-call loop detection (if the agent calls the exact same `(tool, args)` twice consecutively -> break and return best partial explanation!), and cumulative token caps (`OWASP LLM06:2026` Unbounded Consumption).
 - **Deterministic Context Compaction (Never Blindly Drop Index `0`!):** Long sessions degrade reasoning ("lost in the middle") and multiply input token costs quadratically! Partition the prompt window cleanly into 4 ordered zones:
   1. **Pinned Static System Prefix + Tool Schemas** (NEVER truncated; kept byte-identical for prefix caching!),
   2. **Structured Rolling State Summary** (explicit factual state: confirmed goals, decisions, resolved IDs, open constraints — updated when history exceeds threshold),
@@ -108,7 +108,7 @@ A support agent lets users inspect order logs via a tool that returns raw 90 KB 
 
 ## 11. Authoritative References
 - Anthropic Engineering — *Building Effective Agents* & *Effective Context Engineering for AI Agents* (`https://www.anthropic.com/engineering`).
-- OWASP Top 10 for LLM Applications 2025 — `LLM02` & `LLM10`.
+- OWASP Top 10 for LLM Applications 2026 — `LLM02` Sensitive Information Disclosure & `LLM06` Unbounded Consumption (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`); agentic `ASI06` Memory and Context Poisoning ([02](02-structured-outputs-and-tool-trust-boundaries.md)).
 
 ## 12. Limitations & When NOT to Use
 - Avoid complex multi-agent swarms ("Manager -> Researcher -> Critic -> Writer") when a single well-structured prompt + 3 clean tools solves the workflow deterministically — extra agent hops multiply latency, token spend, and failure surface!

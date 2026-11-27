@@ -1,7 +1,7 @@
 # 02. AI/LLM Token Economics, Prefix Prompt Caching & Thinking/Output Token Caps
 
 ## 1. Purpose & Activation Conditions
-Use this playbook when estimating, auditing, or optimizing production **LLM, RAG, and AI Agent token costs**. Unbounded reasoning/thinking tokens and cache-busting dynamic prompt prefixes routinely inflate production AI bills by **`5x–15x`** without improving answer quality—and violate **`OWASP LLM10:2025` (Unbounded Consumption)**.
+Use this playbook when estimating, auditing, or optimizing production **LLM, RAG, and AI Agent token costs**. Unbounded reasoning/thinking tokens and cache-busting dynamic prompt prefixes routinely inflate production AI bills by **`5x–15x`** without improving answer quality—and violate **`OWASP LLM06:2026` (Unbounded Consumption)**.
 
 Activate this playbook when:
 - Calculating monthly LLM API spend across input tokens, cached prefix discounts, visible output tokens, and hidden reasoning/thinking tokens (`finops_cost_auditor.py --estimate-llm`).
@@ -22,7 +22,7 @@ Activate this playbook when:
    - Place **100% static content FIRST** in every request: `[System Prompt] -> [Stable Tool Definitions] -> [Shared Few-Shot / Reference Docs]`.
    - Place **all dynamic per-request variables LAST** (inside the user turn): `current_timestamp`, `request_id`, `user_id`, random UUIDs, or live RAG chunks.
    - Injecting `datetime.now()` or `Date.now()` into the system prompt prefix invalidates the KV/prefix cache on **100% of calls**, immediately destroying `75%–95%` cached input savings!
-3. **Mandatory Output & Thinking Token Caps (`OWASP LLM10:2025`)**:
+3. **Mandatory Output & Thinking Token Caps (`OWASP LLM06:2026` Unbounded Consumption)**:
    - Every production LLM route MUST set explicit `max_output_tokens` / `max_completion_tokens` AND bounded `thinking_budget` (or `reasoning_effort`) matched to route complexity, plus hard loop-iteration caps on tool-calling agents (`max_steps <= 6–10`).
 4. **5 High-Leverage Token Cost Levers**:
    1. **Prefix Prompt Caching** (static prefix -> `75%–95%` off cached input).
@@ -94,7 +94,7 @@ export function buildCacheSafeMessages(
 **Impact:** Moving the timestamp to the user message (`84%` cache hit rate), capping thinking tokens (`0` for FAQ tier, `1,500` for escalations), and routing 75% of queries to a fast workhorse model slashed spend from **`$14,800/mo` -> `$2,650/mo` (`-82%`)** while cutting `p95` latency by `1.9s` with zero drop in `/shadow-eval` faithfulness score.
 
 ## 8. Failure Modes & Edge Cases
-- **WRONG (Injecting `Date.now()`, `uuid()`, or per-user memory into the top of `system_prompt` and leaving `max_output_tokens` unset):** Permanently busts prefix KV caching (`0%` hit rate) and invites `OWASP LLM10:2025` runaway token exhaustion attacks.
+- **WRONG (Injecting `Date.now()`, `uuid()`, or per-user memory into the top of `system_prompt` and leaving `max_output_tokens` unset):** Permanently busts prefix KV caching (`0%` hit rate) and invites `OWASP LLM06:2026` Unbounded Consumption runaway token exhaustion attacks.
   **RIGHT:** Freeze static instructions/tools at the top of the prompt, append dynamic timestamps/user state at the end, and enforce strict `max_output_tokens`, `maxThinkingTokens`, and `maxAgentSteps` per route.
 - **WRONG (Re-ordering tool JSON keys dynamically on every request via unsorted dict iteration):** Silently changes prefix byte hash and invalidates prompt caching across worker replicas.
   **RIGHT:** Serialize tool schemas deterministically (`sort_keys=True`) at process startup.
@@ -107,7 +107,7 @@ export function buildCacheSafeMessages(
 - Log `prompt_tokens`, `cached_input_tokens`, `output_tokens`, `thinking_tokens`, `model_id`, and `route_tier` as structured metrics (`/shadow-observe`) so cache-hit-rate drops (`< 60%`) trigger immediate FinOps alerts before month-end billing surprises!
 
 ## 11. Authoritative References
-- **OWASP Top 10 for LLM Applications 2025** — *LLM10:2025 Unbounded Consumption* (`https://genai.owasp.org/`).
+- **OWASP Top 10 for LLM Applications 2026** — *LLM06:2026 Unbounded Consumption* (`https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md`).
 - **FinOps Foundation** — *FinOps for AI* (`https://www.finops.org/`).
 - **Shadow FinOps Auditor** — [`../scripts/finops_cost_auditor.py`](../scripts/finops_cost_auditor.py).
 

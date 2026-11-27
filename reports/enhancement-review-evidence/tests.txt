@@ -1,0 +1,51 @@
+antislop | Ran 1 test in 0.056s  OK 
+context7 | Ran 1 test in 0.037s  OK 
+shadow-accessibility | Ran 5 tests in 0.001s  OK 
+shadow-ai-eng | Ran 2 tests in 0.000s  OK 
+shadow-analytics | Ran 4 tests in 0.002s  OK 
+shadow-api | Ran 3 tests in 0.000s  OK 
+shadow-architect | Ran 1 test in 0.000s  OK 
+shadow-auth | Ran 4 tests in 0.800s  OK 
+shadow-bootstrap | Ran 4 tests in 0.088s  OK 
+shadow-browser | Ran 7 tests in 0.000s  OK 
+shadow-cache | Ran 6 tests in 0.144s  OK 
+shadow-compat | Ran 5 tests in 0.000s  OK 
+shadow-concurrency | Ran 2 tests in 0.000s  OK 
+shadow-data | Ran 4 tests in 0.003s  OK 
+shadow-db | Ran 3 tests in 0.006s  OK 
+shadow-debug | Ran 3 tests in 0.001s  OK 
+shadow-design | Ran 22 tests in 5.058s  OK 
+shadow-discovery | Ran 1 test in 0.000s  OK 
+shadow-doc | Ran 14 tests in 1.679s  OK 
+shadow-domain | Ran 3 tests in 0.000s  OK 
+shadow-email | Ran 3 tests in 0.002s  OK 
+shadow-eval | Ran 6 tests in 4.941s  OK 
+shadow-finops | Ran 1 test in 0.001s  OK 
+shadow-git | Ran 3 tests in 4.335s  OK 
+shadow-grc | Ran 1 test in 0.000s  OK 
+shadow-handover | Ran 2 tests in 0.033s  OK 
+shadow-illustration | Ran 10 tests in 6.143s  OK 
+shadow-integrate | Ran 1 test in 0.001s  OK 
+shadow-maintain | Ran 1 test in 0.001s  OK 
+shadow-mobile | Ran 1 test in 0.000s  OK 
+shadow-monarch | Ran 3 tests in 11.923s  OK 
+shadow-observe | Ran 4 tests in 0.001s  OK 
+shadow-ops | Ran 10 tests in 9.037s  OK 
+shadow-perf | Ran 0 tests in 0.000s  NO TESTS RAN 
+shadow-plan | Ran 3 tests in 0.001s  OK 
+shadow-privacy | Ran 2 tests in 0.001s  OK 
+shadow-quality | Ran 10 tests in 0.896s  OK 
+shadow-realtime | Ran 7 tests in 9.829s  OK 
+shadow-refactor | Ran 3 tests in 0.001s  OK 
+shadow-release | Ran 2 tests in 0.001s  OK 
+shadow-resilience | Ran 5 tests in 0.001s  OK 
+shadow-search | Ran 9 tests in 0.753s  OK 
+shadow-sec | Ran 9 tests in 22.203s  OK 
+shadow-seo | Ran 3 tests in 0.000s  OK 
+shadow-supplychain | Ran 6 tests in 5.579s  OK 
+shadow-test | Ran 3 tests in 0.001s  OK 
+shadow-uat | Ran 1 test in 0.000s  OK 
+----------------------------------------------------------------------
+Ran 32 tests in 6.687s
+
+OK

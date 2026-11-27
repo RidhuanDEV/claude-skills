@@ -116,7 +116,7 @@ export function evaluateBastItemStatus(
 ## 11. Authoritative References
 - **ISO/IEC/IEEE 12207:2017** — *Transition Process & Operational Handover*.
 - **Shadow Doc Engine** — `shadow-doc/templates/17_HANDOVER.md` & `shadow-doc/scripts/doc_orchestrator.py`.
-- **Shadow Supplychain** — CycloneDX 1.5 / SPDX SBOM provenance standards.
+- **Shadow Supplychain** — CycloneDX 1.7 / SPDX 3.0.1 SBOM and SLSA v1.2 provenance standards (CycloneDX 1.5+ accepted as a minimum).
 
 ## 12. Limitations & When NOT to Use
 - **Do NOT use** `/shadow-handover` to save or resume AI agent conversation memory — use `/handoff` (`shadow_handoff` MCP).

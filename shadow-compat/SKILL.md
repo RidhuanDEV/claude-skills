@@ -1,6 +1,6 @@
 ---
 name: shadow-compat
-description: "Compatibility & Upgrade Assurance. Use when auditing API/webhook wire & semantic backward compatibility, implementing RFC 9745 Deprecation / RFC 8594 Sunset / 410 Gone, upgrading dependencies/runtimes safely, or verifying cross-browser/iOS Safari/OS casing & consumer replay matrices. Do NOT use for greenfield API design (shadow-api) or SBOM provenance (shadow-supplychain)."
+description: "Use when checking backward compatibility, dependency upgrades, consumer replay, Deprecation/Sunset, or breaking API changes."
 ---
 
 # Shadow Compat (`/shadow-compat`) — API Evolution, RFC 9745/8594 Deprecation, Upgrades & Cross-Platform Compatibility

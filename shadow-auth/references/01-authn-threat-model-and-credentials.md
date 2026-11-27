@@ -1,13 +1,13 @@
 # 01. AuthN Threat Model & Credential Security
 
 ## 1. Purpose & Activation Conditions
-Design phishing-resistant, brute-force-hardened authentication grounded in **NIST SP 800-63-4** and **OWASP ASVS 5.0 (V2)**. Load when building or auditing login, registration, password storage, password reset, account lockout, or credential-stuffing defenses.
+Design phishing-resistant, brute-force-hardened authentication grounded in **NIST SP 800-63-4** and **OWASP ASVS 5.0.0 (V6 Authentication)**. Load when building or auditing login, registration, password storage, password reset, account lockout, or credential-stuffing defenses.
 
 ## 2. Prerequisites
 - TLS 1.2+/1.3 transport enforcement, structured redacting logger (`BACKEND.md §12`), and Redis/DB rate-limit store.
 
 ## 3. Technical Principles & Constraints
-- **Memory-Hard Password Hashing (`OWASP ASVS V2.4`):** Use **Argon2id** (preferred: `m=19456 KiB`–`65536 KiB`, `t=2–3`, `p=1`, random `128-bit` salt) or **bcrypt** (`cost >= 12`, aware of 72-byte truncation -> pre-hash carefully or enforce Argon2id). NEVER use `SHA-256`, `MD5`, unsalted hashes, or reversible encryption for passwords.
+- **Memory-Hard Password Hashing (`OWASP ASVS 5.0.0 V6 Authentication` / `V11 Cryptography`; verify the exact section number before citing):** Use **Argon2id** (preferred: `m=19456 KiB`–`65536 KiB`, `t=2–3`, `p=1`, random `128-bit` salt) or **bcrypt** (`cost >= 12`, aware of 72-byte truncation -> pre-hash carefully or enforce Argon2id). NEVER use `SHA-256`, `MD5`, unsalted hashes, or reversible encryption for passwords.
 - **NIST SP 800-63-4 Password Policy:** Require minimum `>= 8` (recommended `>= 12–15` for staff/admin) up to `>= 64` characters, allow spaces and Unicode, **block breached/common passwords** against known breach corpuses (e.g., k-anonymity HIBP / offline top-100k list), and **do NOT impose arbitrary periodic 90-day forced rotation** or brittle composition rules that weaken entropy.
 - **Account Enumeration & Timing-Side-Channel Defense:** Login, registration, and forgot-password MUST return uniform generic messages (`"Invalid credentials"` / `"If an account exists, instructions have been sent"`). When a user email is NOT found during login, still execute a dummy `Argon2id`/`bcrypt` verify against a constant dummy hash so response latency does not reveal valid accounts!
 - **Layered Brute-Force & Credential-Stuffing Controls:** Apply sliding-window rate limits per **IP/subnet**, per **normalized account identifier**, and global credential-stuffing burst alerts. Prefer exponential backoff + CAPTCHA/Turnstile challenge over permanent indefinite lockouts (which let attackers DoS legitimate users).
@@ -87,7 +87,7 @@ A B2B portal returns `404` in `4ms` for unknown emails and `401` in `180ms` for 
 
 ## 11. Authoritative References
 - NIST SP 800-63-4 / 800-63B-4 — *Digital Identity Guidelines: Authentication and Authenticator Management* (`https://csrc.nist.gov/pubs/sp/800/63/4/final`).
-- OWASP ASVS 5.0 — *V2 Authentication Verification Requirements* (`https://asvs.owasp.org/`).
+- OWASP ASVS 5.0.0 — *V6 Authentication* and *V11 Cryptography* (`https://github.com/OWASP/ASVS`); cite requirements as `v5.0.0-<chapter>.<section>.<requirement>`.
 - OWASP Password Storage Cheat Sheet (`https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html`).
 
 ## 12. Limitations & When NOT to Use

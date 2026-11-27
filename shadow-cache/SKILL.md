@@ -1,6 +1,6 @@
 ---
 name: shadow-cache
-description: "Client & Server Caching Architecture. Use when designing or debugging HTTP/CDN Cache-Control/Surrogate-Key invalidation, Redis/Valkey L2 & bounded L1 LRU caches, multi-tenant key partitioning, Singleflight stampede & negative caching, TanStack Query/SWR optimistic updates, or Idempotency-Key patterns. Do NOT use for search indexing (shadow-search) or durable queues (shadow-concurrency)."
+description: "Use when designing Redis, CDN, Cache-Control, TTL, tenant keys, invalidation, or stampede protection. Not for search indexes (/shadow-search)."
 ---
 
 # Shadow Cache (`/shadow-cache`) — Multi-Tier Caching, Coherency, Stampede Defense & Idempotency

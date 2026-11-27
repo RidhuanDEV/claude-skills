@@ -16,7 +16,8 @@ Digital screens emit additive light (`sRGB` / `Display P3`), whereas physical pr
 
 ## 3. Implementation Examples
 
-### Safe Production `svgo.config.mjs` (Zero Broken `viewBox` / ID Collisions)
+### Safe Production `svgo.config.mjs` (SVGO v4; Zero Broken `viewBox` / ID Collisions)
+SVGO v4's `preset-default` no longer includes `removeViewBox` or `removeTitle`, so `viewBox` and `<title>` are kept unless a config enables those plugins. Do not add either plugin.
 ```js
 /** @type {import('svgo').Config} */
 export default {
@@ -26,8 +27,7 @@ export default {
       name: "preset-default",
       params: {
         overrides: {
-          removeViewBox: false, // Never strip viewBox: breaks responsive scaling
-          cleanupIds: false,    // Keep IDs referenced by gradients/clips/JS
+          cleanupIds: false, // Keep IDs referenced by gradients/clips/JS
         },
       },
     },
@@ -55,10 +55,10 @@ export default {
 - Require printer proof PDFs (`PDF/X-4`) to embed crop marks and verify rich black (`C60 M40 Y40 K100`) on large fills while keeping body text pure `K100` to avoid ink registration blur.
 
 ## 5. Anti-Patterns (`WRONG` vs `RIGHT`)
-- **WRONG (Default SVGO stripping `viewBox` & global `#clip0` IDs):** Running generic minifiers that delete `viewBox` or share `id="clip0_1_2"` across two inline hero SVGs (hiding the second SVG breaks `<defs>` across the whole DOM!).
-  **RIGHT:** Disable `removeViewBox`, preserve accessibility tags, and run `prefixIds` (plus `aria-hidden` cleanup only when decorative).
+- **WRONG (Minifier configs stripping `viewBox` & global `#clip0` IDs):** Running generic minifiers that delete `viewBox` or share `id="clip0_1_2"` across two inline hero SVGs (hiding the second SVG breaks `<defs>` across the whole DOM!).
+  **RIGHT:** On SVGO v4 keep `removeViewBox` and `removeTitle` out of the config (they are no longer in `preset-default`; on older SVGO, disable them explicitly), preserve accessibility tags, and run `prefixIds` (plus `aria-hidden` cleanup only when decorative).
 - **WRONG (Sending 72 DPI RGB PNGs to commercial offset print):** Exporting a web hero PNG directly for a roll-up banner or booklet without bleed.
   **RIGHT:** Export CMYK vector `PDF/X-4` (or `300 DPI` flattened CMYK TIFF/PDF) with `3–5 mm` bleed and `5–10 mm` safe text margins.
 
 ## 6. Production Considerations
-- **Pre-Flight QA:** Inspect transparent assets composited over `#FFFFFF` and `#0F172A`, verify total SVG path node counts, and run `svgo --check` or deterministic asset hashing in CI so visual diffs remain auditable.
+- **Pre-Flight QA:** Inspect transparent assets composited over `#FFFFFF` and `#0F172A`, verify total SVG path node counts, and in CI re-run SVGO with the committed config and fail when the output differs from the committed file (deterministic asset hashing), so visual diffs remain auditable.

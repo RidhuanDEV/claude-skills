@@ -1,6 +1,6 @@
 ---
 name: shadow-design
-description: "Product UI/UX & Design Systems. Use when designing design tokens, UX user flows, wireframes, 9-state component contracts, or human-AI UX states. Pair with antislop-ui."
+description: "Use when designing user flows, wireframes, UX states, component contracts, or design tokens. Not for CSS polish (/antislop-ui)."
 ---
 
 # Shadow Design (`/shadow-design`) — Product Design, User Flows, 9-State Machines & Design Systems

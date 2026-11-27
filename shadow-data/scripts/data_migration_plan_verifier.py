@@ -20,6 +20,13 @@ from pathlib import Path
 from typing import Any
 
 
+def _strict_int(value: Any) -> int | None:
+    """Return value only when it is a real JSON integer (bool and numeric strings are rejected)."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
 def check_backfill_plan(plan: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -30,11 +37,12 @@ def check_backfill_plan(plan: dict[str, Any]) -> dict[str, Any]:
             f"Backfill must use stable 'keyset' cursor pagination (got '{pagination}'); OFFSET degrades to O(N^2) and skips rows."
         )
 
-    batch_size = int(plan.get("batch_size", 0))
-    if batch_size < 100 or batch_size > 10000:
+    batch_size = _strict_int(plan.get("batch_size"))
+    if batch_size is None or batch_size < 100 or batch_size > 10000:
         errors.append(f"Backfill batch_size={batch_size} out of safe bounded range [100, 10000].")
 
-    if int(plan.get("pause_ms", 0)) <= 0 and plan.get("replica_lag_throttle_enabled") is not True:
+    pause_ms = _strict_int(plan.get("pause_ms"))
+    if (pause_ms is None or pause_ms <= 0) and plan.get("replica_lag_throttle_enabled") is not True:
         errors.append("Backfill must configure positive pause_ms or replica-lag adaptive throttling to avoid replication/lock stalls.")
 
     if plan.get("resumable_checkpoint_persisted") is not True:
@@ -58,19 +66,19 @@ def check_migration_phases(phases: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
 
-    if phases.get("destructive_ddl_in_expand_phase") is True:
+    if phases.get("destructive_ddl_in_expand_phase") is not False:
         errors.append("FORBIDDEN: Destructive DDL (DROP/RENAME/type rewrite) cannot run inside Expand phase while old writers run.")
 
     if phases.get("mixed_version_rollback_tested") is not True:
         errors.append("Expand phase must verify rollback safety while both old and new application versions write simultaneously.")
 
-    if phases.get("contract_phase_requested") is True:
+    if phases.get("contract_phase_requested", False) is not False:
         if phases.get("zero_legacy_readers_writers_verified") is not True:
             errors.append("CONTRACT_HOLD: Cannot drop old columns/tables until telemetry confirms 0 active legacy readers/writers.")
         if phases.get("explicit_l4_destructive_approval") is not True:
             errors.append("CONTRACT_HOLD: Destructive Contract DDL requires separate explicit L4 Monarch approval.")
 
-    if phases.get("ephemeral_docker_cleanup_enforced") is False:
+    if "ephemeral_docker_cleanup_enforced" in phases and phases["ephemeral_docker_cleanup_enforced"] is not True:
         errors.append("Ephemeral migration verification containers MUST use --rm --label shadow.ephemeral=true + try/finally cleanup.")
 
     return {"check": "migration_phases", "passed": len(errors) == 0, "errors": errors, "warnings": warnings}

@@ -1,0 +1,98 @@
+[
+ {
+  "id": "antislop-copywriting-g-id-near-01",
+  "issue": "Error title/detail text is error-message copy, which the copywriting filter covers.",
+  "old_prompt": "Rancang format error response API problem+json (RFC 9457) untuk endpoint transfer, termasuk field type, title, dan detail.",
+  "new_prompt": "Rancang kontrak OpenAPI untuk endpoint transfer antar rekening, termasuk skema request, kode status, dan header Idempotency-Key.",
+  "old_expected": "shadow-api",
+  "new_expected": "shadow-api"
+ },
+ {
+  "id": "context7-g-en-near-01",
+  "issue": "Context7 overlap: a library major-version migration needs version-specific docs, so the lookup skill would legitimately activate.",
+  "old_prompt": "Move our service from Express 4 to Express 5 and check which API consumers break on the path-to-regexp route syntax changes.",
+  "new_prompt": "We are removing the legacy_status field from the /v1/orders response. Replay last week's recorded consumer traffic against the new version and list which mobile app versions break.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "shadow-accessibility-g-id-near-01",
+  "issue": "Translation/localization of UI copy overlaps the accessibility skill's i18n scope.",
+  "old_prompt": "Terjemahkan microcopy onboarding ke bahasa Indonesia yang natural untuk aplikasi pinjaman, total 5 layar.",
+  "new_prompt": "Tulis ulang microcopy 5 layar onboarding aplikasi pinjaman supaya lebih singkat, jelas, dan tidak bertele-tele.",
+  "old_expected": "antislop-copywriting",
+  "new_expected": "antislop-copywriting"
+ },
+ {
+  "id": "shadow-api-g-id-03",
+  "issue": "Ambiguous owner: outbound webhooks to merchants overlap the partner-webhook boundary of the integration skill.",
+  "old_prompt": "Kami mau kirim outbound webhook ke merchant saat status pembayaran berubah. Desain payload, signature, dan jadwal retry dari sisi kita.",
+  "new_prompt": "Rancang endpoint GET /v1/pasien dengan filter, sorting, dan cursor pagination, serta format error problem+json yang konsisten.",
+  "old_expected": "shadow-api",
+  "new_expected": "shadow-api"
+ },
+ {
+  "id": "shadow-doc-g-id-03",
+  "issue": "Ambiguous owner: requirement-to-design traceability overlaps the UAT skill's RTM work.",
+  "old_prompt": "Cek traceability antara SKPL dan DPPL di dokumen kita, mana requirement yang belum ter-cover di desain.",
+  "new_prompt": "Tambahkan bab lampiran baru di sumber JSON AST laporan akhir, lalu generate ulang versi PDF dan DOCX-nya.",
+  "old_expected": "shadow-doc",
+  "new_expected": "shadow-doc"
+ },
+ {
+  "id": "shadow-doc-g-en-near-01",
+  "issue": "Writing manuals/BAST is document production that could co-activate the document skill.",
+  "old_prompt": "Write the BAST and admin/operator manuals for transferring the system to the hospital.",
+  "new_prompt": "Prepare the credential transfer checklist and plan Training of Trainers sessions so the hospital IT team can run the system on their own.",
+  "old_expected": "shadow-handover",
+  "new_expected": "shadow-handover"
+ },
+ {
+  "id": "shadow-email-g-id-near-01",
+  "issue": "'Notifikasi ke merchant' is ambiguous and can read as email sending.",
+  "old_prompt": "Rancang endpoint REST untuk mengirim notifikasi status ke merchant dengan Idempotency-Key.",
+  "new_prompt": "Rancang endpoint REST untuk membuat dan membatalkan reservasi kamar rawat inap dengan dukungan Idempotency-Key.",
+  "old_expected": "shadow-api",
+  "new_expected": "shadow-api"
+ },
+ {
+  "id": "shadow-perf-g-en-near-01",
+  "issue": "Rule 3: EXPLAIN-based query plan analysis is performance profiling territory, so the excluded skill's topic is mentioned.",
+  "old_prompt": "Here's the EXPLAIN ANALYZE showing a Seq Scan on orders filtered by tenant_id and status. Which composite index column order?",
+  "new_prompt": "Add the missing index on the orders.customer_id foreign key and rewrite the RLS policy on orders to use (SELECT auth.uid()).",
+  "old_expected": "shadow-db",
+  "new_expected": "shadow-db"
+ },
+ {
+  "id": "shadow-search-g-id-near-01",
+  "issue": "Autocomplete results are a search feature, so the excluded skill could reasonably activate.",
+  "old_prompt": "Cache hasil autocomplete di Redis dengan TTL pendek dan invalidasi saat katalog berubah.",
+  "new_prompt": "Cache hasil kalkulasi ongkir per kota di Redis dengan TTL pendek dan invalidasi saat tarif kurir berubah.",
+  "old_expected": "shadow-cache",
+  "new_expected": "shadow-cache"
+ },
+ {
+  "id": "shadow-sec-g-id-near-01",
+  "issue": "Rule 3: 'static analysis' reads as SAST, a security topic.",
+  "old_prompt": "Tambahkan static analysis mypy dan Ruff di job CI repo ETL.",
+  "new_prompt": "Tambahkan pengecekan tipe mypy strict dan linter Ruff di job CI repo ETL, lalu perbaiki temuan yang memblok pipeline.",
+  "old_expected": "shadow-quality",
+  "new_expected": "shadow-quality"
+ },
+ {
+  "id": "shadow-uat-g-en-near-01",
+  "issue": "Rule 3: 'acceptance criteria' overlaps the acceptance/UAT topic.",
+  "old_prompt": "Write Given/When/Then acceptance criteria for the refund feature in the PRD.",
+  "new_prompt": "Write the functional and non-functional requirements for the refund feature in the PRD, including edge cases for partial refunds.",
+  "old_expected": "shadow-discovery",
+  "new_expected": "shadow-discovery"
+ },
+ {
+  "id": "shadow-video-g-id-near-01",
+  "issue": "Clicking through all flows overlaps the video skill's GUI click-through verification.",
+  "old_prompt": "Jalankan Playwright untuk klik semua alur checkout dan cek error di console.",
+  "new_prompt": "Jalankan Playwright di staging, mock respons 401 dari /api/cart, dan pastikan halaman checkout redirect ke login tanpa error di console.",
+  "old_expected": "shadow-browser",
+  "new_expected": "shadow-browser"
+ }
+]

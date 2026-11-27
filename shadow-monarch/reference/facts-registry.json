@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "description": "Dated, sourced facts that skills cite. Each skill should reference these values instead of restating them from memory. The checker (shadow-quality/scripts/facts_registry_check.py) fails on an overdue review_by date, on duplicate IDs, and on stale_patterns found in skill content outside an allowed context.",
+  "facts": [
+    {
+      "id": "OWASP-LLM-TOP10",
+      "statement": "The current OWASP Top 10 for LLM Applications is the 2026 edition (published 2026-08-04): LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Excessive Agency, LLM04 Supply Chain, LLM05 Data and Model Poisoning, LLM06 Unbounded Consumption, LLM07 Misinformation, LLM08 Hidden Context Exposure, LLM09 Vector and Embedding Weaknesses, LLM10 Improper Output Handling.",
+      "value": "2026",
+      "source_url": "https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-LLM-Top10/main/README.md",
+      "publisher": "OWASP GenAI Security Project",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)OWASP\\s+(?:Top\\s*10\\s+)?(?:for\\s+)?LLM(?:\\s+Applications)?\\s*(?:\\(|\\s)?2025(?!\\s*(?:edition|edisi)\\b[^\\n]{0,80}(?:superseded|previous|digantikan|sebelumnya))"
+      ],
+      "allow_context": "(?i)superseded|previous edition|edisi sebelumnya|2025 numbering|penomoran 2025|2025\\s*(?:→|->)\\s*2026"
+    },
+    {
+      "id": "OWASP-AGENTIC-TOP10",
+      "statement": "OWASP Top 10 for Agentic Applications (for 2026, published 2025-12-09): ASI01 Agent Goal Hijack, ASI02 Tool Misuse and Exploitation, ASI03 Identity and Privilege Abuse, ASI04 Agentic Supply Chain, ASI05 Unexpected Code Execution, ASI06 Memory and Context Poisoning, ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent Trust Exploitation, ASI10 Rogue Agents.",
+      "value": "2026",
+      "source_url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "publisher": "OWASP GenAI Security Project",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [],
+      "required_in": [
+        "shadow-eval",
+        "shadow-ai-eng"
+      ],
+      "required_token": "ASI01"
+    },
+    {
+      "id": "OWASP-WEB-TOP10",
+      "statement": "OWASP Top 10:2025 is current; it adds A03 Software Supply Chain Failures and A10 Mishandling of Exceptional Conditions, and folds SSRF into A01 Broken Access Control.",
+      "value": "2025",
+      "source_url": "https://top10.owasp.org/2025",
+      "publisher": "OWASP",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)OWASP\\s+Top\\s*10\\s*(?::|\\s)\\s*2021\\b"
+      ],
+      "allow_context": "(?i)superseded|previous|2021\\s*(?:→|->)"
+    },
+    {
+      "id": "OWASP-ASVS",
+      "statement": "OWASP ASVS 5.0.0 (May 2025) is current. Chapters: V6 Authentication, V7 Session Management, V8 Authorization, V9 Self-contained Tokens, V10 OAuth and OIDC, V11 Cryptography. Cite requirements as v5.0.0-<chapter>.<section>.<requirement>.",
+      "value": "5.0.0",
+      "source_url": "https://github.com/OWASP/ASVS",
+      "publisher": "OWASP",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)\\bASVS\\s*(?:v?4\\.0(?:\\.3)?)\\b",
+        "(?<!M)ASVS[ -]5\\.0[ -]V4\\.1\\.1\\b"
+      ],
+      "allow_context": "(?i)superseded|previous|4\\.0\\.3\\s*(?:→|->)|legacy mapping|WRONG|fabricated|mixing|mixed"
+    },
+    {
+      "id": "MCP-SPEC",
+      "statement": "The current MCP specification revision is 2026-07-28: stateless (no initialize handshake, no Mcp-Session-Id), server/discover is mandatory, Dynamic Client Registration is deprecated in favour of Client ID Metadata Documents, and Roots, Sampling and Logging are deprecated. The previous revision is 2025-11-25.",
+      "value": "2026-07-28",
+      "source_url": "https://modelcontextprotocol.io/specification/2026-07-28/changelog",
+      "publisher": "Model Context Protocol project",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-02-26",
+      "stale_patterns": [
+        "(?i)\\binitialize\\b[^\\n]{0,60}\\b(?:request|handshake)\\b"
+      ],
+      "allow_context": "(?i)2025-11-25|2025-06-18|earlier revision|legacy|pre-2026|revisi lama"
+    },
+    {
+      "id": "DMARC-RFC",
+      "statement": "DMARC is RFC 9989 (Proposed Standard, published 2026-05-19), which obsoletes RFC 7489 and RFC 9091 and removes the pct tag; reporting moved to companion documents (RFC 9990 aggregate, RFC 9991 failure reporting).",
+      "value": "RFC 9989",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc9989.html",
+      "publisher": "IETF / RFC Editor",
+      "verified_on": "2026-11-27",
+      "review_by": "2027-05-27",
+      "stale_patterns": [
+        "\\bRFC\\s*7489\\b",
+        "\\bpct=\\d"
+      ],
+      "allow_context": "(?i)obsolete|superseded|digantikan|RFC\\s*9989|removed|dihapus|legacy"
+    },
+    {
+      "id": "GMAIL-POSTMASTER",
+      "statement": "Google Postmaster Tools v2 retired the domain and IP reputation dashboards in 2025; use the Compliance Status view plus the user-reported spam rate.",
+      "value": "v2 Compliance Status",
+      "source_url": "https://support.google.com/mail/answer/16594218",
+      "publisher": "Google",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)Postmaster[^\\n]{0,40}\\b(?:Domain|IP)\\s*(?:&|and|dan)?\\s*(?:IP\\s*)?Reputation"
+      ],
+      "allow_context": "(?i)retired|dihentikan|no longer|tidak lagi|v1"
+    },
+    {
+      "id": "OAUTH-2-1",
+      "statement": "OAuth 2.1 is still an IETF Internet-Draft (draft-ietf-oauth-v2-1-17, 2026-10-31), not an RFC. The security baseline is RFC 9700 (BCP 240, January 2025), used with RFC 7636 (PKCE) and RFC 9449 (DPoP).",
+      "value": "draft-ietf-oauth-v2-1-17",
+      "source_url": "https://datatracker.ietf.org/doc/draft-ietf-oauth-v2-1/",
+      "publisher": "IETF",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-02-26",
+      "stale_patterns": [
+        "(?i)OAuth\\s*2\\.1(?![^\\n]{0,120}(?:draft|draf|Internet-Draft|RFC\\s*9700|BCP\\s*240))"
+      ],
+      "allow_context": "(?i)draft|draf|RFC\\s*9700|BCP\\s*240"
+    },
+    {
+      "id": "PLAY-TARGET-API",
+      "statement": "Google Play requires new apps and app updates to target Android API level 36 since 2026-08-31; existing apps must target at least API 35 to stay visible to new users on newer devices.",
+      "value": "36",
+      "source_url": "https://developer.android.com/google/play/requirements/target-sdk",
+      "publisher": "Google / Android Developers",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)targetSdk(?:Version)?\\s*[=:]?\\s*35\\b"
+      ],
+      "allow_context": "(?i)existing apps|aplikasi lama|minimum for visibility|stay visible|tetap terlihat"
+    },
+    {
+      "id": "WEBAUTHN",
+      "statement": "Web Authentication Level 3 became a W3C Recommendation on 2026-08-25.",
+      "value": "Level 3",
+      "source_url": "https://www.w3.org/news/2026/web-authentication-an-api-for-accessing-public-key-credentials-level-3-is-now-a-w3c-recommendation/",
+      "publisher": "W3C",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)WebAuthn\\s+(?:Level|L)\\s*2\\b(?![^\\n]{0,40}(?:superseded|previous|→|->))"
+      ],
+      "allow_context": "(?i)superseded|previous|Level\\s*3"
+    },
+    {
+      "id": "WCAG-LARGE-TEXT",
+      "statement": "WCAG 2.2 large-scale text is at least 18pt (about 24 CSS px) regular or 14pt (about 18.66 CSS px) bold; large text needs 3:1 contrast, other text 4.5:1. WCAG 2.2 is also ISO/IEC 40500:2025; WCAG 3 is still a Working Draft.",
+      "value": "24px or 18.66px bold",
+      "source_url": "https://www.w3.org/TR/WCAG22/#dfn-large-scale",
+      "publisher": "W3C",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-11-26",
+      "stale_patterns": [
+        "(?i)large(?:-scale)?\\s+text[^\\n]{0,30}\\b18\\s*px\\b(?!\\s*bold|[^\\n]{0,20}bold)",
+        "\\b18px\\+"
+      ],
+      "allow_context": "(?i)18\\.66|14pt|24\\s*px"
+    },
+    {
+      "id": "NIST-SSDF",
+      "statement": "NIST SP 800-218 SSDF v1.1 (2022-02-03) is final; SP 800-218 Rev. 1 (SSDF v1.2) is an Initial Public Draft (2025-12-17); SP 800-218A (generative AI profile) is final (2024-07-26).",
+      "value": "v1.1 final; v1.2 draft",
+      "source_url": "https://csrc.nist.gov/projects/ssdf/publications",
+      "publisher": "NIST",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-02-26",
+      "stale_patterns": [
+        "(?i)SSDF\\s*v?1\\.2(?![^\\n]{0,40}(?:draft|draf|IPD))"
+      ],
+      "allow_context": "(?i)draft|draf|IPD"
+    },
+    {
+      "id": "SBOM-PROVENANCE-VERSIONS",
+      "statement": "Current supply-chain specifications: SLSA v1.2 (adds the Source Track), CycloneDX 1.7 (2025-10-21, ECMA-424 2nd edition), SPDX 3.0.1 (ISO/IEC 5962:2021 still equals SPDX 2.2.1).",
+      "value": "SLSA 1.2; CycloneDX 1.7; SPDX 3.0.1",
+      "source_url": "https://cyclonedx.org/news/cyclonedx-v1.7-released",
+      "publisher": "OpenSSF SLSA / OWASP CycloneDX / Linux Foundation SPDX",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)\\bSLSA\\s*v?1\\.[01]\\b(?![^\\n]{0,40}(?:compatible|kompatibel|superseded))",
+        "(?i)\\bCycloneDX\\s*(?:v)?1\\.[45]\\b(?![^\\n]{0,40}(?:or later|atau lebih baru|minimum|superseded))"
+      ],
+      "allow_context": "(?i)or later|atau lebih baru|minimum|superseded|backward|v1\\.2|1\\.[4-7]\\+"
+    },
+    {
+      "id": "SVGO-VERSION",
+      "statement": "SVGO v4 is current; its preset-default no longer includes removeViewBox and removeTitle, so viewBox and title are kept unless a config enables those plugins.",
+      "value": "4.x",
+      "source_url": "https://github.com/svg/svgo/releases",
+      "publisher": "SVGO",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-05-26",
+      "stale_patterns": [
+        "(?i)\\bsvgo\\s*(?:v|@)?3\\b"
+      ],
+      "allow_context": "(?i)superseded|migrat|v3\\s*(?:→|->)"
+    },
+    {
+      "id": "RFC-9457",
+      "statement": "Problem Details for HTTP APIs is RFC 9457 (July 2023), which obsoletes RFC 7807.",
+      "value": "RFC 9457",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc9457.html",
+      "publisher": "IETF / RFC Editor",
+      "verified_on": "2026-11-26",
+      "review_by": "2027-11-26",
+      "stale_patterns": [
+        "\\bRFC\\s*7807\\b"
+      ],
+      "allow_context": "(?i)obsolete|superseded|RFC\\s*9457|digantikan"
+    }
+  ]
+}

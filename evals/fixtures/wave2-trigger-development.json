@@ -1,0 +1,415 @@
+[
+  {
+    "id": "wave2-development-01",
+    "language": "en",
+    "prompt": "Use the frontend quality filters together on this generated notification center. Its decorative badges, repeated status copy, and optimistic failure feedback all need review.",
+    "expected_primary": "antislop",
+    "confusable": "antislop-ui"
+  },
+  {
+    "id": "wave2-development-02",
+    "language": "id",
+    "prompt": "Di modul kalender akademik, hapus komentar yang menamai ulang operasi biasa. Pertahankan catatan historis kenapa awal pekan tidak mengikuti locale.",
+    "expected_primary": "antislop-code",
+    "confusable": "shadow-refactor"
+  },
+  {
+    "id": "wave2-development-03",
+    "language": "en",
+    "prompt": "Draft the confirmation text for sharing a dispatch list with the entire branch. Include a clear action label and explain who can read it afterward.",
+    "expected_primary": "antislop-copywriting",
+    "confusable": "shadow-design"
+  },
+  {
+    "id": "wave2-development-04",
+    "language": "id",
+    "prompt": "Rapikan indikator hover, focus-visible, dan pressed pada tombol format teks. Pengguna harus bisa melihat perbedaannya tanpa bergantung pada perubahan warna.",
+    "expected_primary": "antislop-human",
+    "confusable": "shadow-accessibility"
+  },
+  {
+    "id": "wave2-development-05",
+    "language": "en",
+    "prompt": "Make this date toolbar fit at 320px when the locale changes to German. The arrows and date ranges need room to wrap without clipping touch targets.",
+    "expected_primary": "antislop-layoutmobile",
+    "confusable": "modern-web-guidance"
+  },
+  {
+    "id": "wave2-development-06",
+    "language": "id",
+    "prompt": "Rapikan variasi bayangan, radius, dan tinggi baris pada komponen daftar lampiran yang sudah jadi. Ikuti ritme visual komponen proyek tanpa merancang alur baru.",
+    "expected_primary": "antislop-ui",
+    "confusable": "shadow-design"
+  },
+  {
+    "id": "wave2-development-07",
+    "language": "en",
+    "prompt": "Check the official reference for how the pinned Django version supports constraint validation during model cleaning and quote the exact API name.",
+    "expected_primary": "context7",
+    "confusable": "shadow-compat"
+  },
+  {
+    "id": "wave2-development-08",
+    "language": "id",
+    "prompt": "Sesi agen yang mengerjakan impor data akan dipindah. Catat konteks keputusan dan tes yang masih tertahan agar chat baru bisa meneruskannya.",
+    "expected_primary": "handoff",
+    "confusable": "shadow-handover"
+  },
+  {
+    "id": "wave2-development-09",
+    "language": "en",
+    "prompt": "Replace the scroll event handler for this reading progress indicator with a native CSS animation if our browser Baseline supports it.",
+    "expected_primary": "modern-web-guidance",
+    "confusable": "antislop-ui"
+  },
+  {
+    "id": "wave2-development-10",
+    "language": "id",
+    "prompt": "Uji aksesibilitas pemilih rentang tanggal. Verifikasi pola dialog dan grid dengan pembaca layar serta catat kriteria WCAG untuk pengumuman tanggal yang gagal.",
+    "expected_primary": "shadow-accessibility",
+    "confusable": "antislop-human"
+  },
+  {
+    "id": "wave2-development-11",
+    "language": "en",
+    "prompt": "Build a streaming model gateway that falls back to a second provider only before the first emitted token and records structured provider outcomes.",
+    "expected_primary": "shadow-ai-eng",
+    "confusable": "shadow-eval"
+  },
+  {
+    "id": "wave2-development-12",
+    "language": "id",
+    "prompt": "Rancang eksperimen untuk fitur pengingat mingguan. Tentukan unit randomisasi, minimum detectable effect, dan metrik keberhasilan yang tidak mudah terdistorsi.",
+    "expected_primary": "shadow-analytics",
+    "confusable": "shadow-observe"
+  },
+  {
+    "id": "wave2-development-13",
+    "language": "en",
+    "prompt": "Expose existing postal-zone lookups through a new gRPC interface. Design the protobuf messages and map validation failures consistently for callers.",
+    "expected_primary": "shadow-api",
+    "confusable": "shadow-integrate"
+  },
+  {
+    "id": "wave2-development-14",
+    "language": "id",
+    "prompt": "Tentukan batas modul untuk satu aplikasi peminjaman ruang. Buat keputusan arsitektur tentang job pemutakhiran jadwal dan aturan dependency antarmodul.",
+    "expected_primary": "shadow-architect",
+    "confusable": "shadow-ea"
+  },
+  {
+    "id": "wave2-development-15",
+    "language": "en",
+    "prompt": "Design passkey enrollment and recovery for operators who may lose a shared terminal. Include server-side credential revocation and step-up authentication for sensitive changes.",
+    "expected_primary": "shadow-auth",
+    "confusable": "shadow-sec"
+  },
+  {
+    "id": "wave2-development-16",
+    "language": "id",
+    "prompt": "Inisialisasi library baru untuk konversi satuan dari repo kosong. Pakai generator resmi dan siapkan contoh import serta perintah tes minimal.",
+    "expected_primary": "shadow-bootstrap",
+    "confusable": "shadow-architect"
+  },
+  {
+    "id": "wave2-development-17",
+    "language": "en",
+    "prompt": "Open the running scheduler in Chromium and Firefox, drag an appointment to another time slot, and compare screenshots and UI behavior after refresh.",
+    "expected_primary": "shadow-browser",
+    "confusable": "shadow-test"
+  },
+  {
+    "id": "wave2-development-18",
+    "language": "id",
+    "prompt": "Beberapa endpoint publik membalas 304 walau konten terbitan berubah. Telusuri ETag dan aturan revalidation antara browser, proxy, dan origin.",
+    "expected_primary": "shadow-cache",
+    "confusable": "shadow-concurrency"
+  },
+  {
+    "id": "wave2-development-19",
+    "language": "en",
+    "prompt": "Check whether changing serial numbers from integers to strings breaks existing CSV-upload API clients and design a compatibility window backed by client recordings.",
+    "expected_primary": "shadow-compat",
+    "confusable": "shadow-api"
+  },
+  {
+    "id": "wave2-development-20",
+    "language": "id",
+    "prompt": "Rancang transactional outbox untuk pemrosesan arsip. Sambungkan perubahan state dan event secara atomik, lalu tentukan cara consumer mengenali pengiriman ulang.",
+    "expected_primary": "shadow-concurrency",
+    "confusable": "shadow-integrate"
+  },
+  {
+    "id": "wave2-development-21",
+    "language": "en",
+    "prompt": "Plan a resumable keyset backfill of normalized phone values into a new column, including staged validation and the switchover while existing writes continue.",
+    "expected_primary": "shadow-data",
+    "confusable": "shadow-db"
+  },
+  {
+    "id": "wave2-development-22",
+    "language": "id",
+    "prompt": "Bandingkan indeks parsial dan indeks penutup untuk pencarian tiket terbuka. Gunakan EXPLAIN ANALYZE dan statistik tabel sebagai bukti rekomendasi.",
+    "expected_primary": "shadow-db",
+    "confusable": "shadow-data"
+  },
+  {
+    "id": "wave2-development-23",
+    "language": "en",
+    "prompt": "The XML importer only reports duplicate closing tags on files saved with a BOM. Isolate where decoding diverges and prove the cause with a minimal fixture.",
+    "expected_primary": "shadow-debug",
+    "confusable": "shadow-maintain"
+  },
+  {
+    "id": "wave2-development-24",
+    "language": "id",
+    "prompt": "Rancang pengalaman pencarian jasa untuk dua peran pelanggan. Buat alur utama, wireframe setiap tahap, dan perlakuan komponen saat penawaran kedaluwarsa.",
+    "expected_primary": "shadow-design",
+    "confusable": "antislop-ui"
+  },
+  {
+    "id": "wave2-development-25",
+    "language": "en",
+    "prompt": "Turn contradictory workshop notes about emergency purchase approval into a stakeholder decision list and testable functional requirements.",
+    "expected_primary": "shadow-discovery",
+    "confusable": "shadow-plan"
+  },
+  {
+    "id": "wave2-development-26",
+    "language": "id",
+    "prompt": "Gunakan AST yang sudah disahkan untuk merender ulang risalah rapat ke DOCX. Pastikan penomoran, caption foto, dan representasi daftar peserta konsisten.",
+    "expected_primary": "shadow-doc",
+    "confusable": "shadow-handover"
+  },
+  {
+    "id": "wave2-development-27",
+    "language": "en",
+    "prompt": "Model the consistency rules for a room-booking aggregate when recurring blocks overlap and supervisors can grant exceptions with expiration.",
+    "expected_primary": "shadow-domain",
+    "confusable": "shadow-concurrency"
+  },
+  {
+    "id": "wave2-development-28",
+    "language": "id",
+    "prompt": "Buat peta kapabilitas lintas divisi dari daftar sistem operasional. Susun rencana konsolidasi portofolio dan tetapkan kepemilikan pertukaran data antarunit.",
+    "expected_primary": "shadow-ea",
+    "confusable": "shadow-architect"
+  },
+  {
+    "id": "wave2-development-29",
+    "language": "en",
+    "prompt": "Tune the mailing infrastructure for a new subdomain. Decide how to warm sender reputation and monitor DMARC reports and complaint rates before expanding volume.",
+    "expected_primary": "shadow-email",
+    "confusable": "shadow-integrate"
+  },
+  {
+    "id": "wave2-development-30",
+    "language": "id",
+    "prompt": "Uji stabilitas evaluator jawaban asisten pada tanggapan yang menyebut angka salah. Ukur false-pass terhadap penilaian manusia dan bandingkan dua prompt grader.",
+    "expected_primary": "shadow-eval",
+    "confusable": "shadow-ai-eng"
+  },
+  {
+    "id": "wave2-dev-b-01",
+    "language": "en",
+    "prompt": "Our annual cloud commitment covers fewer compute hours than forecast. Use the bill export to model utilization and decide how much capacity to reserve next quarter.",
+    "expected_primary": "shadow-finops",
+    "confusable": "shadow-ops"
+  },
+  {
+    "id": "wave2-dev-b-02",
+    "language": "id",
+    "prompt": "Hasil squash di cabang tim mengubah hash beberapa commit milik saya. Periksa patch mana yang sudah masuk upstream agar saya tidak mengulang perubahan saat menyelaraskan cabang.",
+    "expected_primary": "shadow-git",
+    "confusable": "shadow-release"
+  },
+  {
+    "id": "wave2-dev-b-03",
+    "language": "en",
+    "prompt": "For an internal assurance review, distinguish control exceptions from evidence gaps. Record the sample window and which findings have enough evidence for an audit conclusion.",
+    "expected_primary": "shadow-grc",
+    "confusable": "shadow-pmo"
+  },
+  {
+    "id": "wave2-dev-b-04",
+    "language": "id",
+    "prompt": "Susun dokumen serah terima sebagian untuk modul yang sudah diterima klien. Cantumkan pengecualian, penanggung jawab aset, dan kewajiban vendor yang masih terbuka.",
+    "expected_primary": "shadow-handover",
+    "confusable": "shadow-uat"
+  },
+  {
+    "id": "wave2-dev-b-05",
+    "language": "en",
+    "prompt": "Design a procedural particle illustration for the welcome screen. Supply a static fallback and reusable SVG elements so the UI team can implement it.",
+    "expected_primary": "shadow-illustration",
+    "confusable": "shadow-video"
+  },
+  {
+    "id": "wave2-dev-b-06",
+    "language": "id",
+    "prompt": "Dua penyedia pembayaran mengembalikan format data refund yang berbeda. Buat adapter untuk menyatukan statusnya dan menyimpan identitas refund dari masing-masing vendor.",
+    "expected_primary": "shadow-integrate",
+    "confusable": "shadow-api"
+  },
+  {
+    "id": "wave2-dev-b-07",
+    "language": "en",
+    "prompt": "Turn the recurring production certificate-expiry incident into a maintenance playbook. Include the confirmed service impact, escalation owner, and follow-up repair work.",
+    "expected_primary": "shadow-maintain",
+    "confusable": "shadow-ops"
+  },
+  {
+    "id": "wave2-dev-b-08",
+    "language": "id",
+    "prompt": "Tinjau cara aplikasi iPhone menyimpan kunci lokal. Tentukan pemakaian Keychain dan nyatakan pengujian perangkat yang dibutuhkan untuk verifikasi MASVS.",
+    "expected_primary": "shadow-mobile",
+    "confusable": "shadow-auth"
+  },
+  {
+    "id": "wave2-dev-b-09",
+    "language": "en",
+    "prompt": "The inherited import system has hidden rules tied to batch dates. Inventory the behaviors from old records and source code before we decide whether the subsystem can be replaced.",
+    "expected_primary": "shadow-modernize",
+    "confusable": "shadow-refactor"
+  },
+  {
+    "id": "wave2-dev-b-10",
+    "language": "id",
+    "prompt": "Bagi kepemilikan pekerjaan lintas platform, keamanan, dan kebutuhan bisnis untuk penggantian layanan desa ini. Tentukan satu penanggung jawab akhir, kanal review, dan keputusan yang harus mendapat izin klien.",
+    "expected_primary": "shadow-monarch",
+    "confusable": "shadow-ea"
+  },
+  {
+    "id": "wave2-dev-b-11",
+    "language": "en",
+    "prompt": "Define the structured event emitted once per request. It needs the trace ID, normalized status, dependency timings, and a bounded set of fields safe for the logs pipeline.",
+    "expected_primary": "shadow-observe",
+    "confusable": "shadow-privacy"
+  },
+  {
+    "id": "wave2-dev-b-12",
+    "language": "id",
+    "prompt": "Pisahkan state Terraform lingkungan pengujian dan produksi. Pastikan perubahan jaringan di lingkungan uji tidak memakai state atau hak akses produksi.",
+    "expected_primary": "shadow-ops",
+    "confusable": "shadow-release"
+  },
+  {
+    "id": "wave2-dev-b-13",
+    "language": "en",
+    "prompt": "Before staging acceptance, compare open arrival-rate and closed virtual-user workloads. Choose a bounded load profile and define the latency and saturation evidence required to pass.",
+    "expected_primary": "shadow-perf",
+    "confusable": "shadow-uat"
+  },
+  {
+    "id": "wave2-dev-b-14",
+    "language": "id",
+    "prompt": "Kebutuhan aktivasi akun sudah disetujui. Susun backlog untuk dua iterasi dengan pekerjaan fondasi, cerita pengguna, dan dependensi yang menentukan urutannya.",
+    "expected_primary": "shadow-plan",
+    "confusable": "shadow-discovery"
+  },
+  {
+    "id": "wave2-dev-b-15",
+    "language": "en",
+    "prompt": "The steering committee removed two work packages mid-quarter. Reconcile earned value against the new contractual baseline and explain how the change affects schedule variance.",
+    "expected_primary": "shadow-pmo",
+    "confusable": "shadow-plan"
+  },
+  {
+    "id": "wave2-dev-b-16",
+    "language": "id",
+    "prompt": "Bantu hitung harga penawaran paket implementasi dari BoQ tender. Jelaskan biaya langsung, margin penyedia, dan bagaimana kurs memengaruhi kelayakan penawaran.",
+    "expected_primary": "shadow-presales",
+    "confusable": "shadow-finops"
+  },
+  {
+    "id": "wave2-dev-b-17",
+    "language": "en",
+    "prompt": "Design the process for a customer to obtain and correct records about them. Tie identity validation, response deadlines, and vendor-held copies to the rights request.",
+    "expected_primary": "shadow-privacy",
+    "confusable": "shadow-auth"
+  },
+  {
+    "id": "wave2-dev-b-18",
+    "language": "id",
+    "prompt": "Pasang aturan pemeriksaan kode supaya impor dari domain ke lapisan infrastruktur menggagalkan CI. Petakan pengecualian yang memang sudah jadi pola di repo.",
+    "expected_primary": "shadow-quality",
+    "confusable": "shadow-architect"
+  },
+  {
+    "id": "wave2-dev-b-19",
+    "language": "en",
+    "prompt": "An operator can revoke a channel subscription mid-session. Define how connected clients stop receiving messages immediately and how rejoining checks current channel access.",
+    "expected_primary": "shadow-realtime",
+    "confusable": "shadow-auth"
+  },
+  {
+    "id": "wave2-dev-b-20",
+    "language": "id",
+    "prompt": "Pecah pelaporan retur menjadi beberapa fungsi yang lebih kecil tanpa mengubah kapan transaksi basis data dibuka dan kapan notifikasi dikirim.",
+    "expected_primary": "shadow-refactor",
+    "confusable": "shadow-domain"
+  },
+  {
+    "id": "wave2-dev-b-21",
+    "language": "en",
+    "prompt": "Plan the promotion of one signed artifact from staging into production during a fixed launch window. Define the go-ahead evidence, the abort point, and reversal order.",
+    "expected_primary": "shadow-release",
+    "confusable": "shadow-supplychain"
+  },
+  {
+    "id": "wave2-dev-b-22",
+    "language": "id",
+    "prompt": "Sesudah penyedia pemrosesan sempat gagal, pulihkan pekerjaan tertahan secara bertahap. Rancang latihan staging dan batas laju replay supaya layanan tidak gagal lagi.",
+    "expected_primary": "shadow-resilience",
+    "confusable": "shadow-concurrency"
+  },
+  {
+    "id": "wave2-dev-b-23",
+    "language": "en",
+    "prompt": "People often swap letters in product names. Evaluate a typo-tolerant candidate strategy and check whether it displaces exact matches that should rank first.",
+    "expected_primary": "shadow-search",
+    "confusable": "shadow-seo"
+  },
+  {
+    "id": "wave2-dev-b-24",
+    "language": "id",
+    "prompt": "Lakukan review defensif pada unduhan lampiran. Pastikan pemetaan berkas selalu memeriksa direktori yang diizinkan dan kebijakan akses sebelum data dikirim.",
+    "expected_primary": "shadow-sec",
+    "confusable": "shadow-auth"
+  },
+  {
+    "id": "wave2-dev-b-25",
+    "language": "en",
+    "prompt": "Search Console keeps reporting discontinued models as soft 404s. Decide which pages should redirect, remain indexed, or return an explicit removal status.",
+    "expected_primary": "shadow-seo",
+    "confusable": "shadow-release"
+  },
+  {
+    "id": "wave2-dev-b-26",
+    "language": "id",
+    "prompt": "Batasi artefak yang diterima pipeline promosi berdasarkan identitas workflow dan penandatangan attestasi. Tunjukkan cara memverifikasi asal build yang diharapkan.",
+    "expected_primary": "shadow-supplychain",
+    "confusable": "shadow-release"
+  },
+  {
+    "id": "wave2-dev-b-27",
+    "language": "en",
+    "prompt": "Parameterize our pytest parser checks for leap days and unsupported locales. Add lost-input regressions and make sure failures identify which case broke.",
+    "expected_primary": "shadow-test",
+    "confusable": "shadow-debug"
+  },
+  {
+    "id": "wave2-dev-b-28",
+    "language": "id",
+    "prompt": "Sebelum berita acara disiapkan, susun daftar verifikasi untuk perwakilan tiap peran pengguna di staging. Rekam bukti per kebutuhan dan status pengecualian yang mereka setujui.",
+    "expected_primary": "shadow-uat",
+    "confusable": "shadow-handover"
+  },
+  {
+    "id": "wave2-dev-b-29",
+    "language": "en",
+    "prompt": "Produce a captioned release walkthrough from existing footage. Keep narration synchronized with the cut and generate a compressed copy for the help center.",
+    "expected_primary": "shadow-video",
+    "confusable": "shadow-illustration"
+  }
+]

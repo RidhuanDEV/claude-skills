@@ -22,6 +22,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Protocol
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 SHADOW_DOC_ROOT = SCRIPT_DIR.parent
 REPO_ROOT_FALLBACK = SHADOW_DOC_ROOT.parent
@@ -694,7 +697,7 @@ def discover_project_generators(repo_root: Path, *, include_system_clis: bool = 
                     "capabilities_verified": bool(declared_outputs or declared_inputs),
                     "runtime_checks": inspected_pg.get("runtime_checks", []),
                     "security_scan": {"scanned": entry.is_file() if exists else False, "unsafe_sinks": inspected_pg.get("unsafe_sinks", [])},
-                    "verified_source_scan": bool(inspected_pg.get("has_entry")),
+                    "verified_source_scan": inspected_pg.get("has_entry") is True,
                     "side_effects_verified": False,
                     "contradictions": contradictions,
                     "supported_inputs": declared_inputs,
@@ -814,11 +817,11 @@ def assess_generator_compatibility(
     req = requirements or {}
     needed_outputs = {str(x).lower() for x in req.get("required_outputs", ["md"])}
     needed_input = str(req.get("preferred_input", "markdown")).lower()
-    needs_tables = bool(req.get("requires_tables", True))
-    needs_diagrams = bool(req.get("requires_diagrams", False))
-    needs_code = bool(req.get("requires_code_blocks", False))
-    needs_citations = bool(req.get("requires_citations", False))
-    needs_templates = bool(req.get("requires_templates", False))
+    needs_tables = strict_bool(req.get("requires_tables", True), "requires_tables")
+    needs_diagrams = strict_bool(req.get("requires_diagrams", False), "requires_diagrams")
+    needs_code = strict_bool(req.get("requires_code_blocks", False), "requires_code_blocks")
+    needs_citations = strict_bool(req.get("requires_citations", False), "requires_citations")
+    needs_templates = strict_bool(req.get("requires_templates", False), "requires_templates")
 
     cand_exists = candidate.get("exists", True)
     exec_p = candidate.get("paths", {}).get("executable_path")
@@ -1315,6 +1318,9 @@ class MarkdownCompatibilityAdapter:
         # Re-parsed tables exclude metadata/history/approvals? Compare total data row content presence instead
         for tb in src_tables:
             td = tb["table_data"]
+            header_cols = [str(c).replace("|", "\\|") for c in td.get("columns", td.get("headers", []))]
+            if header_cols and ("| " + " | ".join(header_cols) + " |") not in md_text:
+                failures.append(f"Table header lost or reordered in {tb.get('id')}: {header_cols}")
             for row in td.get("rows", []):
                 for cell in row:
                     c_str = str(cell)
@@ -1475,4 +1481,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

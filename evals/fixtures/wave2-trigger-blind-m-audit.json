@@ -1,0 +1,42 @@
+[
+ {
+  "id": "antislop-copywriting-m-id-near-01",
+  "issue": "Prompt quoted a shouty OTP subject line, inviting a copy rewrite; the excluded copywriting skill could legitimately activate.",
+  "old_prompt": "Subjek email OTP kami 'SEGERA VERIFIKASI!!!' masuk spam Gmail; perbaiki DKIM alignment dan naikkan DMARC ke p=quarantine.",
+  "new_prompt": "Email OTP kami masuk folder spam Gmail sejak pindah ESP; cek SPF, perbaiki DKIM alignment, dan naikkan DMARC ke p=quarantine.",
+  "old_expected": "shadow-email",
+  "new_expected": "shadow-email"
+ },
+ {
+  "id": "context7-m-en-near-01",
+  "issue": "A Next.js major-version upgrade inherently needs version-specific migration docs, so the excluded docs-lookup skill would reasonably activate.",
+  "old_prompt": "Upgrade the listing portal from Next.js 14 to 15 and work out which pages break due to the async request API change.",
+  "new_prompt": "Replay last month's recorded requests from v1 mobile clients against the new listing API build and report every wire-level and semantic difference that would break them.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "shadow-plan-m-en-near-01",
+  "issue": "Near-verbatim duplicate of positive shadow-pmo-m-en-01, leaking a positive into the near-miss set.",
+  "old_prompt": "The client calls the missing Excel export a bug; per the SOW, is it a defect or a paid change request?",
+  "new_prompt": "Mid-project the payroll client asks for a bulk-approve feature; check the contract addendum and SOW to decide whether it is in scope or a billable change request.",
+  "old_expected": "shadow-pmo",
+  "new_expected": "shadow-pmo"
+ },
+ {
+  "id": "shadow-realtime-m-id-near-01",
+  "issue": "SSE streaming is core transport territory of the excluded realtime skill; exclusion was not defensible.",
+  "old_prompt": "Streaming SSE jawaban LLM asisten hukum yang bisa dibatalkan pengguna.",
+  "new_prompt": "Tambahkan pembatalan generasi LLM di runtime asisten hukum: teruskan sinyal abort ke provider dan simpan jawaban parsial yang sudah terbentuk.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ },
+ {
+  "id": "shadow-seo-m-en-near-01",
+  "issue": "Near-verbatim duplicate of positive modern-web-guidance-m-en-03 (LCP hero fetchpriority/sizes).",
+  "old_prompt": "The property hero image gives LCP 4s; add fetchpriority and correct sizes.",
+  "new_prompt": "The 3,000-row legal template index page renders slowly; apply content-visibility: auto and stop the layout shift caused by late-loading thumbnails.",
+  "old_expected": "modern-web-guidance",
+  "new_expected": "modern-web-guidance"
+ }
+]

@@ -1,6 +1,6 @@
 ---
 name: shadow-realtime
-description: "Realtime Transport & Client Synchronization Engineering. Use when designing WebSockets, Server-Sent Events (SSE), WebRTC/MQTT, long-lived streams, Last-Event-ID resumption cursors, mid-connection auth revocation, presence TTL leases, slow-consumer backpressure, multi-node pub/sub fan-out, or CRDT sync. Do NOT use for durable queue semantics (shadow-concurrency), stateless HTTP APIs (shadow-api), or third-party webhooks (shadow-integrate)."
+description: "Use when designing WebSockets, SSE, presence, reconnect cursors, backpressure, or CRDT sync. Not for durable jobs (/shadow-concurrency)."
 ---
 
 # `/shadow-realtime` — Realtime Transport, Resumption, Revocation & Client Synchronization

@@ -1,6 +1,6 @@
 ---
 name: shadow-mobile
-description: "Mobile Build, MASVS v2.1.0 & Store Release Engineering. Use when hardening, signing, or releasing Android/iOS/Flutter/React Native apps, checking PrivacyInfo.xcprivacy, Play Integrity API, targetSdkVersion, Universal/App Links, or Maestro/Detox E2E."
+description: "Use when signing or releasing Android/iOS apps, target SDK, Play Integrity, App Links, or PrivacyInfo.xcprivacy."
 ---
 
 # `/shadow-mobile` — Mobile Hardening (`OWASP MASVS v2.1.0`), Signing & Store Release Gate

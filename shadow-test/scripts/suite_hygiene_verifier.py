@@ -14,9 +14,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 import sys
 from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shadow-monarch" / "scripts"))
+from shadow_input import run_checked_cli, strict_bool
 
 FLAKY_SLEEP_RE = re.compile(
     r"(?:\btime\.sleep\s*\(|\bsetTimeout\s*\([^,]+,\s*\d{3,}|\bwaitForTimeout\s*\(|\bThread\.sleep\s*\(|\bsleep\s+[1-9]\d*)",
@@ -24,7 +28,10 @@ FLAKY_SLEEP_RE = re.compile(
 )
 TS_ANY_RE = re.compile(r"(?::\s*any\b|\bany\[\]|<any>)")
 TS_CAST_RE = re.compile(r"\bas\s+(?!const\b)[A-Z][A-Za-z0-9_<>\[\]| ]*")
-DOCKER_RUN_RE = re.compile(r"\bdocker\s+run\b[^\n]*", re.IGNORECASE)
+DOCKER_RUN_RE = re.compile(r"\bdocker\s+run\b([^;\n{}]*)", re.IGNORECASE)
+DOCKER_COMMENT_RE = re.compile(
+    r"""(?P<quoted>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|/\*[\s\S]*?\*/|<\#[\s\S]*?\#>|(?:^|(?<=[\s;{}]))(?:\#|//)[^\n]*"""
+)
 
 REQUIRED_HTTP_SURFACES = frozenset({
     "happy_path",
@@ -36,6 +43,64 @@ REQUIRED_HTTP_SURFACES = frozenset({
     "boundary_values",
     "state_cleanup",
 })
+
+
+DOCKER_OPTIONS_WITH_VALUE = {
+    "--env", "--env-file", "--label", "--name", "--network", "--platform",
+    "--publish", "--tmpfs", "--user", "--volume", "--workdir", "-e", "-p", "-u", "-v", "-w",
+}
+DOCKER_SWITCHES = {"--detach", "--interactive", "--tty", "--init", "--privileged", "-d", "-i", "-t", "-it"}
+
+
+def _docker_run_settings(command: str) -> tuple[bool, str | None]:
+    try:
+        tokens = iter(shlex.split(command))
+    except ValueError:
+        return False, None
+    auto_remove = False
+    owned = False
+    name = None
+    for token in tokens:
+        if token == "--":
+            return bool(next(tokens, "")) and auto_remove and owned, name
+        if not token.startswith("-"):
+            return auto_remove and owned, name
+        option, separator, value = token.partition("=")
+        if option == "--rm":
+            auto_remove = not separator or value == "true"
+        elif option in DOCKER_OPTIONS_WITH_VALUE:
+            value = value if separator else next(tokens, "")
+            if option == "--label" and value.partition("=")[0] == "shadow.ephemeral":
+                owned = value == "shadow.ephemeral=true"
+            elif option == "--name":
+                name = value
+        elif option not in DOCKER_SWITCHES:
+            return False, None
+    return False, name
+
+
+def _docker_cleanup_targets(code: str) -> set[str]:
+    bodies = re.findall(r"(?:^|[;\n}])\s*(?:finally\s*|afterAll\s*\([^{}]*?)\{([^{}]*)\}", code, re.IGNORECASE)
+    for trap in re.findall(r"""(?:^|[;\n])\s*trap\s+("[^"\n]+"|'[^'\n]+'|[\w-]+)\s+EXIT\b""", code):
+        if trap[0] in ('"', "'"):
+            bodies.append(trap[1:-1])
+        else:
+            body = re.search(rf"(?m)^\s*{re.escape(trap)}\s*\(\s*\)\s*\{{([^{{}}]*)\}}", code)
+            if body:
+                bodies.append(body[1])
+    targets: set[str] = set()
+    for body in bodies:
+        for args in re.findall(r"(?:^|[;\n])\s*docker\s+rm\s+([^;\n|><]+)", body, re.IGNORECASE):
+            try:
+                tokens = shlex.split(args)
+            except ValueError:
+                continue
+            options = {token for token in tokens if token.startswith("-")}
+            force = bool(options & {"-f", "-fv", "-vf", "--force"})
+            volumes = bool(options & {"-v", "-fv", "-vf", "--volumes"})
+            if force and volumes:
+                targets.update(token for token in tokens if not token.startswith("-"))
+    return targets
 
 
 def check_test_hygiene(spec: Any) -> list[dict[str, str]]:
@@ -55,7 +120,7 @@ def check_test_hygiene(spec: Any) -> list[dict[str, str]]:
             name = str(item.get("file", f"snippet[{idx}]"))
             lang = str(item.get("language", "")).lower()
             code = str(item.get("code", ""))
-            uses_fake_timers = bool(item.get("uses_fake_timers", False))
+            uses_fake_timers = strict_bool(item.get("uses_fake_timers", False), "uses_fake_timers")
 
             if FLAKY_SLEEP_RE.search(code) and not uses_fake_timers:
                 violations.append({
@@ -75,21 +140,21 @@ def check_test_hygiene(spec: Any) -> list[dict[str, str]]:
                         "detail": f"`{name}` uses forbidden `as Type` cast in TypeScript test; narrow or build typed fixtures instead.",
                     })
 
-            if DOCKER_RUN_RE.search(code):
-                has_rm = "--rm" in code
-                has_label = "shadow.ephemeral=true" in code
-                has_teardown = bool(re.search(r"\b(?:finally|trap\s+.*EXIT|afterAll)\b", code, re.IGNORECASE)) and bool(
-                    re.search(r"docker\s+(?:rm\s+-f|compose\b.*\bdown)", code, re.IGNORECASE)
-                )
-                if not has_rm or not has_label:
+            docker_code = DOCKER_COMMENT_RE.sub(lambda match: match["quoted"] or " ", code)
+            docker_code = docker_code.replace("\\\n", " ").replace("`" + "\n", " ")
+            runs = DOCKER_RUN_RE.findall(docker_code)
+            if runs:
+                settings = [_docker_run_settings(command) for command in runs]
+                if not all(has_flags for has_flags, _ in settings):
                     violations.append({
                         "code": "DOCKER_MISSING_EPHEMERAL_FLAGS",
                         "detail": f"`{name}` spawns Docker test container without both `--rm` and `--label shadow.ephemeral=true`.",
                     })
-                if not has_teardown:
+                targets = _docker_cleanup_targets(docker_code)
+                if not targets or any(name and name not in targets for _, name in settings):
                     violations.append({
                         "code": "DOCKER_MISSING_GUARANTEED_TEARDOWN",
-                        "detail": f"`{name}` spawns Docker container without guaranteed `finally`/`trap EXIT` teardown (`docker rm -f -v`).",
+                        "detail": f"`{name}` spawns Docker container without matching `finally`/`trap EXIT` teardown (`docker rm -f -v`).",
                     })
 
     endpoint_tests = spec.get("http_endpoint_suites", [])
@@ -227,4 +292,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_checked_cli(main))

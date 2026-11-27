@@ -1,6 +1,6 @@
 ---
 name: shadow-sec
-description: "Application & SDLC Security Engineering Specialist. Use when performing STRIDE threat modeling, OWASP ASVS 5.0 & NIST SSDF audits, SQLi/OS-injection/XSS/CSP/CORS/SSRF hardening, AES-256-GCM/KMS secrets review, SAST/CVE reachability triage, security incident containment, or pre-install audits of third-party skills, plugins, and MCP servers. Do NOT use for UU PDP privacy (/shadow-privacy), auth implementation (/shadow-auth), or COBIT/OJK GRC (/shadow-grc)."
+description: "Use when threat modeling, reviewing AppSec/ASVS, SAST, secrets, or vetting third-party skills and MCP servers before install."
 ---
 
 # Shadow Sec (`/shadow-sec`) — SDLC Security, Threat Modeling & OWASP ASVS 5.0 Auditor

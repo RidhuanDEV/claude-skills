@@ -1,6 +1,6 @@
 ---
 name: shadow-refactor
-description: "Behavior-Preserving Codebase Evolution. Use when safely refactoring legacy modules, writing characterization (golden master) tests, extracting pure seams, executing branch-by-abstraction with read-only shadow parity, cleaning scoped dead code, or preserving side-effect ordering within existing conventions. Do NOT use for topology redesign (shadow-architect/shadow-ea), TCO due diligence (shadow-modernize), or bug hunting (shadow-debug)."
+description: "Use when preserving behavior during code cleanup, seam extraction, characterization tests, or branch-by-abstraction."
 ---
 
 # `/shadow-refactor` — Behavior-Preserving Codebase Evolution

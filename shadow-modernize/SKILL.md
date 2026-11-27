@@ -1,6 +1,6 @@
 ---
 name: shadow-modernize
-description: "Technical Due Diligence & Legacy Modernization. Use when auditing inherited/legacy systems, performing business-rule archaeology, scoring multi-dimensional risk vectors, or comparing Strangler Fig Refactor vs Full Rewrite TCO including coexistence costs."
+description: "Use when assessing legacy systems, business-rule archaeology, or Strangler Fig versus rewrite TCO. Not for scoped refactors (/shadow-refactor)."
 ---
 
 # `/shadow-modernize` — Technical Due Diligence & Migration Intelligence

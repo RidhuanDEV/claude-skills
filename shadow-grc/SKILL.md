@@ -1,6 +1,6 @@
 ---
 name: shadow-grc
-description: "Evidence-Based IT Governance, Risk & Regulatory Assurance. Use when auditing COBIT 2019 (Capability vs Maturity), ISO/IEC 27001:2022 (Clauses 4-10 + 93 Annex A SoA), SPBE & Indeks KAMI BSSN, or banking IT rules (POJK 11/2022 & PADK OJK 1/2026)."
+description: "Use when auditing COBIT capability, ISO 27001 SoA, SPBE or banking IT controls. Not for hands-on AppSec (/shadow-sec)."
 ---
 
 # `/shadow-grc` — Evidence-Based Governance & Regulatory Assurance

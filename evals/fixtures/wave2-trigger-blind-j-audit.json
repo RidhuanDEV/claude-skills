@@ -1,0 +1,58 @@
+[
+ {
+  "id": "modern-web-guidance-j-en-near-01",
+  "issue": "Rule 1 risk: canonical-tag fixes are frontend markup work that would activate the UI filters including the excluded skill; moved to pure crawl/infra SEO.",
+  "old_prompt": "sitemap.xml lists 40k hotel URLs but Search Console shows 'Discovered - currently not indexed' for most. Fix crawl and canonical issues.",
+  "new_prompt": "sitemap.xml lists 40k hotel URLs but Search Console shows 'Discovered - currently not indexed' for most. Audit robots.txt rules, sitemap segmentation, and crawl budget from the server access logs.",
+  "old_expected": "shadow-seo",
+  "new_expected": "shadow-seo"
+ },
+ {
+  "id": "shadow-ai-eng-j-en-03",
+  "issue": "Ambiguous primary: SSE streaming is a core shadow-realtime topic in the catalog; reworded to LLM-runtime-specific cancellation and compaction.",
+  "old_prompt": "Implement cancellable SSE streaming for chatbot replies, plus context compaction once a conversation passes 100k tokens.",
+  "new_prompt": "Let users cancel an in-flight LLM generation mid-reply without leaking provider calls, and add context compaction once a chatbot conversation passes 100k tokens.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ },
+ {
+  "id": "shadow-ai-eng-j-id-03",
+  "issue": "Ambiguous primary: 'RAG hybrid' points at hybrid retrieval tuning (shadow-search) and generic caching; reworded to LLM runtime concerns.",
+  "old_prompt": "Rancang runtime RAG hybrid untuk chatbot layanan pelanggan telco, termasuk prefix caching untuk system prompt yang panjang.",
+  "new_prompt": "Rancang runtime LLM untuk chatbot layanan pelanggan telco: perakitan konteks dari dokumen yang sudah diambil, prefix caching system prompt yang panjang, dan fallback antarpenyedia.",
+  "old_expected": "shadow-ai-eng",
+  "new_expected": "shadow-ai-eng"
+ },
+ {
+  "id": "shadow-compat-j-id-03",
+  "issue": "Ambiguous primary: naming the File System Access API makes it a Baseline web API choice (modern-web-guidance); reworded to a cross-platform compatibility matrix with replay.",
+  "old_prompt": "Susun matriks kompatibilitas iOS Safari 16-18 dan Chrome Android untuk fitur unggah foto lahan sebelum kami memakai File System Access API.",
+  "new_prompt": "Susun matriks kompatibilitas iOS Safari 16-18 dan Chrome Android untuk fitur unggah foto lahan, lalu replay skenario unggah yang terekam di tiap kombinasi versi.",
+  "old_expected": "shadow-compat",
+  "new_expected": "shadow-compat"
+ },
+ {
+  "id": "shadow-git-j-id-near-01",
+  "issue": "Ambiguity: 'tag v2.4.0' reads as a Git tagging operation for the excluded skill; reworded to release versioning only.",
+  "old_prompt": "Tentukan versi SemVer berikutnya dan checklist preflight untuk tag v2.4.0.",
+  "new_prompt": "Tentukan versi SemVer berikutnya dari daftar perubahan sejak v2.3.2 dan susun checklist preflight rilis v2.4.0.",
+  "old_expected": "shadow-release",
+  "new_expected": "shadow-release"
+ },
+ {
+  "id": "shadow-monarch-j-en-03",
+  "issue": "Ambiguous primary: framing as an 'incident' makes shadow-maintain a credible owner; reworded to a cross-domain change needing routing.",
+  "old_prompt": "This chatbot incident spans the LLM runtime, Redis cache, logged prompts with phone numbers, and billing. Route it and give one accountable plan.",
+  "new_prompt": "This chatbot change spans the LLM runtime, Redis cache, logged prompts with phone numbers, and billing. Route each part to the right specialist and give one accountable plan.",
+  "old_expected": "shadow-monarch",
+  "new_expected": "shadow-monarch"
+ },
+ {
+  "id": "shadow-release-j-id-01",
+  "issue": "Ambiguous primary: a release that removes an old field is a breaking-change question for shadow-compat; reworded to versioning and readiness from the changelog.",
+  "old_prompt": "Tentukan versi SemVer untuk rilis yang menghapus field lama dan buat checklist kesiapan rilis.",
+  "new_prompt": "Tentukan versi SemVer untuk rilis berikutnya berdasarkan changelog sprint ini dan buat checklist kesiapan rilis beserta langkah rollback.",
+  "old_expected": "shadow-release",
+  "new_expected": "shadow-release"
+ }
+]

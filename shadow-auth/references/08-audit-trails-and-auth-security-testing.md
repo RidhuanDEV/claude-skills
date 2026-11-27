@@ -73,13 +73,13 @@ During an ISO 27001 / POJK audit, an application cannot prove who granted `super
 - **RIGHT:** Verify pre-top-K filtering directly in the vector/search query implementation and tie eval runs to an independently frozen policy revision.
 
 ## 9. Testing & Verification
-- Preserve and execute `shadow-auth/tests/test_auth_policy_matrix.py` alongside `test_auth_policy_verifier.py`; confirm `Authorization`/`Cookie`/`x-api-key` appear as `[REDACTED]` in recorded audit logs.
+- Preserve and execute `shadow-auth/tests/test_auth_policy_matrix.py` alongside `test_auth_policy_verifier.py`; they check the offline policy gate (including `audit_log_enabled` in session configs) but do not inspect recorded audit logs, so redaction of `Authorization`/`Cookie`/`x-api-key` needs its own test in the target service.
 
 ## 10. Operational Considerations
 - Partition `security_audit_logs` monthly by `occurred_at` and archive cold partitions to immutable WORM object storage (S3 Object Lock) per statutory retention requirements (typically 1–5 years in regulated fintech/gov).
 
 ## 11. Authoritative References
-- OWASP Logging Cheat Sheet & ASVS 5.0 V7/V16 (`https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html`).
+- OWASP Logging Cheat Sheet (`https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html`) & OWASP ASVS 5.0.0 security logging chapter (verify chapter number before citing; V7 is Session Management in 5.0.0).
 - NIST SP 800-92 — *Guide to Computer Security Log Management*.
 
 ## 12. Limitations & When NOT to Use

@@ -17,7 +17,7 @@ Activate this playbook when:
    - Build release artifacts strictly as signed `.aab` bundles (`./gradlew bundleRelease`), enrolling in **Play App Signing** so Google safeguards the final app signing key while CI uses an upload key.
    - **NEVER** commit `.jks` / `.keystore` files or hardcode `storePassword` / `keyPassword` in `build.gradle*` or Git — inject exclusively via `System.getenv(...)` or untracked, `.gitignore`d `keystore.properties`.
 2. **Active `targetSdkVersion` & Non-Debuggable Release Manifests**:
-   - Verify `targetSdk` satisfies Google Play's active annual target API policy for both new apps and updates.
+   - Verify `targetSdk` satisfies Google Play's active annual target API policy for both new apps and updates (API 36 since 2026-08-31; existing apps must target at least API 35 to stay visible to new users on newer devices — `https://developer.android.com/google/play/requirements/target-sdk`).
    - Enforce `android:debuggable="false"` (never hardcoded `true` in `src/main/AndroidManifest.xml`), `android:usesCleartextTraffic="false"`, and `isMinifyEnabled = true` + `isShrinkResources = true` on release variants.
    - Upload R8 `mapping.txt` and native debug symbols to Play Console / crash reporting for every release build.
 3. **16 KB Memory Page-Size Alignment (Android 15+ Mandate)**:
@@ -33,12 +33,12 @@ Activate this playbook when:
 ### Hardened `android/app/build.gradle.kts` Release Signing & R8 Template
 ```kotlin
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.app"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36 // Google Play: new apps & updates must target API 36 since 2026-08-31
         versionCode = (System.getenv("ANDROID_VERSION_CODE") ?: "1").toInt()
         versionName = System.getenv("ANDROID_VERSION_NAME") ?: "1.0.0"
     }
@@ -128,7 +128,7 @@ export function evaluatePlayIntegrityVerdict(
 | **Staged Rollout** | `5% -> 20% -> 50% -> 100%` watching Play Vitals ANR/crash rate | `10% -> 50% -> 100%` over 48–72h |
 
 ## 7. Real Production Scenario
-**Context:** A logistics Flutter app targeting `targetSdk = 35` built cleanly locally and passed unit tests, but crashed instantly on Pixel 9 Android 15 16 KB devices (`dlopen failed: empty/missing DT_HASH / not 16KB aligned`) due to a bundled barcode-scanner `.so` compiled with NDK r23.
+**Context:** A logistics Flutter app targeting `targetSdk = 36` built cleanly locally and passed unit tests, but crashed instantly on Pixel 9 Android 15 16 KB devices (`dlopen failed: empty/missing DT_HASH / not 16KB aligned`) due to a bundled barcode-scanner `.so` compiled with NDK r23.
 **Fix:** Running `llvm-objdump -p` against extracted `.so` files from the release `.aab` identified the unaligned third-party AAR (`align 2**12` instead of `2**14`), upgrading the scanner SDK + NDK r27+, and adding an automated 16 KB ELF alignment check in CI eliminated the crash before Production rollout.
 
 ## 8. Failure Modes & Edge Cases

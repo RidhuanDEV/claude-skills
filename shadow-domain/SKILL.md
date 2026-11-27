@@ -1,6 +1,6 @@
 ---
 name: shadow-domain
-description: "Domain-Driven Design & Business Invariant Modeling Specialist. Use when modeling complex state machines, approval/cancellation/backdating policies, bounded contexts, aggregate consistency boundaries, optimistic locking, domain events, or anti-corruption layers. Do NOT use for simple CRUD screens (keep lightweight), PRD interviews (/shadow-discovery), SQL tuning (/shadow-db), or C4 topology (/shadow-architect)."
+description: "Use when modeling business invariants, state transitions, aggregates, cancellation, or bounded contexts. Not for simple CRUD."
 ---
 
 # Shadow Domain (`/shadow-domain`) — DDD, State Machines & Business Invariants

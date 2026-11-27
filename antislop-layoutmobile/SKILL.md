@@ -1,6 +1,6 @@
 ---
 name: antislop-layoutmobile
-description: "Mobile layout filter for antislop. Use when building responsive grids, mobile viewports, tap targets, or preventing horizontal overflow across screen sizes."
+description: "Use when fixing mobile overflow, breakpoints, responsive grids, or tap targets. Not for native releases (/shadow-mobile)."
 allowed-tools: Read Write Edit Glob Grep
 ---
 # antislop-layoutmobile
