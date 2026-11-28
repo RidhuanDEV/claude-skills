@@ -38,7 +38,16 @@ foreach ($Root in $TargetRoots) {
         $SrcPath = Join-Path $PSScriptRoot $Folder
         if (Test-Path (Join-Path $SrcPath 'SKILL.md')) {
             $DstPath = Join-Path $Root $Folder
-            if (Test-Path $DstPath) { Remove-Item -Recurse -Force $DstPath }
+            $Existing = Get-Item -LiteralPath $DstPath -Force -ErrorAction SilentlyContinue
+            if ($null -ne $Existing) {
+                if (($Existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    # A junction or symlink (for example from install-codex.ps1): remove only the link.
+                    # Remove-Item -Recurse on a link can delete the files of the folder it points to.
+                    [System.IO.Directory]::Delete($Existing.FullName, $false)
+                } else {
+                    Remove-Item -LiteralPath $DstPath -Recurse -Force
+                }
+            }
             Copy-Item -Recurse -Force -Path $SrcPath -Destination $DstPath
         }
     }
