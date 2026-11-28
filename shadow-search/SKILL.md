@@ -29,7 +29,7 @@ Load ONLY the 1–2 modular playbooks needed for the active search subtask:
 ## 2. 7-Step Search Engineering Playbook
 Read [`methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md`](methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md) and [`playbooks/SEARCH-RELEVANCE-AND-MIGRATION-PLAYBOOK.md`](playbooks/SEARCH-RELEVANCE-AND-MIGRATION-PLAYBOOK.md):
 1. **Characterize Query Tasks:** Separate exact ID/SKU/pasal lookup (lexical BM25) from conceptual semantic queries (dense vector + hybrid RRF).
-2. **Design Indonesian + Domain Analyzers:** Handle slang/typo fuzziness, stopwords carefully, stemming vs exact keyword subfields (`keyword` + `text`).
+2. **Design Indonesian + Domain Analyzers:** apply the exact analyzer chain, the separator-stripping code normalizer, the negation-safe stop list and the probed identifier grammars from [reference 01](references/01-search-engines-and-indonesian-analyzers.md); route detected codes and citations to a boosted exact `term` clause and keep fuzziness off for tokens shorter than 4 characters. Load reference 01 for any exact-identifier or analyzer task.
 3. **Curate Held-Out Relevance Judgments:** Graded relevance (`0..3`) with Indonesian slang, near-duplicates, and high-selectivity filters.
 4. **Measure Baseline (`Recall@K`, `MRR@K`, `NDCG@K`):** Evaluate retrieval independently from LLM answer generation (`/shadow-eval`).
 5. **Verify Tenant ACL & Freshness Tombstones:** Test cross-tenant isolation and near-real-time document deletion/revocation.
@@ -39,6 +39,8 @@ Read [`methodologies/HYBRID-BM25-VECTOR-RRF-AND-ACL.md`](methodologies/HYBRID-BM
 ```powershell
 python "shadow-search/scripts/search_relevance_acl_gate.py" --self-test
 python "shadow-search/scripts/search_relevance_acl_gate.py" --evaluate path/to/search_eval.json
+python "shadow-search/scripts/identifier_query_router.py" "cari INV-8841-ID dan PP-27/2022"   # exact-term vs text split
+python "shadow-search/scripts/identifier_query_router.py" --self-test
 python -m unittest discover -s shadow-search/tests -v
 ```
 

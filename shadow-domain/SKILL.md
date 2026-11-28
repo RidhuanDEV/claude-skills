@@ -13,7 +13,8 @@ description: "Use when modeling business invariants, state transitions, aggregat
 1. **Anti-Overengineering Rule:** Never introduce heavy DDD ceremony (Aggregate Roots, Value Objects, Event Sourcing) for simple lookup tables or stateless CRUD without invariants.
 2. **Ambiguity Escalation Rule:** If two business policies conflict (e.g., cancelling a settled invoice or backdating a completed shift), **STOP and escalate** the conflict to the domain owner/Monarch instead of silently guessing.
 3. **Closed FSM & Optimistic CAS:** Express state transitions in a closed `ALLOWED_TRANSITIONS` map, enforce maker-checker (`approverId !== requesterId`), keep monetary totals in integer minor units, and persist mutations with `WHERE id = $1 AND tenant_id = $2 AND version = $3`.
-4. **Domain vs Integration Events & ACL:** Emit versioned integration events via Transactional Outbox strictly inside DB commit; translate external vendor/ERP payloads through fail-closed Anti-Corruption Layers.
+4. **Cross-Context Impact Rule (retroactive or historical changes):** Before changing any record that is `COMPLETED`, settled, invoiced, paid, or reported, list every bounded context that has already consumed it (for example Dispatch, Payroll, Billing, Reporting, Audit) and mark which are closed for that period. Never let one shared model or table carry those meanings. The owning context records the correction as an audited adjustment (who, when, reason, before/after, approver), and closed contexts react only through versioned events: Payroll posts its own adjustment line in the next open period and never rewrites a settled run. Name the context split, the closed-period rule and the adjustment record explicitly in the answer.
+5. **Domain vs Integration Events & ACL:** Emit versioned integration events via Transactional Outbox strictly inside DB commit; translate external vendor/ERP payloads through fail-closed Anti-Corruption Layers.
 
 ## 2. 6-Step Domain Modeling Playbook & Verifier
 
@@ -33,6 +34,7 @@ Load **only** the 1–2 modules matching the active subtask (never load all 4 at
 | :--- | :--- | :--- |
 | DDD vs thin CRUD decision matrix, ubiquitous glossary, ambiguity escalation & bounded contexts | CORE | [references/01-ddd-applicability-and-bounded-contexts.md](references/01-ddd-applicability-and-bounded-contexts.md) |
 | Small aggregate boundaries, multi-tenant & integer-money invariants, optimistic `version` CAS | CORE | [references/02-aggregates-invariants-and-optimistic-locking.md](references/02-aggregates-invariants-and-optimistic-locking.md) |
+| Backdating, retroactive corrections or a change touching settled data | CORE | Load **both** 03 (guards and adjustment records) and 01 (which contexts own and consume the record) |
 | Closed FSM `ALLOWED_TRANSITIONS`, maker-checker approvals, backdating & cancellation guards | CORE | [references/03-finite-state-machines-and-cancellation-policies.md](references/03-finite-state-machines-and-cancellation-policies.md) |
 | Domain vs versioned integration events (Outbox), fail-closed ACL adapters & property/FSM testing | ADVANCED | [references/04-domain-events-acl-and-invariant-testing.md](references/04-domain-events-acl-and-invariant-testing.md) |
 

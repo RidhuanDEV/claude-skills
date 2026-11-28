@@ -28,7 +28,7 @@ Activate this playbook when:
 3. **Zero-Tests != Automatic Full Rewrite**:
    - Absence of automated tests (`has_automated_tests: false`) NEVER automatically justifies a `FULL_REWRITE`. High-stability legacy cores carrying complex undocumented business rules and high downtime costs are almost always safer to stabilize via **Characterization Tests + Strangler Fig** (`02` & `03`).
 4. **Internal SDK & Framework Preservation Gate**:
-   - Under `OFFICIAL-FIRST-DEPENDENCY-POLICY.md`, preserve verified internal auth/SSO adapters (e.g., `ridhuan-sso` / `file:../sdk/sso-client`) and working framework conventions unless proven insecure or unmaintainable with explicit Monarch authorization.
+   - Under `OFFICIAL-FIRST-DEPENDENCY-POLICY.md`, preserve verified internal auth/SSO adapters (e.g., `your-org-sso` / `file:../sdk/sso-client`) and working framework conventions unless proven insecure or unmaintainable with explicit Monarch authorization.
 
 ## 4. Architecture & Implementation
 ### Multi-Dimensional Risk Vector Contract (Strict TypeScript)

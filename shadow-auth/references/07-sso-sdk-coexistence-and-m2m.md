@@ -1,7 +1,7 @@
 # 07. SSO SDK Coexistence, M2M & API Key Lifecycle
 
 ## 1. Purpose & Activation Conditions
-Safely integrate and coexist multiple identity surfaces — existing internal/local SSO SDKs (such as `ridhuan-sso`), external OIDC/SAML SSO, browser cookie sessions, JWKS API tokens, and M2M / developer API keys — without breaking existing contracts or introducing unverified supply-chain swaps. Load when integrating local SSO SDKs, supporting hybrid cookie+JWT auth, or issuing partner/M2M credentials.
+Safely integrate and coexist multiple identity surfaces — existing internal/local SSO SDKs (such as `your-org-sso`), external OIDC/SAML SSO, browser cookie sessions, JWKS API tokens, and M2M / developer API keys — without breaking existing contracts or introducing unverified supply-chain swaps. Load when integrating local SSO SDKs, supporting hybrid cookie+JWT auth, or issuing partner/M2M credentials.
 
 ## 2. Prerequisites
 - Inspection of existing auth dependencies (`package.json`, local `sdk/` folders, existing middleware) via `shadow-monarch/scripts/official_first_verifier.py --check-auth-sdk`.
@@ -9,7 +9,7 @@ Safely integrate and coexist multiple identity surfaces — existing internal/lo
 ## 3. Technical Principles & Constraints
 - **Local / Internal SSO SDK Preservation Rule (`OFFICIAL-FIRST-DEPENDENCY-POLICY.md`):**
   1. Always inspect the existing local SDK (`exports`, version, token/session model, verifier hooks) BEFORE writing auth code.
-  2. **NEVER** silently replace a local file-linked SDK (e.g., `ridhuan-sso` at `file:../sdk/sso-client`) with an unverified similarly named npm package (high dependency-confusion / typosquatting risk!) or rewrite login flows without explicit Monarch approval.
+  2. **NEVER** silently replace a local file-linked SDK (e.g., `your-org-sso` at `file:../sdk/sso-client`) with an unverified similarly named npm package (high dependency-confusion / typosquatting risk!) or rewrite login flows without explicit Monarch approval.
   3. Report build/Docker portability caveats for `file:../sdk/...` paths honestly as a separate note while preserving the authoritative SDK.
   4. **Never Trust Frontend Claims Alone:** Never accept frontend-supplied `username`/`email`/`role` as proof of SSO authentication; verify the IdP/SSO token or session cryptographically on the server before mapping local accounts.
 - **Unified Principal Resolution (Coexisting SSO + Cookie + JWKS JWT):** When a backend must simultaneously accept (a) browser `__Host-sid` cookies from local/SSO login AND (b) `Authorization: Bearer <jwt>` verified against JWKS for legacy/mobile APIs, funnel BOTH authenticators through ONE unified auth middleware producing a single immutable `AuthenticatedPrincipal` (`userId`, `tenantId`, `role`, `authMethod`, `sessionId?`) so downstream RBAC/tenant isolation behaves identically!
@@ -77,7 +77,7 @@ export function verifyScopedApiKey(
 A government/enterprise portal migrates web logins to an external SSO while mobile clients still send JWKS-verified JWTs. An engineer leaves cookie auth and JWT auth on two separate middlewares — the JWT middleware sets `req.user.orgId` while the cookie middleware sets `req.session.tenantId`. Because downstream invoice queries read `req.user?.orgId`, cookie users trigger `undefined` lookups or bypass filters. Unifying both authenticators into a single strict `AuthenticatedPrincipal` contract + adding `test_sso_coexistence` integration tests resolves the mismatch permanently.
 
 ## 8. Failure Modes & Edge Cases
-- **WRONG:** Replacing `file:../sdk/sso-client` with `npm install ridhuan-sso` without verifying registry ownership or Monarch approval.
+- **WRONG:** Replacing `file:../sdk/sso-client` with `npm install your-org-sso` without verifying registry ownership or Monarch approval.
 - **RIGHT:** Run `official_first_verifier.py --check-auth-sdk`, inspect local SDK exports, preserve the local authoritative SDK, and document any workspace packaging notes separately.
 - **WRONG:** Comparing API keys with `===` or storing raw API keys in Postgres so support staff can "view the user's key later."
 - **RIGHT:** Show the generated API key **exactly once** on creation, store only `HMAC-SHA256` digest + prefix (`sk_live_abc1...`), and compare via `crypto.timingSafeEqual`.

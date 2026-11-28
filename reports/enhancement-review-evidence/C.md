@@ -1,6 +1,6 @@
 # Grades — Group C (15 skills: quality, test, debug, refactor, perf, uat, release, compat, sec, supplychain, privacy, ops, observe, resilience, finops)
 
-Reviewer mode: read-only. Repo: `D:\Ridhuan Ngoding Moment\SKILL` @ 1dbe3b5. Probe scripts: `C:/Users/Ridhuan/AppData/Local/Temp/claude/e80b2dfa48902dc8/c0b822e3-f9e8-41c6-a8c8-050edf286e4e/scratchpad/probeC/p1..p5.py`.
+Reviewer mode: read-only. Repo: `<repo>` @ 1dbe3b5. Probe scripts: `<home>/AppData/Local/Temp/claude/e80b2dfa48902dc8/c0b822e3-f9e8-41c6-a8c8-050edf286e4e/scratchpad/probeC/p1..p5.py`.
 
 ## Summary table
 

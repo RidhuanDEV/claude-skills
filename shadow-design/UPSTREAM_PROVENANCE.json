@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
   "pack_name": "ai-product-designer-skill-pack",
-  "source_location": "C:\\Users\\Ridhuan\\Downloads\\ai-product-designer-skill-pack",
+  "source_location": "local:ai-product-designer-skill-pack",
   "target_skill": "shadow-design",
   "trust_tier": "T1_AUDITED_MARKDOWN",
-  "license_note": "Original vendor-authored Markdown reference pack; curated external links in 11-external-projects-and-trust.md are tracked at Tier T0 (read-only citation, not bundled).",
+  "license_note": "Original work of the repository owner (RidhuanDEV), released under the repository MIT License; curated external links in 11-external-projects-and-trust.md are tracked at Tier T0 (read-only citation, not bundled).",
   "audited_at": "2026-11-12T11:25:04.277410+00:00",
   "last_synced_at": "2026-11-12T11:46:51.562153+00:00",
   "safety_gate_passed": true,
@@ -13,7 +13,7 @@
     {
       "name": "ai-product-designer-skill-pack",
       "url": "local://ai-product-designer-skill-pack",
-      "license": "Custom / Vendor-Authored Markdown Pack (No bundled third-party code)",
+      "license": "Original work of the repository owner (RidhuanDEV), MIT License (see LICENSE)",
       "trust_tier": "T1",
       "role": "Primary vendored product-design reference & template pack",
       "bundled": true,
@@ -3283,10 +3283,10 @@
   "vendored_packs": {
     "ai-product-designer-skill-pack": {
       "pack_name": "ai-product-designer-skill-pack",
-      "source_location": "C:\\Users\\Ridhuan\\Downloads\\ai-product-designer-skill-pack",
+      "source_location": "local:ai-product-designer-skill-pack",
       "upstream_url": "local://ai-product-designer-skill-pack",
       "git_commit": "local-pack-v1",
-      "license_summary": "Vendor-authored Markdown reference pack",
+      "license_summary": "Original work of the repository owner (RidhuanDEV), MIT License (see LICENSE)",
       "trust_tier": "T1_AUDITED_MARKDOWN",
       "non_t1_excluded_count": 0,
       "vendored_files_count": 16,

@@ -8,11 +8,11 @@ If it looks beautiful but is confusing, slow, hard to learn, inaccessible or uns
 > **Indonesian UI/UX & Art Direction Deep Reference**: For an exhaustive 43-chapter knowledge base in Bahasa Indonesia (user research,
 > Gestalt & visual hierarchy, grid/spacing, mobile patterns & thumb zones, typography, WCAG AA accessibility,
 > component states, art direction, visual choreography, usability testing, developer handoff checklist, and AI prompt library), see
-> [`reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-monarch/reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md).
+> [`reference/UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md`](UI_UX_Design_Knowledge_Base_v2_Art_Direction_Web_Mobile_ID.md).
 >
 > **Product Design & 9-State Flow Pack (`/shadow-design`)**: For `US-ID -> FLOW-ID -> SCR-ID -> STATE-ID -> AC-ID` traceability,
 > 12-domain adversarial UX walkthroughs, and `FEATURE-DESIGN.md` / `UX-REVIEW.md` templates, see
-> [`shadow-design/SKILL.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/SKILL.md) and its audited `T1` reference modules in
+> [`shadow-design/SKILL.md`](../../shadow-design/SKILL.md) and its audited `T1` reference modules in
 > `shadow-design/references/ai-product-designer-skill-pack/`.
 
 ## 1. Before designing screens (Evidence & Existing Product Guardian)

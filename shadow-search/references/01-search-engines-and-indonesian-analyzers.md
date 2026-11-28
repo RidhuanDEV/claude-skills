@@ -25,7 +25,14 @@ Choose the right-sized search engine for corpus scale and query latency, and des
 {
   "settings": {
     "analysis": {
+      "char_filter": {
+        "strip_code_separators": { "type": "pattern_replace", "pattern": "[^\\p{L}\\p{N}]", "replacement": "" }
+      },
+      "normalizer": {
+        "code_normalizer": { "type": "custom", "char_filter": ["strip_code_separators"], "filter": ["lowercase", "asciifolding"] }
+      },
       "filter": {
+        "id_stop": { "type": "stop", "stopwords": ["yang", "dan", "di", "ke", "dari", "untuk", "pada", "dengan", "ini", "itu"] },
         "id_stemmer": { "type": "stemmer", "language": "indonesian" },
         "domain_synonyms": {
           "type": "synonym_graph",
@@ -35,11 +42,11 @@ Choose the right-sized search engine for corpus scale and query latency, and des
       "analyzer": {
         "id_search_index": {
           "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "id_stemmer"]
+          "filter": ["lowercase", "asciifolding", "id_stop", "id_stemmer"]
         },
         "id_search_query": {
           "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "domain_synonyms", "id_stemmer"]
+          "filter": ["lowercase", "asciifolding", "id_stop", "domain_synonyms", "id_stemmer"]
         }
       }
     }
@@ -47,7 +54,7 @@ Choose the right-sized search engine for corpus scale and query latency, and des
   "mappings": {
     "properties": {
       "tenant_id": { "type": "keyword" },
-      "doc_code": { "type": "keyword" },
+      "doc_code": { "type": "keyword", "normalizer": "code_normalizer" },
       "title": {
         "type": "text",
         "analyzer": "id_search_index",
@@ -58,7 +65,19 @@ Choose the right-sized search engine for corpus scale and query latency, and des
   }
 }
 ```
-PostgreSQL right-sized hybrid lexical + trigram schema (`< 1M` docs):
+Notes on the mapping above:
+- `id_stop` is a deliberately short list. It never contains negations (`tidak`, `bukan`, `tanpa`, `belum`) or legal terms (`pasal`, `ayat`), because dropping them changes meaning. Grow it only from measured noise in the held-out set.
+- `code_normalizer` maps `PP-27/2022`, `pp 27 2022` and `PP27/2022` to the same `pp272022` term. Index codes into `doc_code`; at query time extract identifier-shaped substrings, normalize them the same way and send a `term` query on `doc_code` with a higher boost than the analyzed `title`/`body` match. Use two grammars, because product codes and legal citations look different:
+
+  ```python
+  CODE = re.compile(r"\b(?=[A-Za-z0-9/-]*\d)(?=[A-Za-z0-9/-]*[A-Za-z])[A-Za-z0-9]+(?:[-/][A-Za-z0-9]+)+\b|\b[A-Z]{2,}\d+[A-Z0-9]*\b")
+  CITE = re.compile(r"(?i)\b(?:uu|pp|perpres|permen\w*|perda|pojk|pasal|ayat)\s*(?:no\.?\s*)?\d+(?:\s*/\s*\d{4})?\b")
+  ```
+
+  Probed 2026-11-28. Recall 8/8: `PP-27/2022`, `INV-8841-ID`, `Perpres 46/2025`, `SKU123`, `Pasal 56`, `UU No. 27/2022`, `POJK 11/2022`, and a code inside a sentence. Precision 7/7 with no match: `tahun 2022`, `2022`, `tanggal 12/05`, `ukuran 3 kg`, `halaman 2`, and plain words. A naive `[A-Za-z]{1,6}[-\s]?\d+` failed this test: it matched `tahun 2022`, cut `Perpres` to `erpres` and dropped the `-ID` suffix. Extend the citation prefixes from your corpus, and re-run both probe sets after every change.
+- The `indonesian` stemmer is a light Snowball stemmer. Sastrawi is more aggressive and can over-stem names; compare both on the held-out judgments rather than assuming.
+
+PostgreSQL right-sized hybrid lexical + trigram schema (`< 1M` docs). First check which text search configurations the server has (`SELECT cfgname FROM pg_ts_config;`); if `indonesian` is missing, use `simple` plus `pg_trgm`, or install a Sastrawi-based dictionary:
 ```sql
 -- Combined tsvector + exact code + tenant_id leading composite index
 ALTER TABLE knowledge_docs ADD COLUMN IF NOT EXISTS search_tsv tsvector

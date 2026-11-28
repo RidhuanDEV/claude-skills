@@ -2,7 +2,7 @@
 
 - **Run ID:** `2026-11-16-SA-SE-ENH-001`
 - **Inspected Date:** `2026-11-16T11:54:45+07:00`
-- **Repository Root:** `D:\Ridhuan Ngoding Moment\SKILL`
+- **Repository Root:** `<repo>`
 - **Git Branch & SHA:** `main` -> `origin/main` (`185c42a2fa8e520293b3819a56b681fd60b9fe18`, clean working tree)
 
 ## 1. Verified Baseline Counts

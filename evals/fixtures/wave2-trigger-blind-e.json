@@ -905,7 +905,7 @@
  {
   "id": "shadow-auth-e-id-03",
   "language": "id",
-  "prompt": "Aplikasi baru harus login pakai SDK ridhuan-sso yang udah ada, tapi juga butuh login lokal buat vendor. Gimana biar dua-duanya jalan?",
+  "prompt": "Aplikasi baru harus login pakai SDK your-org-sso yang udah ada, tapi juga butuh login lokal buat vendor. Gimana biar dua-duanya jalan?",
   "expected_primary": "shadow-auth",
   "rationale": "Login, OIDC, sessions, JWT, RBAC, tenant isolation"
  },

@@ -7,7 +7,8 @@ Inputs (one graded scenario per skill):
   scenarios.json        qid, skill, prompt, pass_criteria, red_flags, a_is ("skill" or "baseline")
   judge-output-*.json   blinded grades for answer A and answer B; a later file overrides an
                         earlier one for the same qid (re-judging after a criteria correction)
-Scenarios listed in EXCLUDED are reported but left out of the statistics.
+Scenarios whose skill is excluded are reported but left out of the statistics. A fixture folder
+may list its own exclusions in excluded.json ({skill: reason}); otherwise EXCLUDED applies.
 """
 
 from __future__ import annotations
@@ -37,8 +38,19 @@ class Row:
     excluded: str | None
 
 
+def load_exclusions(fixtures: Path) -> dict[str, str]:
+    path = fixtures / "excluded.json"
+    if not path.exists():
+        return dict(EXCLUDED)
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in loaded.items()):
+        raise ValueError(f"{path}: expected an object of skill -> reason")
+    return {str(k): str(v) for k, v in loaded.items()}
+
+
 def load_rows(fixtures: Path) -> list[Row]:
     scenarios = json.loads((fixtures / "scenarios.json").read_text(encoding="utf-8"))
+    exclusions = load_exclusions(fixtures)
     grades: dict[str, dict[str, object]] = {}
     for path in sorted(fixtures.glob("judge-output-*.json")):
         grades.update(json.loads(path.read_text(encoding="utf-8")))
@@ -51,7 +63,7 @@ def load_rows(fixtures: Path) -> list[Row]:
             raise ValueError(f"{scenario['qid']}: malformed grade")
         rows.append(Row(
             scenario["skill"], int(skill_grade["score"]), int(base_grade["score"]),
-            skill_grade["pass"] is True, base_grade["pass"] is True, EXCLUDED.get(scenario["skill"]),
+            skill_grade["pass"] is True, base_grade["pass"] is True, exclusions.get(scenario["skill"]),
         ))
     return rows
 

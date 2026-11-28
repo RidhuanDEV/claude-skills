@@ -29,7 +29,7 @@ Protect existing production codebases from **unsolicited architectural rewrites,
   - **Level 5:** Generic AI stylistic preferences (**NEVER** allowed to override Levels 1–4!).
 - **Official-First 5-Tier Technology Hierarchy & 8-Field Decision Record:**
   - `1. Reuse existing repo capability -> 2. Official SDK/generator -> 3. Verified mature package (non-destructive npm view/context7 inspection first) -> 4. Justified small custom helper -> 5. Approved replacement`.
-  - **NEVER** silently replace internal/local SSO SDKs (`ridhuan-sso` / `file:../sdk/sso-client`) with unverified registry packages or introduce extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices) without an 8-field Decision Record and explicit Monarch approval!
+  - **NEVER** silently replace internal/local SSO SDKs (`your-org-sso` / `file:../sdk/sso-client`) with unverified registry packages or introduce extra infrastructure (`Docker`, `Redis`, `Kafka`, microservices) without an 8-field Decision Record and explicit Monarch approval!
 
 ## 4. Architecture & Implementation
 

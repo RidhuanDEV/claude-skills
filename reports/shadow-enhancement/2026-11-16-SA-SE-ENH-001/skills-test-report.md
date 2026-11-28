@@ -1,6 +1,6 @@
 # Phase 5 — Skills & Tooling Verification Report (`SA-SE-ENH-001`)
 
-All commands below were executed locally on `D:\Ridhuan Ngoding Moment\SKILL` after edits (except global install and live external CLI inference, explicitly marked `NOT_RUN`).
+All commands below were executed locally on `<repo>` after edits (except global install and live external CLI inference, explicitly marked `NOT_RUN`).
 
 ## 1. Deterministic Gate Scripts (`L2`–`L4` Executable Suites)
 | Skill / Engine | Script Command | Exit Code | Result | Observed Evidence |

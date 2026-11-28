@@ -293,7 +293,7 @@ P0 menangani keyakinan palsu pada gate inti atau dampak tak terotorisasi; P1 mem
 
 **Bidang B, I, K, L** · Dependensi X04,X05 · P1 · Risiko M · 3–5 hari-orang.
 
-**Masalah profesional.** Blok Foreign-Key Reference Routing menggunakan tautan `file:///d:/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain.
+**Masalah profesional.** Blok Foreign-Key Reference Routing menggunakan tautan `<repo>/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain.
 
 **Hasil yang dituju.** Gunakan bukti alur dan state yang dapat dicapai, lalu pilih referensi relevan secara relatif terhadap paket terpasang. Bedakan state domain dari status jaringan atau kondisi tampilan; beberapa state hanya berlaku untuk satu komponen.
 

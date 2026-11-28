@@ -1,6 +1,6 @@
 # Grade sheet D: orchestrator, utilities, delivery and consulting skills (14)
 
-Reviewer: strict principal-level, read-only. Repo: `D:\Ridhuan Ngoding Moment\SKILL` @ `1dbe3b5` (clean). Date 2026-11-26.
+Reviewer: strict principal-level, read-only. Repo: `<repo>` @ `1dbe3b5` (clean). Date 2026-11-26.
 Scale: 1=BAD, 2=MEDIUM, 3=GOOD, 4=PERFECT. Grade rule follows the rubric (PERFECT avg>=3.6 and no dim<3; GOOD avg>=3.0 and no dim=1; MEDIUM avg>=2.2; BAD avg<2.2 or a critical defect).
 
 ## Summary table

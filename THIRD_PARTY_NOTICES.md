@@ -10,10 +10,8 @@ Original Shadow Army content is MIT-licensed (see [LICENSE](LICENSE)). The files
 | `shadow-design/references/external-upstreams/*` | ghaida/intent (CC0 1.0), jpoindexter/ux-flow-skills, phuryn/pm-skills, Owl-Listener/designer-skills (MIT) | as listed in each `LICENSE.txt` | [UPSTREAM_PROVENANCE.json](shadow-design/UPSTREAM_PROVENANCE.json) |
 | `antislop-human`, `antislop-ui` (web-quality components) | [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) | MIT | `LICENSE-web-quality-skills` in each folder |
 
-## Open item
+## Resolved: shadow-design primary pack
 
-The primary `shadow-design` reference pack (`ai-product-designer-skill-pack`) was imported from a local folder. `UPSTREAM_PROVENANCE.json` records it as vendor-authored but names no license.
-
-**Decision (2026-11-28):** until its owner documents a license, or confirms that it is original work of the repository owner, the pack is treated as **internal use only**. It is excluded from the MIT grant and must not be redistributed or published with this repository. When a license is confirmed, record it here and in `UPSTREAM_PROVENANCE.json`.
+The primary `shadow-design` reference pack (`shadow-design/references/ai-product-designer-skill-pack`) was imported from a local folder and earlier recorded as "vendor-authored" with no license. On 2026-11-28 the repository owner confirmed it is their own original work. It is covered by the repository's MIT License, and `UPSTREAM_PROVENANCE.json` records this.
 
 Upstream revisions of the `shadow-ops` and `shadow-test` vendor files were not recorded when the files were vendored. `VENDOR.json` pins the current SHA-256, and `evals/test_vendor_provenance.py` fails if a file changes without its lock being updated.

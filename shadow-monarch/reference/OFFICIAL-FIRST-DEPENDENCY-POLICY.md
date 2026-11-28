@@ -77,13 +77,13 @@ If package authenticity or compatibility cannot be verified, report uncertainty 
 
 ---
 
-## 3. Special Rule: Authentication, SSO & `ridhuan-sso`
+## 3. Special Rule: Authentication, SSO & `your-org-sso`
 
 - Inspect any existing local/internal SSO SDK first (identity, exports, supported flow, session/token model, version).
 - Never implement a custom replacement login flow or switch auth architecture without explicit Monarch approval.
 - Never trust frontend-supplied `username` claims as authentication proof; require verified server-side authenticated claims (verified token signature/introspection/assertion) before local user mapping.
 - Never assume similarly named registry packages belong to the same publisher.
-- **`ridhuan-sso` (`file:../sdk/sso-client`) Rule:**
+- **`your-org-sso` (`file:../sdk/sso-client`) Rule:**
   1. Treat the inspected local SDK as the existing authoritative implementation.
   2. Check whether an official registry distribution exists and verify publisher ownership before considering migration.
   3. Preserve `file:../sdk/sso-client` when appropriate; NEVER replace it with an unverified npm lookalike package.

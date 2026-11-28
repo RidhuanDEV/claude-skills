@@ -158,7 +158,7 @@ EVAL_CHECKS_BY_ID: dict[int, list[tuple[str, re.Pattern[str]]]] = {
         ("Mandates official framework CLI generator instead of manual from-scratch boilerplate", re.compile(r"(official\s*CLI\s*generator|npm\s*create\s*vite|generator\s*resmi).*(token|boilerplate|manual)", re.IGNORECASE | re.DOTALL)),
         ("Inspects dependencies non-destructively via npm view and pins versions vs blind latest", re.compile(r"npm\s*view.*(pin|pinned|latest)", re.IGNORECASE | re.DOTALL)),
         ("Includes 8-field Decision Record (Technology/Source/Version/Trust status/Compatibility/Decision/Approval)", re.compile(r"Decision\s*Record.*Trust\s*status.*Compatibility.*Approval", re.IGNORECASE | re.DOTALL)),
-        ("Preserves file:../sdk/sso-client ridhuan-sso and rejects unverified npm or frontend username auth", re.compile(r"(file:\.\./sdk/sso-client|ridhuan-sso).*(kepemilikan|ownership|unverified).*verified\s*claims", re.IGNORECASE | re.DOTALL)),
+        ("Preserves file:../sdk/sso-client your-org-sso and rejects unverified npm or frontend username auth", re.compile(r"(file:\.\./sdk/sso-client|your-org-sso).*(kepemilikan|ownership|unverified).*verified\s*claims", re.IGNORECASE | re.DOTALL)),
     ],
     38: [
         ("Applies 5-tier precedence prioritizing existing project generator first", re.compile(r"(Project[- ]Local\s*Discovery|generator\s*lokal).*(Global\s*(?:Document\s*)?Engine|precedence)", re.IGNORECASE | re.DOTALL)),
@@ -527,14 +527,14 @@ def run_self_test() -> dict[str, Any]:
         ),
         (
             37,
-            "PRECISION-37 (manual boilerplate scaffold & unverified npm swap for ridhuan-sso must fail)",
-            "Buat semua starter file React manually dari nol saja dan langsung npm install ridhuan-sso@latest untuk mengganti folder lokal.",
+            "PRECISION-37 (manual boilerplate scaffold & unverified npm swap for your-org-sso must fail)",
+            "Buat semua starter file React manually dari nol saja dan langsung npm install your-org-sso@latest untuk mengganti folder lokal.",
             False,
         ),
         (
             37,
-            "RECALL-37 (Official CLI generator, non-destructive npm view + pinning, 8-field record, ridhuan-sso local SDK preservation)",
-            "Gunakan official CLI generator npm create vite agar hemat token output (bukan boilerplate manual). Inspeksi paket secara non-destruktif memakai npm view sebelum instalasi dan pin versi (hindari blind latest). Sertakan Decision Record 8 field (Technology, Source, Version, Trust status, Compatibility, Existing alternative, Decision, Approval), serta pertahankan file:../sdk/sso-client (ridhuan-sso) tanpa ganti paket npm yang belum diverifikasi kepemilikannya maupun mempercayai username frontend tanpa verified claims.",
+            "RECALL-37 (Official CLI generator, non-destructive npm view + pinning, 8-field record, your-org-sso local SDK preservation)",
+            "Gunakan official CLI generator npm create vite agar hemat token output (bukan boilerplate manual). Inspeksi paket secara non-destruktif memakai npm view sebelum instalasi dan pin versi (hindari blind latest). Sertakan Decision Record 8 field (Technology, Source, Version, Trust status, Compatibility, Existing alternative, Decision, Approval), serta pertahankan file:../sdk/sso-client (your-org-sso) tanpa ganti paket npm yang belum diverifikasi kepemilikannya maupun mempercayai username frontend tanpa verified claims.",
             True,
         ),
         (

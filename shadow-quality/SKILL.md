@@ -9,6 +9,13 @@ Use this skill during development or at **SDLC Stage 4 (Verification Gate)** to 
 
 ---
 
+## 0. Review Output Contract (applies to every review, before the checks below)
+
+1. **Read-only:** a review is `L0_READ_ONLY`. Make zero edits, and say so.
+2. **Scope triage first:** split the change into (a) the requested fix, (b) unrelated formatting, (c) dependency or architecture swaps. Approve (a) on its own merits; ask for (b) as a separate formatting-only PR; block (c) as `UNSOLICITED_ORM_HTTP_CLIENT` / `UNEXPECTED_ARCHITECTURAL_LAYER` unless an ADR or the owner approved it, because it changes error handling, interceptors, retries, timeouts and bundle size outside the task.
+3. **Anchor every finding:** each finding gives `path:line` from the diff, severity, impact and a concrete fix. If the diff is not available, write the anchor as `<path>:<line>` and ask for the diff. Never present an unanchored finding as verified.
+4. **Verdict:** end with `APPROVE`, `REQUEST_CHANGES` or `BLOCK`, plus the checks you ran or did not run (`PASS | FAIL | NOT_RUN`).
+
 ## 1. The 7 Mandatory Quality Checks
 
 ### 1. Strict Compiler & Type Safety Gate (`0 Errors`, `0 Warnings`)

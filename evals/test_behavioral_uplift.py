@@ -34,5 +34,29 @@ class BehavioralUpliftTests(unittest.TestCase):
         self.assertEqual(len(self.summary["no_uplift"]), 7)
 
 
+class BehavioralRerunTests(unittest.TestCase):
+    """Wave 5 follow-up: the 7 no-uplift skills plus shadow-video, re-measured after their fixes."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.summary = scoring.summarize(scoring.load_rows(scoring.DEFAULT_FIXTURES.parent / "wave5-rerun"))
+
+    def test_rerun_numbers_match_the_stored_judgments(self) -> None:
+        summary = self.summary
+        self.assertEqual(summary["valid_scenarios"], 13)
+        self.assertEqual(summary["excluded"], {})
+        self.assertEqual((summary["mean_skill_score"], summary["mean_baseline_score"]), (9.85, 6.85))
+        self.assertEqual((summary["skill_full_passes"], summary["baseline_full_passes"]), (13, 3))
+        self.assertEqual((summary["positive"], summary["ties"], summary["negative"]), (13, 0, 0))
+        self.assertEqual(summary["no_uplift"], [])
+
+    def test_every_previous_no_uplift_skill_and_video_is_covered(self) -> None:
+        skills = {row["skill"] for row in self.summary["rows"]}
+        self.assertEqual(skills, {
+            "antislop-copywriting", "shadow-ai-eng", "shadow-compat", "shadow-domain",
+            "shadow-quality", "shadow-search", "shadow-illustration", "shadow-video",
+        })
+
+
 if __name__ == "__main__":
     unittest.main()

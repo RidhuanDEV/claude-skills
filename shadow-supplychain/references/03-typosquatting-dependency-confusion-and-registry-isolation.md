@@ -12,7 +12,7 @@ Stop supply-chain compromises **before malicious code ever executes on a develop
   - ALWAYS run **non-destructive metadata inspection** FIRST:
     - `npm view <pkg> version repository maintainers engines dist-tags license time.created --json`
     - Check: official repository link matches GitHub org, active recognized maintainers, publish age (`< 30` days on a lookalike name = massive red flag!), download volume, clean license, zero surprise `postinstall` binary downloads (`npm view <pkg> scripts`).
-- **Slopsquatting & Typosquatting Defense:** Attackers register names commonly hallucinated by LLMs or 1 character off popular libraries (`lodahs`, `reqeusts`, `ridhuan-sso` mimicking local `file:../sdk/sso-client`!). Verify exact spelling against official docs (`/context7`) and **NEVER** replace local workspace/file SDKs with public registry packages!
+- **Slopsquatting & Typosquatting Defense:** Attackers register names commonly hallucinated by LLMs or 1 character off popular libraries (`lodahs`, `reqeusts`, `your-org-sso` mimicking local `file:../sdk/sso-client`!). Verify exact spelling against official docs (`/context7`) and **NEVER** replace local workspace/file SDKs with public registry packages!
 - **Private Registry Isolation (Zero Dependency Confusion):**
   - If your company uses private package `@company/auth-core` or `company-internal-utils`, an attacker who publishes `@company/auth-core@99.99.99` on public npm/PyPI hijacks installs unless package-manager resolution is strictly scoped!
   - **Node (`.npmrc`):** Always bind private scopes explicitly (`@company:registry=https://npm.pkg.github.com/`) and NEVER use unscoped private package names!
@@ -74,7 +74,7 @@ company-auth-sdk = { index = "company-private" }
 | **`ignore-scripts=true` + Explicit Build Allowlist** | Very Low | **High** | All CI & developer workstations |
 
 ## 7. Real Production Scenario
-During a refactor, an automated assistant saw `import { verifySso } from 'ridhuan-sso'` (backed by `"ridhuan-sso": "file:../sdk/sso-client"`), assumed it was a broken public dependency, and attempted to run `npm install ridhuan-sso` from public npm. Enforcing Phase 3 non-destructive inspection + local SDK preservation caught the substitution before execution, preserved the trusted `file:../sdk/sso-client` contract, and locked `.npmrc` with `ignore-scripts=true`.
+During a refactor, an automated assistant saw `import { verifySso } from 'your-org-sso'` (backed by `"your-org-sso": "file:../sdk/sso-client"`), assumed it was a broken public dependency, and attempted to run `npm install your-org-sso` from public npm. Enforcing Phase 3 non-destructive inspection + local SDK preservation caught the substitution before execution, preserved the trusted `file:../sdk/sso-client` contract, and locked `.npmrc` with `ignore-scripts=true`.
 
 ## 8. Failure Modes & Edge Cases
 - **WRONG:** Passing `--extra-index-url https://private.corp/simple` in `pip install` alongside default PyPI for an internal package `corp-billing` (classic Alex Birsan dependency confusion RCE!).

@@ -83,6 +83,28 @@ There was no sign of A/B position bias: A won 18 times and B 25, with the skill 
 | shadow-quality | 8 vs 8 | Both answers missed citing `file:line` |
 | shadow-search | 8 vs 8 | Both answers missed analyzer details (ASCII folding, Sastrawi stemming, stopwords) |
 
+## 4. Follow-up: fixing and re-measuring the no-uplift skills (2026-11-28)
+
+Every skill above was fixed where a real gap existed, then re-measured with a fresh blind A/B run ([evals/fixtures/wave5-rerun](../evals/fixtures/wave5-rerun), locked by `BehavioralRerunTests`). Thirteen scenarios: each skill's original failing scenario, a harder one from its own `evaluations.md`, and shadow-video for the first time. Answer length was balanced this time (156 vs 159 words on average), which removes the earlier verbosity confound.
+
+| | With skill | Baseline |
+| --- | ---: | ---: |
+| Mean score | **9.85** | 6.85 |
+| Full passes | **13/13** | 3/13 |
+| Uplift > 0 / = 0 / < 0 | 13 / 0 / 0 (sign test p ≈ 1.2×10⁻⁴) | |
+
+| Skill | Gap found | Fix |
+| --- | --- | --- |
+| shadow-domain | The skill had bounded contexts but did not force a cross-context check | Cross-Context Impact Rule: list the contexts that consumed a settled record, honour closed periods, and correct through audited adjustments. Backdating now loads references 01 and 03. DOMAIN-EVAL-01 went from 7 to 10 |
+| shadow-quality | The `file:line` rule was buried at the end | Review Output Contract at the top: read-only, scope triage, anchored findings, verdict. QUALITY-EVAL-01 went from 8 to 10 |
+| shadow-search | The analyzer chain was generic; codes such as `PP-27/2022` were not normalized; no stop list kept negations | Exact analyzer chain, `code_normalizer`, curated `id_stop`, and a check for Postgres text search configs. New tested helper [identifier_query_router.py](../shadow-search/scripts/identifier_query_router.py): 18/18 self-test, mutation smoke PASS. Its first pattern failed the precision probes (`tahun 2022` matched, `Perpres` became `erpres`) and was replaced by two probed grammars |
+| shadow-compat | Consumer inventory and replay sat under the browser rule | Consumer evidence is now required before any wire or semantic verdict; a consumer that cannot be replayed is `NOT_MEASURED`. CMP-EVAL-03 went from 8 to 10 |
+| shadow-illustration | No raster-to-vector tracing guidance | Tracing playbook (reconstruction, auto-trace only as an underlay, overlay diff, a verified-versus-assumed table) plus a routing row. ILLU-EVAL-02 went from 8 to 10 |
+| antislop-copywriting, shadow-ai-eng | Fixed earlier in Wave 5 | ASCP-01 9 vs 7, ASCP-05 10 vs 6; AIENG-EVAL-01 10 vs 9, AIENG-EVAL-06 10 vs 5 |
+| shadow-video | Not measurable before | VIDEO-EVAL-02 10 vs 4 |
+
+No skill needs retirement or merging: each covers a distinct field, and all seven now show uplift.
+
 ## Not measured
 
 - **pass^k:** each skill has one scenario and one run. Repetition is needed before any skill is retired.
@@ -90,7 +112,7 @@ There was no sign of A/B position bias: A won 18 times and B 25, with the skill 
 - **Real tasks:** answers are plans with no tool execution, so this measures expert reasoning, not finished code.
 - **Judge calibration:** the judges were LLMs. Answer length differed (155 vs 110 words on average); length was instructed out but not controlled for statistically.
 - **Hook in a live session:** pipe-tested (`git push` → `ask`, `ls` → silent). A sentinel check inside this session did not fire, because the settings watcher has not reloaded yet; it needs `/hooks` or a restart.
-- **Re-measurement:** the fixes to copywriting, ai-eng and video were not re-measured.
+- **Repetition of the follow-up:** k = 1 per scenario. R05 and R12 were judged twice in total (before and after their fix), with the baseline answers reused.
 
 ## Verification
 

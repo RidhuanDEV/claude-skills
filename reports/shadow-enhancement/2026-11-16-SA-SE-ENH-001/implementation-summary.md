@@ -1,7 +1,7 @@
 # Phase 5 — Implementation Summary (`SA-SE-ENH-001`)
 
 - **Run ID:** `2026-11-16-SA-SE-ENH-001`
-- **Repository:** `D:\Ridhuan Ngoding Moment\SKILL` (`main` -> base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`)
+- **Repository:** `<repo>` (`main` -> base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`)
 - **Current Readiness Level:** `VERIFIED-LOCAL` (all repository-local deterministic suites, router probes, eval probes, safety scans, and isolated temp Codex junction smoke test `PASS`; global home installation, git commit/push, and live external CLI inference remain `NOT_RUN` awaiting Monarch authorization).
 
 ## 1. Executive Outcome

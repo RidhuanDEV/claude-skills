@@ -891,7 +891,7 @@
   {
     "id": "shadow-auth-c-id-01",
     "language": "id",
-    "prompt": "Tolong integrasikan login OIDC dengan PKCE ke Keycloak kantor, tapi SDK ridhuan-sso yang lama jangan diganti.",
+    "prompt": "Tolong integrasikan login OIDC dengan PKCE ke Keycloak kantor, tapi SDK your-org-sso yang lama jangan diganti.",
     "expected_primary": "shadow-auth",
     "rationale": "Authentication, sessions, tokens, RBAC, tenant authorization."
   },

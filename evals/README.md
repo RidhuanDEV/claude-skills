@@ -50,7 +50,7 @@
 | 34 realtime-sse-resume-auth-revocation | `/shadow-realtime`: SSE `Last-Event-ID`/WS ADR, mid-session token revocation, slow-consumer bounds & multi-node fan-out |
 | 35 supplychain-sbom-pinning-slsa-gate | `/shadow-supplychain`: SBOM vs lockfile 1:1 reconciliation, pinned 40-char SHAs/digests & offline unverified labeling |
 | 36 user-intent-boundary-and-execution-approval-protocol | `shadow-monarch`: `L0`–`L4` execution approval gate, 7-part approval contract, testing boundaries & sub-agent inheritance |
-| 37 official-first-scaffolding-dependency-and-sso-sdk-verification | `shadow-monarch`: official CLI generators (token efficiency), `npm view` verification, 8-field record & `ridhuan-sso` preservation |
+| 37 official-first-scaffolding-dependency-and-sso-sdk-verification | `shadow-monarch`: official CLI generators (token efficiency), `npm view` verification, 8-field record & `your-org-sso` preservation |
 
 ## If something fails
 

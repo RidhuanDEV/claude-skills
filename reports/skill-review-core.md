@@ -217,7 +217,7 @@ Mengisolasi sebab kegagalan dari gejala melalui hipotesis yang dapat digugurkan 
 
 Memetakan cerita pengguna ke alur, layar, state dan kriteria penerimaan serta memilih paket rujukan desain yang sesuai. [Kontrak shadow-design](../shadow-design/SKILL.md)
 
-**Dasar penilaian.** Blok Foreign-Key Reference Routing menggunakan tautan `file:///d:/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain.
+**Dasar penilaian.** Blok Foreign-Key Reference Routing menggunakan tautan `<repo>/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain.
 
 **Perbaikan.** Gunakan tautan relatif terhadap skill dan verifikasi integritas dari direktori instalasi sementara. Izinkan state yang tidak relevan diberi alasan singkat.
 

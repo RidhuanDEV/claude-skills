@@ -1,6 +1,6 @@
 # Grades: Group A (UI, design, content, docs, browser, email). 15 skills
 
-Reviewer: strict principal-level, read-only. Repo: `D:\Ridhuan Ngoding Moment\SKILL` @ `1dbe3b5` (main, clean). Date 2026-11-26.
+Reviewer: strict principal-level, read-only. Repo: `<repo>` @ `1dbe3b5` (main, clean). Date 2026-11-26.
 Paths below are relative to the repo root. All tests ran offline, each in under 60 s, with `PYTHONDONTWRITEBYTECODE=1`.
 
 **Side-effect disclosure:** `shadow-doc/scripts/doc_scaffold.py --acceptance-suite` writes its reports into `shadow-doc/output/`, which is inside the skill folder and gitignored. It overwrote `acceptance_report_v2.{json,md}`, the handover zip and the `at0x_*` fixtures there. No tracked file changed: `git status` is clean.
@@ -243,7 +243,7 @@ Command: `python shadow-monarch/scripts/skill_router.py --route "<prompt>"`. Res
 **Gaps**
 - HIGH. Discoverability. `references/methods.json` has 17 entries covering 14 method names, but there are 216 vendored SKILL.md entry points. `resolve_method.py design-token`, `color-system`, `heuristic-evaluation` and `accessibility-audit` all return `UNSUPPORTED`, even though the modules exist (for example `references/external-upstreams/designer-skills/design-systems/skills/design-token/SKILL.md`). Design tokens are the skill's headline trigger (`:3`). The agent must browse READMEs to find modules.
 - MEDIUM. Vendored module depth is uneven. The designer-skills modules are generic (design-token is 27 lines, color-system 34), and the core ai-product-designer chapters are about 1.3–2.7 KB each (`06-accessibility-responsive-content.md` is 8 lines). flow-auth (152 lines) is genuinely expert.
-- MEDIUM. The primary pack's provenance is `local://` from `C:\Users\Ridhuan\Downloads\…` with license "Vendor-authored" and `last_synced_at: null` per pack (`UPSTREAM_PROVENANCE.json`). There is no license grant for redistribution.
+- MEDIUM. The primary pack's provenance is `local://` from `<home>\Downloads\…` with license "Vendor-authored" and `last_synced_at: null` per pack (`UPSTREAM_PROVENANCE.json`). There is no license grant for redistribution.
 - MEDIUM. The description has no "Do NOT use" clause (`:3`). Router: `design pricing page hero section` returns none.
 - LOW. `update-remote` is listed beside read-only commands with no approval gate (`:14`). Two overlapping routing tables (§0 and the Reference Guide) plus the §0b list add about 60 lines of index to SKILL.md.
 

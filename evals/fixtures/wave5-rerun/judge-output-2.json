@@ -1,0 +1,14 @@
+{
+  "R05": {
+    "criteria_total": 6,
+    "A": {"score": 6, "pass": false, "criteria_met": 4},
+    "B": {"score": 10, "pass": true, "criteria_met": 6},
+    "note": "Both flag sort flip, null-vs-omitted, default and cursor breaks, but only B requires a per-version consumer inventory and contract-owner sign-off."
+  },
+  "R12": {
+    "criteria_total": 5,
+    "A": {"score": 6, "pass": false, "criteria_met": 3},
+    "B": {"score": 10, "pass": true, "criteria_met": 5},
+    "note": "B rebuilds real primitives with minimal anchors and reports verified versus assumed, while A gives only generic path cleanup and no verified/assumed report."
+  }
+}

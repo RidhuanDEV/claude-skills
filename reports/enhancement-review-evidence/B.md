@@ -1,6 +1,6 @@
 # Grader B: 15 backend/data/AI skills (read-only review, 2026-11-26)
 
-Repo: `D:\Ridhuan Ngoding Moment\SKILL` @ `1dbe3b5` (clean). I modified no repo files. The probe fixtures are in `C:/Users/Ridhuan/AppData/Local/Temp/claude/e80b2dfa48902dc8/c0b822e3-f9e8-41c6-a8c8-050edf286e4e/scratchpad/probesB/`.
+Repo: `<repo>` @ `1dbe3b5` (clean). I modified no repo files. The probe fixtures are in `<home>/AppData/Local/Temp/claude/e80b2dfa48902dc8/c0b822e3-f9e8-41c6-a8c8-050edf286e4e/scratchpad/probesB/`.
 
 ## Global runs
 `python -B -m unittest discover -s tests -q` was run in each skill dir. All 15 suites passed, as follows: api 3, auth 4, cache 6, concurrency 2, data 4, db 3, integrate 1, realtime 7 (19.7s), search 9, domain 3, ai-eng 2, eval 6 (39.7s), analytics 4, architect 1, bootstrap 4.

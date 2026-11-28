@@ -298,10 +298,11 @@ def vendor_skill_pack(
     packs_map[pack_name] = asdict(
         VendoredPackRecord(
             pack_name=pack_name,
-            source_location=str(source_dir),
+            # Only the folder name: an absolute path would leak the operator's machine layout.
+            source_location=f"local:{source_dir.name}",
             upstream_url="local://ai-product-designer-skill-pack",
             git_commit="local-pack-v1",
-            license_summary="Vendor-authored Markdown reference pack",
+            license_summary="Original work of the repository owner (RidhuanDEV), MIT License (see LICENSE)",
             trust_tier="T1_AUDITED_MARKDOWN",
             non_t1_excluded_count=0,
             vendored_files_count=len(vendored_entries),

@@ -1,7 +1,7 @@
 # Verification Report: User Intent Boundary & Execution Approval Protocol (`SA-EXEC-APPROVAL-001`)
 
 - **Run ID:** `2026-11-16-SA-EXEC-APPROVAL-001`
-- **Repository:** `D:\Ridhuan Ngoding Moment\SKILL` (`main`, base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`)
+- **Repository:** `<repo>` (`main`, base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`)
 - **Readiness Level:** `VERIFIED-LOCAL` (all deterministic policy, fail-closed gate, negative/positive probes, router probes, eval assertions, and repo safety checks executed locally and passing; global home install, git commit/push, and live external agent CLI execution remain `NOT_RUN` awaiting Monarch authorization).
 
 ---

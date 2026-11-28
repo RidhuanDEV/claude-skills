@@ -2,7 +2,7 @@
 
 Generated: 2026-11-17  
 Baseline Commit: `a957246` (`main...origin/main`, clean working tree before `SA-DOC-ENGINE-002` edits)  
-Target Repository: `d:\Ridhuan Ngoding Moment\SKILL` (`RidhuanDEV/claude-skills`)
+Target Repository: `<repo>` (`RidhuanDEV/claude-skills`)
 
 ## 1. Existing System Inventory Audited
 - `shadow-doc/scripts/doc_orchestrator.py` (939 lines): 5-tier generator discovery/resolution, 15-criteria compatibility scoring, `MarkdownCompatibilityAdapter`, path traversal & overwrite helpers, `classify_document_action`, 5 self-test probes.

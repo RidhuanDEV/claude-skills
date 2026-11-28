@@ -95,7 +95,7 @@ export function compareLegacyAndCandidateOutputs(
 | :--- | :--- | :--- |
 | **External system reads legacy SQL view directly** | Maintain backward-compatible SQL view / CDC sync during transition (`Expand-Contract` `/shadow-data`) | Temporary dual maintenance; prevents silent ERP/BI breakage |
 | **Complex financial calc locked in legacy stored proc** | Build Golden-Master characterization suite -> port calculation -> shadow-compare 100% of synthetic & replay inputs | Extra parity test phase; eliminates Rupiah/rounding bugs |
-| **Shared auth cookie across legacy + new slice** | Bridge via shared SSO/OIDC token gateway (`/shadow-auth` — preserving `ridhuan-sso` if present) | Seamless UX across strangled routes |
+| **Shared auth cookie across legacy + new slice** | Bridge via shared SSO/OIDC token gateway (`/shadow-auth` — preserving `your-org-sso` if present) | Seamless UX across strangled routes |
 
 ## 7. Real Production Scenario
 **Context:** A government licensing platform began rewriting its fee calculator in TypeScript based on a 2019 Word manual. During archaeology, the team inspected `pg_dump --schema-only` and discovered two PostgreSQL triggers applying grandfather fee waivers for pre-2021 permits plus a read-only SQL view consumed nightly by the finance ministry's reporting bridge.

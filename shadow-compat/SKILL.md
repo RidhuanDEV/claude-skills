@@ -30,6 +30,7 @@ Load ONLY the 1–2 modular playbooks needed for the active compatibility subtas
    - **Backward Compatible** (new reader reads old data): deploy **Consumer first**, then Producer.
    - **Forward Compatible** (old tolerant reader ignores new optional fields; zero `additionalProperties: false` tightening): deploy **Producer first**, then Consumer.
    - **Full Compatible / Rename / Retype:** Use Expand-Contract dual-write/dual-read (`/shadow-data`) or introduce `/api/v2/...`. Audit semantic breaks (sort flips, `null` vs omitted, default changes, pagination cap cuts, enum exhaustion) beyond AST OpenAPI diffs!
+   - **Consumer evidence before any verdict:** for every wire or semantic change, list the consumers (client build or SDK release, owner, how many requests still use it, whether you can run their decoder) and replay sanitized recorded traffic per consumer against the new build. A consumer you cannot replay is `NOT_MEASURED`, not compatible. Get the contract owner's sign-off on the deploy order and on any default or ordering change, or keep the old behaviour behind the current version and expose the new one as an explicit parameter or `v2`.
 2. **RFC 9745 & RFC 8594 Retirement (`02`):**
    - Emit `Deprecation: @<unix_sec>` (NEVER draft `true`), `Sunset: <IMF-fixdate>` (`Sunset >= Deprecation`), and `Link` (`rel="alternate"`, `rel="deprecation"`). Verify `legacy_route_hits` telemetry drained before enabling **`410 Gone`** (not `404`).
 3. **Incremental Dependency Upgrades (`03`):**

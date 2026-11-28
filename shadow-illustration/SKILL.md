@@ -20,6 +20,7 @@ description: "Use when creating illustrations, SVG, icons, mascots, diagrams, OG
 | Create or revise a mascot or pose | [Character design](references/character-design.md) and the selected production method |
 | Generate, edit, or export raster artwork | [Raster production](references/raster-production.md) |
 | Draw editable SVG or fix path geometry | [Vector geometry](references/vector-geometry.md), [SVG authoring and rendering](references/svg-authoring-and-rendering.md) |
+| Trace a PNG/JPG logo or artwork into SVG | [Vector geometry: raster-to-vector tracing](references/vector-geometry.md#raster-to-vector-tracing-png-or-jpg-to-svg) (reconstruction steps and the verified/assumed report) |
 | Build HTML5 `<canvas>`, WebGL, GLSL shaders, particles, or procedural hero visuals | [Canvas, WebGL & procedural hub](references/canvas-webgl-procedural.md) (routes to 10 focused engineering modules + 5 strict-TS examples — load only the task-relevant modules) |
 | Batch-generate OG cards, responsive `srcset`, favicons, PWA icons, or spritesheets via code | [Programmatic image pipelines](references/programmatic-image-pipelines.md) |
 | Design UI icon systems, custom architecture diagrams, or annotated screenshots | [Iconography and diagrams](references/iconography-and-diagrams.md) |

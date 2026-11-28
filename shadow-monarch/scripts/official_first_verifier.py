@@ -7,7 +7,7 @@ Deterministic fail-closed verifier enforcing:
 2. 8-field Technology & Dependency Decision Record completeness
 3. Non-destructive dependency trust & version pinning checks (no blind `latest` in prod/regulated)
 4. Reuse-before-rebuild discipline & explicit approval on architecture/SDK replacement
-5. Auth/SSO SDK preservation (including `ridhuan-sso` / `file:../sdk/sso-client`) & verified claims
+5. Auth/SSO SDK preservation (including `your-org-sso` / `file:../sdk/sso-client`) & verified claims
 """
 
 from __future__ import annotations
@@ -130,7 +130,7 @@ def verify_decision_record(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def verify_auth_sdk_policy(spec: dict[str, Any]) -> dict[str, Any]:
-    """Enforce Special Rule: Authentication, SSO, and `ridhuan-sso` (`file:../sdk/sso-client`)."""
+    """Enforce Special Rule: Authentication, SSO, and `your-org-sso` (`file:../sdk/sso-client`)."""
     errors: list[str] = []
     codes: list[str] = []
 
@@ -140,7 +140,7 @@ def verify_auth_sdk_policy(spec: dict[str, Any]) -> dict[str, Any]:
     user_approval = strict_bool(spec.get("user_approval_granted", False), "user_approval_granted")
     trusts_fe_username = strict_bool(spec.get("trusts_frontend_username_without_verified_claims", False), "trusts_frontend_username_without_verified_claims")
     verified_claims = strict_bool(spec.get("verified_authenticated_claims", False), "verified_authenticated_claims")
-    is_local_sso = ("sso-client" in sdk_source) or ("ridhuan-sso" in str(spec.get("sdk_name") or ""))
+    is_local_sso = ("sso-client" in sdk_source) or ("your-org-sso" in str(spec.get("sdk_name") or ""))
 
     publisher_verified = strict_bool(spec.get("publisher_ownership_verified", False), "publisher_ownership_verified")
     if is_local_sso and target_source and target_source != sdk_source:
@@ -202,7 +202,7 @@ def run_self_test() -> dict[str, Any]:
         "task_class": "sdk_integration",
         "publisher_verified": False,
         "repository_verified": False,
-        "decision_record": _base_valid_record(technology="ridhuan-sso-helper", trust_status="Unverified", decision="Install", version="1.0.0"),
+        "decision_record": _base_valid_record(technology="your-org-sso-helper", trust_status="Unverified", decision="Install", version="1.0.0"),
     })
     probes.append({"probe": "OF-NEG-02: Unverified registry dependency blocked", "passed": r2["status"] == "BLOCKED" and "BLOCKED_UNVERIFIED_DEPENDENCY" in r2["codes"], "codes": r2["codes"]})
 
@@ -233,20 +233,20 @@ def run_self_test() -> dict[str, Any]:
     })
     probes.append({"probe": "OF-NEG-05: Unjustified custom rebuild when SDK exists blocked", "passed": r5["status"] == "BLOCKED" and "BLOCKED_UNJUSTIFIED_CUSTOM_REBUILD" in r5["codes"], "codes": r5["codes"]})
 
-    # OF-NEG-06: Replacing `file:../sdk/sso-client` (`ridhuan-sso`) with unverified npm lookalike without approval
+    # OF-NEG-06: Replacing `file:../sdk/sso-client` (`your-org-sso`) with unverified npm lookalike without approval
     r6 = verify_auth_sdk_policy({
-        "sdk_name": "ridhuan-sso",
+        "sdk_name": "your-org-sso",
         "existing_sdk_source": "file:../sdk/sso-client",
-        "proposed_source": "npm:ridhuan-sso@1.0.2",
+        "proposed_source": "npm:your-org-sso@1.0.2",
         "publisher_ownership_verified": False,
         "user_approval_granted": False,
         "verified_authenticated_claims": True,
     })
-    probes.append({"probe": "OF-NEG-06: Replacing `ridhuan-sso` with unverified npm package blocked", "passed": r6["status"] == "BLOCKED" and "BLOCKED_UNVERIFIED_NPM_LOOKALIKE_SUBSTITUTION" in r6["codes"], "codes": r6["codes"]})
+    probes.append({"probe": "OF-NEG-06: Replacing `your-org-sso` with unverified npm package blocked", "passed": r6["status"] == "BLOCKED" and "BLOCKED_UNVERIFIED_NPM_LOOKALIKE_SUBSTITUTION" in r6["codes"], "codes": r6["codes"]})
 
     # OF-NEG-07: Trusting frontend-supplied username as auth proof without verified claims
     r7 = verify_auth_sdk_policy({
-        "sdk_name": "ridhuan-sso",
+        "sdk_name": "your-org-sso",
         "existing_sdk_source": "file:../sdk/sso-client",
         "trusts_frontend_username_without_verified_claims": True,
         "verified_authenticated_claims": False,
@@ -280,16 +280,16 @@ def run_self_test() -> dict[str, Any]:
     })
     probes.append({"probe": "OF-POS-02: Verified mature dependency install passes", "passed": p2["valid"]})
 
-    # OF-POS-03: Preserving local `ridhuan-sso` (`file:../sdk/sso-client`) with verified claims passes
+    # OF-POS-03: Preserving local `your-org-sso` (`file:../sdk/sso-client`) with verified claims passes
     p3 = verify_auth_sdk_policy({
-        "sdk_name": "ridhuan-sso",
+        "sdk_name": "your-org-sso",
         "existing_sdk_source": "file:../sdk/sso-client",
         "proposed_source": "file:../sdk/sso-client",
         "creates_custom_login_replacement": False,
         "trusts_frontend_username_without_verified_claims": False,
         "verified_authenticated_claims": True,
     })
-    probes.append({"probe": "OF-POS-03: Preserving local `ridhuan-sso` SDK with verified claims passes", "passed": p3["valid"]})
+    probes.append({"probe": "OF-POS-03: Preserving local `your-org-sso` SDK with verified claims passes", "passed": p3["valid"]})
 
     # OF-POS-04: Small custom implementation when official option unsuitable & rationale documented passes
     p4 = verify_decision_record({

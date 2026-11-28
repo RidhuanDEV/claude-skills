@@ -1549,7 +1549,7 @@ def route_prompt(
                 matched_ordered.append(rsk)
                 matched_risk.append(rsk)
 
-    if not is_trivial and not artifact_audit_owners and re.search(r"\b(?:ridhuan-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
+    if not is_trivial and not artifact_audit_owners and re.search(r"\b(?:your-org-sso|sso-client|SSO\s+SDK)\b", stripped, re.IGNORECASE):
         if "shadow-auth" in known_skills and primary_skill != "shadow-auth":
             if "shadow-auth" in matched_ordered:
                 matched_ordered.remove("shadow-auth")
@@ -1586,7 +1586,7 @@ def route_prompt(
     is_official_first_task = bool(
         re.search(
             r"\b(?:scaffold|new\s+project|from\s+scratch|from\s+zero|buat\s+proyek\s+baru|create-next-app|create\s+vite|"
-            r"npm\s+install|add\s+package|tambah\s+library|dependency|ridhuan-sso|sso-client|file:\.\./sdk|SSO\s+SDK)\b",
+            r"npm\s+install|add\s+package|tambah\s+library|dependency|your-org-sso|sso-client|file:\.\./sdk|SSO\s+SDK)\b",
             stripped,
             re.IGNORECASE,
         )
@@ -2024,8 +2024,8 @@ def run_self_test() -> dict[str, Any]:
         ("Bootstrap plain request", "Bootstrap a new project for an offline CLI.", ["shadow-bootstrap"], ["shadow-perf"], "shadow-bootstrap"),
         ("Bootstrap CSS existing project", "Adjust Bootstrap CSS spacing in existing project.", [], ["shadow-bootstrap"], None),
         (
-            "OFFICIAL-2: ridhuan-sso SDK integration loads shadow-auth + OFFICIAL-FIRST-DEPENDENCY-POLICY.md",
-            "Integrate existing ridhuan-sso (file:../sdk/sso-client) SDK into our backend app.",
+            "OFFICIAL-2: your-org-sso SDK integration loads shadow-auth + OFFICIAL-FIRST-DEPENDENCY-POLICY.md",
+            "Integrate existing your-org-sso (file:../sdk/sso-client) SDK into our backend app.",
             ["shadow-auth"],
             ["shadow-perf"],
             "shadow-auth",

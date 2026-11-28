@@ -373,7 +373,7 @@ Setiap sel mewarisi sumber pada unit yang sama. S menunjuk berkas otoritatif; A 
 
 **Owner:** Product designer dan design engineer. **Target L4:** Context Awareness, Integration, Adaptability.
 
-**A.** Blok Foreign-Key Reference Routing menggunakan tautan `file:///d:/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain. [S · shadow-design/SKILL.md](../shadow-design/SKILL.md) · [A · audit dan reproduksi](skill-review-core.md).
+**A.** Blok Foreign-Key Reference Routing menggunakan tautan `<repo>/...` ke checkout penulis. Pemilihan topik bisa benar namun rujukannya gagal dibuka dari instalasi lain. [S · shadow-design/SKILL.md](../shadow-design/SKILL.md) · [A · audit dan reproduksi](skill-review-core.md).
 
 <a id="e-shadow-discovery"></a>
 

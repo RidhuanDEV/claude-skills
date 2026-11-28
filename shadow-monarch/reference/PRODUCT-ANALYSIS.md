@@ -15,8 +15,8 @@ Use when translating business goals or user needs into requirements, PRDs, BRDs,
 ## 2. Discovery, Assumption Mapping & Pre-Mortem (PM / BA)
 
 > **Foreign-Key Deep References**:
-> - **PM Discovery, Strategy, Execution & GTM (124 `T1` files)**: [`shadow-design/references/external-upstreams/pm-skills/README.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/external-upstreams/pm-skills/README.md)
-> - **Evidence & Story-to-Flow Traceability**: [`shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md) & [`10-handoff-and-measurement.md`](file:///D:/Ridhuan%20Ngoding%20Moment/SKILL/shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md)
+> - **PM Discovery, Strategy, Execution & GTM (124 `T1` files)**: [`shadow-design/references/external-upstreams/pm-skills/README.md`](../../shadow-design/references/external-upstreams/pm-skills/README.md)
+> - **Evidence & Story-to-Flow Traceability**: [`shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md`](../../shadow-design/references/ai-product-designer-skill-pack/01-discovery-and-evidence.md) & [`10-handoff-and-measurement.md`](../../shadow-design/references/ai-product-designer-skill-pack/10-handoff-and-measurement.md)
 
 - **Evidence Tagging**: Label every product/UX statement as `[EVIDENCE]` (citing repo code, analytics, tickets, or dated user studies), `[ASSUMPTION]` (with risk & validation plan), `[PROPOSAL]`, or `[NEEDS VALIDATION]`. Never invent user interviews or personas.
 - **Objective & KPIs**: state the business goal, target user personas, success metrics (HEART / Goal-Signal-Metric leading & lagging indicators), and explicit **Non-Goals (Out of Scope)** to prevent scope creep.

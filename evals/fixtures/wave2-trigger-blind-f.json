@@ -905,7 +905,7 @@
  {
   "id": "shadow-auth-f-id-03",
   "language": "id",
-  "prompt": "Aplikasi baru harus tetap pakai SDK ridhuan-sso yang lama, tapi tim mau tambah login Google. Gimana biar dua-duanya jalan bareng?",
+  "prompt": "Aplikasi baru harus tetap pakai SDK your-org-sso yang lama, tapi tim mau tambah login Google. Gimana biar dua-duanya jalan bareng?",
   "expected_primary": "shadow-auth",
   "rationale": "Login, sessions, tokens, RBAC and tenant authorization."
  },

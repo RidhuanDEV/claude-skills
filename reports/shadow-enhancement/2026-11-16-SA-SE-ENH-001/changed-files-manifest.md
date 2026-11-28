@@ -1,6 +1,6 @@
 # Phase 5 — Changed Files Manifest (`SA-SE-ENH-001`)
 
-Verified against `git status -sb` and `git diff --stat` on `D:\Ridhuan Ngoding Moment\SKILL` (base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`).
+Verified against `git status -sb` and `git diff --stat` on `<repo>` (base SHA `185c42a2fa8e520293b3819a56b681fd60b9fe18`).
 
 ## 1. Modified Tracked Files (`29` Files)
 - **Orchestrator & Global Rules (`3`):**

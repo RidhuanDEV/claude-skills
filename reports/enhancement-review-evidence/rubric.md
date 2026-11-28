@@ -1,6 +1,6 @@
 # Grading rubric (read-only review; do NOT edit any repo file)
 
-Repo root: D:\Ridhuan Ngoding Moment\SKILL. Each skill = <dir>/SKILL.md + references/ + scripts/ + tests/ + evaluations.md.
+Repo root: <repo>. Each skill = <dir>/SKILL.md + references/ + scripts/ + tests/ + evaluations.md.
 Question being answered: "If an AI agent loads this skill, will it ACT and KNOW like a senior professional expert engineer in this domain?"
 
 Score each skill 1-4 on 8 dimensions (1=BAD, 2=MEDIUM, 3=GOOD, 4=PERFECT):

@@ -100,25 +100,7 @@ loads `CORE` + `DEBUGGING` + `BACKEND` + `DEVOPS` + `lang-TYPESCRIPT-NODE`, and 
 
 ## Install
 
-### Codex (Windows, all projects)
-
-From this folder run:
-
-```powershell
-./install-codex.ps1
-```
-
-This creates a directory junction at `%USERPROFILE%\.agents\skills\shadow-monarch` pointing to
-the local `shadow-monarch` folder. Edits here become available through the installed link.
-It preserves any conflicting installation and does not modify global `AGENTS.md` or `config.toml`.
-Running it again with the same source is safe and makes no duplicate installation.
-
-Invoke with `$shadow-monarch`, for example:
-`Use $shadow-monarch to fix this endpoint using verified backend contracts and strict types.`
-Automatic selection remains enabled. If the skill does not appear, restart Codex.
-The user skill directory and link discovery follow the [official skills documentation](https://learn.chatgpt.com/docs/build-skills).
-
-### Claude Code (all projects on your machine)
+### Claude Code, Codex, Gemini CLI and Antigravity (one command)
 
 **Windows (PowerShell)**
 ```powershell
@@ -135,11 +117,24 @@ cd claude-skills
 ```
 
 The script:
-1. copies `shadow-monarch/` to `~/.claude/skills/shadow-monarch/` (replacing an older copy), and
-2. adds the contents of `GLOBAL.md` to `~/.claude/CLAUDE.md` between marker comments, backing up any existing file first.
-   Running it again updates that block instead of duplicating it.
+1. copies every skill folder (all `*/SKILL.md`, currently 59) to each agent's user skill directory, replacing older copies:
+   `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/skills` and `~/.gemini/config/skills`;
+2. adds `shadow-monarch/GLOBAL.md` between marker comments to `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` and
+   `~/.gemini/GEMINI.md`, backing up each existing file first. Running it again updates the block instead of duplicating it.
 
-Manual alternative: copy the folder yourself and paste `GLOBAL.md` into `~/.claude/CLAUDE.md`.
+Both scripts honour `CLAUDE_CONFIG_DIR` and `CODEX_HOME` when you keep those folders somewhere else. Nothing in the repo
+assumes a particular drive, user name or checkout location.
+
+### Codex with live links (Windows, optional)
+
+```powershell
+./install-codex.ps1                                   # links into %USERPROFILE%\.agents\skills
+./install-codex.ps1 -SkillsDirectory <your-skills-dir>
+```
+
+This creates one directory junction per skill pointing at this checkout, so edits here are live without reinstalling.
+It preserves conflicting installations, does not touch `AGENTS.md` or `config.toml`, and is safe to re-run.
+Invoke with `$shadow-monarch`; if a skill does not appear, restart Codex.
 
 ### Claude apps (claude.ai / desktop / mobile)
 
@@ -158,9 +153,27 @@ plus how to compare with the skill turned off.
 
 ## Updating
 
-The Codex junction reads this folder directly; re-run `install-codex.ps1` if you move the source folder.
+Codex junctions read this folder directly; re-run `install-codex.ps1` if you move the checkout.
 After pulling a new version: re-run the install script (Claude Code) and re-upload the zip (Claude apps; the uploaded
 copy does not update itself). If `GLOBAL.md` changed, paste it into your profile preferences again.
+
+## Configure for your environment
+
+These are opt-in and live in your own settings, never in this repo:
+
+- **Safety hook (Claude Code).** `shadow-monarch/hooks/shadow_guard.py` asks before git publishing or destructive
+  commands, recursive deletes, global installs and infra destroys, and blocks piping a downloaded script into a shell.
+  Copy the `hooks` block from [docs/claude-code-hooks.example.json](docs/claude-code-hooks.example.json) into
+  `~/.claude/settings.json`. It points at `$HOME/.claude/skills/...`; change the path if you run it from a checkout.
+  Then open `/hooks` once or restart Claude Code.
+- **Skill listing budget.** With 59 skills, Claude Code's default listing budget shows most descriptions as name-only.
+  Setting `"skillListingBudgetFraction": 0.02` in `~/.claude/settings.json` lists them all
+  (see [docs/claude-code-wave2.settings.json](docs/claude-code-wave2.settings.json)).
+- **Your SSO SDK.** The auth and dependency rules use `your-org-sso` (`file:../sdk/sso-client`) as the example of an
+  internal SDK that must never be swapped for a public look-alike package. Replace it with your own SDK name in
+  `shadow-monarch/GLOBAL.md` if you want the rule to name it.
+- **MCP servers.** `mcp-servers/` holds the optional `shadow-api`, `shadow-db` and `shadow-handoff` servers. Register
+  them in your agent's MCP configuration with the path to your own checkout.
 
 ## Customize
 
@@ -186,4 +199,4 @@ The Shadow Army suite integrates and respects the work of open-source authors:
 
 ## License
 
-MIT for original Shadow Army content: copy, fork and adapt freely. Vendored third-party files keep their own licenses and are not covered by the MIT grant. In particular, the OWASP cheat sheets in `shadow-ops/references/vendor` are CC BY-SA 4.0, and the `shadow-design` `ai-product-designer-skill-pack` is internal use only until its license is confirmed. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+MIT for original Shadow Army content: copy, fork and adapt freely. Vendored third-party files keep their own licenses and are not covered by the MIT grant. In particular, the OWASP cheat sheets in `shadow-ops/references/vendor` are CC BY-SA 4.0. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

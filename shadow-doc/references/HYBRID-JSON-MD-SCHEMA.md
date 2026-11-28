@@ -94,7 +94,7 @@ Adapted from `D:\Pekerjaan-Sistem-Analis\Laporan\Laporan-Generator` and upgraded
 Legacy v1.0 files (`jenis`, `judul`, `bagian`) remain 100% supported by `doc_scaffold.py check-readiness` and can be migrated to v2.0 at any time using:
 
 ```powershell
-python "d:\Ridhuan Ngoding Moment\SKILL\shadow-doc\scripts\doc_scaffold.py" migrate-v1 --in legacy.json --project-id PRJ-2026 --doc-id DOC-001 --out migrated_v2.json
+python "<repo>\shadow-doc\scripts\doc_scaffold.py" migrate-v1 --in legacy.json --project-id PRJ-2026 --doc-id DOC-001 --out migrated_v2.json
 ```
 
 (Automatically creates `legacy.v1.bak.json` and preserves the original `bagian` array under `legacy_v1_bagian`).

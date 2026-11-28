@@ -1,7 +1,7 @@
 # SA-DOC-ENGINE-001 — Generator Inventory (`G0`)
 
 Generated: 2026-11-17  
-Scope: `d:\Ridhuan Ngoding Moment\SKILL`
+Scope: `<repo>`
 
 ## 1. Existing Document Generation Infrastructure in Repository
 

@@ -8,7 +8,7 @@
 
 | Concern / Request Domain | Accountable Primary Owner | Consult / Delegate (`Supporting` / `Risk`) | Explicit Anti-Overlap Boundary |
 | :--- | :--- | :--- | :--- |
-| **SSO / AuthN / AuthZ / Multi-Tenant Isolation** | `shadow-auth` | `shadow-sec`, `shadow-api`, `shadow-privacy` | Security audit (`shadow-sec`) never replaces auth implementation ownership (`shadow-auth`); preserve existing local SSO SDKs (`ridhuan-sso`). |
+| **SSO / AuthN / AuthZ / Multi-Tenant Isolation** | `shadow-auth` | `shadow-sec`, `shadow-api`, `shadow-privacy` | Security audit (`shadow-sec`) never replaces auth implementation ownership (`shadow-auth`); preserve existing local SSO SDKs (`your-org-sso`). |
 | **API Contracts, Transports, OpenAPI & Uploads** | `shadow-api` | `shadow-auth`, `shadow-compat`, `shadow-test` | Never redesign core business domain invariants without `shadow-domain`; never manually edit generated specs. |
 | **Cross-Cutting AppSec, STRIDE, Headers & SSRF** | `shadow-sec` | `shadow-auth`, `shadow-supplychain`, `shadow-privacy` | Audits shared trust boundaries & SAST controls; delegates auth implementation to `shadow-auth`, SBOM/SLSA to `shadow-supplychain`, UU PDP to `shadow-privacy`. |
 | **UU PDP (UU No. 27/2022), GDPR, DPIA & DSAR** | `shadow-privacy` | `shadow-data`, `shadow-analytics`, `shadow-sec` | Owns lawful basis, retention, DSAR receipts & 72h breach governance; escalate legal interpretation to qualified counsel. |

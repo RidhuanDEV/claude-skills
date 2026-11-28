@@ -23,7 +23,7 @@ import re
 import shlex
 import sys
 
-SEGMENT_SPLIT = re.compile(r"\s*(?:&&|\|\||;|\|)\s*")
+SEGMENT_SPLIT = re.compile(r"\s*(?:&&|\|\||;|\||\r?\n)\s*")
 GIT_ASK = {
     "push": "publishes commits", "commit": "creates a commit", "merge": "merges branches",
     "rebase": "rewrites history", "cherry-pick": "rewrites history", "am": "applies patches as commits",
@@ -36,6 +36,43 @@ BLANKET_KILL = re.compile(
     r"\bkillall\s+(?:node|python|java)\b|\bStop-Process\b.*-Name\s+(?:node|python|java)\b",
     re.IGNORECASE,
 )
+
+
+HEREDOC_START = re.compile(r"<<(-?)\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
+SHELL_HEADS = {"bash", "sh", "zsh", "dash", "ksh", "fish", "pwsh", "powershell", "cmd", "source", "."}
+
+
+def _strip_data_heredocs(command: str) -> str:
+    """Drop heredoc bodies that are data (file text, interpreter source), keep bodies fed to a shell.
+
+    `cat > README.md <<'EOF' ... EOF` may quote `curl ... | sh` as documentation; that text never runs
+    as a command. A body fed to `bash`/`sh`/`pwsh` does run, so it stays visible to the checks.
+    """
+    lines = command.split("\n")
+    kept: list[str] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        kept.append(line)
+        index += 1
+        match = HEREDOC_START.search(line)
+        if not match:
+            continue
+        before = line[: match.start()]
+        segment = SEGMENT_SPLIT.split(before)[-1].strip()
+        words = _words(segment)
+        head = words[0].rsplit("/", 1)[-1].rsplit("\\", 1)[-1].lower().removesuffix(".exe") if words else ""
+        feeds_shell = head in SHELL_HEADS
+        strip_tabs, delimiter = match[1] == "-", match[3]
+        while index < len(lines):
+            body = lines[index]
+            index += 1
+            if (body.lstrip("\t") if strip_tabs else body) == delimiter:
+                kept.append(body)
+                break
+            if feeds_shell:
+                kept.append(body)
+    return "\n".join(kept)
 
 
 def _words(segment: str) -> list[str]:
@@ -114,6 +151,7 @@ def decide(payload: object) -> dict[str, object] | None:
     command = tool_input.get("command") if isinstance(tool_input, dict) else None
     if not isinstance(command, str) or not command.strip():
         return None
+    command = _strip_data_heredocs(command)
     if REMOTE_PIPE.search(command) or ROOT_DELETE.search(command):
         return _output("deny", "Shadow guard: piping a downloaded script into a shell, or deleting the root/home directory, is never allowed.")
     if BLANKET_KILL.search(command):

@@ -905,7 +905,7 @@
  {
   "id": "shadow-auth-m-id-03",
   "language": "id",
-  "prompt": "Hubungkan login dashboard cold-chain ke SDK ridhuan-sso yang sudah ada tanpa menggantinya, plus cookie session dan proteksi CSRF.",
+  "prompt": "Hubungkan login dashboard cold-chain ke SDK your-org-sso yang sudah ada tanpa menggantinya, plus cookie session dan proteksi CSRF.",
   "expected_primary": "shadow-auth",
   "rationale": "Primary task: login, MFA, OAuth, sessions, RBAC, tenant isolation."
  },
